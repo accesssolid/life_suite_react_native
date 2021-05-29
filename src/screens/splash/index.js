@@ -20,7 +20,7 @@ const Splash = (props) => {
 
     const checkAuth = () => {
         setTimeout(() => {
-            // props.navigation.navigate('NonAuth') 
+            props.navigation.navigate('OrderHistory') 
         }, 2000);
     }
 

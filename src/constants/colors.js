@@ -3,6 +3,7 @@ const LS_COLORS = {
         white: "#ffffff",
         black: "#000000",        
         transparent: "transparent",
+        cyan: '#ACF0F2'
     },
 }
 

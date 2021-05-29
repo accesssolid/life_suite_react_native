@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux';
 
 /* Screens */
 import Splash from '../screens/splash';
+import OrderHistory from '../screens/nonAuth/orderHistory';
 
 const Stack = createStackNavigator();
 
@@ -26,7 +27,8 @@ const Router = () => {
     <>
       <NavigationContainer>
         <Stack.Navigator headerMode={'none'}>
-          <Stack.Screen name="Splash" component={Splash} />          
+          <Stack.Screen name="Splash" component={Splash} />
+          <Stack.Screen name="OrderHistory" component={OrderHistory} />     
         </Stack.Navigator>
       </NavigationContainer>
       {loading && <Loader />}
