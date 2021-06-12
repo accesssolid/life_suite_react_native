@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text } from 'react-native'
+import { View, StyleSheet, Text, Image, Touchable, TouchableOpacity } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -13,15 +13,29 @@ const Header = (props) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.leftView}>
-
-            </View>
-            <View style={styles.middleView}>
-                <Text style={styles.title}>{props.title}</Text>
-            </View>
-            <View style={styles.rightView}>
-
-            </View>
+            <TouchableOpacity style={styles.leftView}
+                onPress={props.action}
+                activeOpacity={0.7}
+            >
+                <Image
+                    style={{ height: 20, width: 20, resizeMode: 'contain' }}
+                    source={require("../assets/back.png")}
+                />
+            </TouchableOpacity>
+          
+                <View style={styles.middleView}>
+                    <Text style={styles.title}>{props.title}</Text>
+                </View>
+            
+            <TouchableOpacity style={styles.rightView}
+                onPress={props.action1}
+                activeOpacity={0.7}
+            >
+                <Image
+                    style={{ height: 20, width: 20, resizeMode: 'contain' }}
+                    source={require("../assets/home.png")}
+                />
+            </TouchableOpacity>
         </View>
     )
 }
@@ -31,28 +45,24 @@ export default Header;
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        paddingVertical:11,
-        paddingHorizontal:20
+        paddingVertical: 15,
+        justifyContent: 'space-between',
     },
     leftView: {
-        flex: 0.5,
-        alignItems: 'flex-start',
-        justifyContent: 'center'
+        left: 20,
+        alignItems: 'center'
     },
     middleView: {
-        flex: 1,
         alignItems: 'center',
-        justifyContent: 'center'
     },
     rightView: {
-        flex: 0.5,
+        right: 20,
         alignItems: 'center',
-        justifyContent: 'flex-end'
     },
     title: {
         fontFamily: LS_FONTS.PoppinsMedium,
         color: LS_COLORS.global.black,
         fontSize: 16,
-        textTransform:'uppercase'
+        textTransform: 'uppercase'
     }
 })

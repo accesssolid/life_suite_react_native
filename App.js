@@ -17,7 +17,7 @@ import Router from './src/router';
 const App = () => {
   return (
     <StoreProvider store={store}>
-      <StatusBar backgroundColor={LS_COLORS.global.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={LS_COLORS.global.cyan} barStyle="dark-content" />
       <SafeAreaProvider>
         <Router />
       </SafeAreaProvider>
