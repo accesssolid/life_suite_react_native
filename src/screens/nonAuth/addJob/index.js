@@ -23,7 +23,7 @@ const addJob = (props) => {
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
-                            props.navigation.navigate("Profile");
+                            props.navigation.navigate("ServiceProfile");
                         }}
                     >
                         <Image
@@ -43,23 +43,28 @@ const addJob = (props) => {
                         />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={{ flexDirection: 'row' ,marginTop:30,width:'30%'}}>
+                <TouchableOpacity style={{ flexDirection: 'row', marginTop: 30, width: '30%' }}
+                    activeOpacity={0.7}
+                    onPress={() => {
+                        props.navigation.navigate("Calendar")
+                    }}
+                >
                     <Image
                         style={styles.plusImage}
                         source={require("../../../assets/addgreen.png")}
                     />
-                    <Text style = {{alignSelf:'center',marginLeft:10,fontSize:18,fontFamily:LS_FONTS.PoppinsMedium}}>Add Job</Text>
+                    <Text style={{ alignSelf: 'center', marginLeft: 10, fontSize: 18, fontFamily: LS_FONTS.PoppinsMedium }}>Add Job</Text>
                 </TouchableOpacity>
-                <View style = {{flexDirection:'row',justifyContent:'space-between'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <MediumCards
-                    title1 = "HOME"
-                    title2 = "SERVICES"
-                    imageUrl={require("../../../assets/handyMan.png")}
-                    action={() => {
-                        props.navigation.navigate("HomeServices");
-                    }}
+                        title1="HOME"
+                        title2="SERVICES"
+                        imageUrl={require("../../../assets/handyMan.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServices");
+                        }}
                     />
-                   
+
                 </View>
 
                 <View style={styles.orderContainer}>
@@ -123,7 +128,7 @@ const styles = StyleSheet.create({
         fontFamily: LS_FONTS.PoppinsMedium,
         color: LS_COLORS.global.white
     },
-    plusImage:{
+    plusImage: {
         resizeMode: 'contain',
         width: 25,
         height: 25,

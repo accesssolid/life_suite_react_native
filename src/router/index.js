@@ -28,6 +28,9 @@ import Events from '../screens/nonAuth/events';
 import PersonalCare from '../screens/nonAuth/personalCare';
 import Profile from '../screens/nonAuth/profile';
 import AddJob from '../screens/nonAuth/addJob';
+import MechanicServices from '../screens/nonAuth/mechanicServices';
+import ServiceProfile from '../screens/nonAuth/serviceProfile';
+import Calendar from '../screens/nonAuth/calendar';
 
 const Stack = createStackNavigator();
 
@@ -49,7 +52,10 @@ const Router = () => {
           <Stack.Screen name="Automative" component={Automative} />  
           <Stack.Screen name="Events" component={Events} />  
           <Stack.Screen name="PersonalCare" component={PersonalCare} />  
-          <Stack.Screen name="Profile" component={Profile} />  
+          <Stack.Screen name="Profile" component={Profile} /> 
+          <Stack.Screen name="ServiceProfile" component={ServiceProfile} />   
+          <Stack.Screen name="MechanicServices" component={MechanicServices} /> 
+          <Stack.Screen name="Calendar" component={Calendar} />   
         </Stack.Navigator>
       </NavigationContainer>
       {loading && <Loader />}

@@ -13,61 +13,55 @@ import { Container, Content } from "native-base";
 /* Components */
 import Header from '../../../components/header';
 import CustomInput from "../../../components/textInput"
-import CustomButton from "../../../components/customButton"
 
-const Profile = (props) => {
+const ServiceProfile = (props) => {
     const dispatch = useDispatch()
     const [lastName, setLastName] = useState("")
-    console.log(lastName)
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [no, setNo] = useState("")
+    const [pass, setPass] = useState("")
     const [add, setAdd] = useState(true)
-    const [edit, setEdit] = useState(true)
     const [add1, setAdd1] = useState("")
     const [add2, setAdd2] = useState("")
-    const [add3, setAdd3] = useState("")
-    const [add4, setAdd4] = useState("")
-    const [number, setNumber] = useState("")
-    const [holderName, setHolderName] = useState("")
-
+    const [noti, setNoti] = useState("")
+    const [bank, setBank] = useState("")
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
 
             <Header
-                // title="MY INFORMATION"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.pop()
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
-                    props.navigation.navigate("HomeScreen")
+                    props.navigation.navigate("AddJob")
                 }}
             />
-             <TouchableOpacity
-                    style={{alignSelf: 'center', position: 'absolute',zIndex:100,top: Platform.OS === 'ios' ? "6%" : "1%" }}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                    }}>
-                    <Image
-                        style={{ height: 116, width: 116, resizeMode: 'contain' }}
-                        source={require("../../../assets/andrea.png")}
-                    />
-                </TouchableOpacity>
+            <TouchableOpacity
+                style={{ alignSelf: 'center', position: 'absolute', zIndex: 100,top: Platform.OS === 'ios' ? "6%" : "1%"}}
+                activeOpacity={0.7}
+                onPress={() => {
+                }}>
+                <Image
+                    style={{ height: 116, width: 116, resizeMode: 'contain' }}
+                    source={require("../../../assets/man.png")}
+                />
+            </TouchableOpacity>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 bounces={false}
                 style={styles.container}>
-               
-                <View style = {{top:'6%'}}>
+
+                <View style={{ top: '6%' }}>
 
                     <View style={{}}>
                         <Text style={styles.text}>MY INFORMATION</Text>
-                        <Text style={styles.text1}>Sarah</Text>
+                        <Text style={styles.text1}>Alexi</Text>
                         <Text style={styles.text2}>Profile ID : 54692</Text>
                     </View>
 
@@ -101,6 +95,13 @@ const Profile = (props) => {
                                 setNo(text)
                             }}
                         />
+                        <CustomInput
+                            text="Password"
+                            value={pass}
+                            onChangeText={(text) => {
+                                setPass(text)
+                            }}
+                        />
                         <TouchableOpacity
                             onPress={() => {
                                 setAdd(!add)
@@ -111,7 +112,7 @@ const Profile = (props) => {
                                     style={{ height: 24, width: 24, resizeMode: "contain" }}
                                     source={require("../../../assets/plus.png")}
                                 />
-                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS</Text>
+                                <Text style={{ ...styles.text2, marginLeft: 10, }}>PERMANENT ADDRESS</Text>
                             </View> :
                                 <>
                                     <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
@@ -119,7 +120,7 @@ const Profile = (props) => {
                                             style={{ height: 24, width: 24, resizeMode: "contain" }}
                                             source={require("../../../assets/minus.png")}
                                         />
-                                        <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS</Text>
+                                        <Text style={{ ...styles.text2, marginLeft: 10, }}>PERMANENT ADDRESS</Text>
                                     </View>
                                     <View style={{}}>
                                         <CustomInput
@@ -152,101 +153,30 @@ const Profile = (props) => {
 
                             }
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={{ marginTop: 10 }}
-                            onPress={() => {
-                                setEdit(!edit)
-                            }}
-                        >
-                            {edit ? <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
-                                <Image
-                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                    source={require("../../../assets/plus.png")}
-                                />
-                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS</Text>
-                            </View> :
-                                <>
-                                    <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
-                                        <Image
-                                            style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                            source={require("../../../assets/minus.png")}
-                                        />
-                                        <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS</Text>
-                                    </View>
 
-                                    <CustomInput
-                                        text="ADDRESS LINE 1"
-                                        value={add3}
-                                        onChangeText={(text) => {
-                                            setAdd3(text)
-                                        }}
-                                    />
-                                    <CustomInput
-                                        text="ADDRESS LINE 2"
-                                        value={add4}
-                                        onChangeText={(text) => {
-                                            setAdd4(text)
-                                        }}
-                                    />
-                                    <TouchableOpacity
-                                        style={styles.save}
-                                        activeOpacity={0.7}
-                                        onPress={() => {
-                                            setEdit(!edit)
-                                        }}
-                                    >
-                                        <Text style={styles.saveText}>
-                                            Save
-                                         </Text>
-                                    </TouchableOpacity>
-                                </>
-
-                            }
-                        </TouchableOpacity>
                         <View style={{}}>
                             <CustomInput
+                                text="Bank Information"
+                                value={bank}
+                                onChangeText={(text) => {
+                                    setBank(text)
+                                }}
+                            />
+                            <CustomInput
                                 text="Type of Notification"
-                                value={add3}
+                                value={noti}
+                                onChangeText={(text) => {
+                                    setNoti(text)
+                                }}
                             />
                         </View>
                         <View style={{ height: 40 }}></View>
                     </View>
-                    <View style={{ ...styles.personalContainer, marginTop: 20 }}>
-                        <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION</Text>
-                        <CustomInput
-                            text="Credit Card Number"
-                            value={number}
-                            onChangeText={(text) => {
-                                setNumber(text)
-                            }}
-                        />
-                        <CustomInput
-                            text="Credit Card Holder Name"
-                            value={holderName}
-                            onChangeText={(text) => {
-                                setHolderName(text)
-                            }}
-                        />
-                        <View style={{ flexDirection: 'row' }}>
-                            <CustomInput
-                                text="Expiry Date"
-                                value={number}
-                                onChangeText={(text) => {
-                                    setNumber(text)
-                                }}
-                            />
-                            <CustomInput
-                                text="Credit Card Holder Name"
-                                value={holderName}
-                                onChangeText={(text) => {
-                                    setHolderName(text)
-                                }}
-                            />
-                        </View>
-                        <View style={{ height: 50 }}></View>
-                    </View>
+
+                    <View style={{ height: 50 }}></View>
+
                 </View>
-                <View style={{ height: 200}}></View>
+                <View style={{ height: 50 }}></View>
                 <TouchableOpacity
                     style={styles.save}
                     activeOpacity={0.7}
@@ -263,7 +193,7 @@ const Profile = (props) => {
     )
 }
 
-export default Profile;
+export default ServiceProfile;
 
 const styles = StyleSheet.create({
     container: {
@@ -291,8 +221,8 @@ const styles = StyleSheet.create({
     },
     personalContainer: {
         maxHeight: '100%',
-        top:"3%",
         width: "90%",
+        top: "5%",
         elevation: 200,
         shadowColor: '#00000029',
         backgroundColor: 'white',

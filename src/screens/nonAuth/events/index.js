@@ -19,10 +19,12 @@ const Events = (props) => {
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header 
             title="Events" 
-            action = {() => {
+            imageUrl = {require("../../../assets/back.png")}
+            action={() => {
                 props.navigation.pop()
             }}
-            action1 = {() => {
+            imageUrl1 = {require("../../../assets/home.png")}
+            action1={() => {
                 props.navigation.navigate("HomeScreen")
             }}
             />

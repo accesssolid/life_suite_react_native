@@ -19,7 +19,7 @@ const Header = (props) => {
             >
                 <Image
                     style={{ height: 20, width: 20, resizeMode: 'contain' }}
-                    source={require("../assets/back.png")}
+                    source= {props.imageUrl}
                 />
             </TouchableOpacity>
           
@@ -32,8 +32,8 @@ const Header = (props) => {
                 activeOpacity={0.7}
             >
                 <Image
-                    style={{ height: 20, width: 20, resizeMode: 'contain' }}
-                    source={require("../assets/home.png")}
+                    style={{ height: 25, width: 25, resizeMode: 'contain' }}
+                    source={props.imageUrl1}
                 />
             </TouchableOpacity>
         </View>
@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingVertical: 15,
         justifyContent: 'space-between',
+        zIndex: 500
     },
     leftView: {
         left: 20,

@@ -19,12 +19,14 @@ const HomeServices = (props) => {
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header 
             title="Home Services" 
-            action = {() => {
-                props.navigation.pop()
-            }}
-            action1 = {() => {
-                props.navigation.navigate("HomeScreen")
-            }}
+            imageUrl = {require("../../../assets/back.png")}
+                action={() => {
+                    props.navigation.pop()
+                }}
+                imageUrl1 = {require("../../../assets/home.png")}
+                action1={() => {
+                    props.navigation.navigate("HomeScreen")
+                }}
             />
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>

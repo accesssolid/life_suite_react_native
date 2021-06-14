@@ -17,20 +17,21 @@ const PersonalCare = (props) => {
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <Header 
-            title="PERSONAL CARE" 
-            image = {true}
-            action = {() => {
-                props.navigation.pop()
-            }}
-            action1 = {() => {
-                props.navigation.navigate("HomeScreen")
-            }}
+            <Header
+                title="PERSONAL CARE"
+                imageUrl={require("../../../assets/back.png")}
+                action={() => {
+                    props.navigation.pop()
+                }}
+                imageUrl1={require("../../../assets/home.png")}
+                action1={() => {
+                    props.navigation.navigate("HomeScreen")
+                }}
             />
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
 
-                <SmallCards
+                    <SmallCards
                         title1="LIFE COACH"
                         imageUrl={require("../../../assets/life.png")}
                     />
@@ -43,7 +44,7 @@ const PersonalCare = (props) => {
                         imageUrl={require("../../../assets/yoga.png")}
                     />
                 </View>
-                <View style={{ flexDirection: "row", justifyContent:'space-evenly',top:"5%"}}>
+                <View style={{ flexDirection: "row", justifyContent: 'space-evenly', top: "5%" }}>
                     <SmallCards
                         title1="NUTRITIONIST"
                         imageUrl={require("../../../assets/nutrition.png")}
@@ -53,8 +54,8 @@ const PersonalCare = (props) => {
                         imageUrl={require("../../../assets/trainer.png")}
                     />
                     <SmallCards
-                      title1 = "ACUPUNCTURIST"
-                      imageUrl={require("../../../assets/accu.png")}
+                        title1="ACUPUNCTURIST"
+                        imageUrl={require("../../../assets/accu.png")}
                     />
                 </View>
             </View>
