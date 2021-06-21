@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, Dimensions, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Image, Text, Dimensions, SafeAreaView, StatusBar, TouchableOpacity, Platform } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -8,9 +8,11 @@ import { globalStyles } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Content } from "native-base";
 import CalendarPicker from 'react-native-calendar-picker';
 import moment from "moment";
+import DropDown from '../../../components/dropDown';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
+import { Container, Content, Row, } from 'native-base'
 
 /* Components */
 import Header from '../../../components/header';
@@ -21,41 +23,39 @@ const Calendar = (props) => {
 
     const [selectedStartDate, setSelectedStartDate] = useState(null)
     const startDate = selectedStartDate ? selectedStartDate.toString() : '';
+    const [date,setDate] = useState(null)
     const onDateChange = (date) => {
+        setDate(date)
         var a = moment(date).format("DD MMM")
         setSelectedStartDate(a)
     }
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-
             <Header
                 title="Calendar"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.pop()
                 }}
-
             />
-
-
             <View
                 style={styles.container}>
                 <Text style={{ textAlign: 'center', marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 18 }}>Add Date</Text>
                 <View style={styles.calendar}>
                     <CalendarPicker
                         onDateChange={onDateChange}
-                        previousTitle = "<"
+                        previousTitle="<"
                         nextTitle=">"
                         scaleFactor={375}
                         weekdays={['S', 'M', 'T', 'W', 'T', 'F', 'S']}
-                        monthYearHeaderWrapperStyle = {{
-                            fontSize:18
+                        monthYearHeaderWrapperStyle={{
+                            fontSize: 18
                         }}
-                        selectedDayColor = {LS_COLORS.global.green}
-                        selectedDayTextColor = {LS_COLORS.global.white}
+                        selectedDayColor={LS_COLORS.global.green}
+                        selectedDayTextColor={LS_COLORS.global.white}
                         textStyle={{
                             fontFamily: LS_FONTS.PoppinsLight,
-                            }}
+                        }}
                     />
 
                     <View>
@@ -66,20 +66,19 @@ const Calendar = (props) => {
                             </View>
                             <Text style={{ alignSelf: 'center', fontSize: 14, fontFamily: LS_FONTS.PoppinsLight, marginLeft: 10 }}>Need a Mechanic</Text>
                         </View>
+                        <TouchableOpacity
+                            style={styles.save}
+                            onPress={() => {
+                                props.navigation.navigate("MechanicLocation",{ "date": date })
+                            }}
+                        >
+                            <Text style={styles.saveText}>Confirm</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
-                <TouchableOpacity
-                    style={styles.save}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                    }}
-                >
-                    <Text style={styles.saveText}>Confirm</Text>
-                </TouchableOpacity>
-                <View style={{ height: 30 }}></View>
             </View>
-
         </SafeAreaView>
+
     )
 }
 
@@ -91,7 +90,6 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.white,
     },
     calendar: {
-        flex: 1,
         backgroundColor: '#FFFFFF',
         top: '5%'
     },
@@ -103,6 +101,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
+        marginTop: 50
     },
     saveText: {
         textAlign: "center",

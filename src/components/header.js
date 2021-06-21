@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingVertical: 15,
         justifyContent: 'space-between',
-        zIndex: 500
+        zIndex: 500,
     },
     leftView: {
         left: 20,

@@ -34,6 +34,9 @@ const Automative = (props) => {
                     <SmallCards
                         title1="HANDYMAN"
                         imageUrl={require("../../../assets/handyMan.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServices")
+                        }}
                     />
                     <SmallCards
                         title1="GARDENER"

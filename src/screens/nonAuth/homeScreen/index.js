@@ -43,38 +43,38 @@ const HomeScreen = (props) => {
                         />
                     </TouchableOpacity>
                 </View>
-                <View style = {{flexDirection:'row',justifyContent:'space-between'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Cards
-                    title1 = "HOME"
-                    title2 = "SERVICES"
-                    imageUrl={require("../../../assets/room.png")}
-                    action={() => {
-                        props.navigation.navigate("HomeServices");
-                    }}
+                        title1="HOME"
+                        title2="SERVICES"
+                        imageUrl={require("../../../assets/room.png")}
+                        action={() => {
+                            props.navigation.navigate("HomeServices");
+                        }}
                     />
                     <Cards
-                    title1 = "AUTOMATIVE"
-                    imageUrl={require("../../../assets/room.png")}
-                    action={() => {
-                        props.navigation.navigate("Automative");
-                    }}
+                        title1="AUTOMATIVE"
+                        imageUrl={require("../../../assets/room.png")}
+                        action={() => {
+                            props.navigation.navigate("Automative");
+                        }}
                     />
                 </View>
-                <View style = {{flexDirection:'row',justifyContent:'space-between',top:'5%'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', top: '5%' }}>
                     <Cards
-                    title1 = "EVENTS"
-                    imageUrl={require("../../../assets/room.png")}
-                    action={() => {
-                        props.navigation.navigate("Events");
-                    }}
+                        title1="EVENTS"
+                        imageUrl={require("../../../assets/room.png")}
+                        action={() => {
+                            props.navigation.navigate("Events");
+                        }}
                     />
                     <Cards
-                    title1 = "PERSONAL"
-                    title2 = "CARE"
-                    imageUrl={require("../../../assets/room.png")}
-                    action={() => {
-                        props.navigation.navigate("PersonalCare");
-                    }}
+                        title1="PERSONAL"
+                        title2="CARE"
+                        imageUrl={require("../../../assets/room.png")}
+                        action={() => {
+                            props.navigation.navigate("PersonalCare");
+                        }}
                     />
                 </View>
 
@@ -82,12 +82,12 @@ const HomeScreen = (props) => {
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
-
+                            props.navigation.navigate("OrderHistory")
                         }}
                     >
                         <Text style={styles.order}>
                             ORDER
-                    </Text>
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </View>

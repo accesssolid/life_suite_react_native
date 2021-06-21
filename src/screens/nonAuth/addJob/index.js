@@ -46,7 +46,7 @@ const addJob = (props) => {
                 <TouchableOpacity style={{ flexDirection: 'row', marginTop: 30, width: '30%' }}
                     activeOpacity={0.7}
                     onPress={() => {
-                        props.navigation.navigate("Calendar")
+
                     }}
                 >
                     <Image
@@ -61,7 +61,7 @@ const addJob = (props) => {
                         title2="SERVICES"
                         imageUrl={require("../../../assets/handyMan.png")}
                         action={() => {
-                            props.navigation.navigate("MechanicServices");
+                           
                         }}
                     />
 

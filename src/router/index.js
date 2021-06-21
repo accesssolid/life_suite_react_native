@@ -31,6 +31,8 @@ import AddJob from '../screens/nonAuth/addJob';
 import MechanicServices from '../screens/nonAuth/mechanicServices';
 import ServiceProfile from '../screens/nonAuth/serviceProfile';
 import Calendar from '../screens/nonAuth/calendar';
+import MechanicLocation from '../screens/nonAuth/mechanicLocation';
+import OrderHistory from '../screens/nonAuth/orderHistory';
 
 const Stack = createStackNavigator();
 
@@ -56,6 +58,8 @@ const Router = () => {
           <Stack.Screen name="ServiceProfile" component={ServiceProfile} />   
           <Stack.Screen name="MechanicServices" component={MechanicServices} /> 
           <Stack.Screen name="Calendar" component={Calendar} />   
+          <Stack.Screen name="MechanicLocation" component={MechanicLocation} />  
+          <Stack.Screen name="OrderHistory" component={OrderHistory} />  
         </Stack.Navigator>
       </NavigationContainer>
       {loading && <Loader />}

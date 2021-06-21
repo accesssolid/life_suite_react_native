@@ -41,7 +41,7 @@ const ServiceProfile = (props) => {
                 }}
             />
             <TouchableOpacity
-                style={{ alignSelf: 'center', position: 'absolute', zIndex: 100,top: Platform.OS === 'ios' ? "6%" : "1%"}}
+                style={{ alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%" }}
                 activeOpacity={0.7}
                 onPress={() => {
                 }}>
