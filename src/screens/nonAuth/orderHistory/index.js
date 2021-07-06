@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 /* Components */
 import Header from '../../../components/header';
-import { Container, Content } from 'native-base';
+import { Card,Container, Content } from 'native-base';
 
 const OrderHistory = (props) => {
     const dispatch = useDispatch()
@@ -30,9 +30,12 @@ const OrderHistory = (props) => {
                 }}
             />
             <Container style={styles.container}>
-                <Content>
-                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
-                    <View style={{ height: 72, width: "100%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: "#DCFBBD" }}>
+                <Content
+                showsVerticalScrollIndicator = {false}
+                showsHorizontalScrollIndicator = {false}
+                >
+                    <Text style={{ fontSize: 16, marginTop:20,marginLeft:15,fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
+                    <View style={{ height: 72, width: "95%", marginTop: 3, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: "#DCFBBD" }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
                                 <Image
@@ -55,7 +58,7 @@ const OrderHistory = (props) => {
                             </View>
                         </View>
                     </View>
-                    <View style={styles.alexiContainer}>
+                    <Card style={styles.alexiContainer}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
                                 <Image
@@ -96,8 +99,8 @@ const OrderHistory = (props) => {
                             <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Time</Text>
                             <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>2.5 hrs</Text>
                         </View>
-                    </View>
-                    <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 40 }}>
+                    </Card>
+                    <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
                         <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
@@ -119,7 +122,7 @@ const OrderHistory = (props) => {
                             </Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{ height: 72, width: "100%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: "#FFFFB0" }}>
+                    <View style={{ height: 72, width: "95%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: "#FFFFB0" }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
                                 <Image
@@ -141,8 +144,8 @@ const OrderHistory = (props) => {
                             </View>
                         </View>
                     </View>
-                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 20 }}>HISTORY</Text>
-                    <View style={{ height: 72, width: "100%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: LS_COLORS.global.white }}>
+                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 20,marginLeft:20 }}>HISTORY</Text>
+                    <View style={{ height: 72, width: "95%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: LS_COLORS.global.white }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
                                 <Image
@@ -155,7 +158,7 @@ const OrderHistory = (props) => {
                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>April 20 at 10:10am</Text>
                             </View>
                             <View style={{}}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, marginTop: 10 }}>Pending</Text>
+                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, marginTop: 10 }}>Declined</Text>
                             </View>
                             <View style={{ justifyContent: 'center' }}>
                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>$50</Text>
@@ -172,7 +175,7 @@ const OrderHistory = (props) => {
                             }}
                         >
                             <Text style={styles.saveText}>
-                                Block/Umblock
+                                Block/Unblock
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -187,7 +190,7 @@ const OrderHistory = (props) => {
                         </TouchableOpacity>
                     </View>
                     <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
-                    <View style={styles.alexiContainer}>
+                    <Card style={styles.alexiContainer}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
                                 <Image
@@ -196,7 +199,7 @@ const OrderHistory = (props) => {
                                 />
 
                             </View>
-                            <View style={{ right: 10, top: "8%" }}>
+                            <View style={{ top: "5%" ,right:30}}>
                                 <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Alexi</Text>
                                 <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
                             </View>
@@ -225,8 +228,8 @@ const OrderHistory = (props) => {
                             <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Time</Text>
                             <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>2.5 hrs</Text>
                         </View>
-                    </View>
-                    <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 40 }}>
+                    </Card>
+                    <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
                         <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
@@ -249,7 +252,7 @@ const OrderHistory = (props) => {
                         </TouchableOpacity>
                     </View>
                     <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
-                    <View style={{ height: 72, width: "100%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: LS_COLORS.global.white }}>
+                    <View style={{ height: 72, width: "95%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: LS_COLORS.global.white }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
                                 <Image
@@ -294,7 +297,7 @@ const OrderHistory = (props) => {
                         </TouchableOpacity>
                     </View>
                     <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
-                    <View style={{ height: 72, width: "100%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: LS_COLORS.global.white }}>
+                    <View style={{ height: 72, width: "95%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: LS_COLORS.global.white }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
                                 <Image
@@ -339,6 +342,8 @@ const OrderHistory = (props) => {
                             </Text>
                         </TouchableOpacity>
                     </View>
+                    <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
+                    <View style = {{height:30}}></View>
                 </Content>
             </Container>
         </SafeAreaView>
@@ -355,19 +360,9 @@ const styles = StyleSheet.create({
        paddingBottom:10
     },
     alexiContainer: {
-        maxHeight: '100%',
-        top: "3%",
-        width: "100%",
-        elevation: 3,
-        shadowColor: '#00000029',
-        backgroundColor: 'white',
-        shadowColor: '#00000029',
-        shadowOffset: {
-            width: 0,
-            height: 3
-        },
-        shadowRadius: 5,
-        shadowOpacity: 1.0,
+        maxHeight:'100%',
+        top: "1%",
+        width: "95%",
         alignSelf: 'center',
         borderRadius: 6,
         padding: 10
@@ -375,7 +370,7 @@ const styles = StyleSheet.create({
     save: {
         justifyContent: "center",
         alignItems: 'center',
-        height: 40,
+        height: 32,
         width: 111,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,

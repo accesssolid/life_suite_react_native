@@ -20,7 +20,7 @@ const TouchId = (props) => {
             <>
                 <View style={styles.container}>
                     <View style={styles.logoContainer}>
-                        <Image resizeMode="contain" style={styles.image} source={require('../../../assets/fingerPrint.png')} />
+                        {/* <Image resizeMode="contain" style={styles.image} source={require('../../../assets/fingerPrint.png')} /> */}
                     </View>
                     <View>
                         <Text style={styles.text}>Login with Touch ID</Text>

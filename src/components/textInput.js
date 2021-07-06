@@ -9,6 +9,7 @@ import { globalStyles } from '../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
+import { baseProps } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlers';
 
 function CustomInput({
     text,
@@ -19,6 +20,9 @@ function CustomInput({
     value,
     onChangeText,
     keyboardType,
+    image,
+    action,
+    imageUrl
 }) {
     return (
         <Item
@@ -33,7 +37,7 @@ function CustomInput({
             }}>
             <View
                 style={{
-                    position:'absolute',top:-11,left:20,paddingHorizontal:5,backgroundColor:LS_COLORS.global.white
+                    position: 'absolute', top: -11, left: 20, paddingHorizontal: 5, backgroundColor: LS_COLORS.global.white
                 }}>
                 <Text
                     style={{
@@ -58,6 +62,17 @@ function CustomInput({
                     fontSize: 16,
                 }}
             />
+           
+                <TouchableOpacity onPress={action} style={{ right: 10 }}>
+                    <Image
+                        style={{
+                            height: 22,
+                            width: 22,
+                            resizeMode: 'contain',
+                        }}
+                        source={imageUrl}
+                    />
+                </TouchableOpacity>
         </Item>
     );
 }

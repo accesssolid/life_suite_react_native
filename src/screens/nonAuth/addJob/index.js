@@ -61,7 +61,7 @@ const addJob = (props) => {
                         title2="SERVICES"
                         imageUrl={require("../../../assets/handyMan.png")}
                         action={() => {
-                           
+                            props.navigation.navigate("ServicesProvided")
                         }}
                     />
 

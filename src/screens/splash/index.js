@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 /* Methods */
 import { getJsonData } from '../../asyncStorage/async';
+import { retrieveItem,showToast } from '../../components/validators';
 
 const Splash = (props) => {
     const dispatch = useDispatch()
@@ -20,7 +21,14 @@ const Splash = (props) => {
 
     const checkAuth = () => {
         setTimeout(() => {
-            props.navigation.navigate('WelcomeScreen') 
+            retrieveItem('user').then((data) => {
+                if (data) {
+                     props.navigation.navigate("LoginScreen")
+                 } 
+                 else {
+                    props.navigation.navigate('WelcomeScreen') 
+                 }
+             })
         }, 2000);
     }
 

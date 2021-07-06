@@ -13,6 +13,7 @@ import { Container, Content } from "native-base";
 /* Components */
 import Header from '../../../components/header';
 import CustomInput from "../../../components/textInput"
+import BankModal from '../../../components/bankModal';
 
 const ServiceProfile = (props) => {
     const dispatch = useDispatch()
@@ -26,10 +27,18 @@ const ServiceProfile = (props) => {
     const [add2, setAdd2] = useState("")
     const [noti, setNoti] = useState("")
     const [bank, setBank] = useState("")
-
+    const [open, setOpen] = useState(false)
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-
+            <BankModal
+                pressHandler={() => {
+                    setOpen(!open);
+                }}
+                visible={open}
+                action1={() => {
+                    setOpen(!open);
+                }}
+            />
             <Header
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
@@ -146,11 +155,10 @@ const ServiceProfile = (props) => {
                                         >
                                             <Text style={styles.saveText}>
                                                 Save
-                                         </Text>
+                                            </Text>
                                         </TouchableOpacity>
                                     </View>
                                 </>
-
                             }
                         </TouchableOpacity>
 
@@ -160,6 +168,11 @@ const ServiceProfile = (props) => {
                                 value={bank}
                                 onChangeText={(text) => {
                                     setBank(text)
+                                }}
+                                image
+                                imageUrl={require("../../../assets/andrea.png")}
+                                action={() => {
+                                    setOpen(!open)
                                 }}
                             />
                             <CustomInput
@@ -185,7 +198,7 @@ const ServiceProfile = (props) => {
                 >
                     <Text style={styles.saveText}>
                         Save
-                                         </Text>
+                    </Text>
                 </TouchableOpacity>
                 <View style={{ height: 20 }}></View>
             </ScrollView>

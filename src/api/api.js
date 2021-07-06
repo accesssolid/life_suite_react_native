@@ -1,43 +1,48 @@
-export const baseUrl = ""
-export const mediaBaseUrl = ""
+import React from 'react'
+import { showToast } from '../components/validators'
+// import RNFetchBlob from 'rn-fetch-blob'
+export const BASE_URL = "http://122.160.70.200/projects/php/lifeSuite/public"
+// export const imagebaseurl = 'http://122.160.70.200:5004/api/v1/images/'
 
-export const api = async (config) => {
-    if (config.method == "GET") {
-        return new Promise(function (resolve, reject) {
-            fetch(baseUrl + config.endpoint,
-                {
-                    method: config.method,
-                    headers: config.headers,
-                })
-                // .then((response) => console.log("Full Response =>", response))
-                .then((response) => response.json())
-                .then(async (res) => {
-                    console.log("Response => ", ` *${config.endpoint}* `, res)
-                    resolve(res);
-                })
-                .catch((error) => {
-                    console.error("Error => ", ` *${config.endpoint}* `, error);
-                    reject(error)
-                });
+export const getApi = (config)=>{
+  
+    return new Promise((resolve,reject)=>{
+        return fetch(BASE_URL+config.endPoint,{
+           body:config.data,
+            headers:config.headers,
+            method:config.type
+        }).then(async(response)=>{
+         
+            let json = await response.json()
+       
+            resolve(json);  
+        }) .catch((error) => {
+            console.log('err',error.message)
+            
+          
         });
-    } else {
-        return new Promise(function (resolve, reject) {
-            fetch(baseUrl + config.endpoint,
-                {
-                    method: config.method,
-                    headers: config.headers,
-                    body: JSON.stringify(config.data)
-                })
-                // .then((response) => console.log("Full Response =>", response))
-                .then((response) => response.json())
-                .then(async (res) => {
-                    console.log("Response => ", ` *${config.endpoint}* `, res)
-                    resolve(res);
-                })
-                .catch((error) => {
-                    console.error("Error => ", ` *${config.endpoint}* `, error);
-                    reject(error)
-                });
-        });
-    }
+    })
 }
+
+// export const imageApi = (config)=>{
+ 
+   
+//     return new Promise((resolve,reject)=>{
+//         return RNFetchBlob.fetch('POST', BASE_URL + config.endPoint, {
+//             'Authorization': 'Bearer '+config.headers,
+//             'Content-Type': 'multipart/form-data',
+//           },
+//             config.params
+//           ).then(async(response)=>{
+          
+//             let json = await JSON.parse(response.data)
+       
+//             resolve(json);  
+//         }) .catch((error) => {
+//             console.log('err',error.message)
+            
+          
+//         });
+//     })
+
+// }

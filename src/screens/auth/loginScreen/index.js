@@ -12,66 +12,234 @@ import { useDispatch, useSelector } from 'react-redux';
 /* Components */
 import CustomTextInput from '../../../components/customTextInput';
 import CustomButton from '../../../components/customButton';
-
-
+import { Card, Container, Content, Root } from "native-base";
+import { retrieveItem, showToast, storeItem } from '../../../components/validators'
+import ReactNativeBiometrics from 'react-native-biometrics'
+import Loader from "../../../components/loader"
+import { getApi } from "../../../api/api"
+import { loginReducer } from '../../../redux/features/loginReducer';
 const LoginScreen = (props) => {
 
     const dispatch = useDispatch()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loader, setLoader] = useState(false)
+
+    // on_press_login
+    function on_press_login() {
+        setLoader(true)
+        if (email.length == 0 || password.length == 0) {
+            showToast('Enter All Fields', 'danger')
+            setLoader(false)
+            return false
+        }
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        }
+        let user_data = {
+            "email": email.toLowerCase(),
+            "password": password,
+            "fcm_token": "fcm123",
+            device_id: "dev124",
+            login_type: "biometric",
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: '/api/signin',
+            type: 'post'
+        }
+        console.log(config)
+        getApi(config).then((response) => {
+            console.log(response)
+            if (response.status == true) {
+                showToast(response.message, 'success')
+                storeItem('user', response.data)
+                dispatch(loginReducer(response.data))
+                setLoader(false)
+                props.navigation.navigate("HomeScreen")
+                setEmail("")
+                setPassword("")
+            }
+            else {
+                showToast(response.message, 'danger')
+                setLoader(false)
+            }
+        })
+    }
+
+    // on_press_touch
+    async function on_press_touch() {
+        const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+
+        // return ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
+        //     .then((resultObject) => {
+        //         const { success } = resultObject
+        //         if (success) {
+        //             retrieveItem('user').then((data) => {
+        //                 if (data) {
+        //                     storeItem('parentuser', data)
+        //                     dispatch(loginReducer(data))
+        //                 }
+        //                 else {
+        //                     showToast('You have to login First Time', 'danger')
+        //                 }
+        //             })
+        //         } else {
+        //             console.log('user cancelled biometric prompt')
+        //         }
+        //     })
+        //     .catch(() => {
+        //         console.log('biometrics failed')
+        //     })
+
+        if (biometryType === Platform.OS == 'ios' ? ReactNativeBiometrics.TouchID : ReactNativeBiometrics.Biometrics) {
+            ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
+                .then((resultObject) => {
+                    const { success } = resultObject
+                    if (success) {
+                        retrieveItem('user').then((data) => {
+                            if (data) {
+                                storeItem('user', data)
+                                dispatch(loginReducer(data))
+                                props.navigation.navigate("HomeScreen")
+                            }
+                            else {
+                                showToast('You have to login First Time', 'danger')
+                            }
+                        })
+                    } else {
+                        console.log('user cancelled biometric prompt')
+                    }
+                })
+                .catch(() => {
+                    console.log('biometrics failed')
+                })
+        }
+        else {
+            showToast('Doesnot Support TouchID', 'danger')
+        }
+
+    }
+
+    // on_press_face
+    async function on_press_face() {
+        const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+        console.log(biometryType)
+        if (biometryType === Platform.OS == 'ios' ? ReactNativeBiometrics.FaceID : ReactNativeBiometrics.Biometrics) {
+            ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm FaceID', })
+                .then((resultObject) => {
+                    const { success } = resultObject
+                    if (success) {
+                        retrieveItem('user').then((data) => {
+                            if (data) {
+                                storeItem('user', res.data)
+                                dispatch(loginReducer(res.data))
+                                props.navigation.navigate("HomeScreen")
+                            }
+                            else {
+                                showToast('You have to login First Time', 'danger')
+                            }
+                        })
+                    } else {
+                        console.log('User cancelled biometric prompt')
+                    }
+                })
+                .catch(() => {
+                    console.log('biometrics failed')
+                })
+        }
+        else {
+            showToast('Doesnot Support FaceID', 'danger')
+        }
+
+    }
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <>
-                <View style={styles.container}>
-                    <View style={styles.textContainer}>
-                        <Text style={styles.loginText}>Login</Text>
-                        <Text style={styles.text}>Add your details to Login</Text>
-                    </View>
-                    <View style={styles.textInputContainer}>
-                        <CustomTextInput
-                            placeholder="Your Email"
-                            value={email}
-                            onChangeText={(text) => {
-                                setEmail(text)
-                            }}
-                        />
-                        <CustomTextInput
-                            placeholder="Password"
-                            value={password}
-                            onChangeText={(text) => {
-                                setPassword(text)
-                            }}
-                        />
-                    </View>
-                    <View style={styles.buttonContainer}>
-                        <CustomButton
-                            title="Login"
+            <Root>
+                <Container style={styles.container}>
+                    <Content>
+                        <View style={styles.textContainer}>
+                            <Text style={styles.loginText}>Login</Text>
+                            <Text style={styles.text}>Add your details to Login</Text>
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <CustomTextInput
+                                placeholder="Your Email"
+                                value={email}
+                                onChangeText={(text) => {
+                                    setEmail(text)
+                                }}
+                                keyboardType="email-address"
+                            />
+                            <CustomTextInput
+                                placeholder="Password"
+                                value={password}
+                                onChangeText={(text) => {
+                                    setPassword(text)
+                                }}
+                                secureTextEntry
+                            />
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <CustomButton
+                                title="Login"
+                                activeOpacity={0.7}
+                                action={() => {
+                                    on_press_login()
+                                }}
+                            />
+                        </View>
+                        <TouchableOpacity
                             activeOpacity={0.7}
-                            action={() => {
-                                props.navigation.navigate("HomeScreen")
+                            onPress={() => {
+                                props.navigation.navigate("VerificationCode")
                             }}
-                        />
-                    </View>
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => {
-
-                        }}
-                        style={styles.forgotContainer}>
-                        <Text style={styles.forgot}>Forgot Password?</Text>
-                    </TouchableOpacity>
-
-                    <View style={styles.alreadyContainer}>
-                        <Text style={styles.already}>Don't have account ?</Text>
-                        <TouchableOpacity onPress={() => {
-                            props.navigation.navigate("SignUpScreen")
-                        }}>
-                            <Text style={styles.already1}> Sign Up</Text>
+                            style={styles.forgotContainer}>
+                            <Text style={styles.forgot}>Forgot Password?</Text>
                         </TouchableOpacity>
-                    </View>
-                </View>
 
-            </>
+                        <View style={styles.alreadyContainer}>
+                            <Text style={styles.already}>Don't have account ?</Text>
+                            <TouchableOpacity onPress={() => {
+                                props.navigation.navigate("SignUpScreen")
+                            }}>
+                                <Text style={styles.already1}> Sign Up</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.facecontainer}>
+                            {
+                                Platform.OS == 'ios' &&
+                                <TouchableOpacity onPress={() => on_press_face()}>
+                                    <Card style={styles.card}>
+                                        <Image
+                                            style={styles.image}
+                                            source={require("../../../assets/face.png")}
+                                        />
+                                    </Card>
+                                </TouchableOpacity>
+                            }
+
+                            <TouchableOpacity onPress={() => on_press_touch()}>
+                                <Card style={styles.card}>
+                                    <Image
+                                        style={styles.image}
+                                        source={require("../../../assets/fingerprint.png")}
+                                    />
+                                </Card>
+                            </TouchableOpacity>
+
+                        </View>
+                        {
+                            loader == true &&
+                            <Loader />
+
+                        }
+
+                    </Content>
+                </Container>
+            </Root>
         </SafeAreaView>
     )
 }
@@ -112,8 +280,9 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     forgotContainer: {
-        width: "30%",
+        width: "50%",
         marginTop: 20,
+        alignSelf: 'center'
     },
     forgot: {
         color: LS_COLORS.global.lightTextColor,
@@ -138,5 +307,23 @@ const styles = StyleSheet.create({
         lineHeight: 19,
         color: LS_COLORS.global.green,
         fontFamily: LS_FONTS.PoppinsSemiBold
-    }
+    },
+    facecontainer: {
+        flexDirection: 'row',
+        justifyContent: "space-around",
+        alignItems: 'center',
+        marginTop: 30
+    },
+    card: {
+        borderRadius: 17,
+        height: 80,
+        width: 80,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    image: {
+        width: 43,
+        height: 43,
+        resizeMode: 'contain'
+    },
 })

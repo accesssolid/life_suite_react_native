@@ -171,6 +171,7 @@ const MechanicLocation = (props) => {
                         style={styles.save}
                         activeOpacity={0.7}
                         onPress={() => {
+                            props.navigation.navigate("Mechanics")
                         }}
                     >
                         <Text style={styles.saveText}>Submit</Text>

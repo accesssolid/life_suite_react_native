@@ -28,11 +28,19 @@ import Events from '../screens/nonAuth/events';
 import PersonalCare from '../screens/nonAuth/personalCare';
 import Profile from '../screens/nonAuth/profile';
 import AddJob from '../screens/nonAuth/addJob';
-import MechanicServices from '../screens/nonAuth/mechanicServices';
+import MechanicServicesProvided from '../screens/nonAuth/mechanicServicesProvided';
 import ServiceProfile from '../screens/nonAuth/serviceProfile';
 import Calendar from '../screens/nonAuth/calendar';
 import MechanicLocation from '../screens/nonAuth/mechanicLocation';
 import OrderHistory from '../screens/nonAuth/orderHistory';
+import Mechanics from '../screens/nonAuth/mechanics';
+import Client from '../screens/nonAuth/client';
+import CnfSch from '../screens/nonAuth/cnfSch';
+import ServicesProvided from '../screens/nonAuth/servicesOffered';
+import DeclineConfirmation from '../screens/nonAuth/declineConfirmation';
+import OrderHistory1 from '../screens/nonAuth/orderHistory1';
+import VerificationCode from '../screens/auth/verificationScreen';
+import OtpScreen from '../screens/nonAuth/otpScreen';
 
 const Stack = createStackNavigator();
 
@@ -46,7 +54,9 @@ const Router = () => {
           <Stack.Screen name="WelcomeScreen" component={Welcomescreen} />
           <Stack.Screen name="FaceId" component={FaceId} />  
           <Stack.Screen name="TouchId" component={TouchId} />   
-          <Stack.Screen name="LoginScreen" component={LoginScreen} />    
+          <Stack.Screen name="LoginScreen" component={LoginScreen} />  
+          <Stack.Screen name="VerificationCode" component={VerificationCode} /> 
+          <Stack.Screen name="OtpScreen" component={OtpScreen} />    
           <Stack.Screen name="SignUpScreen" component={SignUpScreen} />   
           <Stack.Screen name="HomeScreen" component={HomeScreen} />  
           <Stack.Screen name="AddJob" component={AddJob} />  
@@ -56,10 +66,16 @@ const Router = () => {
           <Stack.Screen name="PersonalCare" component={PersonalCare} />  
           <Stack.Screen name="Profile" component={Profile} /> 
           <Stack.Screen name="ServiceProfile" component={ServiceProfile} />   
-          <Stack.Screen name="MechanicServices" component={MechanicServices} /> 
+          <Stack.Screen name="MechanicServicesProvided" component={MechanicServicesProvided} /> 
           <Stack.Screen name="Calendar" component={Calendar} />   
           <Stack.Screen name="MechanicLocation" component={MechanicLocation} />  
           <Stack.Screen name="OrderHistory" component={OrderHistory} />  
+          <Stack.Screen name="Mechanics" component={Mechanics} />  
+          <Stack.Screen name="Client" component={Client} />  
+          <Stack.Screen name="CnfSch" component={CnfSch} />  
+          <Stack.Screen name="ServicesProvided" component={ServicesProvided} /> 
+          <Stack.Screen name="DeclineConfirmation" component={DeclineConfirmation} /> 
+          <Stack.Screen name="OrderHistory1" component={OrderHistory1} /> 
         </Stack.Navigator>
       </NavigationContainer>
       {loading && <Loader />}

@@ -15,11 +15,10 @@ import Cards from '../../../components/cards';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
-
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
@@ -60,7 +59,7 @@ const HomeScreen = (props) => {
                         }}
                     />
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', top: '5%' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', top: '5%' }}>
                     <Cards
                         title1="EVENTS"
                         imageUrl={require("../../../assets/room.png")}

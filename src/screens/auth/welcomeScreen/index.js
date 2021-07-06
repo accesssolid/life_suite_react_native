@@ -25,7 +25,7 @@ const WelcomeScreen = (props) => {
                     <TouchableOpacity 
                     activeOpacity = {0.7}
                     onPress = {()=> {
-                        props.navigation.navigate('HomeScreen')
+                        props.navigation.navigate('SignUpScreen',{"role":1})
                     }}
                     style={styles.textContainer}>
                         <Text style={styles.text}>Login as User</Text>
@@ -35,7 +35,7 @@ const WelcomeScreen = (props) => {
                     <TouchableOpacity 
                     activeOpacity = {0.7}
                     onPress = {()=> {
-                        props.navigation.navigate('AddJob')
+                        props.navigation.navigate('SignUpScreen',{"role":2})
                     }}
                     style={styles.textContainer}>
                         <Text style={styles.text}>Login as Service Provider</Text>
