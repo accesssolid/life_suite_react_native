@@ -1,7 +1,6 @@
 
 import { createSlice } from '@reduxjs/toolkit'
 
-
 const authenticateSlice = createSlice({
     name: "authenticate",
     initialState: {
@@ -11,26 +10,20 @@ const authenticateSlice = createSlice({
         name: '',
         token: "",
         modal: true,
-        initial: 'SelectOption'
+        initial: 'SelectOption',
+        user_role: 1
     },
     reducers: {
         loadauthentication: (state, action) => {
-            console.log(action,'actionnnn')
             state.user = action.payload
             state.authenticate = true
-
-
         },
         friendauthentication: (state, action) => {
-
             state.friends = action.payload
             state.authenticate = true
-
         },
         fcmToken: (state, action) => {
-
             state.token = action.payload
-
         },
         logoutState: (state, action) => {
             state.authenticate = false
@@ -43,17 +36,17 @@ const authenticateSlice = createSlice({
         loadInitial: (state, action) => {
             state.initial = action.payload
         },
+        setUserRole: (state, action) => {
+            state.user_role = action.payload.data
+        },
     }
 })
 
-export const { logoutState, loadauthentication, friendauthentication, fcmToken, modalState, loadInitial } = authenticateSlice.actions
+export const { logoutState, loadauthentication, friendauthentication, fcmToken, modalState, loadInitial, setUserRole } = authenticateSlice.actions
 
 export const loginReducer = (data) => {
-
     return async (dispatch) => {
-
         try {
-            console.log("data =>", data)
             dispatch(loadauthentication(data))
         } catch (err) {
 

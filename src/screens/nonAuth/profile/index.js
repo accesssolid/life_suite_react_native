@@ -14,11 +14,13 @@ import { Container, Content } from "native-base";
 import Header from '../../../components/header';
 import CustomInput from "../../../components/textInput"
 import CustomButton from "../../../components/customButton"
+import { storeItem } from '../../../components/validators';
 
 const Profile = (props) => {
     const dispatch = useDispatch()
+    const user = useSelector(state => state.authenticate.user)
+
     const [lastName, setLastName] = useState("")
-    console.log(lastName)
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [no, setNo] = useState("")
@@ -46,29 +48,29 @@ const Profile = (props) => {
                     props.navigation.navigate("HomeScreen")
                 }}
             />
-             <TouchableOpacity
-                    style={{alignSelf: 'center', position: 'absolute',zIndex:100,top: Platform.OS === 'ios' ? "6%" : "1%" }}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                    }}>
-                    <Image
-                        style={{ height: 116, width: 116, resizeMode: 'contain' }}
-                        source={require("../../../assets/andrea.png")}
-                    />
-                </TouchableOpacity>
+            <TouchableOpacity
+                style={{ alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%" }}
+                activeOpacity={0.7}
+                onPress={() => {
+                }}>
+                <Image
+                    style={{ height: 116, width: 116, resizeMode: 'contain' }}
+                    source={require("../../../assets/andrea.png")}
+                />
+            </TouchableOpacity>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 bounces={false}
                 style={styles.container}>
-               
-                <View style = {{top:'6%'}}>
+
+                <View style={{ top: '6%' }}>
 
                     <View style={{}}>
                         <Text style={styles.text}>MY INFORMATION</Text>
-                        <Text style={styles.text1}>Sarah</Text>
-                        <Text style={styles.text2}>Profile ID : 54692</Text>
+                        <Text style={styles.text1}>{user.first_name}</Text>
+                        <Text style={styles.text2}>Profile ID : {user.id}</Text>
                     </View>
 
                     <View style={styles.personalContainer}>
@@ -145,7 +147,7 @@ const Profile = (props) => {
                                         >
                                             <Text style={styles.saveText}>
                                                 Save
-                                         </Text>
+                                            </Text>
                                         </TouchableOpacity>
                                     </View>
                                 </>
@@ -197,7 +199,7 @@ const Profile = (props) => {
                                     >
                                         <Text style={styles.saveText}>
                                             Save
-                                         </Text>
+                                        </Text>
                                     </TouchableOpacity>
                                 </>
 
@@ -227,37 +229,38 @@ const Profile = (props) => {
                                 setHolderName(text)
                             }}
                         />
-                        <View style={{ flexDirection: 'row' }}>
-                            <CustomInput
-                                text="Expiry Date"
-                                value={number}
-                                onChangeText={(text) => {
-                                    setNumber(text)
-                                }}
-                            />
-                            <CustomInput
-                                text="Credit Card Holder Name"
-                                value={holderName}
-                                onChangeText={(text) => {
-                                    setHolderName(text)
-                                }}
-                            />
-                        </View>
+                        <CustomInput
+                            text="Expiry Date"
+                            value={number}
+                            onChangeText={(text) => {
+                                setNumber(text)
+                            }}
+                        />
                         <View style={{ height: 50 }}></View>
                     </View>
                 </View>
-                <View style={{ height: 200}}></View>
+                <View style={{ height: 200 }} />
                 <TouchableOpacity
                     style={styles.save}
                     activeOpacity={0.7}
                     onPress={() => {
-                    }}
-                >
+                    }}>
                     <Text style={styles.saveText}>
                         Save
-                                         </Text>
+                    </Text>
                 </TouchableOpacity>
-                <View style={{ height: 20 }}></View>
+                <TouchableOpacity
+                    style={styles.save}
+                    activeOpacity={0.7}
+                    onPress={() => {
+                        storeItem('user', null)
+                        props.navigation.navigate('WelcomeScreen')
+                    }}>
+                    <Text style={styles.saveText}>
+                        Logout
+                    </Text>
+                </TouchableOpacity>
+                <View style={{ height: 20 }} />
             </ScrollView>
         </SafeAreaView>
     )
@@ -291,7 +294,7 @@ const styles = StyleSheet.create({
     },
     personalContainer: {
         maxHeight: '100%',
-        top:"3%",
+        top: "3%",
         width: "90%",
         elevation: 200,
         shadowColor: '#00000029',

@@ -28,7 +28,6 @@ const OtpScreen = props => {
           type: 'post'
         }
         getApi(config).then((response) => {
-          console.log('resp', response)
           if (response.Status == true) {
             showToast(response.Message)
             props.navigation.navigate('Login')
@@ -61,7 +60,6 @@ const OtpScreen = props => {
           type: 'post'
         }
         getApi(config).then((response) => {
-          console.log('resp', response)
           if (response.Status == true) {
             showToast(response.Message, 'success')
             setLoader(false)

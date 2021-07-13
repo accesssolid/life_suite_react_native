@@ -11,9 +11,15 @@ import { useDispatch, useSelector } from 'react-redux';
 
 /* Components */
 import Header from '../../../components/header';
+import { setUserRole } from '../../../redux/features/loginReducer';
 
 const WelcomeScreen = (props) => {
     const dispatch = useDispatch()
+
+    const next = (role) => {
+        dispatch(setUserRole({ data: role }))
+        props.navigation.navigate('AuthStack')
+    }
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -21,23 +27,19 @@ const WelcomeScreen = (props) => {
                 <View style={styles.logoContainer}>
                     <Image resizeMode="contain" style={styles.image} source={require('../../../assets/splash/logo.png')} />
                 </View>
-                <View style = {{top:"13%"}}>
-                    <TouchableOpacity 
-                    activeOpacity = {0.7}
-                    onPress = {()=> {
-                        props.navigation.navigate('SignUpScreen',{"role":1})
-                    }}
-                    style={styles.textContainer}>
+                <View style={{ top: "13%" }}>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => next(1)}
+                        style={styles.textContainer}>
                         <Text style={styles.text}>Login as User</Text>
                     </TouchableOpacity>
                 </View>
                 <View >
-                    <TouchableOpacity 
-                    activeOpacity = {0.7}
-                    onPress = {()=> {
-                        props.navigation.navigate('SignUpScreen',{"role":2})
-                    }}
-                    style={styles.textContainer}>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => next(2)}
+                        style={styles.textContainer}>
                         <Text style={styles.text}>Login as Service Provider</Text>
                     </TouchableOpacity>
                 </View>
@@ -61,7 +63,7 @@ const styles = StyleSheet.create({
         height: '20%',
         alignItems: 'center',
         justifyContent: 'center',
-        top:'18%'
+        top: '18%'
     },
     image: {
         width: '80%',

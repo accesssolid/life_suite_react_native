@@ -25,6 +25,7 @@ const ServicesProvided = (props) => {
     const [checked4, setChecked4] = useState(false);
     const [checked5, setChecked5] = useState(true);
     const [category, setCategory] = useState("Category")
+
     const [oil, setOil] = useState("")
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -41,7 +42,7 @@ const ServicesProvided = (props) => {
                         }}
                         imageUrl1={require("../../../assets/homeWhite.png")}
                         action1={() => {
-                            props.navigation.navigate("AddJob")
+                            props.navigation.navigate("HomeScreen")
                         }}
                     />
                 </View>
@@ -66,15 +67,25 @@ const ServicesProvided = (props) => {
                                 checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                             />
-
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center' }}>Oil</Text>
-                            <View style={styles.fromContainer}>
-                                <TextInput
-                                    style={styles.inputStyle}
-                                    color="black"
-                                    value={oil}
-                                    onChangeText={(text) => { setOil(text) }}
-                                />
+                            <View style={{ flex: 1, justifyContent:'flex-end', flexDirection:'row' }}>
+                                <View style={styles.fromContainer}>
+                                    <TextInput
+                                        style={styles.inputStyle}
+                                        color="black"
+                                        value={oil}
+                                        onChangeText={(text) => { setOil(text) }}
+                                    />
+                                </View>
+                                <View style={styles.fromContainer}>
+                                    <TextInput
+                                        style={styles.inputStyle}
+                                        color="black"
+                                        value={oil}
+                                        placeholder="HH:MM"
+                                        onChangeText={(text) => { setOil(text) }}
+                                    />
+                                </View>
                             </View>
                         </View>
                         <View style={{ width: '30%', flexDirection: "row" }}>
@@ -127,12 +138,12 @@ const ServicesProvided = (props) => {
 
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center' }}>Replace Taillights</Text>
                             <View style={styles.fromContainer}>
-                            <TextInput
-                                style={styles.inputStyle}
-                                color="black"
-                                value={oil}
-                                onChangeText={(text) => { setOil(text) }}
-                            />
+                                <TextInput
+                                    style={styles.inputStyle}
+                                    color="black"
+                                    value={oil}
+                                    onChangeText={(text) => { setOil(text) }}
+                                />
                             </View>
                         </View>
                         <View style={{ width: '26%', flexDirection: "row" }}>
@@ -166,12 +177,12 @@ const ServicesProvided = (props) => {
 
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center' }}>Other</Text>
                             <View style={styles.fromContainer}>
-                            <TextInput
-                                style={styles.inputStyle}
-                                color="black"
-                                value={oil}
-                                onChangeText={(text) => { setOil(text) }}
-                            />
+                                <TextInput
+                                    style={styles.inputStyle}
+                                    color="black"
+                                    value={oil}
+                                    onChangeText={(text) => { setOil(text) }}
+                                />
                             </View>
                         </View>
                         <View style={{ height: 30 }}></View>
@@ -207,18 +218,18 @@ const styles = StyleSheet.create({
         color: LS_COLORS.global.white
     },
     price: {
-        width: '50%',
+        width: '100%',
         alignSelf: 'center',
         height: 40,
-        left: "20%",
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         alignItems: 'center'
     },
     priceTime: {
         fontSize: 12,
         fontFamily: LS_FONTS.PoppinsMedium,
-        color: "black"
+        color: "black",
+        marginRight: 49
     },
     service: {
         fontSize: 18,
@@ -252,13 +263,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         padding: 10,
         backgroundColor: '#ECECEC',
-        marginLeft: '22%'
+        marginRight: 20
     },
     inputStyle: {
-        padding: 10
     },
-
-
 })
 
 

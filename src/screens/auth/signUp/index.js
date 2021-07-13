@@ -15,21 +15,20 @@ import CustomButton from '../../../components/customButton';
 import Loader from "../../../components/loader"
 import { showToast } from '../../../components/validators';
 import { getApi } from '../../../api/api';
-import { Container, Content,Root } from 'native-base';
-const SignUpScreen = (props) => {
-    const role = props.route.params.role
-    console.log(role)
+import { Container, Content, Root } from 'native-base';
+const SignUpScreen = (props) => {    
     const dispatch = useDispatch()
+    const role = useSelector(state => state.authenticate.user_role)
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [cnfPass, setCnfPass] = useState("")
-    const [loader,setLoader] = useState(false)
+    const [loader, setLoader] = useState(false)
 
     function on_press_register() {
         setLoader(true)
         if (name.length == 0 || email.length == 0 || password.length == 0 ||
-            cnfPass.length == 0 
+            cnfPass.length == 0
         ) {
             showToast('Required All Fields', 'danger')
             setLoader(false)
@@ -60,88 +59,91 @@ const SignUpScreen = (props) => {
             "email": email.toLowerCase(),
             "password": password,
             "password_confirmation": cnfPass,
-            "user_role" : role
         }
         let config = {
             headers: headers,
-            data: JSON.stringify(user_data),
-            endPoint: '/api/signup',
+            data: JSON.stringify({ ...user_data }),
+            endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
             type: 'post'
         }
-        getApi(config).then((response) => {
-            console.log('resp', response)
-            if (response.status == true) {
-                showToast('User Registered Successfully', 'success')
-                props.navigation.navigate('LoginScreen')
-                setLoader(false)
-                setName("")
-                setEmail("")
-                setPassword("")
-                setCnfPass("")
-            }
-            else {
-                showToast(response.message, 'danger')
-                setLoader(false)
-            }
-        })
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    showToast('User Registered Successfully', 'success')                                        
+                    setName("")
+                    setEmail("")
+                    setPassword("")
+                    setCnfPass("")
+                    setLoader(false)
+                    props.navigation.navigate('LoginScreen')
+                }
+                else {
+                    showToast(response.message, 'danger')
+                    setLoader(false)
+                }
+            }).catch(err => {
+
+            })
     }
+    
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Root>
                 <Container style={styles.container}>
                     <Content>
-                    <View style={styles.textContainer}>
-                        <Text style={styles.loginText}>Signup</Text>
-                        <Text style={styles.text}>Add your details to Signup</Text>
-                    </View>
-                    <View style={styles.textInputContainer}>
-                        <CustomTextInput
-                            placeholder="Name"
-                            value={name}
-                            onChangeText={(text) => {
-                                setName(text)
-                            }}
-                        />
-                        <CustomTextInput
-                            placeholder="Email"
-                            value={email}
-                            onChangeText={(text) => {
-                                setEmail(text)
-                            }}
-                        />
-                        <CustomTextInput
-                            placeholder="Password"
-                            value={password}
-                            onChangeText={(text) => {
-                                setPassword(text)
-                            }}
-                            secureTextEntry
-                        />
-                        <CustomTextInput
-                            placeholder="Confirm Password"
-                            value={cnfPass}
-                            onChangeText={(text) => {
-                                setCnfPass(text)
-                            }}
-                            secureTextEntry
-                        />
-                    </View>
-                    <View style={styles.buttonContainer}>
-                        <CustomButton
-                            title="Sign Up"
-                            action= {() => {
-                                on_press_register()
-                            }}
-                        />
-                    </View>
-                    <View style={styles.alreadyContainer}>
-                        <Text style={styles.already}>Already have an account ?</Text>
-                        <TouchableOpacity onPress={() => {
-                            props.navigation.navigate("LoginScreen")
-                        }}>
-                            <Text style={styles.already1}> Login</Text>
-                        </TouchableOpacity>
-                    </View>
+                        <View style={styles.textContainer}>
+                            <Text style={styles.loginText}>Signup</Text>
+                            <Text style={styles.text}>Add your details to Signup</Text>
+                        </View>
+                        <View style={styles.textInputContainer}>
+                            <CustomTextInput
+                                placeholder="Name"
+                                value={name}
+                                onChangeText={(text) => {
+                                    setName(text)
+                                }}
+                            />
+                            <CustomTextInput
+                                placeholder="Email"
+                                value={email}
+                                onChangeText={(text) => {
+                                    setEmail(text)
+                                }}
+                            />
+                            <CustomTextInput
+                                placeholder="Password"
+                                value={password}
+                                onChangeText={(text) => {
+                                    setPassword(text)
+                                }}
+                                secureTextEntry
+                            />
+                            <CustomTextInput
+                                placeholder="Confirm Password"
+                                value={cnfPass}
+                                onChangeText={(text) => {
+                                    setCnfPass(text)
+                                }}
+                                secureTextEntry
+                            />
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <CustomButton
+                                title="Sign Up"
+                                action={() => {
+                                    on_press_register()
+                                }}
+                            />
+                        </View>
+                        <View style={styles.alreadyContainer}>
+                            <Text style={styles.already}>Already have an account ?</Text>
+                            <TouchableOpacity onPress={() => {
+                                props.navigation.navigate("LoginScreen")
+                            }}>
+                                <Text style={styles.already1}> Login</Text>
+                            </TouchableOpacity>
+                        </View>
                     </Content>
                 </Container>
                 {
@@ -200,10 +202,10 @@ const styles = StyleSheet.create({
         color: LS_COLORS.global.lightTextColor,
         fontFamily: LS_FONTS.PoppinsRegular
     },
-    already1:{
-        fontSize: 14, 
-        lineHeight: 19, 
-        color: LS_COLORS.global.green, 
+    already1: {
+        fontSize: 14,
+        lineHeight: 19,
+        color: LS_COLORS.global.green,
         fontFamily: LS_FONTS.PoppinsSemiBold
     }
 })

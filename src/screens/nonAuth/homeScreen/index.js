@@ -15,16 +15,21 @@ import Cards from '../../../components/cards';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
+    const user = useSelector(state => state.authenticate.user)
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
-                            props.navigation.navigate("Profile");
-                        }}
-                    >
+                            user.user_role == 3
+                                ?
+                                props.navigation.navigate("ServiceProfile")
+                                :
+                                props.navigation.navigate("Profile")
+                        }}>
                         <Image
                             style={styles.image}
                             source={require("../../../assets/women.png")}
@@ -34,56 +39,85 @@ const HomeScreen = (props) => {
                         activeOpacity={0.7}
                         onPress={() => {
 
-                        }}
-                    >
+                        }}>
                         <Image
                             style={styles.searchImage}
                             source={require("../../../assets/search.png")}
                         />
                     </TouchableOpacity>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Cards
-                        title1="HOME"
-                        title2="SERVICES"
-                        imageUrl={require("../../../assets/room.png")}
-                        action={() => {
-                            props.navigation.navigate("HomeServices");
-                        }}
-                    />
-                    <Cards
-                        title1="AUTOMATIVE"
-                        imageUrl={require("../../../assets/room.png")}
-                        action={() => {
-                            props.navigation.navigate("Automative");
-                        }}
-                    />
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-around', top: '5%' }}>
-                    <Cards
-                        title1="EVENTS"
-                        imageUrl={require("../../../assets/room.png")}
-                        action={() => {
-                            props.navigation.navigate("Events");
-                        }}
-                    />
-                    <Cards
-                        title1="PERSONAL"
-                        title2="CARE"
-                        imageUrl={require("../../../assets/room.png")}
-                        action={() => {
-                            props.navigation.navigate("PersonalCare");
-                        }}
-                    />
-                </View>
+                {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25 }} activeOpacity={0.7} onPress={() => { }}>
+                    <View style={{ height: 30, aspectRatio: 1 }}>
+                        <Image source={require('../../../assets/addgreen.png')} resizeMode="contain" style={{ width: '100%', height: '100%' }} />
+                    </View>
+                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 18, letterSpacing: 0.36, color: LS_COLORS.global.black, marginLeft: 11 }}>ADD JOB</Text>
+                </TouchableOpacity>}
+                {/*  */}
+                {
+                    user.user_role == 3
+                        ?
+                        <>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Cards
+                                    title1=""
+                                    title2="Mechanic"
+                                    imageUrl={require("../../../assets/room.png")}
+                                    action={() => {
+                                        props.navigation.navigate("ServicesProvided");
+                                    }}
+                                />
+                            </View>
+                        </>
+                        :
+                        <>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Cards
+                                    title1="HOME"
+                                    title2="SERVICES"
+                                    imageUrl={require("../../../assets/room.png")}
+                                    action={() => {
+                                        props.navigation.navigate("HomeServices");
+                                    }}
+                                />
+                                <Cards
+                                    title1="AUTOMATIVE"
+                                    imageUrl={require("../../../assets/room.png")}
+                                    action={() => {
+                                        props.navigation.navigate("Automative");
+                                    }}
+                                />
+                            </View>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', top: '5%' }}>
+                                <Cards
+                                    title1="EVENTS"
+                                    imageUrl={require("../../../assets/room.png")}
+                                    action={() => {
+                                        props.navigation.navigate("Events");
+                                    }}
+                                />
+                                <Cards
+                                    title1="PERSONAL"
+                                    title2="CARE"
+                                    imageUrl={require("../../../assets/room.png")}
+                                    action={() => {
+                                        props.navigation.navigate("PersonalCare");
+                                    }}
+                                />
+                            </View>
+                        </>
+                }
+
 
                 <View style={styles.orderContainer}>
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
-                            props.navigation.navigate("OrderHistory")
-                        }}
-                    >
+                            user.user_role == 3
+                                ?
+                                props.navigation.navigate("OrderHistory1")
+                                :
+                                props.navigation.navigate("OrderHistory")
+                        }}>
                         <Text style={styles.order}>
                             ORDER
                         </Text>

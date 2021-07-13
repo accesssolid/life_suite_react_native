@@ -43,7 +43,6 @@ const VerificationCode = props => {
           type: 'POST'
         }
         getApi(config).then((response) => {
-          console.log('ress', response)
           if (response.Status == true) {
             showToast(response.Message, 'success')
             props.navigation.navigate('OtpScreen', { "email": email.toLowerCase() })

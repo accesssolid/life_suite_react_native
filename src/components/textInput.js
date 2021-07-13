@@ -22,7 +22,8 @@ function CustomInput({
     keyboardType,
     image,
     action,
-    imageUrl
+    imageUrl,
+    width
 }) {
     return (
         <Item
@@ -32,6 +33,7 @@ function CustomInput({
                 borderRadius: 7,
                 borderColor: LS_COLORS.global.textInutBorderColor,
                 paddingLeft: 16,
+                width: width,
                 maxWidth: '90%',
                 alignSelf: 'center',
             }}>
@@ -62,17 +64,17 @@ function CustomInput({
                     fontSize: 16,
                 }}
             />
-           
-                <TouchableOpacity onPress={action} style={{ right: 10 }}>
-                    <Image
-                        style={{
-                            height: 22,
-                            width: 22,
-                            resizeMode: 'contain',
-                        }}
-                        source={imageUrl}
-                    />
-                </TouchableOpacity>
+
+            <TouchableOpacity onPress={action} style={{ right: 10 }}>
+                <Image
+                    style={{
+                        height: 22,
+                        width: 22,
+                        resizeMode: 'contain',
+                    }}
+                    source={imageUrl}
+                />
+            </TouchableOpacity>
         </Item>
     );
 }

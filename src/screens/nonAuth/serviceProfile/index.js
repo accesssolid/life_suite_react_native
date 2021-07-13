@@ -46,7 +46,7 @@ const ServiceProfile = (props) => {
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
-                    props.navigation.navigate("AddJob")
+                    props.navigation.navigate("HomeScreen")
                 }}
             />
             <TouchableOpacity

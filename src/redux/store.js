@@ -7,8 +7,4 @@ const store = configureStore({
     },
 })
 
-// store.subscribe(() => {
-//     console.log("Redux Store State ===>>>>> ", store.getState())
-// })
-
 export default store

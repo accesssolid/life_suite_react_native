@@ -17,13 +17,13 @@ const HomeServices = (props) => {
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <Header 
-            title="Home Services" 
-            imageUrl = {require("../../../assets/back.png")}
+            <Header
+                title="Home Services"
+                imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.pop()
                 }}
-                imageUrl1 = {require("../../../assets/home.png")}
+                imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
                     props.navigation.navigate("HomeScreen")
                 }}
@@ -44,7 +44,7 @@ const HomeServices = (props) => {
                         imageUrl={require("../../../assets/cleaning.png")}
                     />
                 </View>
-                <View style={{ flexDirection: "row", justifyContent:'space-evenly',top:"5%"}}>
+                <View style={{ flexDirection: "row", justifyContent: 'space-evenly', top: "5%" }}>
                     <SmallCards
                         title1="HANDYMAN"
                         imageUrl={require("../../../assets/handyMan.png")}
@@ -54,7 +54,7 @@ const HomeServices = (props) => {
                         imageUrl={require("../../../assets/electrician.png")}
                     />
                     <SmallCards
-                       style = {{borderColor:'white'}}
+                        style={{ borderColor: 'white' }}
                     />
                 </View>
             </View>
@@ -69,5 +69,5 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
     },
-   
+
 })

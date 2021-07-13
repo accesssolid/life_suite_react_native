@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -11,6 +11,7 @@ import CustomDropDown from '../../../components/dropDown';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckBox } from 'react-native-elements'
 import moment from "moment";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /* Components */;
 import Header from '../../../components/header';
@@ -30,7 +31,7 @@ const MechanicLocation = (props) => {
     const [checked6, setChecked6] = useState(false);
     const [checked7, setChecked7] = useState(false);
     const [checked8, setChecked8] = useState(false);
-    const [category,setCategory] = useState()
+    const [category, setCategory] = useState()
 
     const category_array = [
         {
@@ -67,12 +68,11 @@ const MechanicLocation = (props) => {
         },
     ]
     const [from, setFrom] = useState("")
-    // const dates = props.route.params.date
-    const[date,setDate] = useState("")
+    const [date, setDate] = useState("")
 
     const renderView = () => {
         return (
-            <Container style={{ marginTop: Platform.OS === 'ios' ? "49%" : "67%" }}>
+            <Container style={{ marginTop:26 }}>
                 <Content>
                     <Image
                         style={{ height: 140, alignSelf: 'center', width: "90%", marginTop: 10 }}
@@ -91,7 +91,7 @@ const MechanicLocation = (props) => {
                                 onChangeText={(text) => { setFrom(text) }}
                             />
                             <TouchableOpacity
-                                style={{alignSelf: "center", marginRight: 10 }}
+                                style={{ alignSelf: "center", marginRight: 10 }}
                                 activeOpacity={0.7}
                             >
                                 <Image
@@ -100,16 +100,16 @@ const MechanicLocation = (props) => {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24,marginTop:20 }}>To</Text>
+                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
                                 style={styles.inputStyle}
                                 color="black"
                                 value={from}
-                                onChangeText={(text) => {setFrom(text)}}
+                                onChangeText={(text) => { setFrom(text) }}
                             />
                             <TouchableOpacity
-                                style={{alignSelf: "center",marginRight:10}}
+                                style={{ alignSelf: "center", marginRight: 10 }}
                                 activeOpacity={0.7}
                             >
                                 <Image
@@ -118,19 +118,19 @@ const MechanicLocation = (props) => {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24,marginTop:20 }}>Add Date</Text>
+                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>Add Date</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
                                 style={styles.inputStyle}
                                 color="black"
                                 value={date}
-                                onChangeText={(text) => {setDate(text)}}
+                                onChangeText={(text) => { setDate(text) }}
                             />
                             <TouchableOpacity
-                            onPress = {() => {
-                                props.navigation.navigate("Calendar")
-                            }}
-                                style={{alignSelf: "center",marginRight:10}}
+                                onPress={() => {
+                                    props.navigation.navigate("Calendar")
+                                }}
+                                style={{ alignSelf: "center", marginRight: 10 }}
                                 activeOpacity={0.7}
                             >
                                 <Image
@@ -140,33 +140,33 @@ const MechanicLocation = (props) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "5%"}}>
-                        
-                            <View style={{ flexDirection: 'column', width: "32%" }}>
-                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>Start Time</Text>
-                                <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10, alignSelf: "center"}}>
-                                    <DropDown
-                                        item={category_array}
-                                        defaultValue={category}
-                                        width={widthPercentageToDP(30)}
-                                        onChangeItem={(t) => setCategory(t.value)}
-                                        placeholder="Car"
-                                    />
-                                </Row>
-                            </View>
-                            <View style={{ flexDirection: 'column', width: "40%" }}>
-                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>End Time</Text>
-                                <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10, alignSelf: "center",marginRight:30}}>
-                                    <DropDown
-                                        item={category_array}
-                                        defaultValue={category}
-                                        width={widthPercentageToDP(30)}
-                                        onChangeItem={(t) => setCategory(t.value)}
-                                        placeholder="Car"
-                                    />
-                                </Row>
-                            </View>
-                            </View>
+                    <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "5%" }}>
+
+                        <View style={{ flexDirection: 'column', width: "32%" }}>
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>Start Time</Text>
+                            <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10, alignSelf: "center" }}>
+                                <DropDown
+                                    item={category_array}
+                                    defaultValue={category}
+                                    width={widthPercentageToDP(30)}
+                                    onChangeItem={(t) => setCategory(t.value)}
+                                    placeholder="Car"
+                                />
+                            </Row>
+                        </View>
+                        <View style={{ flexDirection: 'column', width: "40%" }}>
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>End Time</Text>
+                            <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10, alignSelf: "center", marginRight: 30 }}>
+                                <DropDown
+                                    item={category_array}
+                                    defaultValue={category}
+                                    width={widthPercentageToDP(30)}
+                                    onChangeItem={(t) => setCategory(t.value)}
+                                    placeholder="Car"
+                                />
+                            </Row>
+                        </View>
+                    </View>
                     <TouchableOpacity
                         style={styles.save}
                         activeOpacity={0.7}
@@ -183,40 +183,38 @@ const MechanicLocation = (props) => {
     }
 
     return (
-
-        <SafeAreaView style={styles.safeArea}>
+        <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
-            <ImageBackground
-                source={require("../../../assets/handyMan.png")}
-                style={styles.image}
-            >
-                <View style={{ height: "22%", justifyContent: 'flex-end' }}>
-                    <Header
-                        imageUrl={require("../../../assets/backWhite.png")}
-                        action={() => {
-                            props.navigation.pop()
-                        }}
-                        imageUrl1={require("../../../assets/homeWhite.png")}
-                        action1={() => {
-                            props.navigation.navigate("HomeScreen")
-                        }}
-                    />
-                </View>
-                <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                    <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>MECHANIC</Text>
-                </View>
-            </ImageBackground>
-            <View style={styles.container}>
-                {
-                    Platform.OS == 'android' ?
-                        renderView()
-                        :
-                        renderView()
-                }
-
+            <View style={{ width: '100%', height: '30%' }}>
+                <ImageBackground
+                    resizeMode="stretch"
+                    source={require("../../../assets/handyMan.png")}
+                    style={styles.image}>
+                    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+                        <View style={{ height: "22%", justifyContent: 'flex-end' }}>
+                            <Header
+                                imageUrl={require("../../../assets/backWhite.png")}
+                                action={() => {
+                                    props.navigation.pop()
+                                }}
+                                imageUrl1={require("../../../assets/homeWhite.png")}
+                                action1={() => {
+                                    props.navigation.navigate("HomeScreen")
+                                }}
+                            />
+                        </View>
+                        <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
+                            <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>MECHANIC</Text>
+                        </View>
+                    </SafeAreaView>
+                </ImageBackground>
             </View>
-
-        </SafeAreaView >
+            <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+                <View style={styles.container}>
+                    {renderView()}
+                </View>
+            </SafeAreaView >
+        </>
     )
 }
 
@@ -226,19 +224,15 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: LS_COLORS.global.cyan,
-
     },
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
     },
     image: {
-        position: 'absolute',
-        width: '100%',
-        height: '55%',
-        zIndex: 10,
-        alignSelf: 'center',
         resizeMode: 'contain',
+        width: '100%',
+        height: '100%',
     },
     save: {
         justifyContent: "center",
@@ -283,10 +277,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: "space-between",
         borderWidth: 1,
-        padding:10
+        padding: 10
     },
     inputStyle: {
-        padding:10
+        padding: 10
     },
 
 

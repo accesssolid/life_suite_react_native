@@ -19,13 +19,12 @@ import Loader from "../../../components/loader"
 import { getApi } from "../../../api/api"
 import { loginReducer } from '../../../redux/features/loginReducer';
 const LoginScreen = (props) => {
-
     const dispatch = useDispatch()
+    const role = useSelector(state => state.authenticate.user_role)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loader, setLoader] = useState(false)
 
-    // on_press_login
     function on_press_login() {
         setLoader(true)
         if (email.length == 0 || password.length == 0) {
@@ -47,52 +46,37 @@ const LoginScreen = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify(user_data),
-            endPoint: '/api/signin',
+            endPoint: role == 1 ? '/api/customerSignin' : '/api/providerSignin',
             type: 'post'
         }
-        console.log(config)
-        getApi(config).then((response) => {
-            console.log(response)
-            if (response.status == true) {
-                showToast(response.message, 'success')
-                storeItem('user', response.data)
-                dispatch(loginReducer(response.data))
-                setLoader(false)
-                props.navigation.navigate("HomeScreen")
-                setEmail("")
-                setPassword("")
-            }
-            else {
-                showToast(response.message, 'danger')
-                setLoader(false)
-            }
-        })
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    showToast(response.message, 'success')
+                    storeItem('user', response.data)
+                    dispatch(loginReducer(response.data))
+                    setEmail("")
+                    setPassword("")
+                    setLoader(false)
+                    if (response.data.user_role == 2) {
+                        props.navigation.navigate("UserStack")
+                    } else {
+                        props.navigation.navigate("ProviderStack")
+                    }
+                }
+                else {
+                    showToast(response.message, 'danger')
+                    setLoader(false)
+                }
+            })
+            .catch(err => {
+
+            })
     }
 
-    // on_press_touch
     async function on_press_touch() {
         const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
-
-        // return ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
-        //     .then((resultObject) => {
-        //         const { success } = resultObject
-        //         if (success) {
-        //             retrieveItem('user').then((data) => {
-        //                 if (data) {
-        //                     storeItem('parentuser', data)
-        //                     dispatch(loginReducer(data))
-        //                 }
-        //                 else {
-        //                     showToast('You have to login First Time', 'danger')
-        //                 }
-        //             })
-        //         } else {
-        //             console.log('user cancelled biometric prompt')
-        //         }
-        //     })
-        //     .catch(() => {
-        //         console.log('biometrics failed')
-        //     })
 
         if (biometryType === Platform.OS == 'ios' ? ReactNativeBiometrics.TouchID : ReactNativeBiometrics.Biometrics) {
             ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
@@ -118,7 +102,7 @@ const LoginScreen = (props) => {
                 })
         }
         else {
-            showToast('Doesnot Support TouchID', 'danger')
+            showToast('Does not Support TouchID', 'danger')
         }
 
     }
@@ -225,18 +209,13 @@ const LoginScreen = (props) => {
                                 <Card style={styles.card}>
                                     <Image
                                         style={styles.image}
-                                        source={require("../../../assets/fingerprint.png")}
+                                        source={require("../../../assets/fingerPrint.png")}
                                     />
                                 </Card>
                             </TouchableOpacity>
 
                         </View>
-                        {
-                            loader == true &&
-                            <Loader />
-
-                        }
-
+                        {loader == true && <Loader />}
                     </Content>
                 </Container>
             </Root>

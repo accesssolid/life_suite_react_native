@@ -17,12 +17,12 @@ import Router from './src/router';
 const App = () => {
   return (
     <Root>
-    <StoreProvider store={store}>
-      <StatusBar backgroundColor={LS_COLORS.global.cyan} barStyle="dark-content" />
-      <SafeAreaProvider>
-        <Router />
-      </SafeAreaProvider>
-    </StoreProvider>
+      <StoreProvider store={store}>
+        <StatusBar backgroundColor={LS_COLORS.global.cyan} barStyle="dark-content" />
+        <SafeAreaProvider>
+          <Router />
+        </SafeAreaProvider>
+      </StoreProvider>
     </Root>
   );
 };
