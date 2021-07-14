@@ -10,21 +10,31 @@ import { useDispatch, useSelector } from 'react-redux';
 /* Methods */
 import { getJsonData } from '../../asyncStorage/async';
 import { retrieveItem, showToast } from '../../components/validators';
-import { loginReducer } from '../../redux/features/loginReducer';
+import { loginReducer, setAuthToken } from '../../redux/features/loginReducer';
 import { getApi } from '../../api/api';
 
 const Splash = (props) => {
     const dispatch = useDispatch()
-    const isAuthorized = useSelector(state => state.authenticate.isAuthorized)
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const user = useSelector(state => state.authenticate.user)
 
     useEffect(() => {
         checkAuth()
     }, [])
 
+    useEffect(() => {
+        if (access_token !== null) {
+            getUser(user.id)
+        }
+    }, [access_token])
+
     const getUser = (id) => {
+        access_token
+        console.log("access_token splash =>", access_token)
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
         let user_data = {
             "user_id": id,
@@ -60,14 +70,16 @@ const Splash = (props) => {
 
     const checkAuth = () => {
         retrieveItem('user').then((data) => {
-            console.log("Dataaaa =>> ", data)
             if (data) {
-                getUser(data.id)
+                dispatch(loginReducer(data))
+                retrieveItem('access_token').then(res => {
+                    dispatch(setAuthToken({ data: res }))
+                })
             }
             else {
                 setTimeout(() => {
                     props.navigation.navigate('WelcomeScreen')
-                }, 2000);                
+                }, 2000);
             }
         })
     }

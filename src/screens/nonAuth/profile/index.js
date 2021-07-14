@@ -8,37 +8,127 @@ import { globalStyles } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Content } from "native-base";
+import ImagePicker from 'react-native-image-crop-picker';
 
 /* Components */
 import Header from '../../../components/header';
 import CustomInput from "../../../components/textInput"
 import CustomButton from "../../../components/customButton"
-import { storeItem } from '../../../components/validators';
+import { showToast, storeItem } from '../../../components/validators';
+import { BASE_URL, getApi } from '../../../api/api';
+import { loadauthentication } from '../../../redux/features/loginReducer';
 
 const Profile = (props) => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.authenticate.user)
-
-    const [lastName, setLastName] = useState("")
-    const [name, setName] = useState("")
-    const [email, setEmail] = useState("")
-    const [no, setNo] = useState("")
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const [userData, setUserData] = useState({ ...user })
+    const [loader, setLoader] = useState(false)
     const [add, setAdd] = useState(true)
     const [edit, setEdit] = useState(true)
-    const [add1, setAdd1] = useState("")
-    const [add2, setAdd2] = useState("")
     const [add3, setAdd3] = useState("")
-    const [add4, setAdd4] = useState("")
     const [number, setNumber] = useState("")
     const [holderName, setHolderName] = useState("")
 
+    useEffect(() => {
+        setUserData({ ...user })
+    }, [user])
+
+    const updateProfilePic = (image) => {
+        setLoader(true)
+        let headers = {
+            'Content-Type': 'multipart/form-data',
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        var formdata = new FormData();
+        formdata.append("user_id", user.id);
+        formdata.append('profile', {
+            uri: Platform.OS == "ios" ? image.path.replace('file:///', '') : image.path,
+            name: image.filename,
+            type: image.mime,
+        });
+
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: user.user_role == 2 ? '/api/customer_profile_update' : '/api/provider_profile_update',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setLoader(false)
+                    dispatch(loadauthentication(response.data))
+                    showToast(response.message, 'success')
+                }
+                else {
+                    setLoader(false)
+                    showToast(response.message, 'danger')
+                }
+            })
+            .catch(err => {
+
+            })
+    }
+
+    const pickImage = () => {
+        ImagePicker.openPicker({
+            width: 400,
+            height: 400,
+            cropping: true
+        }).then(image => {
+            console.log(image);
+            updateProfilePic(image)
+        }).catch(err => {
+            console.log("Image picker error : ", err)
+        })
+    }
+
+    const saveUser = () => {
+        setLoader(true)
+        let headers = {
+            'Content-Type': 'multipart/form-data',
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        var formdata = new FormData();
+        formdata.append("user_id", userData.id);
+        formdata.append("email", userData.email);
+        formdata.append("first_name", userData.first_name);
+        formdata.append("last_name", userData.last_name);
+        formdata.append("phone_number", userData.phone_number);
+        formdata.append("prefer_name", userData.prefer_name);
+
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: user.user_role == 2 ? '/api/customer_detail_update' : '/api/provider_detail_update',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setLoader(false)
+                    dispatch(loadauthentication(response.data))
+                    showToast(response.message, 'success')
+                    props.navigation.pop()
+                }
+                else {
+                    setLoader(false)
+                    showToast(response.message, 'danger')
+                }
+            })
+            .catch(err => {
+
+            })
+    }
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-
             <Header
-                // title="MY INFORMATION"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.pop()
@@ -49,13 +139,13 @@ const Profile = (props) => {
                 }}
             />
             <TouchableOpacity
-                style={{ alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%" }}
+                style={{ height: 116, aspectRatio: 1, alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%", overflow: 'hidden', borderRadius: 70 }}
                 activeOpacity={0.7}
-                onPress={() => {
-                }}>
+                onPress={() => pickImage()}>
                 <Image
-                    style={{ height: 116, width: 116, resizeMode: 'contain' }}
-                    source={require("../../../assets/andrea.png")}
+                    resizeMode='contain'
+                    style={{ height: '100%', width: '100%', }}
+                    source={userData.profile_image ? { uri: BASE_URL + userData.profile_image } : require("../../../assets/andrea.png")}
                 />
             </TouchableOpacity>
 
@@ -69,45 +159,51 @@ const Profile = (props) => {
 
                     <View style={{}}>
                         <Text style={styles.text}>MY INFORMATION</Text>
-                        <Text style={styles.text1}>{user.first_name}</Text>
-                        <Text style={styles.text2}>Profile ID : {user.id}</Text>
+                        <Text style={styles.text1}>{userData.first_name}</Text>
+                        <Text style={styles.text2}>Profile ID : {userData.id}</Text>
                     </View>
 
                     <View style={styles.personalContainer}>
                         <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>PERSONAL INFORMATION</Text>
                         <CustomInput
-                            text="Last Name"
-                            value={lastName}
+                            text="First Name"
+                            value={userData.first_name}
                             onChangeText={(text) => {
-                                setLastName(text)
+                                setUserData({ ...userData, first_name: text })
+                            }}
+                        />
+                        <CustomInput
+                            text="Last Name"
+                            value={userData.last_name}
+                            onChangeText={(text) => {
+                                setUserData({ ...userData, last_name: text })
                             }}
                         />
                         <CustomInput
                             text="Preffered Name"
-                            value={name}
+                            value={userData.prefer_name}
                             onChangeText={(text) => {
-                                setName(text)
+                                setUserData({ ...userData, prefer_name: text })
                             }}
                         />
                         <CustomInput
                             text="Email Address"
-                            value={email}
+                            value={userData.email}
                             onChangeText={(text) => {
-                                setEmail(text)
+                                setUserData({ ...userData, email: text })
                             }}
                         />
                         <CustomInput
                             text="Phone Number"
-                            value={no}
+                            value={userData.phone_number}
                             onChangeText={(text) => {
-                                setNo(text)
+                                setUserData({ ...userData, phone_number: text })
                             }}
                         />
                         <TouchableOpacity
                             onPress={() => {
                                 setAdd(!add)
-                            }}
-                        >
+                            }}>
                             {add ? <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
                                 <Image
                                     style={{ height: 24, width: 24, resizeMode: "contain" }}
@@ -126,40 +222,32 @@ const Profile = (props) => {
                                     <View style={{}}>
                                         <CustomInput
                                             text="ADDRESS LINE 1"
-                                            value={add1}
-                                            onChangeText={(text) => {
-                                                setAdd1(text)
-                                            }}
+                                            value={userData.address[0].address_type.toLowerCase() == "home" ? userData.address[0].address_line_1 : ''}
+                                        // onChangeText={(text) => {
+                                        //     setUserData({ ...signUpData, address: [{ ...userData.address[0], address_line_1: text }] })
+                                        // }}
                                         />
                                         <CustomInput
                                             text="ADDRESS LINE 2"
-                                            value={add2}
-                                            onChangeText={(text) => {
-                                                setAdd2(text)
-                                            }}
+                                            value={userData.address[0].address_type.toLowerCase() == "home" ? userData.address[0].address_line_2 : ''}
+                                        // onChangeText={(text) => {
+                                        //     setUserData({ ...signUpData, address: [{ ...userData.address[0], address_line_2: text }] })
+                                        // }}
                                         />
-                                        <TouchableOpacity
-                                            style={styles.save}
-                                            activeOpacity={0.7}
-                                            onPress={() => {
-                                                setAdd(!add)
-                                            }}
-                                        >
+                                        {/* <TouchableOpacity style={styles.save} activeOpacity={0.7} onPress={() => { setAdd(!add) }}>
                                             <Text style={styles.saveText}>
                                                 Save
                                             </Text>
-                                        </TouchableOpacity>
+                                        </TouchableOpacity> */}
                                     </View>
                                 </>
-
                             }
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={{ marginTop: 10 }}
                             onPress={() => {
                                 setEdit(!edit)
-                            }}
-                        >
+                            }}>
                             {edit ? <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
                                 <Image
                                     style={{ height: 24, width: 24, resizeMode: "contain" }}
@@ -178,31 +266,24 @@ const Profile = (props) => {
 
                                     <CustomInput
                                         text="ADDRESS LINE 1"
-                                        value={add3}
-                                        onChangeText={(text) => {
-                                            setAdd3(text)
-                                        }}
+                                        value={userData.address[0].address_type.toLowerCase() !== "home" ? userData.address[0].address_line_1 : ''}
+                                    // onChangeText={(text) => {
+                                    //     setUserData({ ...signUpData, address: [{ ...userData.address[0], address_line_1: text }] })
+                                    // }}
                                     />
                                     <CustomInput
                                         text="ADDRESS LINE 2"
-                                        value={add4}
-                                        onChangeText={(text) => {
-                                            setAdd4(text)
-                                        }}
+                                        value={userData.address[0].address_type.toLowerCase() !== "home" ? userData.address[0].address_line_1 : ''}
+                                    // onChangeText={(text) => {
+                                    //     setUserData({ ...signUpData, address: [{ ...userData.address[0], address_line_1: text }] })
+                                    // }}
                                     />
-                                    <TouchableOpacity
-                                        style={styles.save}
-                                        activeOpacity={0.7}
-                                        onPress={() => {
-                                            setEdit(!edit)
-                                        }}
-                                    >
+                                    {/* <TouchableOpacity style={styles.save} activeOpacity={0.7} onPress={() => { setEdit(!edit) }}>
                                         <Text style={styles.saveText}>
                                             Save
                                         </Text>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity> */}
                                 </>
-
                             }
                         </TouchableOpacity>
                         <View style={{}}>
@@ -243,8 +324,7 @@ const Profile = (props) => {
                 <TouchableOpacity
                     style={styles.save}
                     activeOpacity={0.7}
-                    onPress={() => {
-                    }}>
+                    onPress={() => saveUser()}>
                     <Text style={styles.saveText}>
                         Save
                     </Text>

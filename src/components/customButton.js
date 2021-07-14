@@ -11,12 +11,9 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const CustomButton = props => {
     return (
-        <TouchableOpacity
-        activeOpacity = {0.7}
-        onPress = {props.action}
-        >
-            <View style={styles.screen}>
-                <Text style={styles.text}>{props.title}</Text>
+        <TouchableOpacity activeOpacity={0.7} onPress={props.action}>
+            <View style={{...styles.screen, ...props.customStyles}}>
+                <Text style={{ ...styles.text, ...props.customTextStyles}}>{props.title}</Text>
             </View>
         </TouchableOpacity>
     )
@@ -28,15 +25,15 @@ const styles = StyleSheet.create({
         width: 311,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor:LS_COLORS.global.green,
-        borderRadius:28,
-        alignSelf:'center'
+        backgroundColor: LS_COLORS.global.green,
+        borderRadius: 28,
+        alignSelf: 'center'
     },
     text: {
         color: LS_COLORS.global.white,
         fontSize: 16,
         lineHeight: 25,
-        fontFamily:LS_FONTS.PoppinsSemiBold
+        fontFamily: LS_FONTS.PoppinsSemiBold
     }
 })
 

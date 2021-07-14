@@ -30,31 +30,48 @@ const HomeServices = (props) => {
             />
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-
                     <SmallCards
                         title1="PLUMBING"
                         imageUrl={require("../../../assets/plumbing.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="GARDENER"
                         imageUrl={require("../../../assets/gardener.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="HOUSE CLEANING"
                         imageUrl={require("../../../assets/cleaning.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: 'space-evenly', top: "5%" }}>
                     <SmallCards
                         title1="HANDYMAN"
                         imageUrl={require("../../../assets/handyMan.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="ELECTRICIAN"
                         imageUrl={require("../../../assets/electrician.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         style={{ borderColor: 'white' }}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                 </View>
             </View>

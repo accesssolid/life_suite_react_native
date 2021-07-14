@@ -16,37 +16,67 @@ import Loader from "../../../components/loader"
 import { showToast } from '../../../components/validators';
 import { getApi } from '../../../api/api';
 import { Container, Content, Root } from 'native-base';
-const SignUpScreen = (props) => {    
+import DropDown from '../../../components/dropDown';
+const SignUpScreen = (props) => {
     const dispatch = useDispatch()
     const role = useSelector(state => state.authenticate.user_role)
-    const [name, setName] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [cnfPass, setCnfPass] = useState("")
     const [loader, setLoader] = useState(false)
+    const [isDropOpen, setIsDropOpen] = useState(false)
+    const [dropValue, setDropValue] = useState("Home")
+    const [signUpData, setSignUpData] = useState({
+        first_name: '',
+        last_name: '',
+        prefer_name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+        phone_number: '',
+        address: { address_line_1: '', address_line_2: '', address_type: 'home', lat: '', long: '' },
+        device_id: '#dev12',
+        fcm_token: '#fcm!234'
+    })
+
+    const dropData = role == 1 ? [{
+        label: 'Home',
+        value: 'Home'
+    },
+    {
+        label: 'Work',
+        value: 'Work'
+    }] : [{
+        label: 'Work',
+        value: 'Work'
+    }]
 
     function on_press_register() {
         setLoader(true)
-        if (name.length == 0 || email.length == 0 || password.length == 0 ||
-            cnfPass.length == 0
-        ) {
-            showToast('Required All Fields', 'danger')
+        Object.keys(signUpData).forEach((element, index) => {
+            console.log(element, index)
+            if (typeof signUpData[element] == String && signUpData[element].trim() == '') {
+                showToast('All fields are required', 'danger')
+                setLoader(false)
+                return false
+            }
+        });
+
+        if (signUpData.address.address_line_1.trim() == '' || signUpData.address.address_line_2.trim() == '') {
+            showToast('All fields are required', 'danger')
             setLoader(false)
             return false
         }
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        if (reg.test(email) == false) {
+        if (reg.test(signUpData.email) == false) {
             showToast('Enter Valid Email', 'danger')
             setLoader(false)
             return false
         }
-        if (password.length < 6) {
+        if (signUpData.password.length < 6) {
             showToast('Password Must have 6 Characters', 'danger')
             setLoader(false)
             return false
         }
-        if (password != cnfPass) {
-            showToast('Password Doesnot Match', 'danger')
+        if (signUpData.password != signUpData.password_confirmation) {
+            showToast('Passwords Does not Match', 'danger')
             setLoader(false)
             return false
         }
@@ -54,12 +84,7 @@ const SignUpScreen = (props) => {
             Accept: "application/json",
             "Content-Type": "application/json"
         }
-        let user_data = {
-            "name": name,
-            "email": email.toLowerCase(),
-            "password": password,
-            "password_confirmation": cnfPass,
-        }
+        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify({ ...signUpData.address, address_type: dropValue }) }
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
@@ -70,11 +95,7 @@ const SignUpScreen = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    showToast('User Registered Successfully', 'success')                                        
-                    setName("")
-                    setEmail("")
-                    setPassword("")
-                    setCnfPass("")
+                    showToast('User Registered Successfully', 'success')                    
                     setLoader(false)
                     props.navigation.navigate('LoginScreen')
                 }
@@ -86,46 +107,92 @@ const SignUpScreen = (props) => {
 
             })
     }
-    
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Root>
                 <Container style={styles.container}>
-                    <Content>
+                    <Content showsVerticalScrollIndicator={false}>
                         <View style={styles.textContainer}>
                             <Text style={styles.loginText}>Signup</Text>
                             <Text style={styles.text}>Add your details to Signup</Text>
                         </View>
                         <View style={styles.textInputContainer}>
                             <CustomTextInput
-                                placeholder="Name"
-                                value={name}
+                                placeholder="First Name"
+                                value={signUpData.first_name}
                                 onChangeText={(text) => {
-                                    setName(text)
+                                    setSignUpData({ ...signUpData, first_name: text })
+                                }}
+                            />
+                            <CustomTextInput
+                                placeholder="Last Name"
+                                value={signUpData.last_name}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, last_name: text })
+                                }}
+                            />
+                            <CustomTextInput
+                                placeholder="Preferred Name"
+                                value={signUpData.prefer_name}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, prefer_name: text })
                                 }}
                             />
                             <CustomTextInput
                                 placeholder="Email"
-                                value={email}
+                                value={signUpData.email}
                                 onChangeText={(text) => {
-                                    setEmail(text)
+                                    setSignUpData({ ...signUpData, email: text })
                                 }}
                             />
                             <CustomTextInput
                                 placeholder="Password"
-                                value={password}
+                                value={signUpData.password}
                                 onChangeText={(text) => {
-                                    setPassword(text)
+                                    setSignUpData({ ...signUpData, password: text })
                                 }}
                                 secureTextEntry
                             />
                             <CustomTextInput
                                 placeholder="Confirm Password"
-                                value={cnfPass}
+                                value={signUpData.password_confirmation}
                                 onChangeText={(text) => {
-                                    setCnfPass(text)
+                                    setSignUpData({ ...signUpData, password_confirmation: text })
                                 }}
                                 secureTextEntry
+                            />
+                            <CustomTextInput
+                                placeholder="Phone Number"
+                                value={signUpData.phone_number}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, phone_number: text })
+                                }}
+                            />
+                            <Text style={{ width: '75%', alignSelf: 'center', marginBottom: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black }}>Address Type</Text>
+                            <DropDown
+                                isOpen={isDropOpen}
+                                setOpen={setIsDropOpen}
+                                item={dropData}
+                                defaultValue={"Home"}
+                                value={dropValue}
+                                setValue={setDropValue}
+                                containerStyle={{ width: '75%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%' }}
+                                dropStyle={{ width: '75%', alignSelf: 'center', backgroundColor: LS_COLORS.global.white }}
+                            />
+                            <CustomTextInput
+                                placeholder="Address line 1"
+                                value={signUpData.address.address_line_1}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, address: { ...signUpData.address, address_line_1: text } })
+                                }}
+                            />
+                            <CustomTextInput
+                                placeholder="Address line 2"
+                                value={signUpData.address.address_line_2}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, address: { ...signUpData.address, address_line_2: text } })
+                                }}
                             />
                         </View>
                         <View style={styles.buttonContainer}>
@@ -146,12 +213,7 @@ const SignUpScreen = (props) => {
                         </View>
                     </Content>
                 </Container>
-                {
-                    loader == true &&
-                    <Loader />
-
-                }
-
+                {loader == true && <Loader />}
             </Root>
         </SafeAreaView>
     )
@@ -194,7 +256,8 @@ const styles = StyleSheet.create({
     alreadyContainer: {
         flexDirection: 'row',
         alignSelf: 'center',
-        marginTop: "3%"
+        marginTop: "3%",
+        marginBottom: '5%'
     },
     already: {
         fontSize: 14,

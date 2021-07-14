@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 /* Components */
 import Header from '../../../components/header';
-import { Card,Container, Content } from 'native-base';
+import { Card, Container, Content } from 'native-base';
 
 const OrderHistory = (props) => {
     const dispatch = useDispatch()
@@ -31,11 +31,10 @@ const OrderHistory = (props) => {
             />
             <Container style={styles.container}>
                 <Content
-                showsVerticalScrollIndicator = {false}
-                showsHorizontalScrollIndicator = {false}
-                >
-                    <Text style={{ fontSize: 16, marginTop:20,marginLeft:15,fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
-                    <View style={{ height: 72, width: "95%", marginTop: 3, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: "#DCFBBD" }}>
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}>
+                    <Text style={{ fontSize: 16, marginTop: 20, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate("InProgress")} style={{ height: 72, width: "95%", marginTop: 3, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: "#DCFBBD" }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
                                 <Image
@@ -57,7 +56,7 @@ const OrderHistory = (props) => {
 
                             </View>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                     <Card style={styles.alexiContainer}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
@@ -144,7 +143,7 @@ const OrderHistory = (props) => {
                             </View>
                         </View>
                     </View>
-                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 20,marginLeft:20 }}>HISTORY</Text>
+                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 20, marginLeft: 20 }}>HISTORY</Text>
                     <View style={{ height: 72, width: "95%", marginTop: 20, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: LS_COLORS.global.white }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View>
@@ -154,7 +153,7 @@ const OrderHistory = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', right: 10 }}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular,color:LS_COLORS.global.green}}>Photographer</Text>
+                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Photographer</Text>
                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>April 20 at 10:10am</Text>
                             </View>
                             <View style={{}}>
@@ -199,7 +198,7 @@ const OrderHistory = (props) => {
                                 />
 
                             </View>
-                            <View style={{ top: "5%" ,right:30}}>
+                            <View style={{ top: "5%", right: 30 }}>
                                 <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Alexi</Text>
                                 <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
                             </View>
@@ -261,7 +260,7 @@ const OrderHistory = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', right: 10 }}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular,color:LS_COLORS.global.green }}>Mechanic</Text>
+                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Mechanic</Text>
                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>April 20 at 10:10am</Text>
                             </View>
                             <View style={{}}>
@@ -306,12 +305,12 @@ const OrderHistory = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', right: 10 }}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular,color:LS_COLORS.global.green }}>Mechanic</Text>
+                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Mechanic</Text>
                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>April 20 at 10:10am</Text>
                             </View>
                             <View style={{}}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, marginTop: 10,textAlign:"center" }}>Cancelled</Text>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green}}>(due to delay)</Text>
+                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, marginTop: 10, textAlign: "center" }}>Cancelled</Text>
+                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>(due to delay)</Text>
                             </View>
                             <View style={{ justifyContent: 'center' }}>
                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>$50</Text>
@@ -343,7 +342,7 @@ const OrderHistory = (props) => {
                         </TouchableOpacity>
                     </View>
                     <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
-                    <View style = {{height:30}}></View>
+                    <View style={{ height: 30 }}></View>
                 </Content>
             </Container>
         </SafeAreaView>
@@ -356,11 +355,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
-       paddingHorizontal:10,
-       paddingBottom:10
+        paddingHorizontal: 10,
+        paddingBottom: 10
     },
     alexiContainer: {
-        maxHeight:'100%',
+        maxHeight: '100%',
         top: "1%",
         width: "95%",
         alignSelf: 'center',

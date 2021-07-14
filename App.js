@@ -5,6 +5,7 @@ import { StatusBar } from 'react-native'
 import { Provider as StoreProvider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Root } from 'native-base';
+
 /* Constants */
 import LS_COLORS from './src/constants/colors';
 

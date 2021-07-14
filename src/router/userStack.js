@@ -17,6 +17,7 @@ import MechanicLocation from '../screens/nonAuth/mechanicLocation';
 import OrderHistory from '../screens/nonAuth/orderHistory';
 import Mechanics from '../screens/nonAuth/mechanics';
 import Client from '../screens/nonAuth/client';
+import InProgress from '../screens/nonAuth/inProgress';
 
 const Stack = createStackNavigator();
 
@@ -36,6 +37,7 @@ const UserStack = () => {
             <Stack.Screen name="OrderHistory" component={OrderHistory} />
             <Stack.Screen name="Mechanics" component={Mechanics} />
             <Stack.Screen name="Client" component={Client} />
+            <Stack.Screen name="InProgress" component={InProgress} />
         </Stack.Navigator>
     )
 }

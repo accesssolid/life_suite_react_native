@@ -18,13 +18,13 @@ const DropDown = (props) => {
             setValue={props.setValue}
             items={props.item}
             zIndex={props.zIndex}
-            style={{ backgroundColor: LS_COLORS.global.white, borderColor: "#C7C7C7", borderRadius: 5 }}
+            style={{ backgroundColor: LS_COLORS.global.white, borderColor: "#C7C7C7", borderRadius: 5, ...props.containerStyle }}
             itemStyle={{
                 justifyContent: 'flex-start',
                 fontFamily: LS_FONTS.PoppinsRegular,
                 fontSize: 12,
                 paddingLeft: 5,
-                backgroundColor: LS_COLORS.global.black
+                backgroundColor: LS_COLORS.global.black,                
             }}
             activeLabelStyle={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.white }}
             labelStyle={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.black }}
@@ -32,8 +32,8 @@ const DropDown = (props) => {
             placeholderStyle={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, }}
             placeholder={props.placeholder}
             defaultValue={props.defaultValue}
-            dropDownStyle={{ backgroundColor: LS_COLORS.global.black, borderColor: LS_COLORS.global.cyan }}
             arrowSize={20}
+            dropDownContainerStyle={{ backgroundColor: LS_COLORS.global.black, borderColor: LS_COLORS.global.cyan, ...props.dropStyle }}
             arrowColor={LS_COLORS.global.white}
             onOpen={props.onOpen}
             onChangeValue={props.onChangeValue}

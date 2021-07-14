@@ -17,7 +17,7 @@ import { retrieveItem, showToast, storeItem } from '../../../components/validato
 import ReactNativeBiometrics from 'react-native-biometrics'
 import Loader from "../../../components/loader"
 import { getApi } from "../../../api/api"
-import { loginReducer } from '../../../redux/features/loginReducer';
+import { loginReducer, setAuthToken } from '../../../redux/features/loginReducer';
 const LoginScreen = (props) => {
     const dispatch = useDispatch()
     const role = useSelector(state => state.authenticate.user_role)
@@ -53,12 +53,15 @@ const LoginScreen = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
+                    setLoader(false)
                     showToast(response.message, 'success')
                     storeItem('user', response.data)
+                    storeItem('user_bio_data', response.data)
+                    storeItem('access_token', response.access_token)
+                    dispatch(setAuthToken({ data: response.access_token }))
                     dispatch(loginReducer(response.data))
                     setEmail("")
                     setPassword("")
-                    setLoader(false)
                     if (response.data.user_role == 2) {
                         props.navigation.navigate("UserStack")
                     } else {
@@ -66,8 +69,8 @@ const LoginScreen = (props) => {
                     }
                 }
                 else {
-                    showToast(response.message, 'danger')
                     setLoader(false)
+                    showToast(response.message, 'danger')
                 }
             })
             .catch(err => {
@@ -83,11 +86,17 @@ const LoginScreen = (props) => {
                 .then((resultObject) => {
                     const { success } = resultObject
                     if (success) {
-                        retrieveItem('user').then((data) => {
+                        retrieveItem('user_bio_data').then((data) => {
                             if (data) {
-                                storeItem('user', data)
                                 dispatch(loginReducer(data))
-                                props.navigation.navigate("HomeScreen")
+                                retrieveItem('access_token').then(res => {
+                                    dispatch(setAuthToken({ data: res }))
+                                    if (data.user_role == 2) {
+                                        props.navigation.navigate("UserStack")
+                                    } else {
+                                        props.navigation.navigate("ProviderStack")
+                                    }
+                                })
                             }
                             else {
                                 showToast('You have to login First Time', 'danger')
@@ -104,7 +113,6 @@ const LoginScreen = (props) => {
         else {
             showToast('Does not Support TouchID', 'danger')
         }
-
     }
 
     // on_press_face
@@ -116,11 +124,17 @@ const LoginScreen = (props) => {
                 .then((resultObject) => {
                     const { success } = resultObject
                     if (success) {
-                        retrieveItem('user').then((data) => {
+                        retrieveItem('user_bio_data').then((data) => {
                             if (data) {
-                                storeItem('user', res.data)
-                                dispatch(loginReducer(res.data))
-                                props.navigation.navigate("HomeScreen")
+                                dispatch(loginReducer(data))
+                                retrieveItem('access_token').then(res => {
+                                    dispatch(setAuthToken({ data: res }))
+                                    if (data.user_role == 2) {
+                                        props.navigation.navigate("UserStack")
+                                    } else {
+                                        props.navigation.navigate("ProviderStack")
+                                    }
+                                })
                             }
                             else {
                                 showToast('You have to login First Time', 'danger')

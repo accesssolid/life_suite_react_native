@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -11,17 +11,18 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const Cards = props => {
     return (
-        <TouchableOpacity 
-        activeOpacity = {0.7}
-        onPress = {props.action}
-        style={styles.mainView}>
-            <View style ={{height:126}}>
-            <Image
-                style={styles.room}
-                source={props.imageUrl}
-            />
+        <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={props.action}
+            style={styles.mainView}>
+            <View style={{ height: 126 }}>
+                <Image
+                    resizeMode="cover"
+                    style={styles.room}
+                    source={props.imageUrl}
+                />
             </View>
-            <View style={{height:68,justifyContent:'center',alignItems:'center'}}>
+            <View style={{ height: 68, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={styles.text}>{props.title1}</Text>
                 <Text style={styles.text}>{props.title2}</Text>
             </View>
@@ -32,7 +33,7 @@ const Cards = props => {
 const styles = StyleSheet.create({
     mainView: {
         height: 194,
-        width: 159,
+        width: '47.5%',
         top: "8%",
         elevation: 200,
         shadowColor: '#00000029',
@@ -44,7 +45,8 @@ const styles = StyleSheet.create({
         },
         shadowRadius: 5,
         shadowOpacity: 1.0,
-        borderRadius: 10
+        borderRadius: 10,
+        overflow:'hidden'
     },
     text: {
         textAlign: 'center',
@@ -53,10 +55,8 @@ const styles = StyleSheet.create({
         fontFamily: LS_FONTS.PoppinsMedium
     },
     room: {
-        resizeMode: 'contain',
-        width: 159,
-        height: 126,
-
+        width: '100%',
+        height: '100%',
     },
 })
 

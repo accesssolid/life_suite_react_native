@@ -87,7 +87,7 @@ const HomeScreen = (props) => {
                                     }}
                                 />
                             </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', top: '5%' }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: '5%' }}>
                                 <Cards
                                     title1="EVENTS"
                                     imageUrl={require("../../../assets/room.png")}

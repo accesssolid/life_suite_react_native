@@ -17,45 +17,63 @@ const Events = (props) => {
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <Header 
-            title="Events" 
-            imageUrl = {require("../../../assets/back.png")}
-            action={() => {
-                props.navigation.pop()
-            }}
-            imageUrl1 = {require("../../../assets/home.png")}
-            action1={() => {
-                props.navigation.navigate("HomeScreen")
-            }}
+            <Header
+                title="Events"
+                imageUrl={require("../../../assets/back.png")}
+                action={() => {
+                    props.navigation.pop()
+                }}
+                imageUrl1={require("../../../assets/home.png")}
+                action1={() => {
+                    props.navigation.navigate("HomeScreen")
+                }}
             />
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
 
-                <SmallCards
+                    <SmallCards
                         title1="WEDDING PLANNER"
                         imageUrl={require("../../../assets/wedding.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="BAND"
                         imageUrl={require("../../../assets/band.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="SINGER"
                         imageUrl={require("../../../assets/singer.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                 </View>
-                <View style={{ flexDirection: "row", justifyContent:'space-evenly',top:"5%"}}>
+                <View style={{ flexDirection: "row", justifyContent: 'space-evenly', top: "5%" }}>
                     <SmallCards
                         title1="CHEF/COOK"
                         imageUrl={require("../../../assets/chef.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="DJ"
                         imageUrl={require("../../../assets/dj.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
-                      title1 = "PHOTOGRAPHER"
-                      imageUrl={require("../../../assets/photo.png")}
+                        title1="PHOTOGRAPHER"
+                        imageUrl={require("../../../assets/photo.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                 </View>
             </View>

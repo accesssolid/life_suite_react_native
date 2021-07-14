@@ -19,11 +19,11 @@ const Automative = (props) => {
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
                 title="Automative"
-                imageUrl = {require("../../../assets/back.png")}
+                imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.pop()
                 }}
-                imageUrl1 = {require("../../../assets/home.png")}
+                imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
                     props.navigation.navigate("HomeScreen")
                 }}
@@ -41,25 +41,39 @@ const Automative = (props) => {
                     <SmallCards
                         title1="GARDENER"
                         imageUrl={require("../../../assets/gardener.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="HOUSE CLEANING"
                         imageUrl={require("../../../assets/cleaning.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: 'space-evenly', top: "5%" }}>
                     <SmallCards
                         title1="MOVING TRUCK"
                         imageUrl={require("../../../assets/truck.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="TOW TRUCK"
                         imageUrl={require("../../../assets/towtTruck.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
-
                     <SmallCards
-
-                    />
+                        style={{ borderColor: 'white' }}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
+                    />                
                 </View>
             </View>
         </SafeAreaView>

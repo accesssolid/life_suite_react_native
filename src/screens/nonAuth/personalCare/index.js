@@ -30,32 +30,49 @@ const PersonalCare = (props) => {
             />
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-
                     <SmallCards
                         title1="LIFE COACH"
                         imageUrl={require("../../../assets/life.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="HAIRSTYLIST"
                         imageUrl={require("../../../assets/hair.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="YOGA"
                         imageUrl={require("../../../assets/yoga.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: 'space-evenly', top: "5%" }}>
                     <SmallCards
                         title1="NUTRITIONIST"
                         imageUrl={require("../../../assets/nutrition.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="PERSONAL TRAINER"
                         imageUrl={require("../../../assets/trainer.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                     <SmallCards
                         title1="ACUPUNCTURIST"
                         imageUrl={require("../../../assets/accu.png")}
+                        action={() => {
+                            props.navigation.navigate("MechanicServicesProvided")
+                        }}
                     />
                 </View>
             </View>
