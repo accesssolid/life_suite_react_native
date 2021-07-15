@@ -34,6 +34,60 @@ const Profile = (props) => {
         setUserData({ ...user })
     }, [user])
 
+    const setAddress = (text, line, type) => {
+        if (type.toLowerCase() == "home") {
+            let newVal = {}
+            if (line == "line1") {
+                newVal = {
+                    "address_line_1": text,
+                    "address_line_2": signUpData.address[0].address_line_2,
+                    "address_type": "home",
+                    "lat": "",
+                    "long": ""
+                }
+                let addr = [...signUpData.address]
+                addr[0] = newVal
+                setUserData({ ...userData, address: [...addr] })
+            } else {
+                newVal = {
+                    "address_line_1": signUpData.address[0].address_line_1,
+                    "address_line_2": text,
+                    "address_type": "home",
+                    "lat": "",
+                    "long": ""
+                }
+                let addr = [...signUpData.address]
+                addr[0] = newVal
+                setUserData({ ...userData, address: [...addr] })
+            }
+        } else {
+            let newVal = {}
+            if (line == "line1") {
+                newVal = {
+                    "address_line_1": text,
+                    "address_line_2": signUpData.address[1].address_line_2,
+                    "address_type": "home",
+                    "lat": "",
+                    "long": ""
+                }
+                let addr = [...signUpData.address]
+                addr[1] = newVal
+                setUserData({ ...userData, address: [...addr] })
+            } else {
+                newVal = {
+                    "address_line_1": signUpData.address[1].address_line_1,
+                    "address_line_2": text,
+                    "address_type": "home",
+                    "lat": "",
+                    "long": ""
+                }
+                let addr = [...signUpData.address]
+                addr[1] = newVal
+                setUserData({ ...userData, address: [...addr] })
+            }
+        }
+    }
+
     const updateProfilePic = (image) => {
         setLoader(true)
         let headers = {
@@ -204,43 +258,43 @@ const Profile = (props) => {
                             onPress={() => {
                                 setAdd(!add)
                             }}>
-                            {add ? <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
-                                <Image
-                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                    source={require("../../../assets/plus.png")}
-                                />
-                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS</Text>
-                            </View> :
-                                <>
+                            {
+                                add
+                                    ?
+                                    user.user_role == 2 &&
                                     <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
                                         <Image
                                             style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                            source={require("../../../assets/minus.png")}
+                                            source={require("../../../assets/plus.png")}
                                         />
                                         <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS</Text>
                                     </View>
-                                    <View style={{}}>
-                                        <CustomInput
-                                            text="ADDRESS LINE 1"
-                                            value={userData.address[0].address_type.toLowerCase() == "home" ? userData.address[0].address_line_1 : ''}
-                                        // onChangeText={(text) => {
-                                        //     setUserData({ ...signUpData, address: [{ ...userData.address[0], address_line_1: text }] })
-                                        // }}
-                                        />
-                                        <CustomInput
-                                            text="ADDRESS LINE 2"
-                                            value={userData.address[0].address_type.toLowerCase() == "home" ? userData.address[0].address_line_2 : ''}
-                                        // onChangeText={(text) => {
-                                        //     setUserData({ ...signUpData, address: [{ ...userData.address[0], address_line_2: text }] })
-                                        // }}
-                                        />
-                                        {/* <TouchableOpacity style={styles.save} activeOpacity={0.7} onPress={() => { setAdd(!add) }}>
-                                            <Text style={styles.saveText}>
-                                                Save
-                                            </Text>
-                                        </TouchableOpacity> */}
-                                    </View>
-                                </>
+                                    :
+                                    <>
+                                        <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
+                                            <Image
+                                                style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                source={require("../../../assets/minus.png")}
+                                            />
+                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS</Text>
+                                        </View>
+                                        <View style={{}}>
+                                            <CustomInput
+                                                text="ADDRESS LINE 1"
+                                                value={userData.address[0].address_line_1}
+                                                onChangeText={(text) => {
+                                                    setAddress(text, "line1", "home")
+                                                }}
+                                            />
+                                            <CustomInput
+                                                text="ADDRESS LINE 2"
+                                                value={userData.address[0].address_line_2}
+                                                onChangeText={(text) => {
+                                                    setAddress(text, "line2", "home")
+                                                }}
+                                            />
+                                        </View>
+                                    </>
                             }
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -266,23 +320,19 @@ const Profile = (props) => {
 
                                     <CustomInput
                                         text="ADDRESS LINE 1"
-                                        value={userData.address[0].address_type.toLowerCase() !== "home" ? userData.address[0].address_line_1 : ''}
-                                    // onChangeText={(text) => {
-                                    //     setUserData({ ...signUpData, address: [{ ...userData.address[0], address_line_1: text }] })
-                                    // }}
+                                        value={userData.address[1].address_line_1}
+                                        onChangeText={(text) => {
+                                            setAddress(text, "line1", "work")
+                                        }}
                                     />
                                     <CustomInput
                                         text="ADDRESS LINE 2"
                                         value={userData.address[0].address_type.toLowerCase() !== "home" ? userData.address[0].address_line_1 : ''}
-                                    // onChangeText={(text) => {
-                                    //     setUserData({ ...signUpData, address: [{ ...userData.address[0], address_line_1: text }] })
-                                    // }}
+                                        value={userData.address[1].address_line_1}
+                                        onChangeText={(text) => {
+                                            setAddress(text, "line2", "work")
+                                        }}
                                     />
-                                    {/* <TouchableOpacity style={styles.save} activeOpacity={0.7} onPress={() => { setEdit(!edit) }}>
-                                        <Text style={styles.saveText}>
-                                            Save
-                                        </Text>
-                                    </TouchableOpacity> */}
                                 </>
                             }
                         </TouchableOpacity>
@@ -294,33 +344,52 @@ const Profile = (props) => {
                         </View>
                         <View style={{ height: 40 }}></View>
                     </View>
-                    <View style={{ ...styles.personalContainer, marginTop: 20 }}>
-                        <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION</Text>
-                        <CustomInput
-                            text="Credit Card Number"
-                            value={number}
-                            onChangeText={(text) => {
-                                setNumber(text)
-                            }}
-                        />
-                        <CustomInput
-                            text="Credit Card Holder Name"
-                            value={holderName}
-                            onChangeText={(text) => {
-                                setHolderName(text)
-                            }}
-                        />
-                        <CustomInput
-                            text="Expiry Date"
-                            value={number}
-                            onChangeText={(text) => {
-                                setNumber(text)
-                            }}
-                        />
-                        <View style={{ height: 50 }}></View>
-                    </View>
+                    {
+                        user.user_role == 2
+                            ?
+                            <View style={{ ...styles.personalContainer, marginTop: 20 }}>
+                                <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION</Text>
+                                <CustomInput
+                                    text="Credit Card Number"
+                                    value={number}
+                                    onChangeText={(text) => {
+                                        setNumber(text)
+                                    }}
+                                />
+                                <CustomInput
+                                    text="Credit Card Holder Name"
+                                    value={holderName}
+                                    onChangeText={(text) => {
+                                        setHolderName(text)
+                                    }}
+                                />
+                                <CustomInput
+                                    text="Expiry Date"
+                                    value={number}
+                                    onChangeText={(text) => {
+                                        setNumber(text)
+                                    }}
+                                />
+                                <View style={{ height: 50 }} />
+                            </View>
+                            :
+                            <View style={{ ...styles.personalContainer, paddingVertical: 20, marginTop: 10 }}>
+                                <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Bank Information</Text>
+                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
+                                    activeOpacity={0.7}
+                                    onPress={() => alert('x')}>
+                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Add Accounts</Text>
+                                    <View style={{ height: 21, aspectRatio: 1 }}>
+                                        <Image
+                                            style={{ height: '100%', width: '100%', resizeMode: "contain" }}
+                                            source={require("../../../assets/plus.png")}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                    }
                 </View>
-                <View style={{ height: 200 }} />
+                <View style={{ height: 100 }} />
                 <TouchableOpacity
                     style={styles.save}
                     activeOpacity={0.7}
@@ -397,7 +466,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,
         alignSelf: 'center',
-        marginTop: 20
+        marginTop: 40
     },
     saveText: {
         textAlign: "center",

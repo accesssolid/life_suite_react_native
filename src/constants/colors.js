@@ -11,7 +11,8 @@ const LS_COLORS = {
         lightTextColor:'#BCBCBC',
         textInutBorderColor:'#E5E5E5',
         textCyan: '#04BFBF',
-        divider: '#CFCFCF'
+        divider: '#CFCFCF',
+        darkGray:'#5A5A5A'
     },
 }
 

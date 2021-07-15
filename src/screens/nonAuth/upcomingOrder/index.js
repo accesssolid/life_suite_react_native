@@ -17,7 +17,7 @@ import { Card, Container, Content } from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CustomButton from '../../../components/customButton';
 
-const InProgress = (props) => {
+const UpcomingOrder = (props) => {
     const dispatch = useDispatch()
 
     const progressData = [
@@ -53,7 +53,7 @@ const InProgress = (props) => {
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
-                title="In Progress"
+                title="Upcoming"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.pop()
@@ -133,21 +133,17 @@ const InProgress = (props) => {
                     </View>
                     <CustomButton title="Send Message" customStyles={{ width: '50%', height: 40, marginTop: 28 }} />
                     <View style={{ alignItems: 'center', marginVertical: 15, marginTop: 30, justifyContent: 'center' }}>
-                        <Text style={{ backgroundColor: LS_COLORS.global.white, zIndex: 5, paddingHorizontal: 15, fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, }}>Job is in progress.</Text>
+                        <Text style={{ backgroundColor: LS_COLORS.global.white, zIndex: 5, paddingHorizontal: 15, fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, }}>Upcoming Job</Text>
                         <View style={{ position: 'absolute', borderTopWidth: 2, borderTopColor: LS_COLORS.global.textCyan, width: '85%', }} />
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20, width:'85%', alignSelf:'center' }}>
-                        <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack, }}>Actual Start Time:</Text>
-                        <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.darkBlack, }}>10:10 am</Text>
-                    </View>
+                    </View>                
                 </Content>
-                <CustomButton action={() => props.navigation.navigate('SuspendInProgress')} title="Suspend" customStyles={{ width: '50%', height: 40, marginTop: 10 }} />
+                <CustomButton action={() => props.navigation.navigate('CancelConfirmation')} title="Cancel" customStyles={{ width: '50%', height: 40, marginTop: 10 }} />
             </Container>
         </SafeAreaView>
     )
 }
 
-export default InProgress;
+export default UpcomingOrder;
 
 const styles = StyleSheet.create({
     container: {

@@ -35,10 +35,7 @@ const SureModal = props => {
             <TouchableOpacity
               style={styles.save}
               activeOpacity={0.7}
-              onPress={() => {
-                props.navigation.navigate("OrderHistory")
-              }}
-            >
+              onPress={props.action}>
               <Text style={styles.saveText}>Yes</Text>
             </TouchableOpacity>
             <TouchableOpacity

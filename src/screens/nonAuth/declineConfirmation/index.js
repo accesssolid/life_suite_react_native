@@ -23,6 +23,7 @@ const DeclineConfirmation = (props) => {
                     setOpen(!open);
                 }}
                 visible={open}
+                action1={() => props.navigation.navigate("OrderHistory")}
                 action1={() => {
                     setOpen(!open);
                 }}
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: "15%"
     },
-    
+
     saveText: {
         textAlign: "center",
         fontSize: 12,

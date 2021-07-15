@@ -636,7 +636,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = S94D73XQXZ;
+				DEVELOPMENT_TEAM = 8U4D2VUU8U;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = LifeSuite/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -648,7 +648,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite;
+				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite.app;
 				PRODUCT_NAME = LifeSuite;
 				PROVISIONING_PROFILE_SPECIFIER = "LifeSuite Dev";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -667,7 +667,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = S94D73XQXZ;
+				DEVELOPMENT_TEAM = 8U4D2VUU8U;
 				INFOPLIST_FILE = LifeSuite/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -678,7 +678,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite;
+				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite.app;
 				PRODUCT_NAME = LifeSuite;
 				PROVISIONING_PROFILE_SPECIFIER = "LifeSuite Dev";
 				SWIFT_VERSION = 5.0;

@@ -15,16 +15,15 @@ const Cards = props => {
             activeOpacity={0.7}
             onPress={props.action}
             style={styles.mainView}>
-            <View style={{ height: 126 }}>
+            <View style={{ flex: 1, borderTopLeftRadius: 10, borderTopEndRadius: 10, overflow: 'hidden' }}>
                 <Image
                     resizeMode="cover"
                     style={styles.room}
                     source={props.imageUrl}
                 />
             </View>
-            <View style={{ height: 68, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 10 }}>
                 <Text style={styles.text}>{props.title1}</Text>
-                <Text style={styles.text}>{props.title2}</Text>
             </View>
         </TouchableOpacity>
     )
@@ -32,12 +31,10 @@ const Cards = props => {
 
 const styles = StyleSheet.create({
     mainView: {
-        height: 194,
+        // height: 194,
+        aspectRatio: 1,
         width: '47.5%',
-        top: "8%",
-        elevation: 200,
-        shadowColor: '#00000029',
-        backgroundColor: 'white',
+        elevation: 5,
         shadowColor: '#00000029',
         shadowOffset: {
             width: 0,
@@ -46,7 +43,8 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         shadowOpacity: 1.0,
         borderRadius: 10,
-        overflow:'hidden'
+        backgroundColor: LS_COLORS.global.white,
+        marginBottom: 20
     },
     text: {
         textAlign: 'center',

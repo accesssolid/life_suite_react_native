@@ -28,30 +28,34 @@ const ServicesProvided = (props) => {
 
     const [oil, setOil] = useState("")
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
-            <ImageBackground
-                source={require("../../../assets/handyMan.png")}
-                style={styles.image}
-            >
-                <View style={{ height: "22%", justifyContent: 'flex-end' }}>
-                    <Header
-                        imageUrl={require("../../../assets/backWhite.png")}
-                        action={() => {
-                            props.navigation.pop()
-                        }}
-                        imageUrl1={require("../../../assets/homeWhite.png")}
-                        action1={() => {
-                            props.navigation.navigate("HomeScreen")
-                        }}
-                    />
-                </View>
-                <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                    <Text style={styles.mechanic}>MECHANIC</Text>
-                </View>
-            </ImageBackground>
-            <View style={styles.container}>
-                <Container style={{ paddingTop: Platform.OS === 'ios' ? "49%" : "67%" }}>
+            <View style={{ width: '100%', height: '30%' }}>
+                <ImageBackground
+                    resizeMode="stretch"
+                    source={require("../../../assets/handyMan.png")}
+                    style={styles.image}>
+                    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+                        <View style={{ height: "22%", justifyContent: 'flex-end' }}>
+                            <Header
+                                imageUrl={require("../../../assets/backWhite.png")}
+                                action={() => {
+                                    props.navigation.pop()
+                                }}
+                                imageUrl1={require("../../../assets/homeWhite.png")}
+                                action1={() => {
+                                    props.navigation.navigate("HomeScreen")
+                                }}
+                            />
+                        </View>
+                        <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
+                            <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>MECHANIC</Text>
+                        </View>
+                    </SafeAreaView>
+                </ImageBackground>
+            </View>
+            <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+                <Container>
                     <Content>
                         <Text style={styles.service}>SERVICES</Text>
                         <View style={styles.price}>
@@ -68,7 +72,7 @@ const ServicesProvided = (props) => {
                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                             />
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center' }}>Oil</Text>
-                            <View style={{ flex: 1, justifyContent:'flex-end', flexDirection:'row' }}>
+                            <View style={{ flex: 1, justifyContent: 'flex-end', flexDirection: 'row' }}>
                                 <View style={styles.fromContainer}>
                                     <TextInput
                                         style={styles.inputStyle}
@@ -174,7 +178,6 @@ const ServicesProvided = (props) => {
                                 checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                             />
-
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center' }}>Other</Text>
                             <View style={styles.fromContainer}>
                                 <TextInput
@@ -188,8 +191,9 @@ const ServicesProvided = (props) => {
                         <View style={{ height: 30 }}></View>
                     </Content>
                 </Container>
-            </View>
-        </SafeAreaView >
+                {/* </View> */}
+            </SafeAreaView >
+        </>
     )
 }
 
@@ -199,18 +203,15 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: LS_COLORS.global.cyan,
-
     },
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
     },
     image: {
-        position: 'absolute',
         resizeMode: 'contain',
-        width: '101%',
-        height: '55%',
-        zIndex: 10,
+        width: '100%',
+        height: '100%',
     },
     mechanic: {
         fontSize: 29,

@@ -29,7 +29,7 @@ function CustomInput({
         <Item
             regular
             style={{
-                marginTop: 35,
+                marginTop: text && text.trim() !== '' ? 35 : 0,
                 borderRadius: 7,
                 borderColor: LS_COLORS.global.textInutBorderColor,
                 paddingLeft: 16,
@@ -37,16 +37,8 @@ function CustomInput({
                 maxWidth: '90%',
                 alignSelf: 'center',
             }}>
-            <View
-                style={{
-                    position: 'absolute', top: -11, left: 20, paddingHorizontal: 5, backgroundColor: LS_COLORS.global.white
-                }}>
-                <Text
-                    style={{
-                        color: LS_COLORS.global.grey,
-                        fontSize: 16,
-                        fontFamily: LS_FONTS.PoppinsRegular,
-                    }}>
+            <View style={{ position: 'absolute', top: -11, left: 20, paddingHorizontal: 5, backgroundColor: LS_COLORS.global.white }}>
+                <Text style={{ color: LS_COLORS.global.grey, fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular, }}>
                     {text}
                 </Text>
             </View>

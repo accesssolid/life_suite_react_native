@@ -12,7 +12,8 @@ const authenticateSlice = createSlice({
         modal: true,
         initial: 'SelectOption',
         user_role: 1,
-        access_token: null
+        access_token: null,
+        services: []
     },
     reducers: {
         loadauthentication: (state, action) => {
@@ -43,10 +44,13 @@ const authenticateSlice = createSlice({
         setAuthToken: (state, action) => {
             state.access_token = action.payload.data
         },
+        setServices: (state, action) => {
+            state.services = action.payload.data
+        },
     }
 })
 
-export const { logoutState, loadauthentication, friendauthentication, fcmToken, modalState, loadInitial, setUserRole, setAuthToken } = authenticateSlice.actions
+export const { logoutState, loadauthentication, friendauthentication, fcmToken, modalState, loadInitial, setUserRole, setAuthToken, setServices } = authenticateSlice.actions
 
 export const loginReducer = (data) => {
     return async (dispatch) => {

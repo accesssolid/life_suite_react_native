@@ -31,7 +31,22 @@ const SignUpScreen = (props) => {
         password: '',
         password_confirmation: '',
         phone_number: '',
-        address: { address_line_1: '', address_line_2: '', address_type: 'home', lat: '', long: '' },
+        address: [
+            {
+                "address_line_1": "",
+                "address_line_2": "",
+                "address_type": "home",
+                "lat": "",
+                "long": ""
+            },
+            {
+                "address_line_1": "",
+                "address_line_2": "",
+                "address_type": "work",
+                "lat": "",
+                "long": ""
+            }
+        ],
         device_id: '#dev12',
         fcm_token: '#fcm!234'
     })
@@ -48,10 +63,64 @@ const SignUpScreen = (props) => {
         value: 'Work'
     }]
 
+    const setAddress = (text, line) => {
+        if (dropValue.toLowerCase() == "home") {
+            let newVal = {}
+            if (line == "line1") {
+                newVal = {
+                    "address_line_1": text,
+                    "address_line_2": signUpData.address[0].address_line_2,
+                    "address_type": "home",
+                    "lat": "",
+                    "long": ""
+                }
+                let addr = [...signUpData.address]
+                addr[0] = newVal
+                setSignUpData({ ...signUpData, address: [...addr] })
+            } else {
+                newVal = {
+                    "address_line_1": signUpData.address[0].address_line_1,
+                    "address_line_2": text,
+                    "address_type": "home",
+                    "lat": "",
+                    "long": ""
+                }
+                let addr = [...signUpData.address]
+                addr[0] = newVal
+                setSignUpData({ ...signUpData, address: [...addr] })
+            }
+        } else {
+            let newVal = {}
+            if (line == "line1") {
+                newVal = {
+                    "address_line_1": text,
+                    "address_line_2": signUpData.address[1].address_line_2,
+                    "address_type": "work",
+                    "lat": "",
+                    "long": ""
+                }
+                let addr = [...signUpData.address]
+                addr[1] = newVal
+                setSignUpData({ ...signUpData, address: [...addr] })
+            } else {
+                newVal = {
+                    "address_line_1": signUpData.address[1].address_line_1,
+                    "address_line_2": text,
+                    "address_type": "work",
+                    "lat": "",
+                    "long": ""
+                }
+                let addr = [...signUpData.address]
+                addr[1] = newVal
+                setSignUpData({ ...signUpData, address: [...addr] })
+            }
+        }
+    }
+
     function on_press_register() {
         setLoader(true)
         Object.keys(signUpData).forEach((element, index) => {
-            console.log(element, index)
+            console.log(element, index, signUpData[element])
             if (typeof signUpData[element] == String && signUpData[element].trim() == '') {
                 showToast('All fields are required', 'danger')
                 setLoader(false)
@@ -59,10 +128,26 @@ const SignUpScreen = (props) => {
             }
         });
 
-        if (signUpData.address.address_line_1.trim() == '' || signUpData.address.address_line_2.trim() == '') {
-            showToast('All fields are required', 'danger')
-            setLoader(false)
-            return false
+        if (role == 1) {
+            if (dropValue.toLowerCase() == "home") {
+                if (signUpData.address[0].address_line_1.trim() == '' || signUpData.address[0].address_line_2.trim() == '') {
+                    showToast('All fields are required', 'danger')
+                    setLoader(false)
+                    return false
+                }
+            } else {
+                if (signUpData.address[1].address_line_1.trim() == '' || signUpData.address[1].address_line_2.trim() == '') {
+                    showToast('All fields are required', 'danger')
+                    setLoader(false)
+                    return false
+                }
+            }
+        } else {
+            if (signUpData.address[1].address_line_1.trim() == '' || signUpData.address[1].address_line_2.trim() == '') {
+                showToast('All fields are required', 'danger')
+                setLoader(false)
+                return false
+            }
         }
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         if (reg.test(signUpData.email) == false) {
@@ -84,7 +169,7 @@ const SignUpScreen = (props) => {
             Accept: "application/json",
             "Content-Type": "application/json"
         }
-        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify({ ...signUpData.address, address_type: dropValue }) }
+        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(signUpData.address) }
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
@@ -95,7 +180,7 @@ const SignUpScreen = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    showToast('User Registered Successfully', 'success')                    
+                    showToast('User Registered Successfully', 'success')
                     setLoader(false)
                     props.navigation.navigate('LoginScreen')
                 }
@@ -183,16 +268,12 @@ const SignUpScreen = (props) => {
                             <CustomTextInput
                                 placeholder="Address line 1"
                                 value={signUpData.address.address_line_1}
-                                onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, address: { ...signUpData.address, address_line_1: text } })
-                                }}
+                                onChangeText={(text) => setAddress(text, "line1")}
                             />
                             <CustomTextInput
                                 placeholder="Address line 2"
                                 value={signUpData.address.address_line_2}
-                                onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, address: { ...signUpData.address, address_line_2: text } })
-                                }}
+                                onChangeText={(text) => setAddress(text, "line2")}
                             />
                         </View>
                         <View style={styles.buttonContainer}>

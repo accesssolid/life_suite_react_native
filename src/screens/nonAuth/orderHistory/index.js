@@ -57,48 +57,49 @@ const OrderHistory = (props) => {
                             </View>
                         </View>
                     </TouchableOpacity>
-                    <Card style={styles.alexiContainer}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <View>
-                                <Image
-                                    style={{ height: 100, width: 100, resizeMode: 'contain' }}
-                                    source={require("../../../assets/man.png")}
-                                />
-                                <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>Rating * * * * *</Text>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('UpcomingOrder')}>
+                        <Card style={styles.alexiContainer}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View>
+                                    <Image
+                                        style={{ height: 100, width: 100, resizeMode: 'contain' }}
+                                        source={require("../../../assets/man.png")}
+                                    />
+                                    <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>Rating * * * * *</Text>
 
+                                </View>
+                                <View style={{ right: 10, top: "8%" }}>
+                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Alexi</Text>
+                                    <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
+                                </View>
+                                <View style={{}}>
+                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Upcoming</Text>
+                                </View>
+                                <View style={{}}>
+                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>2.5Hrs</Text>
+                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green }}>$15</Text>
+                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>2/2/2021</Text>
+                                </View>
                             </View>
-                            <View style={{ right: 10, top: "8%" }}>
-                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Alexi</Text>
-                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
+                            <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
+                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 1</Text>
+                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular }}>$10</Text>
                             </View>
-                            <View style={{}}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Upcoming</Text>
-
+                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 2</Text>
+                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular }}>$10</Text>
                             </View>
-                            <View style={{}}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>2.5Hrs</Text>
-                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green }}>$15</Text>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>2/2/2021</Text>
+                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 3</Text>
+                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>$10</Text>
                             </View>
-                        </View>
-                        <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
-                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 1</Text>
-                            <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular }}>$10</Text>
-                        </View>
-                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 2</Text>
-                            <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular }}>$10</Text>
-                        </View>
-                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 3</Text>
-                            <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>$10</Text>
-                        </View>
-                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Time</Text>
-                            <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>2.5 hrs</Text>
-                        </View>
-                    </Card>
+                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Time</Text>
+                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>2.5 hrs</Text>
+                            </View>
+                        </Card>
+                    </TouchableOpacity>
                     <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginTop: 10 }}>
                         <TouchableOpacity
                             style={styles.save}

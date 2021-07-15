@@ -3,12 +3,10 @@ import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, To
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
-import { globalStyles } from '../../../utils';
 import LS_FONTS from '../../../constants/fonts';
-import CustomDropDown from '../../../components/dropDown';
 
 /* Packages */
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { CheckBox } from 'react-native-elements'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -18,7 +16,7 @@ import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Container, Content, Row, } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
-import { Dimensions } from 'react-native';
+import { BASE_URL } from '../../../api/api';
 
 const category_array = [
     {
@@ -55,8 +53,9 @@ const category_array = [
     },
 ]
 
-const MechanicServicesProvided = (props) => {
+const ServicesProvided = (props) => {
     const dispatch = useDispatch()
+    const { subService } = props.route.params
     const [checked, setChecked] = useState(false);
     const [checked1, setChecked1] = useState(false);
     const [checked2, setChecked2] = useState(false);
@@ -94,37 +93,39 @@ const MechanicServicesProvided = (props) => {
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="stretch"
-                    source={require("../../../assets/handyMan.png")}
+                    source={{ uri: BASE_URL + subService.image }}
                     style={styles.image}>
-                    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                        <View style={{ height: "22%", justifyContent: 'flex-end' }}>
-                            <Header
-                                imageUrl={require("../../../assets/backWhite.png")}
-                                action={() => {
-                                    props.navigation.pop()
-                                }}
-                                imageUrl1={require("../../../assets/homeWhite.png")}
-                                action1={() => {
-                                    props.navigation.navigate("HomeScreen")
-                                }}
-                            />
-                        </View>
-                        <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                            <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>MECHANIC</Text>
-                        </View>
-                    </SafeAreaView>
+                    <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.5)' }}>
+                        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+                            <View style={{ height: "22%", justifyContent: 'flex-end' }}>
+                                <Header
+                                    imageUrl={require("../../../assets/backWhite.png")}
+                                    action={() => {
+                                        props.navigation.pop()
+                                    }}
+                                    imageUrl1={require("../../../assets/homeWhite.png")}
+                                    action1={() => {
+                                        props.navigation.navigate("HomeScreen")
+                                    }}
+                                />
+                            </View>
+                            <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
+                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                            </View>
+                        </SafeAreaView>
+                    </View>
                 </ImageBackground>
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    <Container style={{ marginTop:26 }}>
+                    <Container style={{ marginTop: 26 }}>
                         <Content>
                             <View>
                                 <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginLeft: 24 }}>Vechile Type</Text>
                                 <Row style={{ width: widthPercentageToDP(85), justifyContent: 'space-between', marginTop: 10, alignSelf: "center", zIndex: 10 }}>
                                     <DropDown
                                         isOpen={dropData.vehicleType.isOpen}
-                                        setOpen={() => setDropData({ ...dropData, vehicleType: { ...dropData.vehicleType, isOpen: !dropData.vehicleType.isOpen } })}
+                                        // setOpen={() => setDropData({ ...dropData, vehicleType: { ...dropData.vehicleType, isOpen: !dropData.vehicleType.isOpen } })}
                                         item={category_array}
                                         defaultValue={vehicleType}
                                         value={vehicleType}
@@ -139,7 +140,7 @@ const MechanicServicesProvided = (props) => {
                                     <Row style={{ width: widthPercentageToDP(24), justifyContent: 'space-between', marginTop: 10, alignSelf: "center" }}>
                                         <DropDown
                                             isOpen={dropData.make.isOpen}
-                                            setOpen={() => setDropData({ ...dropData, make: { ...dropData.make, isOpen: !dropData.make.isOpen } })}
+                                            // setOpen={() => setDropData({ ...dropData, make: { ...dropData.make, isOpen: !dropData.make.isOpen } })}
                                             item={category_array}
                                             defaultValue={make}
                                             value={make}
@@ -153,7 +154,7 @@ const MechanicServicesProvided = (props) => {
                                     <Row style={{ width: widthPercentageToDP(24), justifyContent: 'space-between', marginTop: 10, alignSelf: "center" }}>
                                         <DropDown
                                             isOpen={dropData.model.isOpen}
-                                            setOpen={() => setDropData({ ...dropData, model: { ...dropData.model, isOpen: !dropData.model.isOpen } })}
+                                            // setOpen={() => setDropData({ ...dropData, model: { ...dropData.model, isOpen: !dropData.model.isOpen } })}
                                             item={category_array}
                                             defaultValue={modal}
                                             value={modal}
@@ -167,7 +168,7 @@ const MechanicServicesProvided = (props) => {
                                     <Row style={{ width: widthPercentageToDP(24), justifyContent: 'space-between', marginTop: 10, alignSelf: "center" }}>
                                         <DropDown
                                             isOpen={dropData.year.isOpen}
-                                            setOpen={() => setDropData({ ...dropData, year: { ...dropData.year, isOpen: !dropData.year.isOpen } })}
+                                            // setOpen={() => setDropData({ ...dropData, year: { ...dropData.year, isOpen: !dropData.year.isOpen } })}
                                             item={category_array}
                                             defaultValue={year}
                                             value={year}
@@ -316,7 +317,7 @@ const MechanicServicesProvided = (props) => {
     )
 }
 
-export default MechanicServicesProvided;
+export default ServicesProvided;
 
 const styles = StyleSheet.create({
     safeArea: {

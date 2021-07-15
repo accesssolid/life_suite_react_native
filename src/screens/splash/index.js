@@ -29,8 +29,7 @@ const Splash = (props) => {
     }, [access_token])
 
     const getUser = (id) => {
-        access_token
-        console.log("access_token splash =>", access_token)
+        console.log("user =>", user)
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -42,7 +41,7 @@ const Splash = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify(user_data),
-            endPoint: '/api/customer_detail',
+            endPoint: user.user_role == 2 ? '/api/customer_detail' : '/api/provider_detail',
             type: 'post'
         }
 

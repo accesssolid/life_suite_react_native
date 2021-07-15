@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -11,17 +11,17 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const SmallCards = props => {
     return (
-        <TouchableOpacity 
-        activeOpacity = {0.7}
-        onPress = {props.action}
-        style={styles.mainView}>
-            <View style ={{height:92,width:116}}>
-            <Image
-                style={styles.room}
-                source={props.imageUrl}
-            />
+        <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={props.action}
+            style={styles.mainView}>
+            <View style={{ height: 92, width: 116 }}>
+                <Image
+                    style={styles.room}
+                    source={props.imageUrl}
+                />
             </View>
-            <View style={{height:28,justifyContent:'center',alignItems:'center'}}>
+            <View style={{ height: 28, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={styles.text}>{props.title1}</Text>
             </View>
         </TouchableOpacity>
@@ -44,8 +44,9 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         shadowOpacity: 1.0,
         borderRadius: 10,
-        borderColor:'#ACF0F2',
-        borderWidth:1,
+        borderColor: '#ACF0F2',
+        borderWidth: 1,
+        marginLeft:'2%'
     },
     text: {
         textAlign: 'center',
@@ -54,8 +55,7 @@ const styles = StyleSheet.create({
         fontFamily: LS_FONTS.PoppinsMedium
     },
     room: {
-        height:92,width:112
-
+        height: 92, width: 112
     },
 })
 
