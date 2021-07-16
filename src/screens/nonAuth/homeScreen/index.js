@@ -15,10 +15,13 @@ import { BASE_URL, getApi } from '../../../api/api';
 import { setServices } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
 
+const dummyJobs = [{"created_at": "2021-07-15T10:49:29.000000Z", "id": 10, "image": "/storage/service/1626346169.png", "name": "Plumbing", "parent_id": 6, "status": 1, "updated_at": "2021-07-15T10:49:29.000000Z"}, {"created_at": "2021-07-15T10:49:47.000000Z", "id": 11, "image": "/storage/service/1626346187.png", "name": "Gardner", "parent_id": 6, "status": 1, "updated_at": "2021-07-15T10:49:47.000000Z"}]
+
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.authenticate.user)
     const services = useSelector(state => state.authenticate.services)
+    const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
@@ -65,7 +68,7 @@ const HomeScreen = (props) => {
                         onPress={() => { props.navigation.navigate("Profile") }}>
                         <Image
                             style={styles.image}
-                            source={require("../../../assets/women.png")}
+                            source={user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/andrea.png")}
                         />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.search}
@@ -78,7 +81,7 @@ const HomeScreen = (props) => {
                         />
                     </TouchableOpacity>
                 </View>
-                {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom:15 }} activeOpacity={0.7} onPress={() => { }}>
+                {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7} onPress={() => setIsAddJobActive(!isAddJobActive)}>
                     <View style={{ height: 30, aspectRatio: 1 }}>
                         <Image source={require('../../../assets/addgreen.png')} resizeMode="contain" style={{ width: '100%', height: '100%' }} />
                     </View>
@@ -88,14 +91,49 @@ const HomeScreen = (props) => {
                     ?
                     <>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Cards
-                                title1="Mechanic"
-                                title2="Mechanic"
-                                imageUrl={require("../../../assets/room.png")}
-                                action={() => {
-                                    props.navigation.navigate("ServicesProvided");
-                                }}
-                            />
+                            {
+                                isAddJobActive
+                                    ?
+                                    <View style={{ flex: 1, paddingTop: '5%' }}>
+                                        <FlatList
+                                            data={services}
+                                            numColumns={2}
+                                            columnWrapperStyle={{ justifyContent: 'space-between' }}
+                                            renderItem={({ item, index }) => {
+                                                return (
+                                                    <Cards
+                                                        title1={item.name}
+                                                        title2="SERVICES"
+                                                        imageUrl={{ uri: BASE_URL + item.image }}
+                                                        action={() => {
+                                                            props.navigation.navigate("SubServices", { service: item });
+                                                        }}
+                                                    />
+                                                )
+                                            }}
+                                            keyExtractor={(item, index) => index}
+                                        />
+                                    </View>
+                                    :
+                                    <FlatList
+                                        data={[...dummyJobs]}
+                                        numColumns={2}
+                                        columnWrapperStyle={{ justifyContent: 'space-between' }}
+                                        renderItem={({ item, index }) => {
+                                            return (
+                                                <Cards
+                                                    title1={item.name}
+                                                    imageUrl={require("../../../assets/room.png")}
+                                                    action={() => {
+                                                        props.navigation.navigate("ServicesProvided", { subService: item });
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                        keyExtractor={(item, index) => index}
+                                    />
+                            }
+
                         </View>
                     </>
                     :
@@ -152,6 +190,7 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
         width: 44,
         height: 44,
+        borderRadius: 22
     },
     search: {
         width: 44,

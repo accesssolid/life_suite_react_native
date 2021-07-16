@@ -17,6 +17,7 @@ const Stack = createStackNavigator();
 
 const AuthStack = () => {
     const loading = useSelector(state => state.authenticate.loading)
+    
     return (
         <Stack.Navigator headerMode={'none'}>
             <Stack.Screen name="LoginScreen" component={LoginScreen} />

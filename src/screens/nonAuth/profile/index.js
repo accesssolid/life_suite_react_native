@@ -35,28 +35,78 @@ const Profile = (props) => {
     }, [user])
 
     const setAddress = (text, line, type) => {
+        let address = [...userData.address]
+        if (address.length == 0) {
+            address = [{
+                "address_line_1": "",
+                "address_line_2": "",
+                "address_type": "home",
+                "lat": "",
+                "long": ""
+            },
+            {
+                "address_line_1": "",
+                "address_line_2": "",
+                "address_type": "work",
+                "lat": "",
+                "long": ""
+            }]
+        } else if (address.length == 1) {
+            if (address[0].address_type == "home") {
+                address = [{
+                    "address_line_1": address[0].address_line_1,
+                    "address_line_2": address[0].address_line_2,
+                    "address_type": address[0].address_type,
+                    "lat": "",
+                    "long": ""
+                },
+                {
+                    "address_line_1": "",
+                    "address_line_2": "",
+                    "address_type": "work",
+                    "lat": "",
+                    "long": ""
+                }]
+            } else {
+                address = [{
+                    "address_line_1": "",
+                    "address_line_2": "",
+                    "address_type": "home",
+                    "lat": "",
+                    "long": ""
+                },
+                {
+                    "address_line_1": address[0].address_line_1,
+                    "address_line_2": address[0].address_line_1,
+                    "address_type": "work",
+                    "lat": "",
+                    "long": ""
+                }]
+            }
+        }
+
         if (type.toLowerCase() == "home") {
             let newVal = {}
             if (line == "line1") {
                 newVal = {
                     "address_line_1": text,
-                    "address_line_2": signUpData.address[0].address_line_2,
+                    "address_line_2": address[0].address_line_2,
                     "address_type": "home",
                     "lat": "",
                     "long": ""
                 }
-                let addr = [...signUpData.address]
+                let addr = [...address]
                 addr[0] = newVal
                 setUserData({ ...userData, address: [...addr] })
             } else {
                 newVal = {
-                    "address_line_1": signUpData.address[0].address_line_1,
+                    "address_line_1": address[0].address_line_1,
                     "address_line_2": text,
                     "address_type": "home",
                     "lat": "",
                     "long": ""
                 }
-                let addr = [...signUpData.address]
+                let addr = [...address]
                 addr[0] = newVal
                 setUserData({ ...userData, address: [...addr] })
             }
@@ -65,23 +115,23 @@ const Profile = (props) => {
             if (line == "line1") {
                 newVal = {
                     "address_line_1": text,
-                    "address_line_2": signUpData.address[1].address_line_2,
-                    "address_type": "home",
+                    "address_line_2": address[1].address_line_2,
+                    "address_type": "work",
                     "lat": "",
                     "long": ""
                 }
-                let addr = [...signUpData.address]
+                let addr = [...address]
                 addr[1] = newVal
                 setUserData({ ...userData, address: [...addr] })
             } else {
                 newVal = {
-                    "address_line_1": signUpData.address[1].address_line_1,
+                    "address_line_1": address[1].address_line_1,
                     "address_line_2": text,
-                    "address_type": "home",
+                    "address_type": "work",
                     "lat": "",
                     "long": ""
                 }
-                let addr = [...signUpData.address]
+                let addr = [...address]
                 addr[1] = newVal
                 setUserData({ ...userData, address: [...addr] })
             }
@@ -147,6 +197,7 @@ const Profile = (props) => {
             "Authorization": `Bearer ${access_token}`
         }
 
+        let address = JSON.stringify(userData.address)
         var formdata = new FormData();
         formdata.append("user_id", userData.id);
         formdata.append("email", userData.email);
@@ -154,6 +205,8 @@ const Profile = (props) => {
         formdata.append("last_name", userData.last_name);
         formdata.append("phone_number", userData.phone_number);
         formdata.append("prefer_name", userData.prefer_name);
+        formdata.append("address", address);
+
 
         let config = {
             headers: headers,
@@ -208,15 +261,12 @@ const Profile = (props) => {
                 showsHorizontalScrollIndicator={false}
                 bounces={false}
                 style={styles.container}>
-
-                <View style={{ top: '6%' }}>
-
+                <View style={{ marginTop: '15%' }}>
                     <View style={{}}>
                         <Text style={styles.text}>MY INFORMATION</Text>
                         <Text style={styles.text1}>{userData.first_name}</Text>
                         <Text style={styles.text2}>Profile ID : {userData.id}</Text>
                     </View>
-
                     <View style={styles.personalContainer}>
                         <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>PERSONAL INFORMATION</Text>
                         <CustomInput
@@ -281,14 +331,14 @@ const Profile = (props) => {
                                         <View style={{}}>
                                             <CustomInput
                                                 text="ADDRESS LINE 1"
-                                                value={userData.address[0].address_line_1}
+                                                value={userData.address[0] ? userData.address[0].address_line_1 : ''}
                                                 onChangeText={(text) => {
                                                     setAddress(text, "line1", "home")
                                                 }}
                                             />
                                             <CustomInput
                                                 text="ADDRESS LINE 2"
-                                                value={userData.address[0].address_line_2}
+                                                value={userData.address[0] ? userData.address[0].address_line_2 : ''}
                                                 onChangeText={(text) => {
                                                     setAddress(text, "line2", "home")
                                                 }}
@@ -320,15 +370,14 @@ const Profile = (props) => {
 
                                     <CustomInput
                                         text="ADDRESS LINE 1"
-                                        value={userData.address[1].address_line_1}
+                                        value={userData.address[1] ? userData.address[1].address_line_1 : ''}
                                         onChangeText={(text) => {
                                             setAddress(text, "line1", "work")
                                         }}
                                     />
                                     <CustomInput
                                         text="ADDRESS LINE 2"
-                                        value={userData.address[0].address_type.toLowerCase() !== "home" ? userData.address[0].address_line_1 : ''}
-                                        value={userData.address[1].address_line_1}
+                                        value={userData.address[1] ? userData.address[1].address_line_2 : ''}
                                         onChangeText={(text) => {
                                             setAddress(text, "line2", "work")
                                         }}
@@ -388,28 +437,26 @@ const Profile = (props) => {
                                 </TouchableOpacity>
                             </View>
                     }
+                    <TouchableOpacity
+                        style={styles.save}
+                        activeOpacity={0.7}
+                        onPress={() => saveUser()}>
+                        <Text style={styles.saveText}>
+                            Save
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{ ...styles.save, marginBottom: 15 }}
+                        activeOpacity={0.7}
+                        onPress={() => {
+                            storeItem('user', null)
+                            props.navigation.navigate('WelcomeScreen')
+                        }}>
+                        <Text style={styles.saveText}>
+                            Logout
+                        </Text>
+                    </TouchableOpacity>
                 </View>
-                <View style={{ height: 100 }} />
-                <TouchableOpacity
-                    style={styles.save}
-                    activeOpacity={0.7}
-                    onPress={() => saveUser()}>
-                    <Text style={styles.saveText}>
-                        Save
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.save}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                        storeItem('user', null)
-                        props.navigation.navigate('WelcomeScreen')
-                    }}>
-                    <Text style={styles.saveText}>
-                        Logout
-                    </Text>
-                </TouchableOpacity>
-                <View style={{ height: 20 }} />
             </ScrollView>
         </SafeAreaView>
     )
@@ -443,7 +490,7 @@ const styles = StyleSheet.create({
     },
     personalContainer: {
         maxHeight: '100%',
-        top: "3%",
+        marginTop: "3%",
         width: "90%",
         elevation: 200,
         shadowColor: '#00000029',
@@ -466,7 +513,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,
         alignSelf: 'center',
-        marginTop: 40
+        marginTop: 15
     },
     saveText: {
         textAlign: "center",

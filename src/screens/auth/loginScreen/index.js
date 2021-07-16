@@ -81,38 +81,54 @@ const LoginScreen = (props) => {
     async function on_press_touch() {
         const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
 
-        if (biometryType === Platform.OS == 'ios' ? ReactNativeBiometrics.TouchID : ReactNativeBiometrics.Biometrics) {
-            ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
-                .then((resultObject) => {
-                    const { success } = resultObject
-                    if (success) {
-                        retrieveItem('user_bio_data').then((data) => {
-                            if (data) {
-                                dispatch(loginReducer(data))
-                                retrieveItem('access_token').then(res => {
-                                    dispatch(setAuthToken({ data: res }))
-                                    if (data.user_role == 2) {
-                                        props.navigation.navigate("UserStack")
-                                    } else {
-                                        props.navigation.navigate("ProviderStack")
-                                    }
-                                })
-                            }
-                            else {
-                                showToast('You have to login First Time', 'danger')
-                            }
-                        })
-                    } else {
-                        console.log('user cancelled biometric prompt')
-                    }
-                })
-                .catch(() => {
-                    console.log('biometrics failed')
-                })
-        }
-        else {
-            showToast('Does not Support TouchID', 'danger')
-        }
+        ReactNativeBiometrics.isSensorAvailable()
+            .then((resultObject) => {
+                const { available, biometryType } = resultObject
+
+                if (available && biometryType === ReactNativeBiometrics.TouchID) {
+                    evaluateBiometric()
+                } else if (available && biometryType === ReactNativeBiometrics.FaceID) {
+                    evaluateBiometric()
+                } else if (available && biometryType === ReactNativeBiometrics.Biometrics) {
+                    evaluateBiometric()
+                } else {
+                    showToast('Biometrics not supported', 'danger')
+                }
+            })
+
+    }
+
+    const evaluateBiometric = () => {
+        ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
+            .then((resultObject) => {
+                const { success } = resultObject
+                if (success) {
+                    retrieveItem('user_bio_data').then((data) => {
+                        if (data) {
+                            dispatch(loginReducer(data))
+                            retrieveItem('access_token').then(res => {
+                                dispatch(setAuthToken({ data: res }))
+                                if(role==1 && data.user_role == 2){
+                                    props.navigation.navigate("UserStack")
+                                } else if(role==2 && data.user_role == 3)
+                                if (data.user_role == 2) {
+                                    props.navigation.navigate("ProviderStack")
+                                } else {
+                                    showToast("Please login first")
+                                }
+                            })
+                        }
+                        else {
+                            showToast('You have to login First Time', 'danger')
+                        }
+                    })
+                } else {
+                    console.log('user cancelled biometric prompt')
+                }
+            })
+            .catch(() => {
+                console.log('biometrics failed')
+            })
     }
 
     // on_press_face
