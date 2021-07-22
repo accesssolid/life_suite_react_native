@@ -14,9 +14,12 @@ import SmallCards from '../../../components/smallCards';
 import { BASE_URL, getApi } from '../../../api/api';
 import Loader from '../../../components/loader';
 import LS_FONTS from '../../../constants/fonts';
+import { setAddServiceMode } from '../../../redux/features/services';
 
 const SubServices = (props) => {
     const { service } = props.route.params
+    const dispatch = useDispatch()
+    const user = useSelector(state => state.authenticate.user)
     const [subServices, setSubServices] = useState([])
     const [loading, setLoading] = useState(false)
 
@@ -82,6 +85,9 @@ const SubServices = (props) => {
                                         title1={item.name}
                                         imageUrl={{ uri: BASE_URL + item.image }}
                                         action={() => {
+                                            if (user.user_role == 3) {
+                                                dispatch(setAddServiceMode({ data: true }))
+                                            }
                                             props.navigation.navigate("ServicesProvided", { subService: item })
                                         }}
                                     />
@@ -91,7 +97,7 @@ const SubServices = (props) => {
                         />
                         :
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize:16 }}>No Services Available</Text>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>
                         </View>
                 }
             </View>
@@ -106,6 +112,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
-        padding: 20
+        paddingVertical: 20,
+        paddingLeft:'4%'
     },
 })

@@ -13,6 +13,7 @@ import ServiceProfile from '../screens/nonAuth/serviceProfile';
 import addJob from '../screens/nonAuth/addJob';
 import Profile from '../screens/nonAuth/profile';
 import SubServices from '../screens/nonAuth/subServices';
+import AddLicense from '../screens/nonAuth/addLicense';
 
 const Stack = createStackNavigator();
 
@@ -27,6 +28,7 @@ const ProviderStack = () => {
             <Stack.Screen name="ServiceProfile" component={ServiceProfile} />
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="SubServices" component={SubServices} />
+            <Stack.Screen name="AddLicense" component={AddLicense} />
         </Stack.Navigator>
     )
 }

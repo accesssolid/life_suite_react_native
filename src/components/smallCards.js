@@ -15,13 +15,14 @@ const SmallCards = props => {
             activeOpacity={0.7}
             onPress={props.action}
             style={styles.mainView}>
-            <View style={{ height: 92, width: 116 }}>
+            <View style={{ height: '75%', width: '100%', overflow: 'hidden' }}>
                 <Image
                     style={styles.room}
                     source={props.imageUrl}
+                    resizeMode="cover"
                 />
             </View>
-            <View style={{ height: 28, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ height: 30, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={styles.text}>{props.title1}</Text>
             </View>
         </TouchableOpacity>
@@ -30,12 +31,9 @@ const SmallCards = props => {
 
 const styles = StyleSheet.create({
     mainView: {
-        height: 120,
-        width: 114,
-        top: "5%",
-        elevation: 200,
-        shadowColor: '#00000029',
-        backgroundColor: 'white',
+        aspectRatio: 1,
+        width: '30%',
+        elevation: 5,
         shadowColor: '#00000029',
         shadowOffset: {
             width: 0,
@@ -44,18 +42,20 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         shadowOpacity: 1.0,
         borderRadius: 10,
-        borderColor: '#ACF0F2',
-        borderWidth: 1,
-        marginLeft:'2%'
+        backgroundColor: LS_COLORS.global.white,
+        marginBottom: 20,
+        margin: '1%'
     },
     text: {
         textAlign: 'center',
         fontSize: 10,
-        lineHeight: 16,
         fontFamily: LS_FONTS.PoppinsMedium
     },
     room: {
-        height: 92, width: 112
+        height: '100%',
+        width: '100%',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10
     },
 })
 

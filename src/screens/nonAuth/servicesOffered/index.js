@@ -5,7 +5,7 @@ import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platf
 import LS_COLORS from '../../../constants/colors';
 import { globalStyles } from '../../../utils';
 import LS_FONTS from '../../../constants/fonts';
-import CustomDropDown from '../../../components/dropDown';
+import Loader from '../../../components/loader';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,22 +16,40 @@ import Header from '../../../components/header';
 import { Container, Content, Row, } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
 import { BASE_URL, getApi } from '../../../api/api';
+import CustomButton from '../../../components/customButton';
+import { setAddServiceData } from '../../../redux/features/services';
+import { showToast } from '../../../components/validators';
 
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
-
-    useEffect(() => {
-        console.log("subService =>", subService)
-    }, [])
-
+    const user = useSelector(state => state.authenticate.user)
+    const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
+    const addServiceData = useSelector(state => state.services.addServiceData)
     const [itemList, setItemList] = useState([])
     const [loading, setLoading] = useState(false)
     const [selectedItems, setSelectedItems] = useState([])
+    const [servicesData, setServicesData] = useState([])
 
     useEffect(() => {
         getServiceItems()
     }, [])
+
+    // useEffect(() => {
+    //     let temp = []
+    //     itemList.map(item => {
+    //         temp.push({
+    //             "item_id": "",
+    //             "price": "",
+    //             "time_duration": "",
+    //         })
+    //     })
+    //     setServicesData([...temp])
+    // }, [itemList])
+
+    useEffect(() => {
+        console.log("servicesData =>", servicesData)
+    },[servicesData])
 
     const getServiceItems = () => {
         setLoading(true)
@@ -67,12 +85,65 @@ const ServicesProvided = (props) => {
 
     const setCheckedData = (index) => {
         let arr = [...selectedItems]
+        let arr2 = [...servicesData]
         if (arr.includes(index)) {
             arr.splice(arr.indexOf(index), 1)
+            arr2.splice(arr2.indexOf(index), 1)
         } else {
             arr.push(index)
+            arr2.push({
+                "item_id": itemList[index].id,
+                "price": "",
+                "time_duration": "",
+            })
         }
         setSelectedItems([...arr])
+        setServicesData([...arr2])
+    }
+
+    const next = () => {
+        servicesData.map(item => {
+            if (item.price.trim() == "" || item.time_duration.trim() == "") {
+                return showToast("Please fill in data for selected services")
+            }
+        })
+        if (isAddServiceMode) {
+            let services = []
+            selectedItems.forEach(element => {
+                services.push(itemList[element])
+            });
+            dispatch(setAddServiceData({
+                data: {
+                    ...addServiceData,
+                    user_id: user.id,
+                    service_id: subService.id,
+                    json_data: {
+                        ...addServiceData.json_data,
+                        services: [...servicesData]
+                    }
+                }
+            }))
+            if (selectedItems.length > 0) {
+                props.navigation.navigate('AddLicense', { subService: subService })
+            } else {
+                showToast("No items selected")
+            }
+        } else {
+
+        }
+    }
+
+    const setText = (key, text, index) => {
+        let temp = [...servicesData]
+        if (key == "price") {
+            temp[index].price = text
+        } else {
+            temp[index].time_duration = text
+        }
+
+        console.log("temp =>", temp)
+
+        setServicesData([...temp])
     }
 
     return (
@@ -106,7 +177,7 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
-                    <Content>
+                    <Content showsVerticalScrollIndicator={false}>
                         <Text style={styles.service}>SERVICES</Text>
                         <View style={styles.price}>
                             <Text style={styles.priceTime}>Price</Text>
@@ -114,39 +185,64 @@ const ServicesProvided = (props) => {
                         </View>
                         {itemList.map(((item, index) => {
                             return (
-                                <View key={index} style={{ width: '100%', flexDirection: "row" }}>
-                                    <CheckBox
-                                        checked={selectedItems.includes(index)}
-                                        onPress={() => setCheckedData(index)}
-                                        checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
-                                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
-                                    />
-                                    <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center' }}>{item.name}</Text>
-                                    <View style={{ flex: 1, justifyContent: 'flex-end', flexDirection: 'row' }}>
-                                        <View style={styles.fromContainer}>
-                                            <TextInput
-                                                style={styles.inputStyle}
-                                                color="black"
-                                                onChangeText={(text) => { }}
+                                <>
+                                    <View key={index} style={{ width: '100%', flexDirection: "row", alignItems: 'center' }}>
+                                        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                                            <CheckBox
+                                                checked={selectedItems.includes(index)}
+                                                onPress={() => setCheckedData(index)}
+                                                checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
+                                                uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                                             />
+                                            <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '70%' }}>{item.name}</Text>
                                         </View>
-                                        <View style={styles.fromContainer}>
-                                            <TextInput
-                                                style={styles.inputStyle}
-                                                color="black"
-                                                placeholder="HH:MM"
-                                                onChangeText={(text) => {  }}
-                                            />
+
+                                        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end' }}>
+                                            <View style={styles.fromContainer}>
+                                                <TextInput
+                                                    style={styles.inputStyle}
+                                                    color="black"
+                                                    placeholder="$000"
+                                                    editable={selectedItems.includes(index)}
+                                                    onChangeText={(text) => setText("price", text, index)}
+                                                    keyboardType="numeric"
+                                                />
+                                            </View>
+                                            <View style={styles.fromContainer}>
+                                                <TextInput
+                                                    style={styles.inputStyle}
+                                                    color="black"
+                                                    placeholder="HH:MM"
+                                                    editable={selectedItems.includes(index)}
+                                                    onChangeText={(text) => setText("time_duration", text, index)}
+                                                    // keyboardType="numeric"
+                                                />
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
+                                    {/* {selectedItems.includes(index) && item.products.map((innerItem => {
+                                        console.log("InnerItem =>", innerItem)
+                                        return (
+                                            <View style={{ flexDirection: 'row', paddingLeft: '10%', alignItems: 'center' }}>
+                                                <CheckBox
+                                                    checked={false}
+                                                    // onPress={() => setCheckedData(index)}
+                                                    checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
+                                                    uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
+                                                />
+                                                <Text>{innerItem.name}</Text>
+                                            </View>
+                                        )
+                                    }))} */}
+                                </>
                             )
                         }))}
-
-                        <View style={{ height: 30 }}></View>
                     </Content>
+                    <View style={{ paddingBottom: '2.5%' }}>
+                        <CustomButton title={isAddServiceMode ? "Next" : "Save"} action={() => next()} />
+                    </View>
                 </Container>
-                {/* </View> */}
+                {loading && <Loader />}
             </SafeAreaView >
         </>
     )
@@ -185,7 +281,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: LS_FONTS.PoppinsMedium,
         color: "black",
-        marginRight: 49
+        marginRight: '13%'
     },
     service: {
         fontSize: 18,
@@ -212,14 +308,13 @@ const styles = StyleSheet.create({
     },
     fromContainer: {
         height: 32,
-        width: 68,
-        alignSelf: 'center',
+        width: 75,
+        alignItems: 'center',
         borderColor: LS_COLORS.global.lightTextColor,
-        flexDirection: 'row',
-        justifyContent: "space-between",
-        padding: 10,
+        justifyContent: "center",
         backgroundColor: '#ECECEC',
-        marginRight: 20
+        paddingHorizontal: 5,
+        marginRight: '10%'
     },
     inputStyle: {
     },

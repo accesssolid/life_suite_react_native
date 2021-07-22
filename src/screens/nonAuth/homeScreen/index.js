@@ -14,18 +14,24 @@ import Cards from '../../../components/cards';
 import { BASE_URL, getApi } from '../../../api/api';
 import { setServices } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
+import { setMyJobs } from '../../../redux/features/provider';
+import { showToast } from '../../../components/validators';
 
-const dummyJobs = [{"created_at": "2021-07-15T10:49:29.000000Z", "id": 10, "image": "/storage/service/1626346169.png", "name": "Plumbing", "parent_id": 6, "status": 1, "updated_at": "2021-07-15T10:49:29.000000Z"}, {"created_at": "2021-07-15T10:49:47.000000Z", "id": 11, "image": "/storage/service/1626346187.png", "name": "Gardner", "parent_id": 6, "status": 1, "updated_at": "2021-07-15T10:49:47.000000Z"}]
+const dummyJobs = [{ "created_at": "2021-07-15T10:49:29.000000Z", "id": 10, "image": "/storage/service/1626346169.png", "name": "Plumbing", "parent_id": 6, "status": 1, "updated_at": "2021-07-15T10:49:29.000000Z" }, { "created_at": "2021-07-15T10:49:47.000000Z", "id": 11, "image": "/storage/service/1626346187.png", "name": "Gardner", "parent_id": 6, "status": 1, "updated_at": "2021-07-15T10:49:47.000000Z" }]
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.authenticate.user)
     const services = useSelector(state => state.authenticate.services)
+    const myJobs = useSelector(state => state.provider.myJobs)
     const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         getServices()
+        if (user.user_role == 3) {
+            getMyJobs()
+        }
     }, [])
 
     const getServices = () => {
@@ -52,6 +58,38 @@ const HomeScreen = (props) => {
                 }
                 else {
                     showToast(response.message, 'danger')
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
+    const getMyJobs = () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        }
+
+        let user_data = {
+            "user_id": user.id
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: '/api/providerServicesList',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    dispatch(setMyJobs({ data: [...response.data] }))
+                    setLoading(false)
+                }
+                else {
                     setLoading(false)
                 }
             }).catch(err => {
@@ -90,7 +128,6 @@ const HomeScreen = (props) => {
                 {user.user_role == 3
                     ?
                     <>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             {
                                 isAddJobActive
                                     ?
@@ -115,26 +152,32 @@ const HomeScreen = (props) => {
                                         />
                                     </View>
                                     :
-                                    <FlatList
-                                        data={[...dummyJobs]}
-                                        numColumns={2}
-                                        columnWrapperStyle={{ justifyContent: 'space-between' }}
-                                        renderItem={({ item, index }) => {
-                                            return (
-                                                <Cards
-                                                    title1={item.name}
-                                                    imageUrl={require("../../../assets/room.png")}
-                                                    action={() => {
-                                                        props.navigation.navigate("ServicesProvided", { subService: item });
-                                                    }}
-                                                />
-                                            )
-                                        }}
-                                        keyExtractor={(item, index) => index}
-                                    />
+                                    <>
+                                        {myJobs.length > 0
+                                            ?
+                                            <FlatList
+                                                data={[...myJobs]}
+                                                numColumns={2}
+                                                columnWrapperStyle={{ justifyContent: 'space-between' }}
+                                                renderItem={({ item, index }) => {
+                                                    return (
+                                                        <Cards
+                                                            title1={item.name}
+                                                            imageUrl={{ uri: BASE_URL + item.image }}
+                                                            action={() => {
+                                                                props.navigation.navigate("ServicesProvided", { subService: item });
+                                                            }}
+                                                        />
+                                                    )
+                                                }}
+                                                keyExtractor={(item, index) => index}
+                                            />
+                                            :
+                                            <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
+                                                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>
+                                            </View>}
+                                    </>
                             }
-
-                        </View>
                     </>
                     :
                     <View style={{ flex: 1, paddingTop: '5%' }}>
