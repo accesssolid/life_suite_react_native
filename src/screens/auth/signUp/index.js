@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -8,6 +8,7 @@ import { globalStyles } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
+import { getUniqueId } from 'react-native-device-info';
 
 /* Components */
 import CustomTextInput from '../../../components/customTextInput';
@@ -17,12 +18,86 @@ import { showToast } from '../../../components/validators';
 import { getApi } from '../../../api/api';
 import { Container, Content, Root } from 'native-base';
 import DropDown from '../../../components/dropDown';
+import { setUserRole } from '../../../redux/features/loginReducer';
+
+const getMessage = (name) => {
+    switch (name) {
+        case "first_name":
+            return "First name is required"
+
+        case "last_name":
+            return "Last name is required"
+
+        case "prefer_name":
+            return "Prefered name is required"
+
+        case "email":
+            return "Email is required "
+
+        case "password":
+            return "Password is required"
+
+        case "password_confirmation":
+            return "Confirm password field is empty"
+
+        case "phone_number":
+            return "Phone number is required"
+
+        default:
+            return "All fields are required"
+    }
+}
+
 const SignUpScreen = (props) => {
     const dispatch = useDispatch()
     const role = useSelector(state => state.authenticate.user_role)
     const [loader, setLoader] = useState(false)
-    const [isDropOpen, setIsDropOpen] = useState(false)
+
+    const dropData = ['Home', 'Work']
+
+    /* Address Type Drop down */
     const [dropValue, setDropValue] = useState("Home")
+
+    /* City Drop Down */
+    const [dropCityValue, setDropCityValue] = useState("City")
+    const [dropCityData, setDropCityData] = useState([])
+    const [isEmptyCityList, setIsEmptyCityList] = useState(false)
+    const [dropCityDataMaster, setDropCityMaster] = useState([])
+
+    /* State Drop Down */
+    const [dropStateValue, setDropStateValue] = useState("State")
+    const [dropStateData, setDropStateData] = useState([])
+    const [dropStateDataMaster, setDropStateMaster] = useState([])
+
+    useEffect(() => {
+        getStates()
+    }, [])
+
+    useEffect(() => {
+        if (dropStateValue !== "State") {
+            const selectedItem = dropStateDataMaster.filter(item => item.name == dropStateValue)
+            if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+                getCities(selectedItem[0].id)
+                setAddressData({ ...addressData, state: selectedItem[0].id })
+            }
+        }
+    }, [dropStateValue])
+
+    useEffect(() => {
+        const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValue)
+        if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+            setAddressData({ ...addressData, city: selectedItem[0].id })
+        }
+    }, [dropCityValue])
+
+    const [addressData, setAddressData] = useState({
+        address_line_1: "",
+        address_line_2: "",
+        city: "",
+        state: "",
+        zip: "",
+    })
+
     const [signUpData, setSignUpData] = useState({
         first_name: '',
         last_name: '',
@@ -31,132 +106,76 @@ const SignUpScreen = (props) => {
         password: '',
         password_confirmation: '',
         phone_number: '',
-        address: [
-            {
-                "address_line_1": "",
-                "address_line_2": "",
-                "address_type": "home",
-                "lat": "",
-                "long": ""
-            },
-            {
-                "address_line_1": "",
-                "address_line_2": "",
-                "address_type": "work",
-                "lat": "",
-                "long": ""
-            }
-        ],
-        device_id: '#dev12',
+        address: [],
+        device_id: getUniqueId(),
         fcm_token: '#fcm!234'
     })
 
-    const dropData = role == 1 ? [{
-        label: 'Home',
-        value: 'Home'
-    },
-    {
-        label: 'Work',
-        value: 'Work'
-    }] : [{
-        label: 'Work',
-        value: 'Work'
-    }]
-
-    const setAddress = (text, line) => {
-        if (dropValue.toLowerCase() == "home") {
-            let newVal = {}
-            if (line == "line1") {
-                newVal = {
-                    "address_line_1": text,
-                    "address_line_2": signUpData.address[0].address_line_2,
-                    "address_type": "home",
-                    "lat": "",
-                    "long": ""
-                }
-                let addr = [...signUpData.address]
-                addr[0] = newVal
-                setSignUpData({ ...signUpData, address: [...addr] })
-            } else {
-                newVal = {
-                    "address_line_1": signUpData.address[0].address_line_1,
-                    "address_line_2": text,
-                    "address_type": "home",
-                    "lat": "",
-                    "long": ""
-                }
-                let addr = [...signUpData.address]
-                addr[0] = newVal
-                setSignUpData({ ...signUpData, address: [...addr] })
-            }
-        } else {
-            let newVal = {}
-            if (line == "line1") {
-                newVal = {
-                    "address_line_1": text,
-                    "address_line_2": signUpData.address[1].address_line_2,
-                    "address_type": "work",
-                    "lat": "",
-                    "long": ""
-                }
-                let addr = [...signUpData.address]
-                addr[1] = newVal
-                setSignUpData({ ...signUpData, address: [...addr] })
-            } else {
-                newVal = {
-                    "address_line_1": signUpData.address[1].address_line_1,
-                    "address_line_2": text,
-                    "address_type": "work",
-                    "lat": "",
-                    "long": ""
-                }
-                let addr = [...signUpData.address]
-                addr[1] = newVal
-                setSignUpData({ ...signUpData, address: [...addr] })
-            }
-        }
-    }
-
     function on_press_register() {
         setLoader(true)
-        Object.keys(signUpData).forEach((element, index) => {
-            console.log(element, index, signUpData[element])
-            if (typeof signUpData[element] == String && signUpData[element].trim() == '') {
-                showToast('All fields are required', 'danger')
-                setLoader(false)
-                return false
-            }
-        });
-
-        if (role == 1) {
-            if (dropValue.toLowerCase() == "home") {
-                if (signUpData.address[0].address_line_1.trim() == '' || signUpData.address[0].address_line_2.trim() == '') {
-                    showToast('All fields are required', 'danger')
-                    setLoader(false)
-                    return false
-                }
-            } else {
-                if (signUpData.address[1].address_line_1.trim() == '' || signUpData.address[1].address_line_2.trim() == '') {
-                    showToast('All fields are required', 'danger')
-                    setLoader(false)
-                    return false
-                }
-            }
-        } else {
-            if (signUpData.address[1].address_line_1.trim() == '' || signUpData.address[1].address_line_2.trim() == '') {
-                showToast('All fields are required', 'danger')
+        let keys = Object.keys(signUpData)
+        for (let index = 0; index < keys.length; index++) {
+            if (typeof signUpData[keys[index]] == 'string' && signUpData[keys[index]].trim() == '') {
+                showToast(getMessage(keys[index]), 'danger')
                 setLoader(false)
                 return false
             }
         }
-        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        if (reg.test(signUpData.email) == false) {
-            showToast('Enter Valid Email', 'danger')
+
+        if (dropStateValue == "State") {
+            showToast("Please select state", 'danger')
             setLoader(false)
             return false
         }
-        if (signUpData.password.length < 6) {
-            showToast('Password Must have 6 Characters', 'danger')
+
+        if (dropCityValue == "City") {
+            showToast("Please select or enter city", 'danger')
+            setLoader(false)
+            return false
+        }
+
+        const address = [
+            {
+                "country": 231,
+                "state": dropValue.toLowerCase() == "home" ? addressData.state : "",
+                "city": dropValue.toLowerCase() == "home" ? addressData.city : "",
+                "address_line_1": dropValue.toLowerCase() == "home" ? addressData.address_line_1 : "",
+                "address_line_2": dropValue.toLowerCase() == "home" ? addressData.address_line_2 : "",
+                "address_type": "home",
+                "lat": "",
+                "long": "",
+                "zip_code": dropValue.toLowerCase() == "home" ? Number(addressData.zip) : "",
+            },
+            {
+                "country": 231,
+                "state": dropValue.toLowerCase() == "work" ? addressData.state : "",
+                "city": dropValue.toLowerCase() == "work" ? addressData.city : "",
+                "address_line_1": dropValue.toLowerCase() == "work" ? addressData.address_line_1 : "",
+                "address_line_2": dropValue.toLowerCase() == "work" ? addressData.address_line_2 : "",
+                "address_type": "work",
+                "lat": "",
+                "long": "",
+                "zip_code": dropValue.toLowerCase() == "work" ? Number(addressData.zip) : "",
+            }
+        ]
+
+        if (dropValue.toLowerCase() == "home") {
+            if (address[0].address_line_1.trim() == '' || address[0].address_line_2.trim() == '' || address[0].city == '' || address[0].state == '' || address[0].zip_code.trim() == '') {
+                showToast('Address is required', 'danger')
+                setLoader(false)
+                return false
+            }
+        } else {
+            if (address[1].address_line_1.trim() == '' || address[1].address_line_2.trim() == '' || address[1].city == '' || address[1].state == '' || address[1].zip_code.trim() == '') {
+                showToast('Address is required', 'danger')
+                setLoader(false)
+                return false
+            }
+        }
+
+        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (reg.test(signUpData.email) == false) {
+            showToast('Enter Valid Email', 'danger')
             setLoader(false)
             return false
         }
@@ -169,7 +188,8 @@ const SignUpScreen = (props) => {
             Accept: "application/json",
             "Content-Type": "application/json"
         }
-        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(signUpData.address) }
+        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
+
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
@@ -193,14 +213,98 @@ const SignUpScreen = (props) => {
             })
     }
 
+    const switchRole = () => {
+        dispatch(setUserRole({ data: role == 1 ? 2 : 1 }))
+    }
+
+    const getStates = () => {
+        setLoader(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        }
+        let user_data = {
+            "country_id": 231,
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: '/api/state_list',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setDropStateMaster([...response.data])
+                    let newArr = [...response.data].map((item, index) => {
+                        return item.name
+                    })
+                    setDropStateData([...newArr])
+                    setLoader(false)
+                }
+                else {
+                    setLoader(false)
+                }
+            })
+            .catch(err => {
+                setLoader(false)
+            })
+    }
+
+    const getCities = (state_id) => {
+        setLoader(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        }
+        let user_data = {
+            "state_id": state_id,
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: '/api/city_list',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setDropCityMaster(response.data)
+                    let newArr = [...response.data].map((item, index) => {
+                        return item.name
+                    })
+                    setDropCityData([...newArr])
+                    setDropCityValue("City")
+                    setIsEmptyCityList(false)
+                    setLoader(false)
+                }
+                else {
+                    setIsEmptyCityList(true)
+                    setLoader(false)
+                }
+            })
+            .catch(err => {
+                setLoader(false)
+            })
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <Root>
-                <Container style={styles.container}>
-                    <Content showsVerticalScrollIndicator={false}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={styles.container}>
+                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+                    <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
                         <View style={styles.textContainer}>
-                            <Text style={styles.loginText}>Signup</Text>
+                            <Text style={styles.loginText}>Signup as {role == 1 ? "Customer" : "Service Provider"}</Text>
                             <Text style={styles.text}>Add your details to Signup</Text>
+                            <TouchableOpacity onPress={() => switchRole()} activeOpacity={0.7}>
+                                <Text style={{ ...styles.text, textDecorationLine: 'underline' }}>Signup as {role == 1 ? "Service Provider" : "Customer"}</Text>
+                            </TouchableOpacity>
                         </View>
                         <View style={styles.textInputContainer}>
                             <CustomTextInput
@@ -238,6 +342,7 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, password: text })
                                 }}
                                 secureTextEntry
+                                bottomText={`Must be at least 8 characters along with:\n• uppercase letter (A-Z)\n• lower case letter (a-z)\n• number (0-9)\n• special character`}
                             />
                             <CustomTextInput
                                 placeholder="Confirm Password"
@@ -256,24 +361,52 @@ const SignUpScreen = (props) => {
                             />
                             <Text style={{ width: '75%', alignSelf: 'center', marginBottom: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black }}>Address Type</Text>
                             <DropDown
-                                isOpen={isDropOpen}
-                                setOpen={setIsDropOpen}
                                 item={dropData}
-                                defaultValue={"Home"}
                                 value={dropValue}
-                                setValue={setDropValue}
-                                containerStyle={{ width: '75%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%' }}
-                                dropStyle={{ width: '75%', alignSelf: 'center', backgroundColor: LS_COLORS.global.white }}
+                                onChangeValue={(index, value) => setDropValue(value)}
+                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                dropdownStyle={{ height: 75 }}
                             />
                             <CustomTextInput
                                 placeholder="Address line 1"
-                                value={signUpData.address.address_line_1}
-                                onChangeText={(text) => setAddress(text, "line1")}
+                                value={signUpData.address_line_1}
+                                onChangeText={(text) => setAddressData({ ...addressData, address_line_1: text })}
                             />
                             <CustomTextInput
                                 placeholder="Address line 2"
+                                value={signUpData.address_line_2}
+                                onChangeText={(text) => setAddressData({ ...addressData, address_line_2: text })}
+                            />
+                            <DropDown
+                                item={dropStateData}
+                                value={dropStateValue}
+                                onChangeValue={(index, value) => setDropStateValue(value)}
+                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                dropdownStyle={{ maxHeight: 300 }}
+                            />
+                            {
+                                isEmptyCityList
+                                    ?
+                                    <CustomTextInput
+                                        placeholder="City"
+                                        value={signUpData.city}
+                                        onChangeText={(text) => setAddressData({ ...addressData, city: text })}
+                                    />
+                                    :
+                                    <DropDown
+                                        item={dropCityData}
+                                        value={dropCityValue}
+                                        onChangeValue={(index, value) => setDropCityValue(value)}
+                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                        dropdownStyle={{ maxHeight: 300 }}
+                                    />
+                            }
+
+                            <CustomTextInput
+                                placeholder="Zip code"
                                 value={signUpData.address.address_line_2}
-                                onChangeText={(text) => setAddress(text, "line2")}
+                                value={signUpData.zip}
+                                onChangeText={(text) => setAddressData({ ...addressData, zip: text })}
                             />
                         </View>
                         <View style={styles.buttonContainer}>
@@ -292,10 +425,10 @@ const SignUpScreen = (props) => {
                                 <Text style={styles.already1}> Login</Text>
                             </TouchableOpacity>
                         </View>
-                    </Content>
-                </Container>
-                {loader == true && <Loader />}
-            </Root>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+            {loader == true && <Loader />}
         </SafeAreaView>
     )
 }
@@ -317,7 +450,9 @@ const styles = StyleSheet.create({
         lineHeight: 42,
         textAlign: 'center',
         color: LS_COLORS.global.black,
-        fontFamily: LS_FONTS.PoppinsSemiBold
+        fontFamily: LS_FONTS.PoppinsSemiBold,
+        width: '90%',
+        alignSelf: 'center'
     },
     text: {
         color: LS_COLORS.global.grey,
@@ -325,7 +460,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 21,
         textAlign: 'center',
-        marginTop: 20
+        marginTop: 20,
+        alignSelf: 'center'
     },
     textInputContainer: {
         marginTop: "10%",

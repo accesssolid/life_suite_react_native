@@ -1,33 +1,20 @@
-import { Toast } from 'native-base';
+// import { Toast } from 'native-base';
+import { ToastAndroid, Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LS_FONTS from '../constants/fonts';
+import Toast from 'react-native-simple-toast';
 
-export const showToast = async (text,type) =>{
-    if(!type)
-    {
-        Toast.show({
-            text: text,        
-            duration: 4000,
-            position: "bottom",
-            textStyle:{textAlign:'center',fontSize:16,fontFamily:LS_FONTS.PoppinsRegular},
-            style:{bottom:15,width:'90%',alignSelf:'center',borderRadius:20}
-          })
-        return false;
+export const showToast = async (text, type) => {
+    if (Platform.OS == "ios") {
+        Toast.showWithGravity(text, Toast.LONG, Toast.BOTTOM);
+    } else {
+        ToastAndroid.show(text, ToastAndroid.LONG);
     }
-    Toast.show({
-        text: text,
-        type:type,
-        duration: 4000,
-        position: "bottom",
-        textStyle:{textAlign:'center',fontSize:16,fontFamily:LS_FONTS.PoppinsRegular},
-        style:{bottom:15,width:'90%',alignSelf:'center',borderRadius:20}
-      })
-  }
+}
 
-  /**
- * store data in async storage
- * 
- */
+/**
+* store data in async storage
+* 
+*/
 export const storeItem = async (key, item) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -62,7 +49,7 @@ export const retrieveItem = async (key) => {
 export const removeItem = async (key) => {
     return new Promise(async (resolve, reject) => {
         try {
-            await AsyncStorage.removeItem(key);            
+            await AsyncStorage.removeItem(key);
             resolve('removed');
         } catch (error) {
             reject(error.message);

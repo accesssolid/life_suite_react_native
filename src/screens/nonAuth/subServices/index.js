@@ -88,7 +88,7 @@ const SubServices = (props) => {
                                             if (user.user_role == 3) {
                                                 dispatch(setAddServiceMode({ data: true }))
                                             }
-                                            props.navigation.navigate("ServicesProvided", { subService: item })
+                                            props.navigation.navigate("ServicesProvided", { subService: item, items:[] })
                                         }}
                                     />
                                 )

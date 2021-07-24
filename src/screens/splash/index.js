@@ -58,7 +58,9 @@ const Splash = (props) => {
                     }, 2000);
                 }
                 else {
-                    showToast(response.message, 'danger')
+                    if (response.message !== "The user id field is required.") {
+                        showToast(response.message, 'danger')
+                    }
                     setLoader(false)
                 }
             })

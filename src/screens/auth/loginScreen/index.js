@@ -8,6 +8,7 @@ import { globalStyles } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
 
 /* Components */
 import CustomTextInput from '../../../components/customTextInput';
@@ -17,13 +18,18 @@ import { retrieveItem, showToast, storeItem } from '../../../components/validato
 import ReactNativeBiometrics from 'react-native-biometrics'
 import Loader from "../../../components/loader"
 import { getApi } from "../../../api/api"
-import { loginReducer, setAuthToken } from '../../../redux/features/loginReducer';
+import { loginReducer, setAuthToken, setUserRole } from '../../../redux/features/loginReducer';
+
 const LoginScreen = (props) => {
     const dispatch = useDispatch()
     const role = useSelector(state => state.authenticate.user_role)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loader, setLoader] = useState(false)
+
+    const switchRole = () => {
+        dispatch(setUserRole({ data: role == 1 ? 2 : 1 }))
+    }
 
     function on_press_login() {
         setLoader(true)
@@ -40,7 +46,7 @@ const LoginScreen = (props) => {
             "email": email.toLowerCase(),
             "password": password,
             "fcm_token": "fcm123",
-            device_id: "dev124",
+            device_id: getUniqueId(),
             login_type: "biometric",
         }
         let config = {
@@ -79,64 +85,31 @@ const LoginScreen = (props) => {
     }
 
     async function on_press_touch() {
-        const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+        try {
+            const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
 
-        ReactNativeBiometrics.isSensorAvailable()
-            .then((resultObject) => {
-                const { available, biometryType } = resultObject
+            ReactNativeBiometrics.isSensorAvailable()
+                .then((resultObject) => {
+                    const { available, biometryType } = resultObject
 
-                if (available && biometryType === ReactNativeBiometrics.TouchID) {
-                    evaluateBiometric()
-                } else if (available && biometryType === ReactNativeBiometrics.FaceID) {
-                    evaluateBiometric()
-                } else if (available && biometryType === ReactNativeBiometrics.Biometrics) {
-                    evaluateBiometric()
-                } else {
-                    showToast('Biometrics not supported', 'danger')
-                }
-            })
-
+                    if (available && biometryType === ReactNativeBiometrics.TouchID) {
+                        evaluateBiometric()
+                    } else if (available && biometryType === ReactNativeBiometrics.FaceID) {
+                        evaluateBiometric()
+                    } else if (available && biometryType === ReactNativeBiometrics.Biometrics) {
+                        evaluateBiometric()
+                    } else {
+                        showToast('Biometrics not supported', 'danger')
+                    }
+                })
+        } catch (error) {
+            console.log("on_press_touch error => ", error)
+        }
     }
 
     const evaluateBiometric = () => {
-        ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
-            .then((resultObject) => {
-                const { success } = resultObject
-                if (success) {
-                    retrieveItem('user_bio_data').then((data) => {
-                        if (data) {
-                            dispatch(loginReducer(data))
-                            retrieveItem('access_token').then(res => {
-                                dispatch(setAuthToken({ data: res }))
-                                if(role==1 && data.user_role == 2){
-                                    props.navigation.navigate("UserStack")
-                                } else if(role==2 && data.user_role == 3)
-                                if (data.user_role == 2) {
-                                    props.navigation.navigate("ProviderStack")
-                                } else {
-                                    showToast("Please login first")
-                                }
-                            })
-                        }
-                        else {
-                            showToast('You have to login First Time', 'danger')
-                        }
-                    })
-                } else {
-                    console.log('user cancelled biometric prompt')
-                }
-            })
-            .catch(() => {
-                console.log('biometrics failed')
-            })
-    }
-
-    // on_press_face
-    async function on_press_face() {
-        const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
-        console.log(biometryType)
-        if (biometryType === Platform.OS == 'ios' ? ReactNativeBiometrics.FaceID : ReactNativeBiometrics.Biometrics) {
-            ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm FaceID', })
+        try {
+            ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
                 .then((resultObject) => {
                     const { success } = resultObject
                     if (success) {
@@ -145,11 +118,14 @@ const LoginScreen = (props) => {
                                 dispatch(loginReducer(data))
                                 retrieveItem('access_token').then(res => {
                                     dispatch(setAuthToken({ data: res }))
-                                    if (data.user_role == 2) {
+                                    if (role == 1 && data.user_role == 2) {
                                         props.navigation.navigate("UserStack")
-                                    } else {
-                                        props.navigation.navigate("ProviderStack")
-                                    }
+                                    } else if (role == 2 && data.user_role == 3)
+                                        if (data.user_role == 2) {
+                                            props.navigation.navigate("ProviderStack")
+                                        } else {
+                                            showToast("Please login first")
+                                        }
                                 })
                             }
                             else {
@@ -157,45 +133,82 @@ const LoginScreen = (props) => {
                             }
                         })
                     } else {
-                        console.log('User cancelled biometric prompt')
+                        console.log('user cancelled biometric prompt')
                     }
                 })
                 .catch(() => {
                     console.log('biometrics failed')
                 })
+        } catch (error) {
+            console.log("evaluateBiometric error => ", error)
         }
-        else {
-            showToast('Doesnot Support FaceID', 'danger')
-        }
+    }
 
+    async function on_press_face() {
+        try {
+            const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+            if (biometryType === Platform.OS == 'ios' ? ReactNativeBiometrics.FaceID : ReactNativeBiometrics.Biometrics) {
+                ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm FaceID', })
+                    .then((resultObject) => {
+                        const { success } = resultObject
+                        if (success) {
+                            retrieveItem('user_bio_data').then((data) => {
+                                if (data) {
+                                    dispatch(loginReducer(data))
+                                    retrieveItem('access_token').then(res => {
+                                        dispatch(setAuthToken({ data: res }))
+                                        if (data.user_role == 2) {
+                                            props.navigation.navigate("UserStack")
+                                        } else {
+                                            props.navigation.navigate("ProviderStack")
+                                        }
+                                    })
+                                }
+                                else {
+                                    showToast('You have to login First Time', 'danger')
+                                }
+                            })
+                        } else {
+                            console.log('User cancelled biometric prompt')
+                        }
+                    })
+                    .catch(() => {
+                        console.log('biometrics failed')
+                    })
+            }
+            else {
+                showToast('Doesnot Support FaceID', 'danger')
+            }
+        } catch (error) {
+            console.log("on_press_face error => ", error)
+        }
     }
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Root>
                 <Container style={styles.container}>
-                    <Content>
+                    <Content showsVerticalScrollIndicator={false}>
                         <View style={styles.textContainer}>
-                            <Text style={styles.loginText}>Login</Text>
+                            <Text style={styles.loginText}>Login as {role == 1 ? "Customer" : "Service Provider"}</Text>
                             <Text style={styles.text}>Add your details to Login</Text>
                         </View>
-                        <View style={styles.textInputContainer}>
-                            <CustomTextInput
-                                placeholder="Your Email"
-                                value={email}
-                                onChangeText={(text) => {
-                                    setEmail(text)
-                                }}
-                                keyboardType="email-address"
-                            />
-                            <CustomTextInput
-                                placeholder="Password"
-                                value={password}
-                                onChangeText={(text) => {
-                                    setPassword(text)
-                                }}
-                                secureTextEntry
-                            />
-                        </View>
+                        <View style={{ marginTop: "10%" }} />
+                        <CustomTextInput
+                            placeholder="Your Email"
+                            value={email}
+                            onChangeText={(text) => {
+                                setEmail(text)
+                            }}
+                            keyboardType="email-address"
+                        />
+                        <CustomTextInput
+                            placeholder="Password"
+                            value={password}
+                            onChangeText={(text) => {
+                                setPassword(text)
+                            }}
+                            secureTextEntry
+                        />
                         <View style={styles.buttonContainer}>
                             <CustomButton
                                 title="Login"
@@ -212,6 +225,12 @@ const LoginScreen = (props) => {
                             }}
                             style={styles.forgotContainer}>
                             <Text style={styles.forgot}>Forgot Password?</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => switchRole()}
+                            style={styles.forgotContainer}>
+                            <Text style={{ ...styles.forgot, alignSelf: 'center', textDecorationLine: 'underline' }}>Login as {role == 1 ? "Service Provider" : "Customer"}</Text>
                         </TouchableOpacity>
 
                         <View style={styles.alreadyContainer}>
@@ -258,19 +277,17 @@ export default LoginScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
         backgroundColor: LS_COLORS.global.white,
-
     },
     textContainer: {
-        marginTop: "20%"
+        marginTop: "20%",
     },
     loginText: {
-        fontSize: 28,
-        lineHeight: 42,
+        fontSize: 24,
         textAlign: 'center',
         color: LS_COLORS.global.black,
-        fontFamily: LS_FONTS.PoppinsSemiBold
+        fontFamily: LS_FONTS.PoppinsSemiBold,
+        alignSelf: 'center'
     },
     text: {
         color: LS_COLORS.global.grey,
@@ -280,16 +297,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 20
     },
-    textInputContainer: {
-        marginTop: "10%",
-        width: '100%'
-    },
     buttonContainer: {
         marginTop: "5%",
         width: '100%'
     },
     forgotContainer: {
-        width: "50%",
+        width: "100%",
         marginTop: 20,
         alignSelf: 'center'
     },
@@ -321,7 +334,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: "space-around",
         alignItems: 'center',
-        marginTop: 30
+        marginTop: 30,
+        paddingHorizontal:'10%'
     },
     card: {
         borderRadius: 17,

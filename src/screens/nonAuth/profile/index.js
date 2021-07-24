@@ -9,14 +9,60 @@ import { globalStyles } from '../../../utils';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
 
 /* Components */
 import Header from '../../../components/header';
 import CustomInput from "../../../components/textInput"
-import CustomButton from "../../../components/customButton"
+import DropDown from '../../../components/dropDown';
 import { showToast, storeItem } from '../../../components/validators';
 import { BASE_URL, getApi } from '../../../api/api';
 import { loadauthentication } from '../../../redux/features/loginReducer';
+import Loader from '../../../components/loader';
+
+const getMessage = (name) => {
+    switch (name) {
+        case "first_name":
+            return "First name is required"
+
+        case "last_name":
+            return "Last name is required"
+
+        case "prefer_name":
+            return "Prefered name is required"
+
+        case "email":
+            return "Email is required "
+
+        case "password":
+            return "Password is required"
+
+        case "password_confirmation":
+            return "Confirm password field is empty"
+
+        case "phone_number":
+            return "Phone number is required"
+
+        default:
+            return "All fields are required"
+    }
+}
+
+const getNotificationType = (type) => {
+    switch (type) {
+        case 1:
+            return "Email"
+
+        case 2:
+            return "Push Notification"
+
+        case 3:
+            return "Text"
+
+        default:
+            "Push Notification";
+    }
+}
 
 const Profile = (props) => {
     const dispatch = useDispatch()
@@ -26,117 +72,69 @@ const Profile = (props) => {
     const [loader, setLoader] = useState(false)
     const [add, setAdd] = useState(true)
     const [edit, setEdit] = useState(true)
-    const [add3, setAdd3] = useState("")
     const [number, setNumber] = useState("")
     const [holderName, setHolderName] = useState("")
+    const [notificationType, setNotificationType] = useState(getNotificationType(userData.notification_prefrence))
+
+    /* City Drop Down */
+    const [dropCityValue, setDropCityValue] = useState("City")
+    const [dropCityData, setDropCityData] = useState([])
+    const [isEmptyCityList, setIsEmptyCityList] = useState(false)
+    const [dropCityDataMaster, setDropCityMaster] = useState([])
+
+    /* State Drop Down */
+    const [dropStateValue, setDropStateValue] = useState("State")
+    const [dropStateData, setDropStateData] = useState([])
+    const [dropStateDataMaster, setDropStateMaster] = useState([])
+
+    /* City Drop Down WORK */
+    const [dropCityValueWork, setDropCityValueWork] = useState("City")
+    const [dropCityDataWork, setDropCityDataWork] = useState([])
+    const [isEmptyCityListWork, setIsEmptyCityListWork] = useState(false)
+    const [dropCityDataMasterWork, setDropCityMasterWork] = useState([])
+
+    /* State Drop Down WORK */
+    const [dropStateValueWork, setDropStateValueWork] = useState("State")
+    const [dropStateDataWork, setDropStateDataWork] = useState([])
+    const [dropStateDataMasterWork, setDropStateMasterWork] = useState([])
 
     useEffect(() => {
         setUserData({ ...user })
     }, [user])
 
-    const setAddress = (text, line, type) => {
-        let address = [...userData.address]
-        if (address.length == 0) {
-            address = [{
-                "address_line_1": "",
-                "address_line_2": "",
-                "address_type": "home",
-                "lat": "",
-                "long": ""
-            },
-            {
-                "address_line_1": "",
-                "address_line_2": "",
-                "address_type": "work",
-                "lat": "",
-                "long": ""
-            }]
-        } else if (address.length == 1) {
-            if (address[0].address_type == "home") {
-                address = [{
-                    "address_line_1": address[0].address_line_1,
-                    "address_line_2": address[0].address_line_2,
-                    "address_type": address[0].address_type,
-                    "lat": "",
-                    "long": ""
-                },
-                {
-                    "address_line_1": "",
-                    "address_line_2": "",
-                    "address_type": "work",
-                    "lat": "",
-                    "long": ""
-                }]
-            } else {
-                address = [{
-                    "address_line_1": "",
-                    "address_line_2": "",
-                    "address_type": "home",
-                    "lat": "",
-                    "long": ""
-                },
-                {
-                    "address_line_1": address[0].address_line_1,
-                    "address_line_2": address[0].address_line_1,
-                    "address_type": "work",
-                    "lat": "",
-                    "long": ""
-                }]
-            }
-        }
+    useEffect(() => {
+        getStates()
+    }, [])
 
-        if (type.toLowerCase() == "home") {
-            let newVal = {}
-            if (line == "line1") {
-                newVal = {
-                    "address_line_1": text,
-                    "address_line_2": address[0].address_line_2,
-                    "address_type": "home",
-                    "lat": "",
-                    "long": ""
-                }
-                let addr = [...address]
-                addr[0] = newVal
-                setUserData({ ...userData, address: [...addr] })
-            } else {
-                newVal = {
-                    "address_line_1": address[0].address_line_1,
-                    "address_line_2": text,
-                    "address_type": "home",
-                    "lat": "",
-                    "long": ""
-                }
-                let addr = [...address]
-                addr[0] = newVal
-                setUserData({ ...userData, address: [...addr] })
-            }
-        } else {
-            let newVal = {}
-            if (line == "line1") {
-                newVal = {
-                    "address_line_1": text,
-                    "address_line_2": address[1].address_line_2,
-                    "address_type": "work",
-                    "lat": "",
-                    "long": ""
-                }
-                let addr = [...address]
-                addr[1] = newVal
-                setUserData({ ...userData, address: [...addr] })
-            } else {
-                newVal = {
-                    "address_line_1": address[1].address_line_1,
-                    "address_line_2": text,
-                    "address_type": "work",
-                    "lat": "",
-                    "long": ""
-                }
-                let addr = [...address]
-                addr[1] = newVal
-                setUserData({ ...userData, address: [...addr] })
-            }
+    useEffect(() => {
+        const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValue)
+        if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+            setHomeAddressData({ ...homeAddressData, city: selectedItem[0].id })
         }
-    }
+    }, [dropCityValue])
+
+    useEffect(() => {
+        const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValueWork)
+        if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+            setWorkAddressData({ ...workAddressData, city: selectedItem[0].id })
+        }
+    }, [dropCityValueWork])
+
+    const [homeAddressData, setHomeAddressData] = useState({
+        address_line_1: userData.address[0].address_line_1,
+        address_line_2: userData.address[0].address_line_2,
+        city: userData.address[0].city,
+        state: userData.address[0].state,
+        zip: userData.address[0].zip_code,
+    })
+
+    const [workAddressData, setWorkAddressData] = useState({
+        address_line_1: userData.address[1].address_line_1,
+        address_line_2: userData.address[1].address_line_2,
+        city: userData.address[1].city,
+        state: userData.address[1].state,
+        zip: userData.address[1].zip_code,
+    })
 
     const updateProfilePic = (image) => {
         setLoader(true)
@@ -199,13 +197,20 @@ const Profile = (props) => {
 
         let address = JSON.stringify(userData.address)
         var formdata = new FormData();
-        formdata.append("user_id", userData.id);
-        formdata.append("email", userData.email);
-        formdata.append("first_name", userData.first_name);
-        formdata.append("last_name", userData.last_name);
-        formdata.append("phone_number", userData.phone_number);
-        formdata.append("prefer_name", userData.prefer_name);
-        formdata.append("address", address);
+        formdata.append("user_id", user.id);
+        formdata.append("email", user.email);
+        formdata.append("first_name", user.first_name);
+        formdata.append("last_name", user.last_name);
+        formdata.append("phone_number", user.phone_number);
+        formdata.append("prefer_name", user.prefer_name);
+        formdata.append("address", JSON.stringify(user.address));
+        // formdata.append("user_id", userData.id);
+        // formdata.append("email", userData.email);
+        // formdata.append("first_name", userData.first_name);
+        // formdata.append("last_name", userData.last_name);
+        // formdata.append("phone_number", userData.phone_number);
+        // formdata.append("prefer_name", userData.prefer_name);
+        // formdata.append("address", address);
 
 
         let config = {
@@ -230,6 +235,110 @@ const Profile = (props) => {
             })
             .catch(err => {
 
+            })
+    }
+
+    const getStates = () => {
+        setLoader(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        }
+        let user_data = {
+            "country_id": 231,
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: '/api/state_list',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setDropStateMaster([...response.data])
+                    let newArr = [...response.data].map((item, index) => {
+                        return item.name
+                    })
+                    setDropStateData([...newArr])
+                    setLoader(false)
+                }
+                else {
+                    setLoader(false)
+                }
+            })
+            .catch(err => {
+                setLoader(false)
+            })
+    }
+
+    const startGetCities = (value, type) => {
+        const selectedItem = dropStateDataMaster.filter(item => item.name == value)
+        if (type == "home") {
+            if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+                setHomeAddressData({ ...homeAddressData, state: selectedItem[0].id })
+            }
+        } else {
+            if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+                setHomeAddressData({ ...workAddressData, state: selectedItem[0].id })
+            }
+        }
+        getCities(selectedItem[0].id, type)
+    }
+
+    const getCities = (state_id) => {
+        setLoader(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        }
+        let user_data = {
+            "state_id": state_id,
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: '/api/city_list',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    if (type == "home") {
+                        setDropCityMaster(response.data)
+                        let newArr = [...response.data].map((item, index) => {
+                            return item.name
+                        })
+                        setDropCityData([...newArr])
+                        setDropCityValue("City")
+                        setIsEmptyCityListWork(false)
+                        setLoader(false)
+                    } else {
+                        setDropCityMasterWork(response.data)
+                        let newArr = [...response.data].map((item, index) => {
+                            return item.name
+                        })
+                        setDropCityDataWork([...newArr])
+                        setDropCityValue("City")
+                        setIsEmptyCityListWork(false)
+                        setLoader(false)
+                    }
+                }
+                else {
+                    if (type == "home") {
+                        setIsEmptyCityList(true)
+                    } else {
+                        setIsEmptyCityListWork(true)
+                    }
+                    setLoader(false)
+                }
+            })
+            .catch(err => {
+                setLoader(false)
             })
     }
 
@@ -331,17 +440,44 @@ const Profile = (props) => {
                                         <View style={{}}>
                                             <CustomInput
                                                 text="ADDRESS LINE 1"
-                                                value={userData.address[0] ? userData.address[0].address_line_1 : ''}
-                                                onChangeText={(text) => {
-                                                    setAddress(text, "line1", "home")
-                                                }}
+                                                value={homeAddressData.address_line_1}
+                                                onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_1: text }) }}
                                             />
                                             <CustomInput
                                                 text="ADDRESS LINE 2"
-                                                value={userData.address[0] ? userData.address[0].address_line_2 : ''}
-                                                onChangeText={(text) => {
-                                                    setAddress(text, "line2", "home")
-                                                }}
+                                                value={homeAddressData.address_line_2}
+                                                onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_2: text }) }}
+                                            />
+                                            <View style={{ marginTop: 25 }} />
+                                            <DropDown
+                                                item={dropStateData}
+                                                value={dropStateValue}
+                                                onChangeValue={(index, value) => { setDropStateValue(value), startGetCities(value, "home") }}
+                                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                                dropdownStyle={{ maxHeight: 300 }}
+                                            />
+                                            {
+                                                isEmptyCityList
+                                                    ?
+                                                    <CustomInput
+                                                        placeholder="City"
+                                                        value={homeAddressData.city}
+                                                        onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, city: text }) }}
+                                                    />
+                                                    :
+                                                    <DropDown
+                                                        item={dropCityData}
+                                                        value={dropCityValue}
+                                                        onChangeValue={(index, value) => setDropCityValue(value)}
+                                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                                        dropdownStyle={{ maxHeight: 300 }}
+                                                    />
+                                            }
+
+                                            <CustomInput
+                                                placeholder="Zip code"
+                                                value={homeAddressData.zip}
+                                                onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
                                             />
                                         </View>
                                     </>
@@ -367,28 +503,57 @@ const Profile = (props) => {
                                         />
                                         <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS</Text>
                                     </View>
-
                                     <CustomInput
                                         text="ADDRESS LINE 1"
-                                        value={userData.address[1] ? userData.address[1].address_line_1 : ''}
-                                        onChangeText={(text) => {
-                                            setAddress(text, "line1", "work")
-                                        }}
+                                        value={workAddressData.address_line_1}
+                                        onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_1: text }) }}
                                     />
                                     <CustomInput
                                         text="ADDRESS LINE 2"
-                                        value={userData.address[1] ? userData.address[1].address_line_2 : ''}
-                                        onChangeText={(text) => {
-                                            setAddress(text, "line2", "work")
-                                        }}
+                                        value={workAddressData.address_line_2}
+                                        onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_2: text }) }}
+                                    />
+                                    <View style={{ marginTop: 25 }} />
+                                    <DropDown
+                                        item={dropStateData}
+                                        value={dropStateValue}
+                                        onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
+                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                        dropdownStyle={{ maxHeight: 300 }}
+                                    />
+                                    {
+                                        isEmptyCityListWork
+                                            ?
+                                            <CustomInput
+                                                placeholder="City"
+                                                value={workAddressData.city}
+                                                onChangeText={(text) => { setWorkAddressData({ ...homeAddressData, city: text }) }}
+                                            />
+                                            :
+                                            <DropDown
+                                                item={dropCityDataWork}
+                                                value={dropCityValueWork}
+                                                onChangeValue={(index, value) => setDropCityValueWork(value)}
+                                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                                dropdownStyle={{ maxHeight: 300 }}
+                                            />
+                                    }
+
+                                    <CustomInput
+                                        placeholder="Zip code"
+                                        value={homeAddressData.zip}
+                                        onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
                                     />
                                 </>
                             }
                         </TouchableOpacity>
                         <View style={{}}>
-                            <CustomInput
-                                text="Type of Notification"
-                                value={add3}
+                            <DropDown
+                                title="Notification type"
+                                item={["Email", "Push Notification", "Text"]}
+                                value={notificationType}
+                                onChangeValue={(index, value) => setNotificationType(value)}
+                                containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                             />
                         </View>
                         <View style={{ height: 40 }}></View>
@@ -445,7 +610,7 @@ const Profile = (props) => {
                             Save
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={{ ...styles.save, marginBottom: 15 }}
                         activeOpacity={0.7}
                         onPress={() => {
@@ -455,9 +620,10 @@ const Profile = (props) => {
                         <Text style={styles.saveText}>
                             Logout
                         </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </ScrollView>
+            {loader && <Loader />}
         </SafeAreaView>
     )
 }
@@ -513,7 +679,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,
         alignSelf: 'center',
-        marginTop: 15
+        marginVertical: 15
     },
     saveText: {
         textAlign: "center",

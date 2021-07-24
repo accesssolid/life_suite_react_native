@@ -21,13 +21,15 @@ import Loader from '../../../components/loader';
 
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
-    const { subService } = props.route.params
-    const [itemList, setItemList] = useState([])
+    const { subService, items } = props.route.params
+    const [itemList, setItemList] = useState([...items])
     const [loading, setLoading] = useState(false)
     const [selectedItems, setSelectedItems] = useState([])
 
     useEffect(() => {
-        getServiceItems()
+        if(!items.length > 0){
+            getServiceItems()
+        }        
     }, [])
 
     const getServiceItems = () => {
@@ -74,7 +76,7 @@ const ServicesProvided = (props) => {
 
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+            <StatusBar translucent={false} backgroundColor="transparent" barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="stretch"

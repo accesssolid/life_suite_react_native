@@ -103,9 +103,11 @@ const HomeScreen = (props) => {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <TouchableOpacity
                         activeOpacity={0.7}
+                        style={{ ...styles.image, overflow: 'hidden' }}
                         onPress={() => { props.navigation.navigate("Profile") }}>
                         <Image
-                            style={styles.image}
+                            style={{ width: '100%', height: '100%' }}
+                            resizeMode="contain"
                             source={user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/andrea.png")}
                         />
                     </TouchableOpacity>
@@ -128,56 +130,60 @@ const HomeScreen = (props) => {
                 {user.user_role == 3
                     ?
                     <>
-                            {
-                                isAddJobActive
-                                    ?
-                                    <View style={{ flex: 1, paddingTop: '5%' }}>
+                        {
+                            isAddJobActive
+                                ?
+                                <View style={{ flex: 1, paddingTop: '5%' }}>
+                                    <FlatList
+                                        data={services}
+                                        numColumns={2}
+                                        columnWrapperStyle={{ justifyContent: 'space-between' }}
+                                        renderItem={({ item, index }) => {
+                                            return (
+                                                <Cards
+                                                    title1={item.name}
+                                                    title2="SERVICES"
+                                                    imageUrl={{ uri: BASE_URL + item.image }}
+                                                    action={() => {
+                                                        item.itemsData.length > 0
+                                                            ?
+                                                            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+                                                            :
+                                                            props.navigation.navigate("SubServices", { service: item })
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                        keyExtractor={(item, index) => index}
+                                    />
+                                </View>
+                                :
+                                <>
+                                    {myJobs.length > 0
+                                        ?
                                         <FlatList
-                                            data={services}
+                                            data={[...myJobs]}
                                             numColumns={2}
                                             columnWrapperStyle={{ justifyContent: 'space-between' }}
                                             renderItem={({ item, index }) => {
                                                 return (
                                                     <Cards
                                                         title1={item.name}
-                                                        title2="SERVICES"
                                                         imageUrl={{ uri: BASE_URL + item.image }}
                                                         action={() => {
-                                                            props.navigation.navigate("SubServices", { service: item });
+                                                            props.navigation.navigate("ServicesProvided", { subService: item });
                                                         }}
                                                     />
                                                 )
                                             }}
                                             keyExtractor={(item, index) => index}
                                         />
-                                    </View>
-                                    :
-                                    <>
-                                        {myJobs.length > 0
-                                            ?
-                                            <FlatList
-                                                data={[...myJobs]}
-                                                numColumns={2}
-                                                columnWrapperStyle={{ justifyContent: 'space-between' }}
-                                                renderItem={({ item, index }) => {
-                                                    return (
-                                                        <Cards
-                                                            title1={item.name}
-                                                            imageUrl={{ uri: BASE_URL + item.image }}
-                                                            action={() => {
-                                                                props.navigation.navigate("ServicesProvided", { subService: item });
-                                                            }}
-                                                        />
-                                                    )
-                                                }}
-                                                keyExtractor={(item, index) => index}
-                                            />
-                                            :
-                                            <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
-                                                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>
-                                            </View>}
-                                    </>
-                            }
+                                        :
+                                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                            <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>
+                                        </View>}
+                                </>
+                        }
                     </>
                     :
                     <View style={{ flex: 1, paddingTop: '5%' }}>
@@ -192,7 +198,11 @@ const HomeScreen = (props) => {
                                         title2="SERVICES"
                                         imageUrl={{ uri: BASE_URL + item.image }}
                                         action={() => {
-                                            props.navigation.navigate("SubServices", { service: item });
+                                            item.itemsData.length > 0
+                                                ?
+                                                props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+                                                :
+                                                props.navigation.navigate("SubServices", { service: item })
                                         }}
                                     />
                                 )
@@ -233,7 +243,7 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
         width: 44,
         height: 44,
-        borderRadius: 22
+        borderRadius: 50
     },
     search: {
         width: 44,

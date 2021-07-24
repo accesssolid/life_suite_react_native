@@ -32,7 +32,7 @@ const WelcomeScreen = (props) => {
                         activeOpacity={0.7}
                         onPress={() => next(1)}
                         style={styles.textContainer}>
-                        <Text style={styles.text}>Login as User</Text>
+                        <Text style={styles.text}>Login as Customer</Text>
                     </TouchableOpacity>
                 </View>
                 <View >
