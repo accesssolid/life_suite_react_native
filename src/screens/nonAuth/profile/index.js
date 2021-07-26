@@ -64,6 +64,22 @@ const getNotificationType = (type) => {
     }
 }
 
+const getNotificationTypeNumber = (type) => {
+    switch (type) {
+        case "Email":
+            return 1
+
+        case "Push Notification":
+            return 2
+
+        case "Text":
+            return 3
+
+        default:
+            1;
+    }
+}
+
 const Profile = (props) => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.authenticate.user)
@@ -76,27 +92,25 @@ const Profile = (props) => {
     const [holderName, setHolderName] = useState("")
     const [notificationType, setNotificationType] = useState(getNotificationType(userData.notification_prefrence))
 
+    /* State Drop Down */
+    const [dropStateValue, setDropStateValue] = useState("State")
+    const [dropStateData, setDropStateData] = useState([])
+    const [dropStateDataMaster, setDropStateMaster] = useState([])
+
     /* City Drop Down */
     const [dropCityValue, setDropCityValue] = useState("City")
     const [dropCityData, setDropCityData] = useState([])
     const [isEmptyCityList, setIsEmptyCityList] = useState(false)
     const [dropCityDataMaster, setDropCityMaster] = useState([])
 
-    /* State Drop Down */
-    const [dropStateValue, setDropStateValue] = useState("State")
-    const [dropStateData, setDropStateData] = useState([])
-    const [dropStateDataMaster, setDropStateMaster] = useState([])
+    /* State Drop Down WORK */
+    const [dropStateValueWork, setDropStateValueWork] = useState("State")
 
     /* City Drop Down WORK */
     const [dropCityValueWork, setDropCityValueWork] = useState("City")
     const [dropCityDataWork, setDropCityDataWork] = useState([])
     const [isEmptyCityListWork, setIsEmptyCityListWork] = useState(false)
     const [dropCityDataMasterWork, setDropCityMasterWork] = useState([])
-
-    /* State Drop Down WORK */
-    const [dropStateValueWork, setDropStateValueWork] = useState("State")
-    const [dropStateDataWork, setDropStateDataWork] = useState([])
-    const [dropStateDataMasterWork, setDropStateMasterWork] = useState([])
 
     useEffect(() => {
         setUserData({ ...user })
@@ -114,11 +128,15 @@ const Profile = (props) => {
     }, [dropCityValue])
 
     useEffect(() => {
-        const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValueWork)
+        const selectedItem = dropCityDataMasterWork.filter(item => item.name == dropCityValueWork)
         if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
             setWorkAddressData({ ...workAddressData, city: selectedItem[0].id })
         }
     }, [dropCityValueWork])
+
+    useEffect(() => {
+        getInitialAddressData()
+    }, [dropStateDataMaster])
 
     const [homeAddressData, setHomeAddressData] = useState({
         address_line_1: userData.address[0].address_line_1,
@@ -190,28 +208,47 @@ const Profile = (props) => {
 
     const saveUser = () => {
         setLoader(true)
+        let notifType = getNotificationTypeNumber(notificationType)
+        const address = [
+            {
+                "country": 231,
+                "state": homeAddressData.state,
+                "city": homeAddressData.city,
+                "address_line_1": homeAddressData.address_line_1,
+                "address_line_2": homeAddressData.address_line_2,
+                "address_type": "home",
+                "lat": "",
+                "long": "",
+                "zip_code": homeAddressData.zip,
+            },
+            {
+                "country": 231,
+                "state": workAddressData.state,
+                "city": workAddressData.city,
+                "address_line_1": workAddressData.address_line_1,
+                "address_line_2": workAddressData.address_line_2,
+                "address_type": "work",
+                "lat": "",
+                "long": "",
+                "zip_code": workAddressData.zip,
+            }
+        ]
+
         let headers = {
             'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
         }
 
-        let address = JSON.stringify(userData.address)
-        var formdata = new FormData();
-        formdata.append("user_id", user.id);
-        formdata.append("email", user.email);
-        formdata.append("first_name", user.first_name);
-        formdata.append("last_name", user.last_name);
-        formdata.append("phone_number", user.phone_number);
-        formdata.append("prefer_name", user.prefer_name);
-        formdata.append("address", JSON.stringify(user.address));
-        // formdata.append("user_id", userData.id);
-        // formdata.append("email", userData.email);
-        // formdata.append("first_name", userData.first_name);
-        // formdata.append("last_name", userData.last_name);
-        // formdata.append("phone_number", userData.phone_number);
-        // formdata.append("prefer_name", userData.prefer_name);
-        // formdata.append("address", address);
 
+        var formdata = new FormData();
+        formdata.append("user_id", userData.id);
+        formdata.append("email", userData.email);
+        formdata.append("first_name", userData.first_name);
+        formdata.append("last_name", userData.last_name);
+        formdata.append("phone_number", userData.phone_number);
+        formdata.append("prefer_name", userData.prefer_name);
+        formdata.append("notification_prefrence", notifType);
+        formdata.append("address", JSON.stringify(address));
 
         let config = {
             headers: headers,
@@ -220,22 +257,26 @@ const Profile = (props) => {
             type: 'post'
         }
 
-        getApi(config)
-            .then((response) => {
-                if (response.status == true) {
-                    setLoader(false)
-                    dispatch(loadauthentication(response.data))
-                    showToast(response.message, 'success')
-                    props.navigation.pop()
-                }
-                else {
-                    setLoader(false)
-                    showToast(response.message, 'danger')
-                }
-            })
-            .catch(err => {
+        try {
+            getApi(config)
+                .then((response) => {
+                    if (response.status == true) {
+                        setLoader(false)
+                        dispatch(loadauthentication(response.data))
+                        showToast(response.message, 'success')
+                        props.navigation.pop()
+                    }
+                    else {
+                        setLoader(false)
+                        showToast(response.message, 'danger')
+                    }
+                })
+                .catch(err => {
 
-            })
+                })
+        } catch (error) {
+            console.log("error ==>> ", error)
+        }
     }
 
     const getStates = () => {
@@ -282,13 +323,13 @@ const Profile = (props) => {
             }
         } else {
             if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
-                setHomeAddressData({ ...workAddressData, state: selectedItem[0].id })
+                setWorkAddressData({ ...workAddressData, state: selectedItem[0].id })
             }
         }
         getCities(selectedItem[0].id, type)
     }
 
-    const getCities = (state_id) => {
+    const getCities = (state_id, type) => {
         setLoader(true)
         let headers = {
             Accept: "application/json",
@@ -314,7 +355,12 @@ const Profile = (props) => {
                             return item.name
                         })
                         setDropCityData([...newArr])
-                        setDropCityValue("City")
+                        let city = response.data.filter(item => item.id == homeAddressData.city)
+                        if (city.length > 0 && city[0].name !== undefined && homeAddressData.city) {
+                            setDropCityValue(city[0].name)
+                        } else {
+                            setDropCityValue("City")
+                        }
                         setIsEmptyCityListWork(false)
                         setLoader(false)
                     } else {
@@ -323,7 +369,12 @@ const Profile = (props) => {
                             return item.name
                         })
                         setDropCityDataWork([...newArr])
-                        setDropCityValue("City")
+                        let city = response.data.filter(item => item.id == workAddressData.city)
+                        if (city.length > 0 && city[0].name !== undefined && workAddressData.city) {
+                            setDropCityValueWork(city[0].name)
+                        } else {
+                            setDropCityValueWork("City")
+                        }
                         setIsEmptyCityListWork(false)
                         setLoader(false)
                     }
@@ -342,17 +393,28 @@ const Profile = (props) => {
             })
     }
 
+    const getInitialAddressData = () => {
+        if (dropStateDataMaster.length > 0) {
+            let homeState = dropStateDataMaster.filter(item => item.id == homeAddressData.state)
+            let workState = dropStateDataMaster.filter(item => item.id == workAddressData.state)
+            if (homeState.length > 0 && homeState[0].name !== undefined) {
+                setDropStateValue(homeState[0].name)
+            }
+            if (workState.length > 0 && workState[0].name !== undefined) {
+                setDropStateValueWork(workState[0].name)
+            }
+            getCities(homeAddressData.state, "home")
+            getCities(workAddressData.state, "work")
+        }
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
                 imageUrl={require("../../../assets/back.png")}
-                action={() => {
-                    props.navigation.pop()
-                }}
+                action={() => props.navigation.pop()}
                 imageUrl1={require("../../../assets/home.png")}
-                action1={() => {
-                    props.navigation.navigate("HomeScreen")
-                }}
+                action1={() => props.navigation.navigate("HomeScreen")}
             />
             <TouchableOpacity
                 style={{ height: 116, aspectRatio: 1, alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%", overflow: 'hidden', borderRadius: 70 }}
@@ -516,7 +578,7 @@ const Profile = (props) => {
                                     <View style={{ marginTop: 25 }} />
                                     <DropDown
                                         item={dropStateData}
-                                        value={dropStateValue}
+                                        value={dropStateValueWork}
                                         onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
                                         containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                         dropdownStyle={{ maxHeight: 300 }}
@@ -527,7 +589,7 @@ const Profile = (props) => {
                                             <CustomInput
                                                 placeholder="City"
                                                 value={workAddressData.city}
-                                                onChangeText={(text) => { setWorkAddressData({ ...homeAddressData, city: text }) }}
+                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, city: text }) }}
                                             />
                                             :
                                             <DropDown
@@ -541,8 +603,8 @@ const Profile = (props) => {
 
                                     <CustomInput
                                         placeholder="Zip code"
-                                        value={homeAddressData.zip}
-                                        onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
+                                        value={workAddressData.zip}
+                                        onChangeText={(text) => { setWorkAddressData({ ...workAddressData, zip: text }) }}
                                     />
                                 </>
                             }
