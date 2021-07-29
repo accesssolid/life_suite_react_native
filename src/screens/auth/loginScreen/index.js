@@ -183,13 +183,15 @@ const LoginScreen = (props) => {
             console.log("on_press_face error => ", error)
         }
     }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Root>
                 <Container style={styles.container}>
                     <Content showsVerticalScrollIndicator={false}>
                         <View style={styles.textContainer}>
-                            <Text style={styles.loginText}>Login as {role == 1 ? "Customer" : "Service Provider"}</Text>
+                            <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
+                            <Text style={{ ...styles.loginText, fontSize: 24 }}>Login</Text>
                             <Text style={styles.text}>Add your details to Login</Text>
                         </View>
                         <View style={{ marginTop: "10%" }} />

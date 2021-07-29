@@ -672,7 +672,7 @@ const Profile = (props) => {
                             Save
                         </Text>
                     </TouchableOpacity>
-                    {/* <TouchableOpacity
+                    <TouchableOpacity
                         style={{ ...styles.save, marginBottom: 15 }}
                         activeOpacity={0.7}
                         onPress={() => {
@@ -682,7 +682,7 @@ const Profile = (props) => {
                         <Text style={styles.saveText}>
                             Logout
                         </Text>
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
             {loader && <Loader />}

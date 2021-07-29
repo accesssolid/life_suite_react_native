@@ -9,6 +9,7 @@ import { globalStyles } from '../../../utils';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import { getUniqueId } from 'react-native-device-info';
+import SearchableDropdown from 'react-native-searchable-dropdown';
 
 /* Components */
 import CustomTextInput from '../../../components/customTextInput';
@@ -16,7 +17,6 @@ import CustomButton from '../../../components/customButton';
 import Loader from "../../../components/loader"
 import { showToast } from '../../../components/validators';
 import { getApi } from '../../../api/api';
-import { Container, Content, Root } from 'native-base';
 import DropDown from '../../../components/dropDown';
 import { setUserRole } from '../../../redux/features/loginReducer';
 
@@ -111,8 +111,9 @@ const SignUpScreen = (props) => {
         fcm_token: '#fcm!234'
     })
 
-    function on_press_register() {
+    async function on_press_register() {
         setLoader(true)
+
         let keys = Object.keys(signUpData)
         for (let index = 0; index < keys.length; index++) {
             if (typeof signUpData[keys[index]] == 'string' && signUpData[keys[index]].trim() == '') {
@@ -134,39 +135,37 @@ const SignUpScreen = (props) => {
             return false
         }
 
-        const address = [
-            {
-                "country": 231,
-                "state": dropValue.toLowerCase() == "home" ? addressData.state : "",
-                "city": dropValue.toLowerCase() == "home" ? addressData.city : "",
-                "address_line_1": dropValue.toLowerCase() == "home" ? addressData.address_line_1 : "",
-                "address_line_2": dropValue.toLowerCase() == "home" ? addressData.address_line_2 : "",
-                "address_type": "home",
-                "lat": "",
-                "long": "",
-                "zip_code": dropValue.toLowerCase() == "home" ? Number(addressData.zip) : "",
-            },
-            {
-                "country": 231,
-                "state": dropValue.toLowerCase() == "work" ? addressData.state : "",
-                "city": dropValue.toLowerCase() == "work" ? addressData.city : "",
-                "address_line_1": dropValue.toLowerCase() == "work" ? addressData.address_line_1 : "",
-                "address_line_2": dropValue.toLowerCase() == "work" ? addressData.address_line_2 : "",
-                "address_type": "work",
-                "lat": "",
-                "long": "",
-                "zip_code": dropValue.toLowerCase() == "work" ? Number(addressData.zip) : "",
-            }
-        ]
+        const address = [{
+            "country": 231,
+            "state": dropValue.toLowerCase() == "home" ? addressData.state : "",
+            "city": dropValue.toLowerCase() == "home" ? addressData.city : "",
+            "address_line_1": dropValue.toLowerCase() == "home" ? addressData.address_line_1 : "",
+            "address_line_2": dropValue.toLowerCase() == "home" ? addressData.address_line_2 : "",
+            "address_type": "home",
+            "lat": "",
+            "long": "",
+            "zip_code": dropValue.toLowerCase() == "home" ? Number(addressData.zip) : "",
+        },
+        {
+            "country": 231,
+            "state": dropValue.toLowerCase() == "work" ? addressData.state : "",
+            "city": dropValue.toLowerCase() == "work" ? addressData.city : "",
+            "address_line_1": dropValue.toLowerCase() == "work" ? addressData.address_line_1 : "",
+            "address_line_2": dropValue.toLowerCase() == "work" ? addressData.address_line_2 : "",
+            "address_type": "work",
+            "lat": "",
+            "long": "",
+            "zip_code": dropValue.toLowerCase() == "work" ? Number(addressData.zip) : "",
+        }]
 
         if (dropValue.toLowerCase() == "home") {
-            if (address[0].address_line_1.trim() == '' || address[0].address_line_2.trim() == '' || address[0].city == '' || address[0].state == '' || address[0].zip_code.trim() == '') {
+            if (address[0].address_line_1.trim() == '' || address[0].address_line_2.trim() == '' || address[0].city == '' || address[0].state == '' || address[0].zip_code == '') {
                 showToast('Address is required', 'danger')
                 setLoader(false)
                 return false
             }
         } else {
-            if (address[1].address_line_1.trim() == '' || address[1].address_line_2.trim() == '' || address[1].city == '' || address[1].state == '' || address[1].zip_code.trim() == '') {
+            if (address[1].address_line_1.trim() == '' || address[1].address_line_2.trim() == '' || address[1].city == '' || address[1].state == '' || address[1].zip_code == '') {
                 showToast('Address is required', 'danger')
                 setLoader(false)
                 return false
@@ -174,43 +173,58 @@ const SignUpScreen = (props) => {
         }
 
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
         if (reg.test(signUpData.email) == false) {
             showToast('Enter Valid Email', 'danger')
             setLoader(false)
             return false
         }
+
         if (signUpData.password != signUpData.password_confirmation) {
             showToast('Passwords Does not Match', 'danger')
             setLoader(false)
             return false
         }
-        let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        }
-        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
 
-        let config = {
-            headers: headers,
-            data: JSON.stringify({ ...user_data }),
-            endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
-            type: 'post'
-        }
+        let codeData = { "city": dropCityValue, "zip_code": addressData.zip }
 
-        getApi(config)
-            .then((response) => {
-                if (response.status == true) {
-                    showToast('User Registered Successfully', 'success')
-                    setLoader(false)
-                    props.navigation.navigate('LoginScreen')
+        verifyZipCode(codeData).then((res) => {
+            if (res.errors.length > 0) {
+                setLoader(false)
+                showToast("Invalid zip code")
+            } else {
+                let headers = {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
                 }
-                else {
-                    showToast(response.message, 'danger')
-                    setLoader(false)
-                }
-            }).catch(err => {
+                let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
 
-            })
+                let config = {
+                    headers: headers,
+                    data: JSON.stringify({ ...user_data }),
+                    endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
+                    type: 'post'
+                }
+
+                getApi(config)
+                    .then((response) => {
+                        if (response.status == true) {
+                            showToast('User Registered Successfully', 'success')
+                            setLoader(false)
+                            props.navigation.navigate('LoginScreen')
+                        }
+                        else {
+                            showToast(response.message, 'danger')
+                            setLoader(false)
+                        }
+                    }).catch(err => {
+
+                    })
+            }
+        }).catch(err => {
+            setLoader(false)
+            return showToast("Could not verify zip code please try again")
+        })
     }
 
     const switchRole = () => {
@@ -292,6 +306,34 @@ const SignUpScreen = (props) => {
             })
     }
 
+    const verifyZipCode = (data) => {
+        return new Promise((resolve, reject) => {
+            let headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            }
+
+            let user_data = { ...data }
+
+            let config = {
+                headers: headers,
+                data: JSON.stringify(user_data),
+                type: 'post'
+            }
+
+            fetch('http://122.160.70.200:3031/api/verify/checkZipCode', {
+                body: config.data,
+                headers: config.headers,
+                method: config.type
+            }).then(async (response) => {
+                let json = await response.json()
+                resolve(json)
+            }).catch((error) => {
+                reject(error)
+            });
+        })
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <KeyboardAvoidingView
@@ -300,7 +342,8 @@ const SignUpScreen = (props) => {
                 <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                     <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
                         <View style={styles.textContainer}>
-                            <Text style={styles.loginText}>Signup as {role == 1 ? "Customer" : "Service Provider"}</Text>
+                            <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
+                            <Text style={{ ...styles.loginText, fontSize: 24 }}>Signup</Text>
                             <Text style={styles.text}>Add your details to Signup</Text>
                             <TouchableOpacity onPress={() => switchRole()} activeOpacity={0.7}>
                                 <Text style={{ ...styles.text, textDecorationLine: 'underline' }}>Signup as {role == 1 ? "Service Provider" : "Customer"}</Text>
@@ -342,7 +385,7 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, password: text })
                                 }}
                                 secureTextEntry
-                                bottomText={`Must be at least 8 characters along with:\n• uppercase letter (A-Z)\n• lower case letter (a-z)\n• number (0-9)\n• special character`}
+                            // bottomText={`Must be at least 8 characters along with:\n• uppercase letter (A-Z)\n• lower case letter (a-z)\n• number (0-9)\n• special character`}
                             />
                             <CustomTextInput
                                 placeholder="Confirm Password"
@@ -393,13 +436,52 @@ const SignUpScreen = (props) => {
                                         onChangeText={(text) => setAddressData({ ...addressData, city: text })}
                                     />
                                     :
-                                    <DropDown
-                                        item={dropCityData}
-                                        value={dropCityValue}
-                                        onChangeValue={(index, value) => setDropCityValue(value)}
-                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                        dropdownStyle={{ maxHeight: 300 }}
+                                    <SearchableDropdown
+                                        onItemSelect={(item) => {
+                                            const items = this.state.selectedItems;
+                                            items.push(item)
+                                            this.setState({ selectedItems: items });
+                                        }}
+                                        containerStyle={{ padding: 5 }}
+                                        onRemoveItem={(item, index) => {
+                                            const items = this.state.selectedItems.filter((sitem) => sitem.id !== item.id);
+                                            this.setState({ selectedItems: items });
+                                        }}
+                                        itemStyle={{
+                                            padding: 10,
+                                            marginTop: 2,
+                                            backgroundColor: '#ddd',
+                                            borderColor: '#bbb',
+                                            borderWidth: 1,
+                                            borderRadius: 5,
+                                        }}
+                                        itemTextStyle={{ color: '#222' }}
+                                        itemsContainerStyle={{ maxHeight: 140 }}
+                                        items={dropCityDataMaster}
+                                        defaultIndex={2}
+                                        resetValue={false}
+                                        textInputProps={{
+                                            placeholder: "placeholder",
+                                            underlineColorAndroid: "transparent",
+                                            style: {
+                                                padding: 12,
+                                                borderWidth: 1,
+                                                borderColor: '#ccc',
+                                                borderRadius: 5,
+                                            },
+                                            onTextChange: text => alert(text)
+                                        }}
+                                        listProps={{ nestedScrollEnabled: true }}
                                     />
+
+                                // <DropDown
+                                //     item={dropCityData}
+                                //     value={dropCityValue}
+                                //     onChangeValue={(index, value) => setDropCityValue(value)}
+                                //     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                //     dropdownStyle={{ maxHeight: 300 }}
+                                // />
+                                // <></>
                             }
 
                             <CustomTextInput
@@ -407,6 +489,7 @@ const SignUpScreen = (props) => {
                                 value={signUpData.address.address_line_2}
                                 value={signUpData.zip}
                                 onChangeText={(text) => setAddressData({ ...addressData, zip: text })}
+                                keyboardType='numeric'
                             />
                         </View>
                         <View style={styles.buttonContainer}>

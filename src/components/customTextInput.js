@@ -25,10 +25,11 @@ const CustomTextInput = props => {
                     fontFamily: LS_FONTS.PoppinsRegular
                 }}
                 {...props}
-                placeholderTextColor={LS_COLORS.global.lightTextColor}
+                placeholderTextColor={LS_COLORS.global.placeholder}
                 color={LS_COLORS.global.black}
                 autoCapitalize="none"
                 autoCorrect={false}
+                keyboardType={props.keyboardType}                
             />
             {props.bottomText && <Text style={styles.bottomText}>
                 {props.bottomText}
