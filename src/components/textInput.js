@@ -50,7 +50,7 @@ function CustomInput({
                 placeholder={placeholder}
                 numberOfLines={numberOfLines}
                 style={{
-                    color: LS_COLORS.global.grey,
+                    color: LS_COLORS.global.black,
                     height: 50,
                     fontFamily: LS_FONTS.PoppinsMedium,
                     fontSize: 16,

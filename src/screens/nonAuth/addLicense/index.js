@@ -21,6 +21,7 @@ import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
+import { setAddServiceMode } from '../../../redux/features/services';
 
 const AddLicense = (props) => {
     const dispatch = useDispatch()
@@ -131,6 +132,7 @@ const AddLicense = (props) => {
                 }
                 else {
                     setLoading(false)
+                    props.navigation.navigate('HomeScreen')
                 }
             }).catch(err => {
                 setLoading(false)

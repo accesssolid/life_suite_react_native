@@ -35,21 +35,9 @@ const ServicesProvided = (props) => {
         getServiceItems()
     }, [])
 
-    // useEffect(() => {
-    //     let temp = []
-    //     itemList.map(item => {
-    //         temp.push({
-    //             "item_id": "",
-    //             "price": "",
-    //             "time_duration": "",
-    //         })
-    //     })
-    //     setServicesData([...temp])
-    // }, [itemList])
-
     useEffect(() => {
-        console.log("servicesData =>", servicesData)
-    },[servicesData])
+        console.log("servicesData =>", itemList)
+    }, [itemList])
 
     const getServiceItems = () => {
         setLoading(true)
@@ -102,11 +90,15 @@ const ServicesProvided = (props) => {
     }
 
     const next = () => {
+        let isValid = true
         servicesData.map(item => {
             if (item.price.trim() == "" || item.time_duration.trim() == "") {
-                return showToast("Please fill in data for selected services")
+                isValid = false                
             }
         })
+        if(!isValid){
+            return showToast("Please fill in data for selected services")
+        }
         if (isAddServiceMode) {
             let services = []
             selectedItems.forEach(element => {
@@ -136,14 +128,22 @@ const ServicesProvided = (props) => {
     const setText = (key, text, index) => {
         let temp = [...servicesData]
         if (key == "price") {
-            temp[index].price = text
+            if(text !== ''){
+                const replaced = replaceAll(text,"$","");     
+                temp[index].price = '$' + replaced + '.00'
+            } else {
+                temp[index].price = text
+            }                        
         } else {
             temp[index].time_duration = text
         }
 
-        console.log("temp =>", temp)
-
         setServicesData([...temp])
+    }
+
+    function replaceAll(str, find, replace) {
+        var escapedFind=find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        return str.replace(new RegExp(escapedFind, 'g'), replace);
     }
 
     return (
@@ -180,7 +180,7 @@ const ServicesProvided = (props) => {
                     <Content showsVerticalScrollIndicator={false}>
                         <Text style={styles.service}>SERVICES</Text>
                         <View style={styles.price}>
-                            <Text style={styles.priceTime}>Price</Text>
+                            <Text style={{ ...styles.priceTime, marginRight: '16%' }}>Price</Text>
                             <Text style={styles.priceTime}>Time</Text>
                         </View>
                         {itemList.map(((item, index) => {
@@ -206,34 +206,33 @@ const ServicesProvided = (props) => {
                                                     editable={selectedItems.includes(index)}
                                                     onChangeText={(text) => setText("price", text, index)}
                                                     keyboardType="numeric"
+                                                    value={servicesData[index]?.price}
                                                 />
                                             </View>
-                                            <View style={styles.fromContainer}>
+                                            <View style={{ ...styles.fromContainer, width: 40, marginRight: '5%' }}>
                                                 <TextInput
                                                     style={styles.inputStyle}
                                                     color="black"
-                                                    placeholder="HH:MM"
+                                                    placeholder="HH"
                                                     editable={selectedItems.includes(index)}
                                                     onChangeText={(text) => setText("time_duration", text, index)}
-                                                    // keyboardType="numeric"
+                                                    maxLength={2}
+                                                    keyboardType="numeric"
+                                                />
+                                            </View>
+                                            <View style={{ ...styles.fromContainer, width: 40, marginRight: '5%' }}>
+                                                <TextInput
+                                                    style={styles.inputStyle}
+                                                    color="black"
+                                                    placeholder="MM"
+                                                    editable={selectedItems.includes(index)}
+                                                    onChangeText={(text) => setText("time_duration", text, index)}
+                                                    maxLength={2}
+                                                    keyboardType="numeric"
                                                 />
                                             </View>
                                         </View>
                                     </View>
-                                    {/* {selectedItems.includes(index) && item.products.map((innerItem => {
-                                        console.log("InnerItem =>", innerItem)
-                                        return (
-                                            <View style={{ flexDirection: 'row', paddingLeft: '10%', alignItems: 'center' }}>
-                                                <CheckBox
-                                                    checked={false}
-                                                    // onPress={() => setCheckedData(index)}
-                                                    checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
-                                                    uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
-                                                />
-                                                <Text>{innerItem.name}</Text>
-                                            </View>
-                                        )
-                                    }))} */}
                                 </>
                             )
                         }))}
@@ -281,7 +280,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: LS_FONTS.PoppinsMedium,
         color: "black",
-        marginRight: '13%'
+        marginRight: '11%'
     },
     service: {
         fontSize: 18,
@@ -307,7 +306,7 @@ const styles = StyleSheet.create({
         color: LS_COLORS.global.white
     },
     fromContainer: {
-        height: 32,
+        height: 40,
         width: 75,
         alignItems: 'center',
         borderColor: LS_COLORS.global.lightTextColor,
@@ -317,6 +316,10 @@ const styles = StyleSheet.create({
         marginRight: '10%'
     },
     inputStyle: {
+        height: '100%',
+        width: '100%',
+        alignItems: 'center',
+        textAlign: 'center'
     },
 })
 

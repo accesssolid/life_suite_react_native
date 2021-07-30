@@ -59,8 +59,7 @@ const SignUpScreen = (props) => {
     const [dropValue, setDropValue] = useState("Home")
 
     /* City Drop Down */
-    const [dropCityValue, setDropCityValue] = useState("City")
-    const [dropCityData, setDropCityData] = useState([])
+    const [dropCityValue, setDropCityValue] = useState("")
     const [isEmptyCityList, setIsEmptyCityList] = useState(false)
     const [dropCityDataMaster, setDropCityMaster] = useState([])
 
@@ -79,15 +78,21 @@ const SignUpScreen = (props) => {
             if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
                 getCities(selectedItem[0].id)
                 setAddressData({ ...addressData, state: selectedItem[0].id })
+                setDropCityValue('')
             }
         }
     }, [dropStateValue])
 
     useEffect(() => {
         const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValue)
-        if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
-            setAddressData({ ...addressData, city: selectedItem[0].id })
+        if (!isEmptyCityList) {
+            if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+                setAddressData({ ...addressData, city: selectedItem[0].id })
+            }
+        } else {
+            setAddressData({ ...addressData, city: dropCityValue })
         }
+
     }, [dropCityValue])
 
     const [addressData, setAddressData] = useState({
@@ -186,45 +191,75 @@ const SignUpScreen = (props) => {
             return false
         }
 
-        let codeData = { "city": dropCityValue, "zip_code": addressData.zip }
+        if (!isEmptyCityList) {
+            let codeData = { "city": dropCityValue, "zip_code": addressData.zip }
 
-        verifyZipCode(codeData).then((res) => {
-            if (res.errors.length > 0) {
+            verifyZipCode(codeData).then((res) => {
+                if (res.errors.length > 0) {
+                    setLoader(false)
+                    showToast("Invalid zip code")
+                } else {
+                    let headers = {
+                        Accept: "application/json",
+                        "Content-Type": "application/json"
+                    }
+                    let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
+
+                    let config = {
+                        headers: headers,
+                        data: JSON.stringify({ ...user_data }),
+                        endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
+                        type: 'post'
+                    }
+
+                    getApi(config)
+                        .then((response) => {
+                            if (response.status == true) {
+                                showToast('User Registered Successfully', 'success')
+                                setLoader(false)
+                                props.navigation.navigate('LoginScreen')
+                            }
+                            else {
+                                showToast(response.message, 'danger')
+                                setLoader(false)
+                            }
+                        }).catch(err => {
+
+                        })
+                }
+            }).catch(err => {
                 setLoader(false)
-                showToast("Invalid zip code")
-            } else {
-                let headers = {
-                    Accept: "application/json",
-                    "Content-Type": "application/json"
-                }
-                let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
-
-                let config = {
-                    headers: headers,
-                    data: JSON.stringify({ ...user_data }),
-                    endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
-                    type: 'post'
-                }
-
-                getApi(config)
-                    .then((response) => {
-                        if (response.status == true) {
-                            showToast('User Registered Successfully', 'success')
-                            setLoader(false)
-                            props.navigation.navigate('LoginScreen')
-                        }
-                        else {
-                            showToast(response.message, 'danger')
-                            setLoader(false)
-                        }
-                    }).catch(err => {
-
-                    })
+                return showToast("Could not verify zip code please try again")
+            })
+        } else {
+            let headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json"
             }
-        }).catch(err => {
-            setLoader(false)
-            return showToast("Could not verify zip code please try again")
-        })
+            let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
+
+            let config = {
+                headers: headers,
+                data: JSON.stringify({ ...user_data }),
+                endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
+                type: 'post'
+            }
+
+            getApi(config)
+                .then((response) => {
+                    if (response.status == true) {
+                        showToast('User Registered Successfully', 'success')
+                        setLoader(false)
+                        props.navigation.navigate('LoginScreen')
+                    }
+                    else {
+                        showToast(response.message, 'danger')
+                        setLoader(false)
+                    }
+                }).catch(err => {
+
+                })
+        }
     }
 
     const switchRole = () => {
@@ -288,11 +323,6 @@ const SignUpScreen = (props) => {
             .then((response) => {
                 if (response.status == true) {
                     setDropCityMaster(response.data)
-                    let newArr = [...response.data].map((item, index) => {
-                        return item.name
-                    })
-                    setDropCityData([...newArr])
-                    setDropCityValue("City")
                     setIsEmptyCityList(false)
                     setLoader(false)
                 }
@@ -427,63 +457,48 @@ const SignUpScreen = (props) => {
                                 containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                 dropdownStyle={{ maxHeight: 300 }}
                             />
-                            {
-                                isEmptyCityList
-                                    ?
-                                    <CustomTextInput
-                                        placeholder="City"
-                                        value={signUpData.city}
-                                        onChangeText={(text) => setAddressData({ ...addressData, city: text })}
-                                    />
-                                    :
-                                    <SearchableDropdown
-                                        onItemSelect={(item) => {
-                                            const items = this.state.selectedItems;
-                                            items.push(item)
-                                            this.setState({ selectedItems: items });
-                                        }}
-                                        containerStyle={{ padding: 5 }}
-                                        onRemoveItem={(item, index) => {
-                                            const items = this.state.selectedItems.filter((sitem) => sitem.id !== item.id);
-                                            this.setState({ selectedItems: items });
-                                        }}
-                                        itemStyle={{
-                                            padding: 10,
-                                            marginTop: 2,
-                                            backgroundColor: '#ddd',
-                                            borderColor: '#bbb',
-                                            borderWidth: 1,
-                                            borderRadius: 5,
-                                        }}
-                                        itemTextStyle={{ color: '#222' }}
-                                        itemsContainerStyle={{ maxHeight: 140 }}
-                                        items={dropCityDataMaster}
-                                        defaultIndex={2}
-                                        resetValue={false}
-                                        textInputProps={{
-                                            placeholder: "placeholder",
-                                            underlineColorAndroid: "transparent",
-                                            style: {
-                                                padding: 12,
-                                                borderWidth: 1,
-                                                borderColor: '#ccc',
-                                                borderRadius: 5,
-                                            },
-                                            onTextChange: text => alert(text)
-                                        }}
-                                        listProps={{ nestedScrollEnabled: true }}
-                                    />
 
-                                // <DropDown
-                                //     item={dropCityData}
-                                //     value={dropCityValue}
-                                //     onChangeValue={(index, value) => setDropCityValue(value)}
-                                //     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                //     dropdownStyle={{ maxHeight: 300 }}
-                                // />
-                                // <></>
-                            }
-
+                            <SearchableDropdown
+                                onItemSelect={(item) => {
+                                    setDropCityValue(item.name)
+                                }}
+                                containerStyle={{
+                                    width: '90%',
+                                    alignSelf: 'center',
+                                    marginBottom: 30,
+                                    paddingHorizontal: '5%',
+                                }}
+                                itemStyle={{
+                                    padding: 10,
+                                    marginTop: 2,
+                                    backgroundColor: '#ddd',
+                                    borderColor: '#bbb',
+                                    borderWidth: 1,
+                                    borderRadius: 50,
+                                    height: 40
+                                }}
+                                itemTextStyle={{
+                                    fontSize: 14,
+                                    height: 50,
+                                    width: "100%",
+                                    fontFamily: LS_FONTS.PoppinsRegular,
+                                }}
+                                itemsContainerStyle={{ maxHeight: 140 }}
+                                items={dropCityDataMaster}
+                                textInputProps={{
+                                    placeholder: "City",
+                                    style: {
+                                        paddingHorizontal: 35,
+                                        borderColor: '#ccc',
+                                        borderRadius: 50,
+                                        height: 50,
+                                        backgroundColor: LS_COLORS.global.lightGrey,
+                                    },
+                                    onTextChange: text => setDropCityValue(text),
+                                    placeholderTextColor: LS_COLORS.global.placeholder,
+                                    value: dropCityValue
+                                }}
+                            />
                             <CustomTextInput
                                 placeholder="Zip code"
                                 value={signUpData.address.address_line_2}

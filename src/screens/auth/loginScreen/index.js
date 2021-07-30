@@ -91,13 +91,12 @@ const LoginScreen = (props) => {
             ReactNativeBiometrics.isSensorAvailable()
                 .then((resultObject) => {
                     const { available, biometryType } = resultObject
-
                     if (available && biometryType === ReactNativeBiometrics.TouchID) {
-                        evaluateBiometric()
+                        evaluateBiometric(biometryType)
                     } else if (available && biometryType === ReactNativeBiometrics.FaceID) {
-                        evaluateBiometric()
+                        evaluateBiometric(biometryType)
                     } else if (available && biometryType === ReactNativeBiometrics.Biometrics) {
-                        evaluateBiometric()
+                        evaluateBiometric(biometryType)
                     } else {
                         showToast('Biometrics not supported', 'danger')
                     }
@@ -107,9 +106,9 @@ const LoginScreen = (props) => {
         }
     }
 
-    const evaluateBiometric = () => {
+    const evaluateBiometric = (type) => {
         try {
-            ReactNativeBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
+            ReactNativeBiometrics.simplePrompt({ promptMessage: type == "FaceID" ? 'Confirm Face ID' : "Confirm fingerprint" })
                 .then((resultObject) => {
                     const { success } = resultObject
                     if (success) {
@@ -246,7 +245,7 @@ const LoginScreen = (props) => {
                         <View style={styles.facecontainer}>
                             {
                                 Platform.OS == 'ios' &&
-                                <TouchableOpacity onPress={() => on_press_face()}>
+                                <TouchableOpacity onPress={() => on_press_touch()}>
                                     <Card style={styles.card}>
                                         <Image
                                             style={styles.image}
@@ -337,7 +336,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
         alignItems: 'center',
         marginTop: 30,
-        paddingHorizontal:'10%'
+        paddingHorizontal: '10%'
     },
     card: {
         borderRadius: 17,

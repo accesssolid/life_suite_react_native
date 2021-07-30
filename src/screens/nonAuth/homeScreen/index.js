@@ -16,8 +16,7 @@ import { setServices } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
 import { setMyJobs } from '../../../redux/features/provider';
 import { showToast } from '../../../components/validators';
-
-const dummyJobs = [{ "created_at": "2021-07-15T10:49:29.000000Z", "id": 10, "image": "/storage/service/1626346169.png", "name": "Plumbing", "parent_id": 6, "status": 1, "updated_at": "2021-07-15T10:49:29.000000Z" }, { "created_at": "2021-07-15T10:49:47.000000Z", "id": 11, "image": "/storage/service/1626346187.png", "name": "Gardner", "parent_id": 6, "status": 1, "updated_at": "2021-07-15T10:49:47.000000Z" }]
+import { TextInput } from 'react-native';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
@@ -26,6 +25,9 @@ const HomeScreen = (props) => {
     const myJobs = useSelector(state => state.provider.myJobs)
     const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [isSearchActive, setSearchActive] = useState(false)
+    const [items, setItems] = useState([...services])
+    const [search, setSearch] = useState('')
 
     useEffect(() => {
         getServices()
@@ -54,6 +56,7 @@ const HomeScreen = (props) => {
             .then((response) => {
                 if (response.status == true) {
                     dispatch(setServices({ data: [...response.data] }))
+                    setItems([...response.data])
                     setLoading(false)
                 }
                 else {
@@ -97,10 +100,34 @@ const HomeScreen = (props) => {
             })
     }
 
+    const searchFilterFunction = (text) => {
+        if (text) {
+            const newData = services.filter(
+                function (item) {
+                    const itemData = item.name
+                        ? item.name.toUpperCase()
+                        : ''.toUpperCase();
+                    const textData = text.toUpperCase();
+                    return itemData.indexOf(textData) > -1;
+                }
+            );
+            setItems(newData);
+            setSearch(text);
+        } else {
+            setItems(services);
+            setSearch(text);
+        }
+    };
+
+    const cancelSearch = () => {
+        setSearchActive(false)
+        searchFilterFunction('')
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <TouchableOpacity
                         activeOpacity={0.7}
                         style={{ ...styles.image, overflow: 'hidden' }}
@@ -111,15 +138,40 @@ const HomeScreen = (props) => {
                             source={user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/andrea.png")}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.search}
-                        activeOpacity={0.7}
-                        onPress={() => {
-                        }}>
-                        <Image
-                            style={styles.searchImage}
-                            source={require("../../../assets/search.png")}
-                        />
-                    </TouchableOpacity>
+                    <View style={{ flex: 1, paddingHorizontal: '5%' }}>
+                        {isSearchActive && <TextInput
+                            style={{ backgroundColor: LS_COLORS.global.lightGrey, height: 40, borderRadius: 50, paddingHorizontal: '10%', fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.black }}
+                            placeholder="Search ..."
+                            placeholderTextColor={LS_COLORS.global.placeholder}
+                            onChangeText={searchFilterFunction}
+                            value={search}
+                        />}
+                    </View>
+                    {user.user_role == 2
+                        ?
+                        <TouchableOpacity style={styles.search}
+                            activeOpacity={0.7}
+                            onPress={() => !isSearchActive ? setSearchActive(true) : cancelSearch()}>
+                            <Image
+                                style={styles.searchImage}
+                                source={require("../../../assets/search.png")}
+                            />
+                        </TouchableOpacity>
+                        :
+                        user.user_role == 3 && isAddJobActive
+                            ?
+                            <TouchableOpacity style={styles.search}
+                                activeOpacity={0.7}
+                                onPress={() => !isSearchActive ? setSearchActive(true) : cancelSearch()}>
+                                <Image
+                                    style={styles.searchImage}
+                                    source={require("../../../assets/search.png")}
+                                />
+                            </TouchableOpacity>
+                            :
+                            null
+                    }
+
                 </View>
                 {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7} onPress={() => setIsAddJobActive(!isAddJobActive)}>
                     <View style={{ height: 30, aspectRatio: 1 }}>
@@ -129,66 +181,61 @@ const HomeScreen = (props) => {
                 </TouchableOpacity>}
                 {user.user_role == 3
                     ?
-                    <>
-                        {
-                            isAddJobActive
-                                ?
-                                <View style={{ flex: 1, paddingTop: '5%' }}>
-                                    <FlatList
-                                        data={services}
-                                        numColumns={2}
-                                        columnWrapperStyle={{ justifyContent: 'space-between' }}
-                                        renderItem={({ item, index }) => {
-                                            return (
-                                                <Cards
-                                                    title1={item.name}
-                                                    title2="SERVICES"
-                                                    imageUrl={{ uri: BASE_URL + item.image }}
-                                                    action={() => {
-                                                        item.itemsData.length > 0
-                                                            ?
-                                                            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
-                                                            :
-                                                            props.navigation.navigate("SubServices", { service: item })
-                                                    }}
-                                                />
-                                            )
-                                        }}
-                                        keyExtractor={(item, index) => index}
-                                    />
-                                </View>
-                                :
-                                <>
-                                    {myJobs.length > 0
-                                        ?
-                                        <FlatList
-                                            data={[...myJobs]}
-                                            numColumns={2}
-                                            columnWrapperStyle={{ justifyContent: 'space-between' }}
-                                            renderItem={({ item, index }) => {
-                                                return (
-                                                    <Cards
-                                                        title1={item.name}
-                                                        imageUrl={{ uri: BASE_URL + item.image }}
-                                                        action={() => {
-                                                            props.navigation.navigate("ServicesProvided", { subService: item });
-                                                        }}
-                                                    />
-                                                )
+                    isAddJobActive
+                        ?
+                        <View style={{ flex: 1, paddingTop: '5%' }}>
+                            <FlatList
+                                data={items}
+                                numColumns={2}
+                                columnWrapperStyle={{ justifyContent: 'space-between' }}
+                                renderItem={({ item, index }) => {
+                                    console.log("item isAddJobActive items =>>", item)
+                                    return (
+                                        <Cards
+                                            title1={item.name}
+                                            title2="SERVICES"
+                                            imageUrl={{ uri: BASE_URL + item.image }}
+                                            action={() => {
+                                                item.itemsData.length > 0
+                                                    ?
+                                                    props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+                                                    :
+                                                    props.navigation.navigate("SubServices", { service: item })
                                             }}
-                                            keyExtractor={(item, index) => index}
                                         />
-                                        :
-                                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>
-                                        </View>}
-                                </>
-                        }
-                    </>
+                                    )
+                                }}
+                                keyExtractor={(item, index) => index}
+                            />
+                        </View>
+                        :
+                        myJobs.length > 0
+                            ?
+                            <FlatList
+                                data={[...myJobs]}
+                                numColumns={2}
+                                columnWrapperStyle={{ justifyContent: 'space-between' }}
+                                renderItem={({ item, index }) => {
+                                    return (
+                                        <Cards
+                                            title1={item.name}
+                                            imageUrl={{ uri: BASE_URL + item.image }}
+                                            action={() => {
+                                                props.navigation.navigate("ServicesProvided", { subService: item });
+                                            }}
+                                        />
+                                    )
+                                }}
+                                keyExtractor={(item, index) => index}
+                            />
+                            :
+                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>
+                            </View>
                     :
                     <View style={{ flex: 1, paddingTop: '5%' }}>
                         <FlatList
-                            data={services}
+                            data={items}
                             numColumns={2}
                             columnWrapperStyle={{ justifyContent: 'space-between' }}
                             renderItem={({ item, index }) => {

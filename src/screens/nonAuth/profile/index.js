@@ -9,7 +9,7 @@ import { globalStyles } from '../../../utils';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
-import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import SearchableDropdown from 'react-native-searchable-dropdown';
 
 /* Components */
 import Header from '../../../components/header';
@@ -98,8 +98,7 @@ const Profile = (props) => {
     const [dropStateDataMaster, setDropStateMaster] = useState([])
 
     /* City Drop Down */
-    const [dropCityValue, setDropCityValue] = useState("City")
-    const [dropCityData, setDropCityData] = useState([])
+    const [dropCityValue, setDropCityValue] = useState("")
     const [isEmptyCityList, setIsEmptyCityList] = useState(false)
     const [dropCityDataMaster, setDropCityMaster] = useState([])
 
@@ -107,8 +106,7 @@ const Profile = (props) => {
     const [dropStateValueWork, setDropStateValueWork] = useState("State")
 
     /* City Drop Down WORK */
-    const [dropCityValueWork, setDropCityValueWork] = useState("City")
-    const [dropCityDataWork, setDropCityDataWork] = useState([])
+    const [dropCityValueWork, setDropCityValueWork] = useState("")
     const [isEmptyCityListWork, setIsEmptyCityListWork] = useState(false)
     const [dropCityDataMasterWork, setDropCityMasterWork] = useState([])
 
@@ -207,8 +205,7 @@ const Profile = (props) => {
     }
 
     const saveUser = () => {
-        setLoader(true)
-        let notifType = getNotificationTypeNumber(notificationType)
+        setLoader(true)        
         const address = [
             {
                 "country": 231,
@@ -234,11 +231,48 @@ const Profile = (props) => {
             }
         ]
 
+        if (isEmptyCityList && address[0].state !== '' && address[0].state !== null && address[0].state !== undefined) {
+            let codeData = { "city": dropCityValue, "zip_code": address[0].zip_code }
+            console.log("codeData ===>>>", codeData)
+            verifyZipCode(codeData).then((res) => {
+                console.log("verifyZipCode home =>> ", res)
+                if (res.errors.length > 0) {
+                    setLoader(false)
+                    showToast("Invalid Home zip code")
+                } else {
+                    save(address)
+                }
+            }).catch(err => {
+                setLoader(false)
+                return showToast("Could not verify Home zip code please try again")
+            })
+        } else if (isEmptyCityListWork && address[1].state !== '' && address[1].state !== null && address[1].state !== undefined) {
+            let codeData = { "city": dropCityValueWork, "zip_code": address[1].zip_code }
+            console.log("codeData ===>>>", codeData)
+            verifyZipCode(codeData).then((res) => {
+                console.log("verifyZipCode work =>> ", res)
+                if (res.errors.length > 0) {
+                    setLoader(false)
+                    showToast("Invalid work zip code")
+                } else {
+                    save(address)
+                }
+            }).catch(err => {
+                setLoader(false)
+                return showToast("Could not verify work zip code please try again")
+            })
+        } else {
+            save(address)
+        }
+    }
+
+    const save = (addr) => {
+        let notifType = getNotificationTypeNumber(notificationType)
+
         let headers = {
             'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
         }
-
 
         var formdata = new FormData();
         formdata.append("user_id", userData.id);
@@ -248,7 +282,7 @@ const Profile = (props) => {
         formdata.append("phone_number", userData.phone_number);
         formdata.append("prefer_name", userData.prefer_name);
         formdata.append("notification_prefrence", notifType);
-        formdata.append("address", JSON.stringify(address));
+        formdata.append("address", JSON.stringify(addr));
 
         let config = {
             headers: headers,
@@ -351,29 +385,21 @@ const Profile = (props) => {
                 if (response.status == true) {
                     if (type == "home") {
                         setDropCityMaster(response.data)
-                        let newArr = [...response.data].map((item, index) => {
-                            return item.name
-                        })
-                        setDropCityData([...newArr])
                         let city = response.data.filter(item => item.id == homeAddressData.city)
                         if (city.length > 0 && city[0].name !== undefined && homeAddressData.city) {
                             setDropCityValue(city[0].name)
                         } else {
-                            setDropCityValue("City")
+                            setDropCityValue("")
                         }
                         setIsEmptyCityListWork(false)
                         setLoader(false)
                     } else {
                         setDropCityMasterWork(response.data)
-                        let newArr = [...response.data].map((item, index) => {
-                            return item.name
-                        })
-                        setDropCityDataWork([...newArr])
                         let city = response.data.filter(item => item.id == workAddressData.city)
                         if (city.length > 0 && city[0].name !== undefined && workAddressData.city) {
                             setDropCityValueWork(city[0].name)
                         } else {
-                            setDropCityValueWork("City")
+                            setDropCityValueWork("")
                         }
                         setIsEmptyCityListWork(false)
                         setLoader(false)
@@ -406,6 +432,34 @@ const Profile = (props) => {
             getCities(homeAddressData.state, "home")
             getCities(workAddressData.state, "work")
         }
+    }
+
+    const verifyZipCode = (data) => {
+        return new Promise((resolve, reject) => {
+            let headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            }
+
+            let user_data = { ...data }
+
+            let config = {
+                headers: headers,
+                data: JSON.stringify(user_data),
+                type: 'post'
+            }
+
+            fetch('http://122.160.70.200:3031/api/verify/checkZipCode', {
+                body: config.data,
+                headers: config.headers,
+                method: config.type
+            }).then(async (response) => {
+                let json = await response.json()
+                resolve(json)
+            }).catch((error) => {
+                reject(error)
+            });
+        })
     }
 
     return (
@@ -518,23 +572,48 @@ const Profile = (props) => {
                                                 containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                                 dropdownStyle={{ maxHeight: 300 }}
                                             />
-                                            {
-                                                isEmptyCityList
-                                                    ?
-                                                    <CustomInput
-                                                        placeholder="City"
-                                                        value={homeAddressData.city}
-                                                        onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, city: text }) }}
-                                                    />
-                                                    :
-                                                    <DropDown
-                                                        item={dropCityData}
-                                                        value={dropCityValue}
-                                                        onChangeValue={(index, value) => setDropCityValue(value)}
-                                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                                        dropdownStyle={{ maxHeight: 300 }}
-                                                    />
-                                            }
+
+                                            <SearchableDropdown
+                                                onItemSelect={(item) => {
+                                                    setDropCityValue(item.name)
+                                                }}
+                                                containerStyle={{
+                                                    width: '90%',
+                                                    alignSelf: 'center',
+                                                    marginBottom: 30,
+                                                    paddingHorizontal: '5%',
+                                                }}
+                                                itemStyle={{
+                                                    padding: 10,
+                                                    marginTop: 2,
+                                                    backgroundColor: '#ddd',
+                                                    borderColor: '#bbb',
+                                                    borderWidth: 1,
+                                                    borderRadius: 50,
+                                                    height: 40
+                                                }}
+                                                itemTextStyle={{
+                                                    fontSize: 14,
+                                                    height: 50,
+                                                    width: "100%",
+                                                    fontFamily: LS_FONTS.PoppinsRegular,
+                                                }}
+                                                itemsContainerStyle={{ maxHeight: 140 }}
+                                                items={dropCityDataMaster}
+                                                textInputProps={{
+                                                    placeholder: "City",
+                                                    style: {
+                                                        paddingHorizontal: 35,
+                                                        borderColor: '#ccc',
+                                                        borderRadius: 50,
+                                                        height: 50,
+                                                        backgroundColor: LS_COLORS.global.lightGrey,
+                                                    },
+                                                    onTextChange: text => setDropCityValue(text),
+                                                    placeholderTextColor: LS_COLORS.global.placeholder,
+                                                    value: dropCityValue
+                                                }}
+                                            />
 
                                             <CustomInput
                                                 placeholder="Zip code"
@@ -583,7 +662,7 @@ const Profile = (props) => {
                                         containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                         dropdownStyle={{ maxHeight: 300 }}
                                     />
-                                    {
+                                    {/* {
                                         isEmptyCityListWork
                                             ?
                                             <CustomInput
@@ -599,7 +678,49 @@ const Profile = (props) => {
                                                 containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                                 dropdownStyle={{ maxHeight: 300 }}
                                             />
-                                    }
+                                    } */}
+
+                                    <SearchableDropdown
+                                        onItemSelect={(item) => {
+                                            setDropCityValueWork(item.name)
+                                        }}
+                                        containerStyle={{
+                                            width: '90%',
+                                            alignSelf: 'center',
+                                            marginBottom: 30,
+                                            paddingHorizontal: '5%',
+                                        }}
+                                        itemStyle={{
+                                            padding: 10,
+                                            marginTop: 2,
+                                            backgroundColor: '#ddd',
+                                            borderColor: '#bbb',
+                                            borderWidth: 1,
+                                            borderRadius: 50,
+                                            height: 40
+                                        }}
+                                        itemTextStyle={{
+                                            fontSize: 14,
+                                            height: 50,
+                                            width: "100%",
+                                            fontFamily: LS_FONTS.PoppinsRegular,
+                                        }}
+                                        itemsContainerStyle={{ maxHeight: 140 }}
+                                        items={dropCityDataMasterWork}
+                                        textInputProps={{
+                                            placeholder: "City",
+                                            style: {
+                                                paddingHorizontal: 35,
+                                                borderColor: '#ccc',
+                                                borderRadius: 50,
+                                                height: 50,
+                                                backgroundColor: LS_COLORS.global.lightGrey,
+                                            },
+                                            onTextChange: text => setDropCityValueWork(text),
+                                            placeholderTextColor: LS_COLORS.global.placeholder,
+                                            value: dropCityValueWork
+                                        }}
+                                    />
 
                                     <CustomInput
                                         placeholder="Zip code"
@@ -677,6 +798,7 @@ const Profile = (props) => {
                         activeOpacity={0.7}
                         onPress={() => {
                             storeItem('user', null)
+                            props.navigation.navigate('HomeScreen')
                             props.navigation.navigate('WelcomeScreen')
                         }}>
                         <Text style={styles.saveText}>
