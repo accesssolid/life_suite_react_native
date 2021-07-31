@@ -13,6 +13,7 @@ target 'LifeSuite' do
   )
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+  pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text', :modular_headers => true
 
   target 'LifeSuiteTests' do
     inherit! :complete

@@ -31,6 +31,7 @@
 		9F9481BE3EFA489BAE85AC19 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3C3AC767F6A44EE89AE06E5B /* Poppins-SemiBold.ttf */; };
 		A145054C8C6142B6AF54D8F5 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AEA86496907445B798D780C9 /* Poppins-Regular.ttf */; };
 		A94EB5E27F164E88A7A63915 /* Poppins-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B9445C74BD8B442A8F437FE8 /* Poppins-BoldItalic.ttf */; };
+		AB0ECFB026B5534500061D80 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0ECFAF26B5534500061D80 /* File.swift */; };
 		CF2AEC3F1F754FD3B8A74072 /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E626E904AD1E4088ABABFEA8 /* Poppins-Light.ttf */; };
 /* End PBXBuildFile section */
 
@@ -98,6 +99,8 @@
 		A17ED02A19E347E38F64EF18 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		A3A2319ACBA248748D798A87 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../assets/Fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
 		AA702A0805095CA58838CFBC /* Pods-LifeSuite-LifeSuiteTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeSuite-LifeSuiteTests.release.xcconfig"; path = "Target Support Files/Pods-LifeSuite-LifeSuiteTests/Pods-LifeSuite-LifeSuiteTests.release.xcconfig"; sourceTree = "<group>"; };
+		AB0ECFAE26B5534500061D80 /* LifeSuite-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LifeSuite-Bridging-Header.h"; sourceTree = "<group>"; };
+		AB0ECFAF26B5534500061D80 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		AEA86496907445B798D780C9 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../assets/Fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		B9445C74BD8B442A8F437FE8 /* Poppins-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BoldItalic.ttf"; path = "../assets/Fonts/Poppins-BoldItalic.ttf"; sourceTree = "<group>"; };
 		BE6E2F8129064B50A0104C76 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -174,6 +177,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				AB0ECFAE26B5534500061D80 /* LifeSuite-Bridging-Header.h */,
 			);
 			name = LifeSuite;
 			sourceTree = "<group>";
@@ -198,6 +202,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				AB0ECFAF26B5534500061D80 /* File.swift */,
 				13B07FAE1A68108700A75B9A /* LifeSuite */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* LifeSuiteTests */,
@@ -339,7 +344,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1250;
 					};
 				};
 			};
@@ -561,6 +566,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				AB0ECFB026B5534500061D80 /* File.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -580,6 +586,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FC2A1ED48B22B9112D82FDAD /* Pods-LifeSuite-LifeSuiteTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -607,6 +614,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AA702A0805095CA58838CFBC /* Pods-LifeSuite-LifeSuiteTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = LifeSuiteTests/Info.plist;
@@ -651,6 +659,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite.app;
 				PRODUCT_NAME = LifeSuite;
 				PROVISIONING_PROFILE_SPECIFIER = "LifeSuite Dev";
+				SWIFT_OBJC_BRIDGING_HEADER = "LifeSuite-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -681,6 +690,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite.app;
 				PRODUCT_NAME = LifeSuite;
 				PROVISIONING_PROFILE_SPECIFIER = "LifeSuite Dev";
+				SWIFT_OBJC_BRIDGING_HEADER = "LifeSuite-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";

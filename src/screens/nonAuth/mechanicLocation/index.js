@@ -21,59 +21,17 @@ import { Container, Content, Row } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
 
 const MechanicLocation = (props) => {
-    const dispatch = useDispatch()
-    const [checked, setChecked] = useState(false);
-    const [checked1, setChecked1] = useState(false);
-    const [checked2, setChecked2] = useState(false);
-    const [checked3, setChecked3] = useState(false);
-    const [checked4, setChecked4] = useState(false);
-    const [checked5, setChecked5] = useState(false);
-    const [checked6, setChecked6] = useState(false);
-    const [checked7, setChecked7] = useState(false);
-    const [checked8, setChecked8] = useState(false);
-    const [category, setCategory] = useState()
+    const [category, setCategory] = useState('1:00')
 
-    const category_array = [
-        {
-            label: 'Yeshivish',
-            value: 'Yeshivish'
-        },
-        {
-            label: 'Modern Yeshivish',
-            value: 'Modern Yeshivish'
-        },
-        {
-            label: 'Chassidish',
-            value: 'Chassidish'
-        },
-        {
-            label: 'Heimish',
-            value: 'Heimish'
-        },
-        {
-            label: 'Chabad',
-            value: 'Chabad'
-        },
-        {
-            label: 'Modern Orthodox Machmir',
-            value: 'Modern Orthodox Machmir'
-        },
-        {
-            label: 'Modern Orthodox',
-            value: 'Modern Orthodox'
-        },
-        {
-            label: 'Toradig',
-            value: 'Toradig'
-        },
-    ]
+    const category_array = ['1:00', '02:00', '03:00', '4:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00']
     const [from, setFrom] = useState("")
-    const [date, setDate] = useState("")
+    const [to, setTo] = useState("")
+    const [date, setDate] = useState("asdasd")
 
     const renderView = () => {
         return (
-            <Container style={{ marginTop:26 }}>
-                <Content>
+            <View style={{ flex:1, marginTop: 26 }}>
+                <ScrollView style={{ flex:1 }} keyboardShouldPersistTaps='handled'>
                     <Image
                         style={{ height: 140, alignSelf: 'center', width: "90%", marginTop: 10 }}
                         source={require("../../../assets/map.png")}
@@ -92,8 +50,7 @@ const MechanicLocation = (props) => {
                             />
                             <TouchableOpacity
                                 style={{ alignSelf: "center", marginRight: 10 }}
-                                activeOpacity={0.7}
-                            >
+                                activeOpacity={0.7}>
                                 <Image
                                     style={{ height: 15, width: 20, resizeMode: "contain", alignSelf: 'center' }}
                                     source={require("../../../assets/location.png")}
@@ -105,13 +62,12 @@ const MechanicLocation = (props) => {
                             <TextInput
                                 style={styles.inputStyle}
                                 color="black"
-                                value={from}
-                                onChangeText={(text) => { setFrom(text) }}
+                                value={to}
+                                onChangeText={(text) => { setTo(text) }}
                             />
                             <TouchableOpacity
                                 style={{ alignSelf: "center", marginRight: 10 }}
-                                activeOpacity={0.7}
-                            >
+                                activeOpacity={0.7}>
                                 <Image
                                     style={{ height: 15, width: 20, resizeMode: "contain", alignSelf: 'center' }}
                                     source={require("../../../assets/location.png")}
@@ -125,14 +81,14 @@ const MechanicLocation = (props) => {
                                 color="black"
                                 value={date}
                                 onChangeText={(text) => { setDate(text) }}
+                                editable={false}
                             />
                             <TouchableOpacity
                                 onPress={() => {
-                                    props.navigation.navigate("Calendar")
+                                    props.navigation.navigate("Calendar", { setDate: setDate.bind(this) })
                                 }}
                                 style={{ alignSelf: "center", marginRight: 10 }}
-                                activeOpacity={0.7}
-                            >
+                                activeOpacity={0.7}>
                                 <Image
                                     style={{ height: 15, width: 20, resizeMode: "contain", alignSelf: 'center' }}
                                     source={require("../../../assets/datePicker.png")}
@@ -141,28 +97,29 @@ const MechanicLocation = (props) => {
                         </View>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "5%" }}>
-
-                        <View style={{ flexDirection: 'column', width: "32%" }}>
+                        <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>Start Time</Text>
                             <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10, alignSelf: "center" }}>
                                 <DropDown
                                     item={category_array}
-                                    defaultValue={category}
+                                    value={category}
                                     width={widthPercentageToDP(30)}
-                                    onChangeItem={(t) => setCategory(t.value)}
+                                    onChangeItem={(t) => setCategory(t)}
                                     placeholder="Car"
+                                    dropdownStyle={{ width: '30%', alignItems: 'center' }}
                                 />
                             </Row>
                         </View>
-                        <View style={{ flexDirection: 'column', width: "40%" }}>
+                        <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>End Time</Text>
-                            <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10, alignSelf: "center", marginRight: 30 }}>
+                            <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10 }}>
                                 <DropDown
                                     item={category_array}
-                                    defaultValue={category}
+                                    value={category}
                                     width={widthPercentageToDP(30)}
-                                    onChangeItem={(t) => setCategory(t.value)}
+                                    onChangeItem={(t) => setCategory(t)}
                                     placeholder="Car"
+                                    dropdownStyle={{ width: '30%', alignItems: 'center' }}
                                 />
                             </Row>
                         </View>
@@ -172,13 +129,12 @@ const MechanicLocation = (props) => {
                         activeOpacity={0.7}
                         onPress={() => {
                             props.navigation.navigate("Mechanics")
-                        }}
-                    >
+                        }}>
                         <Text style={styles.saveText}>Submit</Text>
                     </TouchableOpacity>
                     <View style={{ height: 30 }}></View>
-                </Content>
-            </Container>
+                </ScrollView>
+            </View>
         )
     }
 
@@ -269,7 +225,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5
     },
     fromContainer: {
-        height: 40,
+        height: 50,
         width: "88%",
         alignSelf: 'center',
         borderColor: LS_COLORS.global.lightTextColor,
@@ -277,10 +233,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: "space-between",
         borderWidth: 1,
-        padding: 10
+        overflow: 'hidden',
+        paddingLeft: '5%'
     },
     inputStyle: {
-        padding: 10
+        height: '100%',
+        width: '90%'
     },
 
 

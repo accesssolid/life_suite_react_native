@@ -23,7 +23,8 @@ function CustomInput({
     image,
     action,
     imageUrl,
-    width
+    width,
+    returnKeyType
 }) {
     return (
         <Item
@@ -54,7 +55,8 @@ function CustomInput({
                     height: 50,
                     fontFamily: LS_FONTS.PoppinsMedium,
                     fontSize: 16,
-                }}
+                }}                
+                returnKeyType={returnKeyType}                
             />
 
             <TouchableOpacity onPress={action} style={{ right: 10 }}>

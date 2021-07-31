@@ -10,6 +10,7 @@ import Loader from '../../../components/loader';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckBox } from 'react-native-elements'
+import TextInputMask from 'react-native-text-input-mask';
 
 /* Components */;
 import Header from '../../../components/header';
@@ -93,10 +94,10 @@ const ServicesProvided = (props) => {
         let isValid = true
         servicesData.map(item => {
             if (item.price.trim() == "" || item.time_duration.trim() == "") {
-                isValid = false                
+                isValid = false
             }
         })
-        if(!isValid){
+        if (!isValid) {
             return showToast("Please fill in data for selected services")
         }
         if (isAddServiceMode) {
@@ -121,29 +122,39 @@ const ServicesProvided = (props) => {
                 showToast("No items selected")
             }
         } else {
-
+            showToast("under development")
         }
     }
 
     const setText = (key, text, index) => {
         let temp = [...servicesData]
+        console.log("temp[index].time_duration =>", temp[index].time_duration)
+        let hh = temp[index].time_duration.slice(0, 2)
+        let mm = temp[index].time_duration.length > 2 ? temp[index].time_duration.slice(2) : ''
         if (key == "price") {
-            if(text !== ''){
-                const replaced = replaceAll(text,"$","");     
-                temp[index].price = '$' + replaced + '.00'
+            let parsed = conTwoDecDigit(text.replace('$', ''))
+            if (text == '') {
+                temp[index].price = ''
             } else {
-                temp[index].price = text
-            }                        
+                temp[index].price = '$' + String(parsed)
+            }
+        } else if (key == 'time_duration_m') {
+            mm = text
+            temp[index].time_duration = hh + mm
         } else {
-            temp[index].time_duration = text
+            hh = text
+            temp[index].time_duration = hh + mm
         }
 
         setServicesData([...temp])
     }
 
-    function replaceAll(str, find, replace) {
-        var escapedFind=find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-        return str.replace(new RegExp(escapedFind, 'g'), replace);
+    conTwoDecDigit = (digit) => {
+        return digit.indexOf(".") > 0 ?
+            digit.split(".").length >= 2 ?
+                digit.split(".")[0] + "." + digit.split(".")[1].substring(-1, 2)
+                : digit
+            : digit
     }
 
     return (
@@ -156,7 +167,7 @@ const ServicesProvided = (props) => {
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                            <View style={{ height: "22%", justifyContent: 'flex-end' }}>
+                            <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop:'4%' }}>
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {
@@ -210,25 +221,29 @@ const ServicesProvided = (props) => {
                                                 />
                                             </View>
                                             <View style={{ ...styles.fromContainer, width: 40, marginRight: '5%' }}>
-                                                <TextInput
-                                                    style={styles.inputStyle}
+                                                <TextInputMask
+                                                    onChangeText={(formatted, extracted) => {
+                                                        setText("time_duration_h", extracted, index)
+                                                    }}
+                                                    mask={"[00]"}
                                                     color="black"
                                                     placeholder="HH"
-                                                    editable={selectedItems.includes(index)}
-                                                    onChangeText={(text) => setText("time_duration", text, index)}
-                                                    maxLength={2}
                                                     keyboardType="numeric"
+                                                    editable={selectedItems.includes(index)}
+                                                    style={styles.inputStyle}
                                                 />
                                             </View>
                                             <View style={{ ...styles.fromContainer, width: 40, marginRight: '5%' }}>
-                                                <TextInput
-                                                    style={styles.inputStyle}
+                                                <TextInputMask
+                                                    onChangeText={(formatted, extracted) => {
+                                                        setText("time_duration_m", extracted, index)
+                                                    }}
+                                                    mask={"[00]"}
                                                     color="black"
                                                     placeholder="MM"
-                                                    editable={selectedItems.includes(index)}
-                                                    onChangeText={(text) => setText("time_duration", text, index)}
-                                                    maxLength={2}
                                                     keyboardType="numeric"
+                                                    editable={selectedItems.includes(index)}
+                                                    style={styles.inputStyle}
                                                 />
                                             </View>
                                         </View>

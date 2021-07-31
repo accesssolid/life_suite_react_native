@@ -76,7 +76,7 @@ const ServicesProvided = (props) => {
 
     return (
         <>
-            <StatusBar translucent={false} backgroundColor="transparent" barStyle="light-content" />
+            <StatusBar translucent={true} backgroundColor="transparent" barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="stretch"

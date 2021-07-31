@@ -16,24 +16,21 @@ const CustomTextInput = props => {
             <TextInput
                 style={{
                     width: '100%',
-                    height: 60, 
                     backgroundColor: LS_COLORS.global.lightGrey,
                     borderRadius: 28,
-                    alignSelf: 'center',
-                    paddingHorizontal: 20,
+                    alignSelf: 'center',           
                     fontSize: 14,
-                    fontFamily: LS_FONTS.PoppinsRegular
+                    fontFamily: LS_FONTS.PoppinsRegular,
+                    paddingVertical:15,
+                    paddingHorizontal:'14%',
                 }}
                 {...props}
                 placeholderTextColor={LS_COLORS.global.placeholder}
                 color={LS_COLORS.global.black}
                 autoCapitalize="none"
                 autoCorrect={false}
-                keyboardType={props.keyboardType}                
-            />
-            {props.bottomText && <Text style={styles.bottomText}>
-                {props.bottomText}
-            </Text>}
+                keyboardType={props.keyboardType}  
+            />           
         </View>
     )
 }
@@ -41,13 +38,8 @@ const CustomTextInput = props => {
 const styles = StyleSheet.create({
     screen: {
         marginBottom: 30,
-        paddingHorizontal:'10%'
-    },
-    bottomText:{
-        color: LS_COLORS.global.black,
-        marginTop:5,
-        marginHorizontal:'5%'
-    }
+        marginHorizontal:'10%',
+    }, 
 })
 
 export default CustomTextInput

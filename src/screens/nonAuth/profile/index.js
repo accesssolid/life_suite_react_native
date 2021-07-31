@@ -9,7 +9,6 @@ import { globalStyles } from '../../../utils';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
-import SearchableDropdown from 'react-native-searchable-dropdown';
 
 /* Components */
 import Header from '../../../components/header';
@@ -19,6 +18,7 @@ import { showToast, storeItem } from '../../../components/validators';
 import { BASE_URL, getApi } from '../../../api/api';
 import { loadauthentication } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
+import SearchableDropDown from '../../../components/searchableDropDown';
 
 const getMessage = (name) => {
     switch (name) {
@@ -112,6 +112,7 @@ const Profile = (props) => {
 
     useEffect(() => {
         setUserData({ ...user })
+        console.log("userData  ==>> ", userData)
     }, [user])
 
     useEffect(() => {
@@ -205,7 +206,7 @@ const Profile = (props) => {
     }
 
     const saveUser = () => {
-        setLoader(true)        
+        setLoader(true)
         const address = [
             {
                 "country": 231,
@@ -231,7 +232,57 @@ const Profile = (props) => {
             }
         ]
 
-        if (isEmptyCityList && address[0].state !== '' && address[0].state !== null && address[0].state !== undefined) {
+        console.log("address =>> ", address)
+
+        let keys = Object.keys(userData)
+        for (let index = 0; index < keys.length; index++) {
+            if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '') {
+                showToast(getMessage(keys[index]), 'danger')
+                setLoader(false)
+                return false
+            }
+        }
+
+        if (userData.user_role == 3) {
+            let homekeys = Object.keys(address[0])
+            for (let index = 0; index < homekeys.length; index++) {
+                if (homekeys[index] !== 'lat' && homekeys[index] !== 'long' && String(address[0][homekeys[index]]).trim() == '') {
+                    showToast('Invalid home address', 'danger')
+                    setLoader(false)
+                    return false
+                }
+            }
+
+            let keys = Object.keys(address[1])
+            for (let index = 0; index < keys.length; index++) {
+                if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
+                    showToast('Invalid work address', 'danger')
+                    setLoader(false)
+                    return false
+                }
+            }
+        } else {
+            let keys = Object.keys(address[0])
+            for (let index = 0; index < keys.length; index++) {
+                if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[0][keys[index]]).trim() == '') {
+                    showToast('Invalid home address', 'danger')
+                    setLoader(false)
+                    return false
+                }
+            }
+            if (address[1].address_line_1.trim() !== '' || address[1].address_line_2.trim() !== '' || address[1].zip_code.trim() !== '') {
+                let keys = Object.keys(address[1])
+                for (let index = 0; index < keys.length; index++) {
+                    if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
+                        showToast('Invalid work address', 'danger')
+                        setLoader(false)
+                        return false
+                    }
+                }
+            }
+        }
+
+        if (!isEmptyCityList && address[0].state !== '' && address[0].state !== null && address[0].state !== undefined) {
             let codeData = { "city": dropCityValue, "zip_code": address[0].zip_code }
             console.log("codeData ===>>>", codeData)
             verifyZipCode(codeData).then((res) => {
@@ -246,7 +297,7 @@ const Profile = (props) => {
                 setLoader(false)
                 return showToast("Could not verify Home zip code please try again")
             })
-        } else if (isEmptyCityListWork && address[1].state !== '' && address[1].state !== null && address[1].state !== undefined) {
+        } else if (!isEmptyCityListWork && address[1].state !== '' && address[1].state !== null && address[1].state !== undefined) {
             let codeData = { "city": dropCityValueWork, "zip_code": address[1].zip_code }
             console.log("codeData ===>>>", codeData)
             verifyZipCode(codeData).then((res) => {
@@ -471,7 +522,7 @@ const Profile = (props) => {
                 action1={() => props.navigation.navigate("HomeScreen")}
             />
             <TouchableOpacity
-                style={{ height: 116, aspectRatio: 1, alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%", overflow: 'hidden', borderRadius: 70 }}
+                style={{ height: 100, aspectRatio: 1, alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%", overflow: 'hidden', borderRadius: 70 }}
                 activeOpacity={0.7}
                 onPress={() => pickImage()}>
                 <Image
@@ -485,6 +536,7 @@ const Profile = (props) => {
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 bounces={false}
+                keyboardShouldPersistTaps='handled'
                 style={styles.container}>
                 <View style={{ marginTop: '15%' }}>
                     <View style={{}}>
@@ -536,7 +588,7 @@ const Profile = (props) => {
                             {
                                 add
                                     ?
-                                    user.user_role == 2 &&
+                                    /* user.user_role == 2 */ true  &&
                                     <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
                                         <Image
                                             style={{ height: 24, width: 24, resizeMode: "contain" }}
@@ -573,52 +625,20 @@ const Profile = (props) => {
                                                 dropdownStyle={{ maxHeight: 300 }}
                                             />
 
-                                            <SearchableDropdown
+                                            <SearchableDropDown
                                                 onItemSelect={(item) => {
                                                     setDropCityValue(item.name)
                                                 }}
-                                                containerStyle={{
-                                                    width: '90%',
-                                                    alignSelf: 'center',
-                                                    marginBottom: 30,
-                                                    paddingHorizontal: '5%',
-                                                }}
-                                                itemStyle={{
-                                                    padding: 10,
-                                                    marginTop: 2,
-                                                    backgroundColor: '#ddd',
-                                                    borderColor: '#bbb',
-                                                    borderWidth: 1,
-                                                    borderRadius: 50,
-                                                    height: 40
-                                                }}
-                                                itemTextStyle={{
-                                                    fontSize: 14,
-                                                    height: 50,
-                                                    width: "100%",
-                                                    fontFamily: LS_FONTS.PoppinsRegular,
-                                                }}
-                                                itemsContainerStyle={{ maxHeight: 140 }}
                                                 items={dropCityDataMaster}
-                                                textInputProps={{
-                                                    placeholder: "City",
-                                                    style: {
-                                                        paddingHorizontal: 35,
-                                                        borderColor: '#ccc',
-                                                        borderRadius: 50,
-                                                        height: 50,
-                                                        backgroundColor: LS_COLORS.global.lightGrey,
-                                                    },
-                                                    onTextChange: text => setDropCityValue(text),
-                                                    placeholderTextColor: LS_COLORS.global.placeholder,
-                                                    value: dropCityValue
-                                                }}
+                                                onTextChange={(text) => setDropCityValue(text)}
+                                                value={dropCityValue}
                                             />
 
                                             <CustomInput
                                                 placeholder="Zip code"
                                                 value={homeAddressData.zip}
                                                 onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
+                                                keyboardType="numeric"
                                             />
                                         </View>
                                     </>
@@ -662,70 +682,22 @@ const Profile = (props) => {
                                         containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                         dropdownStyle={{ maxHeight: 300 }}
                                     />
-                                    {/* {
-                                        isEmptyCityListWork
-                                            ?
-                                            <CustomInput
-                                                placeholder="City"
-                                                value={workAddressData.city}
-                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, city: text }) }}
-                                            />
-                                            :
-                                            <DropDown
-                                                item={dropCityDataWork}
-                                                value={dropCityValueWork}
-                                                onChangeValue={(index, value) => setDropCityValueWork(value)}
-                                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                                dropdownStyle={{ maxHeight: 300 }}
-                                            />
-                                    } */}
 
-                                    <SearchableDropdown
+                                    <SearchableDropDown
                                         onItemSelect={(item) => {
                                             setDropCityValueWork(item.name)
                                         }}
-                                        containerStyle={{
-                                            width: '90%',
-                                            alignSelf: 'center',
-                                            marginBottom: 30,
-                                            paddingHorizontal: '5%',
-                                        }}
-                                        itemStyle={{
-                                            padding: 10,
-                                            marginTop: 2,
-                                            backgroundColor: '#ddd',
-                                            borderColor: '#bbb',
-                                            borderWidth: 1,
-                                            borderRadius: 50,
-                                            height: 40
-                                        }}
-                                        itemTextStyle={{
-                                            fontSize: 14,
-                                            height: 50,
-                                            width: "100%",
-                                            fontFamily: LS_FONTS.PoppinsRegular,
-                                        }}
-                                        itemsContainerStyle={{ maxHeight: 140 }}
                                         items={dropCityDataMasterWork}
-                                        textInputProps={{
-                                            placeholder: "City",
-                                            style: {
-                                                paddingHorizontal: 35,
-                                                borderColor: '#ccc',
-                                                borderRadius: 50,
-                                                height: 50,
-                                                backgroundColor: LS_COLORS.global.lightGrey,
-                                            },
-                                            onTextChange: text => setDropCityValueWork(text),
-                                            placeholderTextColor: LS_COLORS.global.placeholder,
-                                            value: dropCityValueWork
-                                        }}
+                                        onTextChange={(text) => setDropCityValueWork(text)}
+                                        value={dropCityValueWork}
                                     />
 
                                     <CustomInput
                                         placeholder="Zip code"
                                         value={workAddressData.zip}
                                         onChangeText={(text) => { setWorkAddressData({ ...workAddressData, zip: text }) }}
+                                        keyboardType="numeric"
+                                        returnKeyType='done'
                                     />
                                 </>
                             }

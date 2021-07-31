@@ -20,14 +20,15 @@ import CustomInput from "../../../components/textInput"
 import CustomButton from "../../../components/customButton"
 
 const Calendar = (props) => {
-
+    const { setDate } = props.route.params
     const [selectedStartDate, setSelectedStartDate] = useState(null)
     const startDate = selectedStartDate ? selectedStartDate.toString() : '';
-    const [date,setDate] = useState(null)
+    const [date,setDatee] = useState(null)
     const onDateChange = (date) => {
-        setDate(date)
-        var a = moment(date).format("DD MMM")
+        setDatee(date)
+        var a = moment(date).format("DD MMM YYYY")
         setSelectedStartDate(a)
+        setDate(a)
     }
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -62,7 +63,7 @@ const Calendar = (props) => {
                         <Text style={{ marginTop: 20, marginLeft: 20, fontSize: 16, fontFamily: LS_FONTS.PoppinsBold }}>Date Added</Text>
                         <View style={{ flexDirection: 'row' }}>
                             <View style={{ height: 50, width: 50, marginTop: 10, backgroundColor: LS_COLORS.global.green, borderRadius: 100, marginLeft: 20, justifyContent: 'center', alignItems: 'center' }}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsBold, color: LS_COLORS.global.white }}>{startDate}</Text>
+                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsBold, color: LS_COLORS.global.white, textAlign:'center' }}>{startDate}</Text>
                             </View>
                             <Text style={{ alignSelf: 'center', fontSize: 14, fontFamily: LS_FONTS.PoppinsLight, marginLeft: 10 }}>Need a Mechanic</Text>
                         </View>

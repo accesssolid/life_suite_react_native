@@ -9,7 +9,6 @@ import { globalStyles } from '../../../utils';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import { getUniqueId } from 'react-native-device-info';
-import SearchableDropdown from 'react-native-searchable-dropdown';
 
 /* Components */
 import CustomTextInput from '../../../components/customTextInput';
@@ -19,6 +18,7 @@ import { showToast } from '../../../components/validators';
 import { getApi } from '../../../api/api';
 import DropDown from '../../../components/dropDown';
 import { setUserRole } from '../../../redux/features/loginReducer';
+import SearchableDropDown from '../../../components/searchableDropDown';
 
 const getMessage = (name) => {
     switch (name) {
@@ -134,7 +134,7 @@ const SignUpScreen = (props) => {
             return false
         }
 
-        if (dropCityValue == "City") {
+        if (dropCityValue == "") {
             showToast("Please select or enter city", 'danger')
             setLoader(false)
             return false
@@ -369,8 +369,8 @@ const SignUpScreen = (props) => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.container}>
-                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-                    <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
+                <ScrollView style={{ flex: 1, width: '100%' }} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
+                    <View style={{ flex: 1, width: '100%' }}>
                         <View style={styles.textContainer}>
                             <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
                             <Text style={{ ...styles.loginText, fontSize: 24 }}>Signup</Text>
@@ -415,7 +415,6 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, password: text })
                                 }}
                                 secureTextEntry
-                            // bottomText={`Must be at least 8 characters along with:\n• uppercase letter (A-Z)\n• lower case letter (a-z)\n• number (0-9)\n• special character`}
                             />
                             <CustomTextInput
                                 placeholder="Confirm Password"
@@ -458,47 +457,15 @@ const SignUpScreen = (props) => {
                                 dropdownStyle={{ maxHeight: 300 }}
                             />
 
-                            <SearchableDropdown
+                            <SearchableDropDown
                                 onItemSelect={(item) => {
                                     setDropCityValue(item.name)
                                 }}
-                                containerStyle={{
-                                    width: '90%',
-                                    alignSelf: 'center',
-                                    marginBottom: 30,
-                                    paddingHorizontal: '5%',
-                                }}
-                                itemStyle={{
-                                    padding: 10,
-                                    marginTop: 2,
-                                    backgroundColor: '#ddd',
-                                    borderColor: '#bbb',
-                                    borderWidth: 1,
-                                    borderRadius: 50,
-                                    height: 40
-                                }}
-                                itemTextStyle={{
-                                    fontSize: 14,
-                                    height: 50,
-                                    width: "100%",
-                                    fontFamily: LS_FONTS.PoppinsRegular,
-                                }}
-                                itemsContainerStyle={{ maxHeight: 140 }}
                                 items={dropCityDataMaster}
-                                textInputProps={{
-                                    placeholder: "City",
-                                    style: {
-                                        paddingHorizontal: 35,
-                                        borderColor: '#ccc',
-                                        borderRadius: 50,
-                                        height: 50,
-                                        backgroundColor: LS_COLORS.global.lightGrey,
-                                    },
-                                    onTextChange: text => setDropCityValue(text),
-                                    placeholderTextColor: LS_COLORS.global.placeholder,
-                                    value: dropCityValue
-                                }}
+                                onTextChange={(text) => setDropCityValue(text)}
+                                value={dropCityValue}
                             />
+
                             <CustomTextInput
                                 placeholder="Zip code"
                                 value={signUpData.address.address_line_2}
@@ -538,7 +505,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         backgroundColor: LS_COLORS.global.white,
-
     },
     textContainer: {
         marginTop: "20%"
@@ -563,7 +529,7 @@ const styles = StyleSheet.create({
     },
     textInputContainer: {
         marginTop: "10%",
-        width: '100%'
+        width: '100%',
     },
     buttonContainer: {
         width: '100%'

@@ -242,7 +242,7 @@ const LoginScreen = (props) => {
                                 <Text style={styles.already1}> Sign Up</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.facecontainer}>
+                        {/* <View style={styles.facecontainer}>
                             {
                                 Platform.OS == 'ios' &&
                                 <TouchableOpacity onPress={() => on_press_touch()}>
@@ -264,7 +264,7 @@ const LoginScreen = (props) => {
                                 </Card>
                             </TouchableOpacity>
 
-                        </View>
+                        </View> */}
                         {loader == true && <Loader />}
                     </Content>
                 </Container>

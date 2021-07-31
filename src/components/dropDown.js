@@ -34,7 +34,8 @@ const DropDown = (props) => {
                     textStyle={{ fontSize: 14, height: 50, width: "100%", fontFamily: LS_FONTS.PoppinsRegular, paddingLeft: 20, textAlignVertical: "center", lineHeight: 50 }}
                     dropdownTextStyle={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.black }}
                     dropdownStyle={[{ borderWidth: 1 }, props.dropdownStyle]}
-                    onSelect={props.onChangeValue}                
+                    onSelect={props.onChangeValue}
+                    showsVerticalScrollIndicator={false}            
                 />
             </View>
         </>
