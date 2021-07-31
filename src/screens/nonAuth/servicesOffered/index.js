@@ -36,10 +36,6 @@ const ServicesProvided = (props) => {
         getServiceItems()
     }, [])
 
-    useEffect(() => {
-        console.log("servicesData =>", itemList)
-    }, [itemList])
-
     const getServiceItems = () => {
         setLoading(true)
         let headers = {
@@ -93,7 +89,9 @@ const ServicesProvided = (props) => {
     const next = () => {
         let isValid = true
         servicesData.map(item => {
-            if (item.price.trim() == "" || item.time_duration.trim() == "") {
+            let hh = item.time_duration.slice(0, 2)
+            let mm = item.time_duration.length > 2 ? item.time_duration.slice(2) : ''
+            if (item.price.trim() == "" || hh.trim() == "" || mm.trim() == "") {
                 isValid = false
             }
         })
@@ -128,7 +126,6 @@ const ServicesProvided = (props) => {
 
     const setText = (key, text, index) => {
         let temp = [...servicesData]
-        console.log("temp[index].time_duration =>", temp[index].time_duration)
         let hh = temp[index].time_duration.slice(0, 2)
         let mm = temp[index].time_duration.length > 2 ? temp[index].time_duration.slice(2) : ''
         if (key == "price") {
@@ -167,7 +164,7 @@ const ServicesProvided = (props) => {
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                            <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop:'4%' }}>
+                            <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop: StatusBar.currentHeight + 20 }}>
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {
@@ -197,7 +194,7 @@ const ServicesProvided = (props) => {
                         {itemList.map(((item, index) => {
                             return (
                                 <>
-                                    <View key={index} style={{ width: '100%', flexDirection: "row", alignItems: 'center' }}>
+                                    <View key={index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
                                         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
                                             <CheckBox
                                                 checked={selectedItems.includes(index)}
@@ -205,7 +202,7 @@ const ServicesProvided = (props) => {
                                                 checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                                             />
-                                            <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '70%' }}>{item.name}</Text>
+                                            <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%' }}>{item.name}</Text>
                                         </View>
 
                                         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end' }}>
@@ -219,8 +216,8 @@ const ServicesProvided = (props) => {
                                                     keyboardType="numeric"
                                                     value={servicesData[index]?.price}
                                                 />
-                                            </View>
-                                            <View style={{ ...styles.fromContainer, width: 40, marginRight: '5%' }}>
+                                            </View>                                            
+                                            <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
                                                 <TextInputMask
                                                     onChangeText={(formatted, extracted) => {
                                                         setText("time_duration_h", extracted, index)
@@ -232,8 +229,8 @@ const ServicesProvided = (props) => {
                                                     editable={selectedItems.includes(index)}
                                                     style={styles.inputStyle}
                                                 />
-                                            </View>
-                                            <View style={{ ...styles.fromContainer, width: 40, marginRight: '5%' }}>
+                                            </View>                                            
+                                            <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
                                                 <TextInputMask
                                                     onChangeText={(formatted, extracted) => {
                                                         setText("time_duration_m", extracted, index)

@@ -22,6 +22,7 @@ import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
 import { setAddServiceMode } from '../../../redux/features/services';
+import { Alert } from 'react-native';
 
 const AddLicense = (props) => {
     const dispatch = useDispatch()
@@ -34,19 +35,45 @@ const AddLicense = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
 
     const pickImage = () => {
-        ImagePicker.openPicker({
-            width: 400,
-            height: 400,
-            cropping: true
-        }).then(image => {
-            setImage({
-                uri: image.path,
-                name: image.filename,
-                type: image.mime,
-            })
-        }).catch(err => {
-            console.log("Image picker error : ", err)
-        })
+        Alert.alert(
+            "LifeSuite",
+            "Pick image from...",
+            [
+                {
+                    text: "Camera",
+                    onPress: () => {
+                        ImagePicker.openCamera({
+                            width: 400,
+                            height: 400,
+                            cropping: true
+                        }).then(image => {
+                            setImage({
+                                uri: image.path,
+                                name: image.filename ? image.filename : image.path.split("/").pop(),
+                                type: image.mime,
+                            })
+                        })
+                    },
+                },
+                {
+                    text: "Gallery", onPress: () => {
+                        ImagePicker.openPicker({
+                            width: 400,
+                            height: 400,
+                            cropping: true
+                        }).then(image => {
+                            setImage({
+                                uri: image.path,
+                                name: image.filename ? image.filename : image.path.split("/").pop(),
+                                type: image.mime,
+                            })
+                        }).catch(err => {
+                            console.log("Image picker error : ", err)
+                        })
+                    }
+                }
+            ]
+        );
     }
 
     const next = () => {
@@ -149,7 +176,7 @@ const AddLicense = (props) => {
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                            <View style={{ height: "22%", justifyContent: 'flex-end' }}>
+                            <View style={{ height: "22%", justifyContent: 'flex-end', marginTop: StatusBar.currentHeight + 20 }}>
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {

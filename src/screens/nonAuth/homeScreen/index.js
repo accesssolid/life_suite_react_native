@@ -189,7 +189,6 @@ const HomeScreen = (props) => {
                                 numColumns={2}
                                 columnWrapperStyle={{ justifyContent: 'space-between' }}
                                 renderItem={({ item, index }) => {
-                                    console.log("item isAddJobActive items =>>", item)
                                     return (
                                         <Cards
                                             title1={item.name}

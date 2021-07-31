@@ -27,9 +27,9 @@ const ServicesProvided = (props) => {
     const [selectedItems, setSelectedItems] = useState([])
 
     useEffect(() => {
-        if(!items.length > 0){
+        if (!items.length > 0) {
             getServiceItems()
-        }        
+        }
     }, [])
 
     const getServiceItems = () => {
@@ -84,7 +84,7 @@ const ServicesProvided = (props) => {
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                            <View style={{ height: "22%", justifyContent: 'flex-end' }}>
+                            <View style={{ height: "22%", justifyContent: 'flex-end', marginTop: StatusBar.currentHeight + 10 }}>
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {

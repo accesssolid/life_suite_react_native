@@ -375,6 +375,7 @@ const SignUpScreen = (props) => {
                             <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
                             <Text style={{ ...styles.loginText, fontSize: 24 }}>Signup</Text>
                             <Text style={styles.text}>Add your details to Signup</Text>
+                            <Text style={styles.text}>or</Text>
                             <TouchableOpacity onPress={() => switchRole()} activeOpacity={0.7}>
                                 <Text style={{ ...styles.text, textDecorationLine: 'underline' }}>Signup as {role == 1 ? "Service Provider" : "Customer"}</Text>
                             </TouchableOpacity>
@@ -430,6 +431,7 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, phone_number: text })
                                 }}
+                                keyboardType='numeric'
                             />
                             <Text style={{ width: '75%', alignSelf: 'center', marginBottom: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black }}>Address Type</Text>
                             <DropDown

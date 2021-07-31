@@ -112,7 +112,6 @@ const Profile = (props) => {
 
     useEffect(() => {
         setUserData({ ...user })
-        console.log("userData  ==>> ", userData)
     }, [user])
 
     useEffect(() => {
@@ -164,7 +163,7 @@ const Profile = (props) => {
         formdata.append("user_id", user.id);
         formdata.append('profile', {
             uri: Platform.OS == "ios" ? image.path.replace('file:///', '') : image.path,
-            name: image.filename,
+            name: image.filename ? image.filename : image.path.split("/").pop(),
             type: image.mime,
         });
 
@@ -232,8 +231,6 @@ const Profile = (props) => {
             }
         ]
 
-        console.log("address =>> ", address)
-
         let keys = Object.keys(userData)
         for (let index = 0; index < keys.length; index++) {
             if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '') {
@@ -284,9 +281,7 @@ const Profile = (props) => {
 
         if (!isEmptyCityList && address[0].state !== '' && address[0].state !== null && address[0].state !== undefined) {
             let codeData = { "city": dropCityValue, "zip_code": address[0].zip_code }
-            console.log("codeData ===>>>", codeData)
             verifyZipCode(codeData).then((res) => {
-                console.log("verifyZipCode home =>> ", res)
                 if (res.errors.length > 0) {
                     setLoader(false)
                     showToast("Invalid Home zip code")
@@ -299,9 +294,7 @@ const Profile = (props) => {
             })
         } else if (!isEmptyCityListWork && address[1].state !== '' && address[1].state !== null && address[1].state !== undefined) {
             let codeData = { "city": dropCityValueWork, "zip_code": address[1].zip_code }
-            console.log("codeData ===>>>", codeData)
             verifyZipCode(codeData).then((res) => {
-                console.log("verifyZipCode work =>> ", res)
                 if (res.errors.length > 0) {
                     setLoader(false)
                     showToast("Invalid work zip code")
@@ -588,7 +581,7 @@ const Profile = (props) => {
                             {
                                 add
                                     ?
-                                    /* user.user_role == 2 */ true  &&
+                                    /* user.user_role == 2 */ true &&
                                     <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
                                         <Image
                                             style={{ height: 24, width: 24, resizeMode: "contain" }}
@@ -746,7 +739,7 @@ const Profile = (props) => {
                                 <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Bank Information</Text>
                                 <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
                                     activeOpacity={0.7}
-                                    onPress={() => alert('x')}>
+                                    onPress={() => alert('under development')}>
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Add Accounts</Text>
                                     <View style={{ height: 21, aspectRatio: 1 }}>
                                         <Image
