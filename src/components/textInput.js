@@ -24,7 +24,10 @@ function CustomInput({
     action,
     imageUrl,
     width,
-    returnKeyType
+    returnKeyType,
+    inpuRef,
+    onSubmitEditing,
+    maxLength
 }) {
     return (
         <Item
@@ -44,6 +47,8 @@ function CustomInput({
                 </Text>
             </View>
             <Input
+                // getRef={inpuRef}
+                ref={inpuRef}
                 keyboardType={keyboardType}
                 secureTextEntry={secureTextEntry}
                 value={value}
@@ -56,7 +61,9 @@ function CustomInput({
                     fontFamily: LS_FONTS.PoppinsMedium,
                     fontSize: 16,
                 }}                
-                returnKeyType={returnKeyType}                
+                returnKeyType={returnKeyType}
+                onSubmitEditing={onSubmitEditing}
+                maxLength={maxLength}            
             />
 
             <TouchableOpacity onPress={action} style={{ right: 10 }}>

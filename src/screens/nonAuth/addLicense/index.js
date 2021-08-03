@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -40,6 +40,9 @@ const AddLicense = (props) => {
             "Pick image from...",
             [
                 {
+                    text: "Cancel", onPress: () => {}, style:'cancel'
+                },
+                {
                     text: "Camera",
                     onPress: () => {
                         ImagePicker.openCamera({
@@ -71,7 +74,7 @@ const AddLicense = (props) => {
                             console.log("Image picker error : ", err)
                         })
                     }
-                }
+                },                
             ]
         );
     }
@@ -201,7 +204,7 @@ const AddLicense = (props) => {
                         <Text style={styles.service}>Load your Certificate or License</Text>
                         <View style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
                             <View style={{ height: image == require('../../../assets/camera.png') ? 33 : '100%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                <Image style={{ height: '100%', width: '100%' }} resizeMode="contain" source={image} />
+                                <Image style={{ height: '100%', width: '100%' }} resizeMode="cover" source={image} />
                             </View>
                         </View>
                         <View style={{ flex: 1 }} />

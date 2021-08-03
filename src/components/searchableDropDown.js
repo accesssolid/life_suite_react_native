@@ -9,25 +9,28 @@ import LS_FONTS from '../constants/fonts';
 const SearchableDropDown = props => {
     return (
         <View style={styles.screen}>
-            <SearchableDropdown                
+            <SearchableDropdown
+
                 onItemSelect={props.onItemSelect}
                 containerStyle={styles.containerStyle}
                 itemStyle={styles.itemStyle}
                 itemTextStyle={styles.itemTextStyle}
-                itemsContainerStyle={{ maxHeight: 140 }}                
+                itemsContainerStyle={{ maxHeight: 140 }}
                 items={props.items}
                 textInputProps={{
                     placeholder: "City",
-                    style: styles.inputStyle,                    
+                    style: styles.inputStyle,
                     onTextChange: props.onTextChange,
-                    placeholderTextColor: LS_COLORS.global.placeholder,                    
-                    value: props.value
+                    placeholderTextColor: LS_COLORS.global.placeholder,
+                    value: props.value,
+                    ref: props.dropRef
                 }}
                 listProps={
                     {
-                      nestedScrollEnabled: true,
+                        nestedScrollEnabled: true,
                     }
-                  }
+                }
+                render
             />
         </View>
     )
@@ -48,7 +51,7 @@ const styles = StyleSheet.create({
         color: LS_COLORS.global.darkBlack
     },
     itemTextStyle: {
-        fontSize: 14,        
+        fontSize: 14,
         fontFamily: LS_FONTS.PoppinsRegular,
         color: LS_COLORS.global.darkGray
     },
@@ -58,7 +61,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
     },
     containerStyle: {
-        width: '100%',        
+        width: '100%',
     }
 })
 

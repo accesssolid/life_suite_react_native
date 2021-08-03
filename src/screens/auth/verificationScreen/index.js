@@ -48,7 +48,7 @@ const VerificationCode = props => {
     getApi(config)
       .then((response) => {
         if (response.status == true) {
-          showToast(response.message, 'success')
+          showToast("Verification code sent on your email", 'success')
           props.navigation.navigate('OtpScreen', { "email": email.toLowerCase() })
           setLoader(false)
         }
@@ -76,6 +76,8 @@ const VerificationCode = props => {
               <CustomTextInput
                 placeholder="Enter your email"
                 value={email}
+                keyboardType="email-address"
+                returnKeyType="done"
                 onChangeText={(text) => {
                   setEmail(text)
                 }}

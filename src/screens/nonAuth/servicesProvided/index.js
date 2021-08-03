@@ -136,7 +136,7 @@ const ServicesProvided = (props) => {
                                 </Content>
                                 :
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                    <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>
+                                    {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
                                 </View>
                         }
 

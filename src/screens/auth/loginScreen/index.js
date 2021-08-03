@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity } from 'react-native'
 
 /* Constants */
@@ -22,6 +22,7 @@ import { loginReducer, setAuthToken, setUserRole } from '../../../redux/features
 
 const LoginScreen = (props) => {
     const dispatch = useDispatch()
+    const passRef = useRef(null)
     const role = useSelector(state => state.authenticate.user_role)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -201,8 +202,11 @@ const LoginScreen = (props) => {
                                 setEmail(text)
                             }}
                             keyboardType="email-address"
+                            returnKeyType="next"
+                            onSubmitEditing={() => passRef.current.focus()}
                         />
                         <CustomTextInput
+                            inputRef={passRef}
                             placeholder="Password"
                             value={password}
                             onChangeText={(text) => {

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, Platform, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, Image, Text, Platform, SafeAreaView, Alert, TouchableOpacity, ScrollView, KeyboardAvoidingView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -9,6 +9,7 @@ import { globalStyles } from '../../../utils';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
+import TextInputMask from 'react-native-text-input-mask';
 
 /* Components */
 import Header from '../../../components/header';
@@ -80,16 +81,58 @@ const getNotificationTypeNumber = (type) => {
     }
 }
 
+const getKeyName = (key) => {
+    switch (key) {
+        case "address_line_1":
+            return "Address line 1"
+        case "address_line_2":
+            return "Address line 1"
+        case "state":
+            return "State"
+        case "city":
+            return "City"
+        case "zip_code":
+            return "Zip code"
+    }
+}
+
 const Profile = (props) => {
     const dispatch = useDispatch()
+
+    const fnameRef = useRef(null)
+    const lnameRef = useRef(null)
+    const prefNameRef = useRef(null)
+    const emailRef = useRef(null)
+    const phoneRef = useRef(null)
+
+    const workAddressLine1Ref = useRef(null)
+    const workAddressLine2Ref = useRef(null)
+    const workAddressZipRef = useRef(null)
+    const workAddressStateDropRef = useRef(null)
+    const workAddressCityDropRef = useRef(null)
+
+    const homeAddressLine1Ref = useRef(null)
+    const homeAddressLine2Ref = useRef(null)
+    const homeAddressZipRef = useRef(null)
+    const homeAddressStateDropRef = useRef(null)
+    const homeAddressCityDropRef = useRef(null)
+
+    const cardNameRef = useRef(null)
+    const cardNumberRef = useRef(null)
+    const cardDateRef = useRef(null)
+
+    const [addWorkAddressActive, setAddWorkAddressActive] = useState(false)
+    const [addHomeAddressActive, setAddHomeAddressActive] = useState(false)
+
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [userData, setUserData] = useState({ ...user })
     const [loader, setLoader] = useState(false)
-    const [add, setAdd] = useState(true)
-    const [edit, setEdit] = useState(true)
-    const [number, setNumber] = useState("")
-    const [holderName, setHolderName] = useState("")
+    const [cardDetails, setCardDetails] = useState({
+        number: '',
+        name: '',
+        expiry: ''
+    })
     const [notificationType, setNotificationType] = useState(getNotificationType(userData.notification_prefrence))
 
     /* State Drop Down */
@@ -112,9 +155,11 @@ const Profile = (props) => {
 
     useEffect(() => {
         setUserData({ ...user })
+        setNotificationType(getNotificationType(userData.notification_prefrence))
     }, [user])
 
     useEffect(() => {
+        setNotificationType(getNotificationType(userData.notification_prefrence))
         getStates()
     }, [])
 
@@ -179,7 +224,7 @@ const Profile = (props) => {
                 if (response.status == true) {
                     setLoader(false)
                     dispatch(loadauthentication(response.data))
-                    showToast(response.message, 'success')
+                    showToast("Profile picture updated", 'success')
                 }
                 else {
                     setLoader(false)
@@ -192,20 +237,79 @@ const Profile = (props) => {
     }
 
     const pickImage = () => {
-        ImagePicker.openPicker({
-            width: 400,
-            height: 400,
-            cropping: true
-        }).then(image => {
-            console.log(image);
-            updateProfilePic(image)
-        }).catch(err => {
-            console.log("Image picker error : ", err)
-        })
+        Alert.alert(
+            "LifeSuite",
+            "Select picture using ...",
+            [
+                { text: "Cancel", onPress: () => { }, style: "cancel" },
+                {
+                    text: "Camera",
+                    onPress: () => {
+                        ImagePicker.openCamera({
+                            width: 400,
+                            height: 400,
+                            cropping: true
+                        }).then(image => {
+                            console.log(image);
+                            updateProfilePic(image)
+                        }).catch(err => {
+                            console.log("Image picker error : ", err)
+                        })
+                    },
+                },
+                {
+                    text: "Gallery", onPress: () => {
+                        ImagePicker.openPicker({
+                            width: 400,
+                            height: 400,
+                            cropping: true
+                        }).then(image => {
+                            console.log(image);
+                            updateProfilePic(image)
+                        }).catch(err => {
+                            console.log("Image picker error : ", err)
+                        })
+                    }
+                },                
+            ]
+        );
+        // ImagePicker.openPicker({
+        //     width: 400,
+        //     height: 400,
+        //     cropping: true
+        // }).then(image => {
+        //     console.log(image);
+        //     updateProfilePic(image)
+        // }).catch(err => {
+        //     console.log("Image picker error : ", err)
+        // })
     }
 
     const saveUser = () => {
         setLoader(true)
+
+        let keys = Object.keys(userData)
+        for (let index = 0; index < keys.length; index++) {
+            if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '') {
+                showToast(getMessage(keys[index]), 'danger')
+                setLoader(false)
+                return false
+            }
+        }
+
+        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+        if (reg.test(userData.email) == false) {
+            showToast('Enter Valid Email', 'danger')
+            setLoader(false)
+            return false
+        }
+
+        if (userData.phone_number.length < 10) {
+            setLoader(false)
+            return showToast("Phone number must be of 10 digits")
+        }
+
         const address = [
             {
                 "country": 231,
@@ -231,20 +335,11 @@ const Profile = (props) => {
             }
         ]
 
-        let keys = Object.keys(userData)
-        for (let index = 0; index < keys.length; index++) {
-            if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '') {
-                showToast(getMessage(keys[index]), 'danger')
-                setLoader(false)
-                return false
-            }
-        }
-
         if (userData.user_role == 3) {
             let homekeys = Object.keys(address[0])
             for (let index = 0; index < homekeys.length; index++) {
                 if (homekeys[index] !== 'lat' && homekeys[index] !== 'long' && String(address[0][homekeys[index]]).trim() == '') {
-                    showToast('Invalid home address', 'danger')
+                    showToast(`${getKeyName(homekeys[index])} is required for home address`, 'danger')
                     setLoader(false)
                     return false
                 }
@@ -253,61 +348,14 @@ const Profile = (props) => {
             let keys = Object.keys(address[1])
             for (let index = 0; index < keys.length; index++) {
                 if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
-                    showToast('Invalid work address', 'danger')
+                    showToast(`${getKeyName(keys[index])} is required for work address`, 'danger')
                     setLoader(false)
                     return false
-                }
-            }
-        } else {
-            let keys = Object.keys(address[0])
-            for (let index = 0; index < keys.length; index++) {
-                if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[0][keys[index]]).trim() == '') {
-                    showToast('Invalid home address', 'danger')
-                    setLoader(false)
-                    return false
-                }
-            }
-            if (address[1].address_line_1.trim() !== '' || address[1].address_line_2.trim() !== '' || address[1].zip_code.trim() !== '') {
-                let keys = Object.keys(address[1])
-                for (let index = 0; index < keys.length; index++) {
-                    if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
-                        showToast('Invalid work address', 'danger')
-                        setLoader(false)
-                        return false
-                    }
                 }
             }
         }
 
-        if (!isEmptyCityList && address[0].state !== '' && address[0].state !== null && address[0].state !== undefined) {
-            let codeData = { "city": dropCityValue, "zip_code": address[0].zip_code }
-            verifyZipCode(codeData).then((res) => {
-                if (res.errors.length > 0) {
-                    setLoader(false)
-                    showToast("Invalid Home zip code")
-                } else {
-                    save(address)
-                }
-            }).catch(err => {
-                setLoader(false)
-                return showToast("Could not verify Home zip code please try again")
-            })
-        } else if (!isEmptyCityListWork && address[1].state !== '' && address[1].state !== null && address[1].state !== undefined) {
-            let codeData = { "city": dropCityValueWork, "zip_code": address[1].zip_code }
-            verifyZipCode(codeData).then((res) => {
-                if (res.errors.length > 0) {
-                    setLoader(false)
-                    showToast("Invalid work zip code")
-                } else {
-                    save(address)
-                }
-            }).catch(err => {
-                setLoader(false)
-                return showToast("Could not verify work zip code please try again")
-            })
-        } else {
-            save(address)
-        }
+        save(address)
     }
 
     const save = (addr) => {
@@ -408,6 +456,15 @@ const Profile = (props) => {
     }
 
     const getCities = (state_id, type) => {
+        if (type == "home") {
+            if (homeAddressCityDropRef.current) {
+                homeAddressCityDropRef.current.blur()
+            }
+        } else {
+            if (workAddressCityDropRef.current) {
+                workAddressCityDropRef.current.blur()
+            }
+        }
         setLoader(true)
         let headers = {
             Accept: "application/json",
@@ -434,6 +491,11 @@ const Profile = (props) => {
                             setDropCityValue(city[0].name)
                         } else {
                             setDropCityValue("")
+                            setTimeout(() => {
+                                if (homeAddressCityDropRef.current) {
+                                    homeAddressCityDropRef.current.focus()
+                                }
+                            }, 250);
                         }
                         setIsEmptyCityListWork(false)
                         setLoader(false)
@@ -444,6 +506,11 @@ const Profile = (props) => {
                             setDropCityValueWork(city[0].name)
                         } else {
                             setDropCityValueWork("")
+                            setTimeout(() => {
+                                if (workAddressCityDropRef.current) {
+                                    workAddressCityDropRef.current.focus()
+                                }
+                            }, 250);
                         }
                         setIsEmptyCityListWork(false)
                         setLoader(false)
@@ -452,8 +519,18 @@ const Profile = (props) => {
                 else {
                     if (type == "home") {
                         setIsEmptyCityList(true)
+                        setTimeout(() => {
+                            if (homeAddressCityDropRef.current) {
+                                homeAddressCityDropRef.current.focus()
+                            }
+                        }, 250);
                     } else {
                         setIsEmptyCityListWork(true)
+                        setTimeout(() => {
+                            if (workAddressCityDropRef.current) {
+                                workAddressCityDropRef.current.focus()
+                            }
+                        }, 250);
                     }
                     setLoader(false)
                 }
@@ -478,34 +555,6 @@ const Profile = (props) => {
         }
     }
 
-    const verifyZipCode = (data) => {
-        return new Promise((resolve, reject) => {
-            let headers = {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            }
-
-            let user_data = { ...data }
-
-            let config = {
-                headers: headers,
-                data: JSON.stringify(user_data),
-                type: 'post'
-            }
-
-            fetch('http://122.160.70.200:3031/api/verify/checkZipCode', {
-                body: config.data,
-                headers: config.headers,
-                method: config.type
-            }).then(async (response) => {
-                let json = await response.json()
-                resolve(json)
-            }).catch((error) => {
-                reject(error)
-            });
-        })
-    }
-
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -521,257 +570,376 @@ const Profile = (props) => {
                 <Image
                     resizeMode='contain'
                     style={{ height: '100%', width: '100%', }}
-                    source={userData.profile_image ? { uri: BASE_URL + userData.profile_image } : require("../../../assets/andrea.png")}
+                    source={userData.profile_image ? { uri: BASE_URL + userData.profile_image } : require("../../../assets/user.png")}
                 />
             </TouchableOpacity>
-
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                bounces={false}
-                keyboardShouldPersistTaps='handled'
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.container}>
-                <View style={{ marginTop: '15%' }}>
-                    <View style={{}}>
-                        <Text style={styles.text}>MY INFORMATION</Text>
-                        <Text style={styles.text1}>{userData.first_name}</Text>
-                        <Text style={styles.text2}>Profile ID : {userData.id}</Text>
-                    </View>
-                    <View style={styles.personalContainer}>
-                        <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>PERSONAL INFORMATION</Text>
-                        <CustomInput
-                            text="First Name"
-                            value={userData.first_name}
-                            onChangeText={(text) => {
-                                setUserData({ ...userData, first_name: text })
-                            }}
-                        />
-                        <CustomInput
-                            text="Last Name"
-                            value={userData.last_name}
-                            onChangeText={(text) => {
-                                setUserData({ ...userData, last_name: text })
-                            }}
-                        />
-                        <CustomInput
-                            text="Preffered Name"
-                            value={userData.prefer_name}
-                            onChangeText={(text) => {
-                                setUserData({ ...userData, prefer_name: text })
-                            }}
-                        />
-                        <CustomInput
-                            text="Email Address"
-                            value={userData.email}
-                            onChangeText={(text) => {
-                                setUserData({ ...userData, email: text })
-                            }}
-                        />
-                        <CustomInput
-                            text="Phone Number"
-                            value={userData.phone_number}
-                            onChangeText={(text) => {
-                                setUserData({ ...userData, phone_number: text })
-                            }}
-                        />
-                        <TouchableOpacity
-                            onPress={() => {
-                                setAdd(!add)
-                            }}>
-                            {
-                                add
-                                    ?
-                                    /* user.user_role == 2 */ true &&
-                                    <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
-                                        <Image
-                                            style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                            source={require("../../../assets/plus.png")}
-                                        />
-                                        <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS</Text>
-                                    </View>
-                                    :
-                                    <>
-                                        <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                    bounces={false}
+                    keyboardShouldPersistTaps='handled'
+                    style={styles.container}>
+                    <View style={{ marginTop: '15%' }}>
+                        <View style={{}}>
+                            <Text style={styles.text}>MY INFORMATION</Text>
+                            <Text style={styles.text1}>{userData.first_name}</Text>
+                            <Text style={styles.text2}>Profile ID : {userData.id}</Text>
+                        </View>
+                        <View style={styles.personalContainer}>
+                            <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>PERSONAL INFORMATION</Text>
+                            <CustomInput
+                                text="First Name"
+                                value={userData.first_name}
+                                onChangeText={(text) => {
+                                    setUserData({ ...userData, first_name: text })
+                                }}
+                                inpuRef={fnameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => { lnameRef.current._root.focus() }}
+                            />
+                            <CustomInput
+                                text="Last Name"
+                                value={userData.last_name}
+                                onChangeText={(text) => {
+                                    setUserData({ ...userData, last_name: text })
+                                }}
+                                inpuRef={lnameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => prefNameRef.current._root.focus()}
+                            />
+                            <CustomInput
+                                text="Preffered Name"
+                                value={userData.prefer_name}
+                                onChangeText={(text) => {
+                                    setUserData({ ...userData, prefer_name: text })
+                                }}
+                                inpuRef={prefNameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => emailRef.current._root.focus()}
+                            />
+                            <CustomInput
+                                text="Email Address"
+                                value={userData.email}
+                                onChangeText={(text) => {
+                                    setUserData({ ...userData, email: text })
+                                }}
+                                inpuRef={emailRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => phoneRef.current._root.focus()}
+                            />
+                            <CustomInput
+                                text="Phone Number"
+                                value={userData.phone_number}
+                                onChangeText={(text) => {
+                                    setUserData({ ...userData, phone_number: text })
+                                }}
+                                inpuRef={phoneRef}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                maxLength={10}
+                                onSubmitEditing={() => {
+                                    setAddHomeAddressActive(true), setTimeout(() => {
+                                        homeAddressLine1Ref.current._root.focus()
+                                    }, 250)
+                                }}
+                            />
+                            <View>
+                                {
+                                    !addHomeAddressActive
+                                        ?
+                                        <TouchableOpacity
+                                            activeOpacity={0.7}
+                                            onPress={() => { setAddHomeAddressActive(!addHomeAddressActive) }}
+                                            style={{ flexDirection: "row", marginLeft: '5%', marginTop: 20, alignItems: 'center' }}>
                                             <Image
                                                 style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                source={require("../../../assets/minus.png")}
+                                                source={require("../../../assets/plus.png")}
                                             />
-                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS</Text>
-                                        </View>
-                                        <View style={{}}>
+                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
+                                        </TouchableOpacity>
+                                        :
+                                        <>
+                                            <TouchableOpacity
+                                                activeOpacity={0.7}
+                                                onPress={() => { setAddHomeAddressActive(!addHomeAddressActive) }}
+                                                style={{ flexDirection: "row", marginLeft: '5%', marginTop: 20, alignItems: 'center' }}>
+                                                <Image
+                                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                    source={require("../../../assets/plus.png")}
+                                                />
+                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
+                                            </TouchableOpacity>
+                                            <View style={{}}>
+                                                <CustomInput
+                                                    text="ADDRESS LINE 1"
+                                                    value={homeAddressData.address_line_1}
+                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_1: text }) }}
+                                                    inpuRef={homeAddressLine1Ref}
+                                                    returnKeyType={"next"}
+                                                    onSubmitEditing={() => homeAddressLine2Ref.current._root.focus()}
+                                                />
+                                                <CustomInput
+                                                    text="ADDRESS LINE 2"
+                                                    value={homeAddressData.address_line_2}
+                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_2: text }) }}
+                                                    inpuRef={homeAddressLine2Ref}
+                                                    returnKeyType={"next"}
+                                                    onSubmitEditing={() => homeAddressStateDropRef.current.show()}
+                                                />
+                                                <View style={{ marginTop: 25 }} />
+                                                <DropDown
+                                                    dropRef={homeAddressStateDropRef}
+                                                    item={dropStateData}
+                                                    value={dropStateValue}
+                                                    onChangeValue={(index, value) => { setDropStateValue(value), startGetCities(value, "home") }}
+                                                    containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                                    dropdownStyle={{ maxHeight: 300 }}
+                                                />
+
+                                                <SearchableDropDown
+                                                    dropRef={homeAddressCityDropRef}
+                                                    onItemSelect={(item) => {
+                                                        setDropCityValue(item.name)
+                                                        homeAddressZipRef.current._root.focus()
+                                                    }}
+                                                    items={dropCityDataMaster}
+                                                    onTextChange={(text) => setDropCityValue(text)}
+                                                    value={dropCityValue}
+                                                />
+
+                                                <CustomInput
+                                                    text="Zip code"
+                                                    value={homeAddressData.zip}
+                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
+                                                    keyboardType="numeric"
+                                                    keyboardType="numeric"
+                                                    returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                                    inpuRef={homeAddressZipRef}
+                                                    onSubmitEditing={() => {
+                                                        setAddWorkAddressActive(true), setTimeout(() => {
+                                                            workAddressLine1Ref.current._root.focus()
+                                                        }, 250)
+                                                    }}
+                                                />
+                                            </View>
+                                        </>
+                                }
+                            </View>
+                            <View style={{ marginTop: 10 }}>
+                                {
+                                    !addWorkAddressActive
+                                        ?
+                                        <TouchableOpacity
+                                            activeOpacity={0.7}
+                                            onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
+                                            style={{ flexDirection: "row", marginBottom: 15, marginLeft: '5%', alignItems: 'center' }}>
+                                            <Image
+                                                style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                source={require("../../../assets/plus.png")}
+                                            />
+                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
+                                        </TouchableOpacity>
+                                        :
+                                        <>
+                                            <TouchableOpacity
+                                                activeOpacity={0.7}
+                                                onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
+                                                style={{ flexDirection: "row", marginBottom: 15, marginLeft: '5%', alignItems: 'center' }}>
+                                                <Image
+                                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                    source={require("../../../assets/plus.png")}
+                                                />
+                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
+                                            </TouchableOpacity>
                                             <CustomInput
                                                 text="ADDRESS LINE 1"
-                                                value={homeAddressData.address_line_1}
-                                                onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_1: text }) }}
+                                                value={workAddressData.address_line_1}
+                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_1: text }) }}
+                                                inpuRef={workAddressLine1Ref}
+                                                returnKeyType={"next"}
+                                                onSubmitEditing={() => workAddressLine2Ref.current._root.focus()}
                                             />
                                             <CustomInput
                                                 text="ADDRESS LINE 2"
-                                                value={homeAddressData.address_line_2}
-                                                onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_2: text }) }}
+                                                value={workAddressData.address_line_2}
+                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_2: text }) }}
+                                                inpuRef={workAddressLine2Ref}
+                                                returnKeyType={"next"}
+                                                onSubmitEditing={() => workAddressStateDropRef.current.show()}
                                             />
                                             <View style={{ marginTop: 25 }} />
                                             <DropDown
+                                                dropRef={workAddressStateDropRef}
                                                 item={dropStateData}
-                                                value={dropStateValue}
-                                                onChangeValue={(index, value) => { setDropStateValue(value), startGetCities(value, "home") }}
+                                                value={dropStateValueWork}
+                                                onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
                                                 containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                                 dropdownStyle={{ maxHeight: 300 }}
                                             />
 
                                             <SearchableDropDown
+                                                dropRef={workAddressCityDropRef}
                                                 onItemSelect={(item) => {
-                                                    setDropCityValue(item.name)
+                                                    setDropCityValueWork(item.name)
+                                                    workAddressZipRef.current._root.focus()
                                                 }}
-                                                items={dropCityDataMaster}
-                                                onTextChange={(text) => setDropCityValue(text)}
-                                                value={dropCityValue}
+                                                items={dropCityDataMasterWork}
+                                                onTextChange={(text) => setDropCityValueWork(text)}
+                                                value={dropCityValueWork}
                                             />
 
                                             <CustomInput
-                                                placeholder="Zip code"
-                                                value={homeAddressData.zip}
-                                                onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
+                                                text="Zip code"
+                                                value={workAddressData.zip}
+                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, zip: text }) }}
                                                 keyboardType="numeric"
+                                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                                returnKeyType='done'
+                                                inpuRef={workAddressZipRef}
+                                            />
+                                        </>
+                                }
+                            </View>
+                            <View style={{}}>
+                                <DropDown
+                                    title="Notification type"
+                                    item={["Email", "Push Notification", "Text"]}
+                                    value={notificationType}
+                                    onChangeValue={(index, value) => { setNotificationType(value), cardNumberRef.current.focus() }}
+                                    containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                />
+                            </View>
+                            <View style={{ height: 40 }}></View>
+                        </View>
+                        {
+                            user.user_role == 2
+                                ?
+                                <View style={{ ...styles.personalContainer, marginTop: 20 }}>
+                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION</Text>
+                                    <TextInputMask
+                                        style={{
+                                            borderRadius: 7,
+                                            borderColor: LS_COLORS.global.textInutBorderColor,
+                                            paddingLeft: 16,
+                                            width: '100%',
+                                            maxWidth: '90%',
+                                            alignSelf: 'center',
+                                            color: LS_COLORS.global.black,
+                                            height: 50,
+                                            fontFamily: LS_FONTS.PoppinsMedium,
+                                            fontSize: 16,
+                                            borderWidth: 1,
+                                            marginTop: 10
+                                        }}
+                                        placeholder={'Credit Card Number'}
+                                        onChangeText={(formatted, extracted) => {
+                                            console.log(formatted)
+                                            console.log(extracted)
+                                            setCardDetails({ ...cardDetails, number: extracted })
+                                        }}
+                                        value={cardDetails.number}
+                                        mask={"[0000] [0000] [0000] [0000]"}
+                                        keyboardType="numeric"
+                                        ref={cardNumberRef}
+                                        returnKeyType="next"
+                                        onSubmitEditing={() => cardNameRef.current.focus()}
+                                    />
+                                    <TextInputMask
+                                        style={{
+                                            borderRadius: 7,
+                                            borderColor: LS_COLORS.global.textInutBorderColor,
+                                            paddingLeft: 16,
+                                            width: '100%',
+                                            maxWidth: '90%',
+                                            alignSelf: 'center',
+                                            color: LS_COLORS.global.black,
+                                            height: 50,
+                                            fontFamily: LS_FONTS.PoppinsMedium,
+                                            fontSize: 16,
+                                            borderWidth: 1,
+                                            marginTop: 10
+                                        }}
+                                        placeholder={'Credit Card Holder Name'}
+                                        onChangeText={(formatted, extracted) => {
+                                            console.log(formatted)
+                                            console.log(extracted)
+                                            setCardDetails({ ...cardDetails, name: extracted })
+                                        }}
+                                        value={cardDetails.name}
+                                        ref={cardNameRef}
+                                        returnKeyType="next"
+                                        onSubmitEditing={() => cardDateRef.current.focus()}
+                                    />
+                                    <TextInputMask
+                                        style={{
+                                            borderRadius: 7,
+                                            borderColor: LS_COLORS.global.textInutBorderColor,
+                                            paddingLeft: 16,
+                                            width: '100%',
+                                            maxWidth: '90%',
+                                            alignSelf: 'center',
+                                            color: LS_COLORS.global.black,
+                                            height: 50,
+                                            fontFamily: LS_FONTS.PoppinsMedium,
+                                            fontSize: 16,
+                                            borderWidth: 1,
+                                            marginTop: 10
+                                        }}
+                                        placeholder={'Expiry Date(MM/YY)'}
+                                        onChangeText={(formatted, extracted) => {
+                                            console.log(formatted)
+                                            console.log(extracted)
+                                            setCardDetails({ ...cardDetails, expiry: extracted })
+                                        }}
+                                        value={cardDetails.expiry}
+                                        mask={"[00]/[00]"}
+                                        keyboardType="numeric"
+                                        ref={cardDateRef}
+                                        returnKeyType="done"
+                                    />
+                                    <View style={{ height: 50 }} />
+                                </View>
+                                :
+                                <View style={{ ...styles.personalContainer, paddingVertical: 20, marginTop: 10 }}>
+                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Bank Information</Text>
+                                    <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
+                                        activeOpacity={0.7}
+                                        onPress={() => alert('under development')}>
+                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Add Accounts</Text>
+                                        <View style={{ height: 21, aspectRatio: 1 }}>
+                                            <Image
+                                                style={{ height: '100%', width: '100%', resizeMode: "contain" }}
+                                                source={require("../../../assets/plus.png")}
                                             />
                                         </View>
-                                    </>
-                            }
+                                    </TouchableOpacity>
+                                </View>
+                        }
+                        <TouchableOpacity
+                            style={styles.save}
+                            activeOpacity={0.7}
+                            onPress={() => saveUser()}>
+                            <Text style={styles.saveText}>
+                                Save
+                            </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={{ marginTop: 10 }}
+                            style={{ ...styles.save, marginBottom: 15 }}
+                            activeOpacity={0.7}
                             onPress={() => {
-                                setEdit(!edit)
+                                storeItem('user', null)
+                                props.navigation.navigate('HomeScreen')
+                                props.navigation.navigate('WelcomeScreen')
                             }}>
-                            {edit ? <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
-                                <Image
-                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                    source={require("../../../assets/plus.png")}
-                                />
-                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS</Text>
-                            </View> :
-                                <>
-                                    <View style={{ flexDirection: "row", marginTop: 20, marginLeft: 20 }}>
-                                        <Image
-                                            style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                            source={require("../../../assets/minus.png")}
-                                        />
-                                        <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS</Text>
-                                    </View>
-                                    <CustomInput
-                                        text="ADDRESS LINE 1"
-                                        value={workAddressData.address_line_1}
-                                        onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_1: text }) }}
-                                    />
-                                    <CustomInput
-                                        text="ADDRESS LINE 2"
-                                        value={workAddressData.address_line_2}
-                                        onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_2: text }) }}
-                                    />
-                                    <View style={{ marginTop: 25 }} />
-                                    <DropDown
-                                        item={dropStateData}
-                                        value={dropStateValueWork}
-                                        onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
-                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                        dropdownStyle={{ maxHeight: 300 }}
-                                    />
-
-                                    <SearchableDropDown
-                                        onItemSelect={(item) => {
-                                            setDropCityValueWork(item.name)
-                                        }}
-                                        items={dropCityDataMasterWork}
-                                        onTextChange={(text) => setDropCityValueWork(text)}
-                                        value={dropCityValueWork}
-                                    />
-
-                                    <CustomInput
-                                        placeholder="Zip code"
-                                        value={workAddressData.zip}
-                                        onChangeText={(text) => { setWorkAddressData({ ...workAddressData, zip: text }) }}
-                                        keyboardType="numeric"
-                                        returnKeyType='done'
-                                    />
-                                </>
-                            }
+                            <Text style={styles.saveText}>
+                                Logout
+                            </Text>
                         </TouchableOpacity>
-                        <View style={{}}>
-                            <DropDown
-                                title="Notification type"
-                                item={["Email", "Push Notification", "Text"]}
-                                value={notificationType}
-                                onChangeValue={(index, value) => setNotificationType(value)}
-                                containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                            />
-                        </View>
-                        <View style={{ height: 40 }}></View>
                     </View>
-                    {
-                        user.user_role == 2
-                            ?
-                            <View style={{ ...styles.personalContainer, marginTop: 20 }}>
-                                <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION</Text>
-                                <CustomInput
-                                    text="Credit Card Number"
-                                    value={number}
-                                    onChangeText={(text) => {
-                                        setNumber(text)
-                                    }}
-                                />
-                                <CustomInput
-                                    text="Credit Card Holder Name"
-                                    value={holderName}
-                                    onChangeText={(text) => {
-                                        setHolderName(text)
-                                    }}
-                                />
-                                <CustomInput
-                                    text="Expiry Date"
-                                    value={number}
-                                    onChangeText={(text) => {
-                                        setNumber(text)
-                                    }}
-                                />
-                                <View style={{ height: 50 }} />
-                            </View>
-                            :
-                            <View style={{ ...styles.personalContainer, paddingVertical: 20, marginTop: 10 }}>
-                                <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Bank Information</Text>
-                                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
-                                    activeOpacity={0.7}
-                                    onPress={() => alert('under development')}>
-                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Add Accounts</Text>
-                                    <View style={{ height: 21, aspectRatio: 1 }}>
-                                        <Image
-                                            style={{ height: '100%', width: '100%', resizeMode: "contain" }}
-                                            source={require("../../../assets/plus.png")}
-                                        />
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                    }
-                    <TouchableOpacity
-                        style={styles.save}
-                        activeOpacity={0.7}
-                        onPress={() => saveUser()}>
-                        <Text style={styles.saveText}>
-                            Save
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={{ ...styles.save, marginBottom: 15 }}
-                        activeOpacity={0.7}
-                        onPress={() => {
-                            storeItem('user', null)
-                            props.navigation.navigate('HomeScreen')
-                            props.navigation.navigate('WelcomeScreen')
-                        }}>
-                        <Text style={styles.saveText}>
-                            Logout
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </KeyboardAvoidingView>
             {loader && <Loader />}
         </SafeAreaView>
     )

@@ -28,6 +28,7 @@ const DropDown = (props) => {
                     <AntDesign name="down" />
                 </View>
                 <ModalDropdown
+                    ref={props.dropRef}
                     defaultValue={props.value}
                     isFullWidth={true}
                     options={props.item}                    

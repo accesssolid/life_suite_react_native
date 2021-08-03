@@ -8,7 +8,6 @@ import LS_COLORS from '../../constants/colors';
 import { useDispatch, useSelector } from 'react-redux';
 
 /* Methods */
-import { getJsonData } from '../../asyncStorage/async';
 import { retrieveItem, showToast } from '../../components/validators';
 import { loginReducer, setAuthToken } from '../../redux/features/loginReducer';
 import { getApi } from '../../api/api';

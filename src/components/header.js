@@ -15,22 +15,18 @@ const Header = (props) => {
         <View style={styles.container}>
             <TouchableOpacity style={styles.leftView}
                 onPress={props.action}
-                activeOpacity={0.7}
-            >
+                activeOpacity={0.7}>
                 <Image
-                    style={{ height: 20, width: 20, resizeMode: 'contain' }}
-                    source= {props.imageUrl}
+                    style={{ height: '80%', width: '80%', resizeMode: 'contain' }}
+                    source={props.imageUrl}
                 />
             </TouchableOpacity>
-          
-                <View style={styles.middleView}>
-                    <Text style={styles.title}>{props.title}</Text>
-                </View>
-            
+            <View style={styles.middleView}>
+                <Text style={styles.title}>{props.title}</Text>
+            </View>
             <TouchableOpacity style={styles.rightView}
                 onPress={props.action1}
-                activeOpacity={0.7}
-            >
+                activeOpacity={0.7}>
                 <Image
                     style={{ height: 25, width: 25, resizeMode: 'contain' }}
                     source={props.imageUrl1}
@@ -45,13 +41,17 @@ export default Header;
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        paddingVertical: 15,
+        // paddingVertical: 15,
         justifyContent: 'space-between',
         zIndex: 500,
     },
     leftView: {
         left: 20,
-        alignItems: 'center'
+        aspectRatio:1,
+        alignItems: 'center',
+        height: 30,
+        alignItems:'center',
+        justifyContent:'center'
     },
     middleView: {
         alignItems: 'center',

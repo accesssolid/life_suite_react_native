@@ -76,7 +76,7 @@ const SuspendInProgress = (props) => {
                 <Image
                     resizeMode='contain'
                     style={{ height: '100%', width: '100%', }}
-                    source={userData.profile_image ? { uri: BASE_URL + userData.profile_image } : require("../../../assets/andrea.png")}
+                    source={userData.profile_image ? { uri: BASE_URL + userData.profile_image } : require("../../../assets/user.png")}
                 />
             </TouchableOpacity>
             <ScrollView

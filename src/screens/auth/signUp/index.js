@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, ScrollView } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -19,6 +19,9 @@ import { getApi } from '../../../api/api';
 import DropDown from '../../../components/dropDown';
 import { setUserRole } from '../../../redux/features/loginReducer';
 import SearchableDropDown from '../../../components/searchableDropDown';
+
+/* Icons */
+import Entypo from 'react-native-vector-icons/Entypo'
 
 const getMessage = (name) => {
     switch (name) {
@@ -48,59 +51,115 @@ const getMessage = (name) => {
     }
 }
 
+const getKeyName = (key) => {
+    switch (key) {
+        case "address_line_1":
+            return "Address line 1"
+        case "address_line_2":
+            return "Address line 1"
+        case "state":
+            return "State"
+        case "city":
+            return "City"
+        case "zip_code":
+            return "Zip code"
+    }
+}
+
 const SignUpScreen = (props) => {
     const dispatch = useDispatch()
+    const fnameRef = useRef(null)
+    const lnameRef = useRef(null)
+    const prefNameRef = useRef(null)
+    const emailRef = useRef(null)
+    const passRef = useRef(null)
+    const confPassRef = useRef(null)
+    const phoneRef = useRef(null)
+
+    const workAddressLine1Ref = useRef(null)
+    const workAddressLine2Ref = useRef(null)
+    const workAddressZipRef = useRef(null)
+    const workAddressStateDropRef = useRef(null)
+    const workAddressCityDropRef = useRef(null)
+
+    const homeAddressLine1Ref = useRef(null)
+    const homeAddressLine2Ref = useRef(null)
+    const homeAddressZipRef = useRef(null)
+    const homeAddressStateDropRef = useRef(null)
+    const homeAddressCityDropRef = useRef(null)
+
+    const [addWorkAddressActive, setAddWorkAddressActive] = useState(false)
+    const [addHomeAddressActive, setAddHomeAddressActive] = useState(false)
     const role = useSelector(state => state.authenticate.user_role)
     const [loader, setLoader] = useState(false)
-
-    const dropData = ['Home', 'Work']
-
-    /* Address Type Drop down */
-    const [dropValue, setDropValue] = useState("Home")
-
-    /* City Drop Down */
-    const [dropCityValue, setDropCityValue] = useState("")
-    const [isEmptyCityList, setIsEmptyCityList] = useState(false)
-    const [dropCityDataMaster, setDropCityMaster] = useState([])
 
     /* State Drop Down */
     const [dropStateValue, setDropStateValue] = useState("State")
     const [dropStateData, setDropStateData] = useState([])
     const [dropStateDataMaster, setDropStateMaster] = useState([])
 
+    /* City Drop Down */
+    const [dropCityValue, setDropCityValue] = useState("")
+    const [isEmptyCityList, setIsEmptyCityList] = useState(false)
+    const [dropCityDataMaster, setDropCityMaster] = useState([])
+
+    /* State Drop Down WORK */
+    const [dropStateValueWork, setDropStateValueWork] = useState("State")
+
+    /* City Drop Down WORK */
+    const [dropCityValueWork, setDropCityValueWork] = useState("")
+    const [isEmptyCityListWork, setIsEmptyCityListWork] = useState(false)
+    const [dropCityDataMasterWork, setDropCityMasterWork] = useState([])
+
+    const [isPassVisible, setIsPassVisible] = useState(false)
+    const [isConfPassVisible, setIsConfPassVisible] = useState(false)
+
+    useEffect(() => {
+        setLoader(false)
+    }, [])
+
     useEffect(() => {
         getStates()
     }, [])
 
     useEffect(() => {
-        if (dropStateValue !== "State") {
-            const selectedItem = dropStateDataMaster.filter(item => item.name == dropStateValue)
-            if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
-                getCities(selectedItem[0].id)
-                setAddressData({ ...addressData, state: selectedItem[0].id })
-                setDropCityValue('')
-            }
-        }
-    }, [dropStateValue])
-
-    useEffect(() => {
         const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValue)
         if (!isEmptyCityList) {
             if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
-                setAddressData({ ...addressData, city: selectedItem[0].id })
+                setHomeAddressData({ ...homeAddressData, city: selectedItem[0].id })
             }
         } else {
-            setAddressData({ ...addressData, city: dropCityValue })
+            setHomeAddressData({ ...homeAddressData, city: dropCityValue })
         }
 
     }, [dropCityValue])
 
-    const [addressData, setAddressData] = useState({
-        address_line_1: "",
-        address_line_2: "",
-        city: "",
-        state: "",
-        zip: "",
+    useEffect(() => {
+        const selectedItem = dropCityDataMasterWork.filter(item => item.name == dropCityValueWork)
+        if (!isEmptyCityListWork) {
+            if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+                setWorkAddressData({ ...workAddressData, city: selectedItem[0].id })
+            }
+        } else {
+            setWorkAddressData({ ...workAddressData, city: dropCityValueWork })
+        }
+
+    }, [dropCityValueWork])
+
+    const [homeAddressData, setHomeAddressData] = useState({
+        address_line_1: '',
+        address_line_2: '',
+        city: '',
+        state: '',
+        zip: '',
+    })
+
+    const [workAddressData, setWorkAddressData] = useState({
+        address_line_1: '',
+        address_line_2: '',
+        city: '',
+        state: '',
+        zip: '',
     })
 
     const [signUpData, setSignUpData] = useState({
@@ -128,55 +187,6 @@ const SignUpScreen = (props) => {
             }
         }
 
-        if (dropStateValue == "State") {
-            showToast("Please select state", 'danger')
-            setLoader(false)
-            return false
-        }
-
-        if (dropCityValue == "") {
-            showToast("Please select or enter city", 'danger')
-            setLoader(false)
-            return false
-        }
-
-        const address = [{
-            "country": 231,
-            "state": dropValue.toLowerCase() == "home" ? addressData.state : "",
-            "city": dropValue.toLowerCase() == "home" ? addressData.city : "",
-            "address_line_1": dropValue.toLowerCase() == "home" ? addressData.address_line_1 : "",
-            "address_line_2": dropValue.toLowerCase() == "home" ? addressData.address_line_2 : "",
-            "address_type": "home",
-            "lat": "",
-            "long": "",
-            "zip_code": dropValue.toLowerCase() == "home" ? Number(addressData.zip) : "",
-        },
-        {
-            "country": 231,
-            "state": dropValue.toLowerCase() == "work" ? addressData.state : "",
-            "city": dropValue.toLowerCase() == "work" ? addressData.city : "",
-            "address_line_1": dropValue.toLowerCase() == "work" ? addressData.address_line_1 : "",
-            "address_line_2": dropValue.toLowerCase() == "work" ? addressData.address_line_2 : "",
-            "address_type": "work",
-            "lat": "",
-            "long": "",
-            "zip_code": dropValue.toLowerCase() == "work" ? Number(addressData.zip) : "",
-        }]
-
-        if (dropValue.toLowerCase() == "home") {
-            if (address[0].address_line_1.trim() == '' || address[0].address_line_2.trim() == '' || address[0].city == '' || address[0].state == '' || address[0].zip_code == '') {
-                showToast('Address is required', 'danger')
-                setLoader(false)
-                return false
-            }
-        } else {
-            if (address[1].address_line_1.trim() == '' || address[1].address_line_2.trim() == '' || address[1].city == '' || address[1].state == '' || address[1].zip_code == '') {
-                showToast('Address is required', 'danger')
-                setLoader(false)
-                return false
-            }
-        }
-
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
         if (reg.test(signUpData.email) == false) {
@@ -191,75 +201,84 @@ const SignUpScreen = (props) => {
             return false
         }
 
-        if (!isEmptyCityList) {
-            let codeData = { "city": dropCityValue, "zip_code": addressData.zip }
+        if (signUpData.phone_number.length < 10) {
+            setLoader(false)
+            return showToast("Phone number must be of 10 digits")
+        }
 
-            verifyZipCode(codeData).then((res) => {
-                if (res.errors.length > 0) {
+        const address = [
+            {
+                "country": 231,
+                "state": homeAddressData.state,
+                "city": homeAddressData.city,
+                "address_line_1": homeAddressData.address_line_1,
+                "address_line_2": homeAddressData.address_line_2,
+                "address_type": "home",
+                "lat": "",
+                "long": "",
+                "zip_code": homeAddressData.zip,
+            },
+            {
+                "country": 231,
+                "state": workAddressData.state,
+                "city": workAddressData.city,
+                "address_line_1": workAddressData.address_line_1,
+                "address_line_2": workAddressData.address_line_2,
+                "address_type": "work",
+                "lat": "",
+                "long": "",
+                "zip_code": workAddressData.zip,
+            }
+        ]
+
+        if (role == 2) {
+            let homekeys = Object.keys(address[0])
+            for (let index = 0; index < homekeys.length; index++) {
+                if (homekeys[index] !== 'lat' && homekeys[index] !== 'long' && String(address[0][homekeys[index]]).trim() == '') {
+                    showToast(`${getKeyName(homekeys[index])} is required for home address`, 'danger')
                     setLoader(false)
-                    showToast("Invalid zip code")
-                } else {
-                    let headers = {
-                        Accept: "application/json",
-                        "Content-Type": "application/json"
-                    }
-                    let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
+                    return false
+                }
+            }
 
-                    let config = {
-                        headers: headers,
-                        data: JSON.stringify({ ...user_data }),
-                        endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
-                        type: 'post'
-                    }
+            let keys = Object.keys(address[1])
+            for (let index = 0; index < keys.length; index++) {
+                if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
+                    showToast(`${getKeyName(keys[index])} is required for work address`, 'danger')
+                    setLoader(false)
+                    return false
+                }
+            }
+        }
 
-                    getApi(config)
-                        .then((response) => {
-                            if (response.status == true) {
-                                showToast('User Registered Successfully', 'success')
-                                setLoader(false)
-                                props.navigation.navigate('LoginScreen')
-                            }
-                            else {
-                                showToast(response.message, 'danger')
-                                setLoader(false)
-                            }
-                        }).catch(err => {
+        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
 
-                        })
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    showToast('User Registered Successfully', 'success')
+                    setLoader(false)
+                    props.navigation.navigate('LoginScreen')
+                }
+                else {
+                    showToast(response.message, 'danger')
+                    setLoader(false)
                 }
             }).catch(err => {
-                setLoader(false)
-                return showToast("Could not verify zip code please try again")
+
             })
-        } else {
-            let headers = {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            }
-            let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
-
-            let config = {
-                headers: headers,
-                data: JSON.stringify({ ...user_data }),
-                endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
-                type: 'post'
-            }
-
-            getApi(config)
-                .then((response) => {
-                    if (response.status == true) {
-                        showToast('User Registered Successfully', 'success')
-                        setLoader(false)
-                        props.navigation.navigate('LoginScreen')
-                    }
-                    else {
-                        showToast(response.message, 'danger')
-                        setLoader(false)
-                    }
-                }).catch(err => {
-
-                })
-        }
     }
 
     const switchRole = () => {
@@ -302,7 +321,12 @@ const SignUpScreen = (props) => {
             })
     }
 
-    const getCities = (state_id) => {
+    const getCities = (state_id, type) => {
+        if (type == "home") {
+            homeAddressCityDropRef.current.blur()
+        } else {
+            workAddressCityDropRef.current.blur()
+        }
         setLoader(true)
         let headers = {
             Accept: "application/json",
@@ -322,12 +346,46 @@ const SignUpScreen = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    setDropCityMaster(response.data)
-                    setIsEmptyCityList(false)
-                    setLoader(false)
+                    if (type == "home") {
+                        setDropCityMaster(response.data)
+                        let city = response.data.filter(item => item.id == homeAddressData.city)
+                        if (city.length > 0 && city[0].name !== undefined && homeAddressData.city) {
+                            setDropCityValue(city[0].name)
+                        } else {
+                            setDropCityValue("")
+                            setTimeout(() => {
+                                homeAddressCityDropRef.current.focus()
+                            }, 250);
+                        }
+                        setIsEmptyCityListWork(false)
+                        setLoader(false)
+                    } else {
+                        setDropCityMasterWork(response.data)
+                        let city = response.data.filter(item => item.id == workAddressData.city)
+                        if (city.length > 0 && city[0].name !== undefined && workAddressData.city) {
+                            setDropCityValueWork(city[0].name)
+                        } else {
+                            setDropCityValueWork("")
+                            setTimeout(() => {
+                                workAddressCityDropRef.current.focus()
+                            }, 250);
+                        }
+                        setIsEmptyCityListWork(false)
+                        setLoader(false)
+                    }
                 }
                 else {
-                    setIsEmptyCityList(true)
+                    if (type == "home") {
+                        setIsEmptyCityList(true)
+                        setTimeout(() => {
+                            homeAddressCityDropRef.current.focus()
+                        }, 250);
+                    } else {
+                        setIsEmptyCityListWork(true)
+                        setTimeout(() => {
+                            workAddressCityDropRef.current.focus()
+                        }, 250);
+                    }
                     setLoader(false)
                 }
             })
@@ -336,32 +394,18 @@ const SignUpScreen = (props) => {
             })
     }
 
-    const verifyZipCode = (data) => {
-        return new Promise((resolve, reject) => {
-            let headers = {
-                Accept: "application/json",
-                "Content-Type": "application/json",
+    const startGetCities = (value, type) => {
+        const selectedItem = dropStateDataMaster.filter(item => item.name == value)
+        if (type == "home") {
+            if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+                setHomeAddressData({ ...homeAddressData, state: selectedItem[0].id })
             }
-
-            let user_data = { ...data }
-
-            let config = {
-                headers: headers,
-                data: JSON.stringify(user_data),
-                type: 'post'
+        } else {
+            if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
+                setWorkAddressData({ ...workAddressData, state: selectedItem[0].id })
             }
-
-            fetch('http://122.160.70.200:3031/api/verify/checkZipCode', {
-                body: config.data,
-                headers: config.headers,
-                method: config.type
-            }).then(async (response) => {
-                let json = await response.json()
-                resolve(json)
-            }).catch((error) => {
-                reject(error)
-            });
-        })
+        }
+        getCities(selectedItem[0].id, type)
     }
 
     return (
@@ -387,6 +431,9 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, first_name: text })
                                 }}
+                                inputRef={fnameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => lnameRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Last Name"
@@ -394,6 +441,9 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, last_name: text })
                                 }}
+                                inputRef={lnameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => prefNameRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Preferred Name"
@@ -401,6 +451,9 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, prefer_name: text })
                                 }}
+                                inputRef={prefNameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => emailRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Email"
@@ -408,6 +461,10 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, email: text })
                                 }}
+                                inputRef={emailRef}
+                                returnKeyType="next"
+                                keyboardType="email-address"
+                                onSubmitEditing={() => passRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Password"
@@ -415,7 +472,12 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, password: text })
                                 }}
-                                secureTextEntry
+                                secureTextEntry={!isPassVisible}
+                                inputRef={passRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => confPassRef.current.focus()}
+                                inlineImageLeft={<Entypo name="eye" size={18} />}
+                                onLeftPress={() => setIsPassVisible(state => !state)}
                             />
                             <CustomTextInput
                                 placeholder="Confirm Password"
@@ -423,7 +485,12 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, password_confirmation: text })
                                 }}
-                                secureTextEntry
+                                secureTextEntry={!isConfPassVisible}
+                                inputRef={confPassRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => phoneRef.current.focus()}
+                                inlineImageLeft={<Entypo name="eye" size={18} />}
+                                onLeftPress={() => setIsConfPassVisible(state => !state)}
                             />
                             <CustomTextInput
                                 placeholder="Phone Number"
@@ -432,49 +499,168 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, phone_number: text })
                                 }}
                                 keyboardType='numeric'
-                            />
-                            <Text style={{ width: '75%', alignSelf: 'center', marginBottom: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black }}>Address Type</Text>
-                            <DropDown
-                                item={dropData}
-                                value={dropValue}
-                                onChangeValue={(index, value) => setDropValue(value)}
-                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                dropdownStyle={{ height: 75 }}
-                            />
-                            <CustomTextInput
-                                placeholder="Address line 1"
-                                value={signUpData.address_line_1}
-                                onChangeText={(text) => setAddressData({ ...addressData, address_line_1: text })}
-                            />
-                            <CustomTextInput
-                                placeholder="Address line 2"
-                                value={signUpData.address_line_2}
-                                onChangeText={(text) => setAddressData({ ...addressData, address_line_2: text })}
-                            />
-                            <DropDown
-                                item={dropStateData}
-                                value={dropStateValue}
-                                onChangeValue={(index, value) => setDropStateValue(value)}
-                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                dropdownStyle={{ maxHeight: 300 }}
-                            />
-
-                            <SearchableDropDown
-                                onItemSelect={(item) => {
-                                    setDropCityValue(item.name)
+                                inputRef={phoneRef}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                returnKeyLabel="next"
+                                maxLength={10}
+                                onSubmitEditing={() => {
+                                    setAddHomeAddressActive(true), setTimeout(() => {
+                                        homeAddressLine1Ref.current.focus()
+                                    }, 250)
                                 }}
-                                items={dropCityDataMaster}
-                                onTextChange={(text) => setDropCityValue(text)}
-                                value={dropCityValue}
                             />
+                            <View>
+                                {
+                                    !addHomeAddressActive
+                                        ?
+                                        <TouchableOpacity
+                                            activeOpacity={0.7}
+                                            onPress={() => { setAddHomeAddressActive(!addHomeAddressActive) }}
+                                            style={{ flexDirection: "row", marginBottom: 15, marginLeft: '12%', alignItems: 'center' }}>
+                                            <Image
+                                                style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                source={require("../../../assets/plus.png")}
+                                            />
+                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS{role == 1 ? '' : "*"}</Text>
+                                        </TouchableOpacity>
+                                        :
+                                        <>
+                                            <TouchableOpacity
+                                                activeOpacity={0.7}
+                                                onPress={() => { setAddHomeAddressActive(!addHomeAddressActive) }}
+                                                style={{ flexDirection: "row", marginBottom: 15, marginLeft: '12%', alignItems: 'center' }}>
+                                                <Image
+                                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                    source={require("../../../assets/plus.png")}
+                                                />
+                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS{role == 1 ? '' : "*"}</Text>
+                                            </TouchableOpacity>
+                                            <View style={{}}>
+                                                <CustomTextInput
+                                                    placeholder="ADDRESS LINE 1"
+                                                    value={homeAddressData.address_line_1}
+                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_1: text }) }}
+                                                    inputRef={homeAddressLine1Ref}
+                                                    returnKeyType={"next"}
+                                                    onSubmitEditing={() => homeAddressLine2Ref.current.focus()}
+                                                />
+                                                <CustomTextInput
+                                                    placeholder="ADDRESS LINE 2"
+                                                    value={homeAddressData.address_line_2}
+                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_2: text }) }}
+                                                    inputRef={homeAddressLine2Ref}
+                                                    returnKeyType={"next"}
+                                                    onSubmitEditing={() => homeAddressStateDropRef.current.show()}
+                                                />
+                                                <DropDown
+                                                    dropRef={homeAddressStateDropRef}
+                                                    item={dropStateData}
+                                                    value={dropStateValue}
+                                                    onChangeValue={(index, value) => { setDropStateValue(value), startGetCities(value, "home") }}
+                                                    containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                                    dropdownStyle={{ maxHeight: 300 }}
+                                                />
 
-                            <CustomTextInput
-                                placeholder="Zip code"
-                                value={signUpData.address.address_line_2}
-                                value={signUpData.zip}
-                                onChangeText={(text) => setAddressData({ ...addressData, zip: text })}
-                                keyboardType='numeric'
-                            />
+                                                <SearchableDropDown
+                                                    dropRef={homeAddressCityDropRef}
+                                                    onItemSelect={(item) => {
+                                                        setDropCityValue(item.name)
+                                                        homeAddressZipRef.current.focus()
+                                                    }}
+                                                    items={dropCityDataMaster}
+                                                    onTextChange={(text) => setDropCityValue(text)}
+                                                    value={dropCityValue}
+                                                />
+
+                                                <CustomTextInput
+                                                    placeholder="Zip code"
+                                                    value={homeAddressData.zip}
+                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
+                                                    keyboardType="numeric"
+                                                    returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                                    inputRef={homeAddressZipRef}
+                                                    onSubmitEditing={() => {
+                                                        setAddWorkAddressActive(true), setTimeout(() => {
+                                                            workAddressLine1Ref.current.focus()
+                                                        }, 250)
+                                                    }}
+                                                />
+                                            </View>
+                                        </>
+                                }
+                            </View>
+                            <View style={{ marginTop: 10 }}>
+                                {
+                                    !addWorkAddressActive
+                                        ?
+                                        <TouchableOpacity
+                                            activeOpacity={0.7}
+                                            onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
+                                            style={{ flexDirection: "row", marginBottom: 15, marginLeft: '12%', alignItems: 'center' }}>
+                                            <Image
+                                                style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                source={require("../../../assets/plus.png")}
+                                            />
+                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS{role == 1 ? '' : "*"}</Text>
+                                        </TouchableOpacity>
+                                        :
+                                        <>
+                                            <TouchableOpacity
+                                                activeOpacity={0.7}
+                                                onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
+                                                style={{ flexDirection: "row", marginBottom: 15, marginLeft: '12%', alignItems: 'center' }}>
+                                                <Image
+                                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                    source={require("../../../assets/plus.png")}
+                                                />
+                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS{role == 1 ? '' : "*"}</Text>
+                                            </TouchableOpacity>
+                                            <CustomTextInput
+                                                placeholder="ADDRESS LINE 1"
+                                                value={workAddressData.address_line_1}
+                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_1: text }) }}
+                                                inputRef={workAddressLine1Ref}
+                                                returnKeyType={"next"}
+                                                onSubmitEditing={() => workAddressLine2Ref.current.focus()}
+                                            />
+                                            <CustomTextInput
+                                                placeholder="ADDRESS LINE 2"
+                                                value={workAddressData.address_line_2}
+                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_2: text }) }}
+                                                inputRef={workAddressLine2Ref}
+                                                returnKeyType={"next"}
+                                                onSubmitEditing={() => workAddressStateDropRef.current.show()}
+                                            />
+                                            <DropDown
+                                                dropRef={workAddressStateDropRef}
+                                                item={dropStateData}
+                                                value={dropStateValueWork}
+                                                onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
+                                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                                dropdownStyle={{ maxHeight: 300 }}
+                                            />
+                                            <SearchableDropDown
+                                                dropRef={workAddressCityDropRef}
+                                                onItemSelect={(item) => {
+                                                    setDropCityValueWork(item.name)
+                                                    workAddressZipRef.current.focus()
+                                                }}
+                                                items={dropCityDataMasterWork}
+                                                onTextChange={(text) => setDropCityValueWork(text)}
+                                                value={dropCityValueWork}
+                                            />
+                                            <CustomTextInput
+                                                placeholder="Zip code"
+                                                value={workAddressData.zip}
+                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, zip: text }) }}
+                                                keyboardType="numeric"
+                                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                                returnKeyType='done'
+                                                inputRef={workAddressZipRef}
+                                            />
+                                        </>
+                                }
+                            </View>
                         </View>
                         <View style={styles.buttonContainer}>
                             <CustomButton

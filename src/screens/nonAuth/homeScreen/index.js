@@ -135,7 +135,7 @@ const HomeScreen = (props) => {
                         <Image
                             style={{ width: '100%', height: '100%' }}
                             resizeMode="contain"
-                            source={user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/andrea.png")}
+                            source={user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/user.png")}
                         />
                     </TouchableOpacity>
                     <View style={{ flex: 1, paddingHorizontal: '5%' }}>
@@ -256,7 +256,7 @@ const HomeScreen = (props) => {
                             keyExtractor={(item, index) => index}
                         />
                     </View>}
-                <View style={styles.orderContainer}>
+                {!loading && <View style={styles.orderContainer}>
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
@@ -270,7 +270,7 @@ const HomeScreen = (props) => {
                             ORDER
                         </Text>
                     </TouchableOpacity>
-                </View>
+                </View>}
             </View>
             {loading && <Loader />}
         </SafeAreaView>

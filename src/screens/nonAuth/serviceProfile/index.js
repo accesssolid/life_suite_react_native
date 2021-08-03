@@ -170,7 +170,7 @@ const ServiceProfile = (props) => {
                                     setBank(text)
                                 }}
                                 image
-                                imageUrl={require("../../../assets/andrea.png")}
+                                imageUrl={require("../../../assets/user.png")}
                                 action={() => {
                                     setOpen(!open)
                                 }}

@@ -20,6 +20,7 @@ import { BASE_URL, getApi } from '../../../api/api';
 import CustomButton from '../../../components/customButton';
 import { setAddServiceData } from '../../../redux/features/services';
 import { showToast } from '../../../components/validators';
+import ServiceItem from '../../../components/serviceItem';
 
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
@@ -35,6 +36,10 @@ const ServicesProvided = (props) => {
     useEffect(() => {
         getServiceItems()
     }, [])
+
+    useEffect(() => {
+        setInitialServiceData()
+    }, [itemList])
 
     const getServiceItems = () => {
         setLoading(true)
@@ -68,41 +73,62 @@ const ServicesProvided = (props) => {
             })
     }
 
-    const setCheckedData = (index) => {
+    const setCheckedData = (index, item) => {
         let arr = [...selectedItems]
-        let arr2 = [...servicesData]
-        if (arr.includes(index)) {
-            arr.splice(arr.indexOf(index), 1)
-            arr2.splice(arr2.indexOf(index), 1)
+
+        if (arr.includes(item.id)) {
+            arr.splice(arr.indexOf(item.id), 1)
         } else {
-            arr.push(index)
-            arr2.push({
-                "item_id": itemList[index].id,
-                "price": "",
-                "time_duration": "",
-            })
+            arr.push(item.id)
         }
+
         setSelectedItems([...arr])
-        setServicesData([...arr2])
+    }
+
+    const setInitialServiceData = () => {
+        let newArr = itemList.map((item, index) => {
+            return {
+                "item_id": item.id,
+                "price": "",
+                "time_duration_h": "",
+                "time_duration_m": "",
+            }
+        })
+        setServicesData([...newArr])
     }
 
     const next = () => {
-        let isValid = true
-        servicesData.map(item => {
-            let hh = item.time_duration.slice(0, 2)
-            let mm = item.time_duration.length > 2 ? item.time_duration.slice(2) : ''
-            if (item.price.trim() == "" || hh.trim() == "" || mm.trim() == "") {
-                isValid = false
-            }
-        })
-        if (!isValid) {
-            return showToast("Please fill in data for selected services")
-        }
         if (isAddServiceMode) {
             let services = []
-            selectedItems.forEach(element => {
-                services.push(itemList[element])
-            });
+            let isValidData = false
+            if (selectedItems.length > 0) {
+                servicesData.forEach((itemm, index) => {
+                    if (selectedItems.includes(itemm.item_id)) {
+                        if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
+                            isValidData = true
+                            var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
+                            var fieldArray = hoursDotMinutes.split(":");
+                            var minutes = Number(fieldArray[0]) + 60 * Number(fieldArray[1]);
+
+                            toHoursAndMinutes(minutes)
+
+                            let obj = {
+                                "item_id": itemm.item_id,
+                                "price": Number(itemm.price.replace('$', '')),
+                                "time_duration": minutes
+                            }
+                            services.push(obj)
+                        } else {
+                            isValidData = false
+                        }
+                    }
+                })
+                if (!isValidData) {
+                    return showToast("Please enter data for selected feilds")
+                }
+            } else {
+                showToast("No items selected")
+            }
             dispatch(setAddServiceData({
                 data: {
                     ...addServiceData,
@@ -110,11 +136,11 @@ const ServicesProvided = (props) => {
                     service_id: subService.id,
                     json_data: {
                         ...addServiceData.json_data,
-                        services: [...servicesData]
+                        services: [...services]
                     }
                 }
             }))
-            if (selectedItems.length > 0) {
+            if (services.length > 0) {
                 props.navigation.navigate('AddLicense', { subService: subService })
             } else {
                 showToast("No items selected")
@@ -124,10 +150,14 @@ const ServicesProvided = (props) => {
         }
     }
 
+    function toHoursAndMinutes(minutes) {
+        var mins = minutes % 60; //modulus dividing by 60
+        var hrs = (minutes - mins) / 60; //Now you get an integer division
+        // alert(hrs + ":" + mins);
+    }
+
     const setText = (key, text, index) => {
         let temp = [...servicesData]
-        let hh = temp[index].time_duration.slice(0, 2)
-        let mm = temp[index].time_duration.length > 2 ? temp[index].time_duration.slice(2) : ''
         if (key == "price") {
             let parsed = conTwoDecDigit(text.replace('$', ''))
             if (text == '') {
@@ -135,12 +165,10 @@ const ServicesProvided = (props) => {
             } else {
                 temp[index].price = '$' + String(parsed)
             }
-        } else if (key == 'time_duration_m') {
-            mm = text
-            temp[index].time_duration = hh + mm
+        } else if (key == 'time_duration_h') {
+            temp[index].time_duration_h = text
         } else {
-            hh = text
-            temp[index].time_duration = hh + mm
+            temp[index].time_duration_m = text
         }
 
         setServicesData([...temp])
@@ -188,64 +216,19 @@ const ServicesProvided = (props) => {
                     <Content showsVerticalScrollIndicator={false}>
                         <Text style={styles.service}>SERVICES</Text>
                         <View style={styles.price}>
-                            <Text style={{ ...styles.priceTime, marginRight: '16%' }}>Price</Text>
+                            <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Price</Text>
                             <Text style={styles.priceTime}>Time</Text>
                         </View>
                         {itemList.map(((item, index) => {
                             return (
-                                <>
-                                    <View key={index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
-                                        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
-                                            <CheckBox
-                                                checked={selectedItems.includes(index)}
-                                                onPress={() => setCheckedData(index)}
-                                                checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
-                                                uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
-                                            />
-                                            <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%' }}>{item.name}</Text>
-                                        </View>
-
-                                        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end' }}>
-                                            <View style={styles.fromContainer}>
-                                                <TextInput
-                                                    style={styles.inputStyle}
-                                                    color="black"
-                                                    placeholder="$000"
-                                                    editable={selectedItems.includes(index)}
-                                                    onChangeText={(text) => setText("price", text, index)}
-                                                    keyboardType="numeric"
-                                                    value={servicesData[index]?.price}
-                                                />
-                                            </View>                                            
-                                            <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
-                                                <TextInputMask
-                                                    onChangeText={(formatted, extracted) => {
-                                                        setText("time_duration_h", extracted, index)
-                                                    }}
-                                                    mask={"[00]"}
-                                                    color="black"
-                                                    placeholder="HH"
-                                                    keyboardType="numeric"
-                                                    editable={selectedItems.includes(index)}
-                                                    style={styles.inputStyle}
-                                                />
-                                            </View>                                            
-                                            <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
-                                                <TextInputMask
-                                                    onChangeText={(formatted, extracted) => {
-                                                        setText("time_duration_m", extracted, index)
-                                                    }}
-                                                    mask={"[00]"}
-                                                    color="black"
-                                                    placeholder="MM"
-                                                    keyboardType="numeric"
-                                                    editable={selectedItems.includes(index)}
-                                                    style={styles.inputStyle}
-                                                />
-                                            </View>
-                                        </View>
-                                    </View>
-                                </>
+                                <ServiceItem
+                                    item={item}
+                                    index={index}
+                                    onCheckPress={() => setCheckedData(index, item)}
+                                    isSelected={selectedItems.includes(item.id)}
+                                    setText={setText}
+                                    serviceItem={servicesData[index]}
+                                />
                             )
                         }))}
                     </Content>
@@ -292,7 +275,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: LS_FONTS.PoppinsMedium,
         color: "black",
-        marginRight: '11%'
+        marginRight: '13%'
     },
     service: {
         fontSize: 18,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Image, Text, SafeAreaView, StatusBar } from 'react-native';
 import Colors from '../../../constants/colors';
 import CustomButton from "../../../components/customButton"
@@ -10,17 +10,31 @@ import Loader from '../../../components/loader';
 import { showToast } from '../../../utils';
 import { getApi } from '../../../api/api';
 import { useSelector } from 'react-redux';
+import Entypo from 'react-native-vector-icons/Entypo'
 
 const ResetPassword = (props) => {
     const { email, otp } = props.route.params
+    const passRef = useRef(null)
+    const confPassRef = useRef(null)
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [isPassVisible, setIsPassVisible] = useState(false)
+    const [isConfPassVisible, setIsConfPassVisible] = useState(false)
 
     const [loader, setLoader] = useState("")
     const role = useSelector(state => state.authenticate.user_role)
 
+    useEffect(() => {
+        setLoader(false)
+    },[])
+
     function on_submit() {
         setLoader(true)
+
+        if (password !== confirmPassword) {
+            setLoader(false)
+            return showToast("Password and confirm password does not match")
+        }
 
         let headers = {
             Accept: 'application/json',
@@ -73,6 +87,12 @@ const ResetPassword = (props) => {
                                 onChangeText={(text) => {
                                     setPassword(text)
                                 }}
+                                secureTextEntry={!isPassVisible}
+                                inputRef={passRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => confPassRef.current.focus()}
+                                inlineImageLeft={<Entypo name="eye" size={18} />}
+                                onLeftPress={() => setIsPassVisible(state => !state)}
                             />
                             <CustomTextInput
                                 placeholder="Confirm new password"
@@ -80,6 +100,11 @@ const ResetPassword = (props) => {
                                 onChangeText={(text) => {
                                     setConfirmPassword(text)
                                 }}
+                                secureTextEntry={!isConfPassVisible}
+                                inputRef={confPassRef}
+                                returnKeyType="done"                                
+                                inlineImageLeft={<Entypo name="eye" size={18} />}
+                                onLeftPress={() => setIsConfPassVisible(state => !state)}
                             />
                         </View>
                         <View style={{ marginTop: '5%' }}>

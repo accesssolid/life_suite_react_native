@@ -11,13 +11,19 @@ import { showToast } from "../../../components/validators"
 import Loader from '../../../components/loader';
 import { useSelector } from 'react-redux';
 import { getApi } from '../../../api/api';
+import { TouchableOpacity } from 'react-native';
+import LS_COLORS from '../../../constants/colors';
 
 const OtpScreen = props => {
-  const [code, setCode] = useState()
+  const [code, setCode] = useState('')
   const [loader, setLoader] = useState(false)
+  const email = props.route.params.email
   const role = useSelector(state => state.authenticate.user_role)
 
   function on_press_submit() {
+    if (code.trim() == '') {
+      return showToast("Please enter verification code")
+    }
     setLoader(true)
     let headers = {
       Accept: "application/json",
@@ -38,16 +44,62 @@ const OtpScreen = props => {
       .then((response) => {
         if (response.status == true) {
           setLoader(false)
-          showToast(response.message, 'success')          
+          // showToast(response.message, 'success')
           props.navigation.navigate('ResetPassword', { otp: code, email: props.route.params.email })
         }
         else {
           setLoader(false)
-          showToast(response.message, 'danger')          
+          showToast(response.message, 'danger')
         }
       })
       .catch(err => {
 
+      })
+  }
+
+  function resendCode() {
+    setCode('')
+    setLoader(true)
+    if (email.length == 0) {
+      showToast('Enter Email', 'danger')
+      setLoader(false)
+      return false
+    }
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (reg.test(email) == false) {
+      showToast('Enter Valid Email', 'danger')
+      setLoader(false)
+      return false
+    }
+    let headers = {
+      Accept: 'application/json',
+      "Content-Type": "application/json"
+    }
+
+    let user_data = {
+      "email": email.toLowerCase(),
+    }
+
+    let config = {
+      headers: headers,
+      data: JSON.stringify(user_data),
+      endPoint: role == 1 ? '/api/customerForgotPassword' : '/api/providerForgotPassword',
+      type: 'POST'
+    }
+
+    getApi(config)
+      .then((response) => {
+        if (response.status == true) {
+          showToast("Verification code sent on your email", 'success')
+          setLoader(false)
+        }
+        else {
+          showToast(response.message, 'danger')
+          setLoader(false)
+        }
+      })
+      .catch(err => {
+        setLoader(false)
       })
   }
 
@@ -63,24 +115,20 @@ const OtpScreen = props => {
             <Text style={styles.email}>sent to your mail.</Text>
             <View style={{ marginTop: '8%' }}>
               <OTPInputView
+                code={code}
                 pinCount={4}
                 style={styles.otp}
                 codeInputFieldStyle={styles.input}
                 placeholderTextColor="black"
                 keyboardType="number-pad"
-                onCodeFilled={(code) => {
-                  setCode(code)
-                }}
+                onCodeChanged={code => setCode(code)}             
               />
             </View>
             <View style={{ flexDirection: 'row', marginTop: 40, alignSelf: 'center' }}>
               <Text style={{ fontFamily: Fonts.PoppinsMedium, color: Colors.white }}>Didn't receive the code? </Text>
-              <Text onPress={() => {
-                {
-
-                }
-              }}
-                style={{ fontFamily: Fonts.PoppinsMedium, color: '#FDABC0' }}>Resend</Text>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => resendCode()}>
+                <Text style={{ fontFamily: Fonts.PoppinsMedium, color: '#FDABC0' }}>Resend</Text>
+              </TouchableOpacity>
             </View>
             <View style={{ marginTop: '10%' }}>
               <CustomButton
@@ -122,7 +170,7 @@ const styles = StyleSheet.create({
     alignSelf: "center"
   },
   input: {
-    color: "#D3D3D3",
+    color: LS_COLORS.global.darkBlack,
     borderColor: "#D3D3D3",
     borderRadius: 5,
   },
