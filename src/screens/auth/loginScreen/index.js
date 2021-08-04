@@ -20,6 +20,9 @@ import Loader from "../../../components/loader"
 import { getApi } from "../../../api/api"
 import { loginReducer, setAuthToken, setUserRole } from '../../../redux/features/loginReducer';
 
+/* Icons */
+import Entypo from 'react-native-vector-icons/Entypo'
+
 const LoginScreen = (props) => {
     const dispatch = useDispatch()
     const passRef = useRef(null)
@@ -27,6 +30,7 @@ const LoginScreen = (props) => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loader, setLoader] = useState(false)
+    const [passVisible, setPassVisible] = useState(false)
 
     const switchRole = () => {
         dispatch(setUserRole({ data: role == 1 ? 2 : 1 }))
@@ -212,7 +216,9 @@ const LoginScreen = (props) => {
                             onChangeText={(text) => {
                                 setPassword(text)
                             }}
-                            secureTextEntry
+                            secureTextEntry={!passVisible}
+                            inlineImageLeft={<Entypo name={!passVisible ? "eye" : 'eye-with-line'} size={18} />}
+                            onLeftPress={() => setPassVisible(state => !state)}
                         />
                         <View style={styles.buttonContainer}>
                             <CustomButton
@@ -267,7 +273,6 @@ const LoginScreen = (props) => {
                                     />
                                 </Card>
                             </TouchableOpacity>
-
                         </View> */}
                         {loader == true && <Loader />}
                     </Content>

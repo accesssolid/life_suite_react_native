@@ -18,6 +18,7 @@ import { Container, Content, Row, } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
 import { BASE_URL, getApi } from '../../../api/api';
 import Loader from '../../../components/loader';
+import { showToast } from '../../../components/validators';
 
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
@@ -84,7 +85,7 @@ const ServicesProvided = (props) => {
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                            <View style={{ height: "22%", justifyContent: 'flex-end', marginTop: StatusBar.currentHeight + 10 }}>
+                            <View style={{ marginTop: StatusBar.currentHeight + 10 }}>
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {
@@ -111,24 +112,52 @@ const ServicesProvided = (props) => {
                             itemList.length > 0
                                 ?
                                 <Content>
-                                    {itemList.map((item, index) => {
-                                        return (
-                                            <View style={{ flexDirection: "row", paddingLeft: '5%' }}>
-                                                <CheckBox
-                                                    checked={selectedItems.includes(index)}
-                                                    onPress={() => setCheckedData(index)}
-                                                    checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
-                                                    uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
-                                                />
-                                                <Text style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{item.name}</Text>
-                                            </View>
-                                        )
-                                    })}
+                                    {
+                                        itemList && itemList.length > 0
+                                            ?
+                                            itemList.map((item, index) => {
+                                                return (
+                                                    <>
+                                                        <View key={index} style={{ flexDirection: "row", paddingLeft: '5%' }}>
+                                                            <CheckBox
+                                                                checked={selectedItems.includes(index)}
+                                                                onPress={() => setCheckedData(index)}
+                                                                checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
+                                                                uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
+                                                            />
+                                                            <Text style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{item.name}</Text>
+                                                        </View>
+                                                        {selectedItems.includes(index) && <View>
+                                                            {item.products.map((product, indexx) => {
+                                                                return (
+                                                                    <View key={indexx} style={{ flexDirection: "row", paddingLeft: '10%' }}>
+                                                                        <CheckBox
+                                                                            checked={false}
+                                                                            onPress={() => { }}
+                                                                            checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
+                                                                            uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
+                                                                        />
+                                                                        <Text style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{product.name}</Text>
+                                                                    </View>
+
+                                                                )
+                                                            })}
+                                                        </View>}
+                                                    </>
+                                                )
+                                            })
+                                            :
+                                            null
+                                    }
                                     <TouchableOpacity
                                         style={styles.save}
                                         activeOpacity={0.7}
                                         onPress={() => {
-                                            props.navigation.navigate("MechanicLocation")
+                                            selectedItems.length > 0
+                                                ?
+                                                props.navigation.navigate("MechanicLocation")
+                                                :
+                                                showToast("Select service first")
                                         }}>
                                         <Text style={styles.saveText}>Next</Text>
                                     </TouchableOpacity>
@@ -161,7 +190,6 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.white,
     },
     image: {
-        resizeMode: 'contain',
         width: '100%',
         height: '100%',
     },

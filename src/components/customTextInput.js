@@ -24,7 +24,7 @@ const CustomTextInput = props => {
                     paddingVertical: 15,
                     paddingHorizontal: '14%',
                 }}
-                // {...props}
+                value={props.value}
                 ref={props.inputRef}
                 placeholderTextColor={LS_COLORS.global.placeholder}
                 color={LS_COLORS.global.black}
@@ -38,6 +38,7 @@ const CustomTextInput = props => {
                 maxLength={props.maxLength}
                 onChangeText={props.onChangeText}
                 secureTextEntry={props.secureTextEntry}
+                editable={props.editable}
             />
             {
                 props.inlineImageLeft && <TouchableOpacity activeOpacity={0.7} onPress={props.onLeftPress} style={{ aspectRatio: 1, position: 'absolute', right: '5%', height:'100%', alignItems:'center', justifyContent:'center' }}>

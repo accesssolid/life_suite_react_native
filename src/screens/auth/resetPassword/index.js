@@ -26,7 +26,7 @@ const ResetPassword = (props) => {
 
     useEffect(() => {
         setLoader(false)
-    },[])
+    }, [])
 
     function on_submit() {
         setLoader(true)
@@ -91,7 +91,7 @@ const ResetPassword = (props) => {
                                 inputRef={passRef}
                                 returnKeyType="next"
                                 onSubmitEditing={() => confPassRef.current.focus()}
-                                inlineImageLeft={<Entypo name="eye" size={18} />}
+                                inlineImageLeft={<Entypo name={!isPassVisible ? "eye" : 'eye-with-line'} size={18} />}
                                 onLeftPress={() => setIsPassVisible(state => !state)}
                             />
                             <CustomTextInput
@@ -102,8 +102,8 @@ const ResetPassword = (props) => {
                                 }}
                                 secureTextEntry={!isConfPassVisible}
                                 inputRef={confPassRef}
-                                returnKeyType="done"                                
-                                inlineImageLeft={<Entypo name="eye" size={18} />}
+                                returnKeyType="done"
+                                inlineImageLeft={<Entypo name={!isConfPassVisible ? "eye" : 'eye-with-line'} size={18} />}
                                 onLeftPress={() => setIsConfPassVisible(state => !state)}
                             />
                         </View>

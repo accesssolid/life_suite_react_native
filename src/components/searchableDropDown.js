@@ -23,7 +23,8 @@ const SearchableDropDown = props => {
                     onTextChange: props.onTextChange,
                     placeholderTextColor: LS_COLORS.global.placeholder,
                     value: props.value,
-                    ref: props.dropRef
+                    ref: props.dropRef,
+                    editable: props.editable
                 }}
                 listProps={
                     {

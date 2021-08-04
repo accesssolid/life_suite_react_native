@@ -95,65 +95,88 @@ const ServicesProvided = (props) => {
             }
         })
         setServicesData([...newArr])
-    }
-
-    const next = () => {
-        if (isAddServiceMode) {
-            let services = []
-            let isValidData = false
-            if (selectedItems.length > 0) {
-                servicesData.forEach((itemm, index) => {
-                    if (selectedItems.includes(itemm.item_id)) {
-                        if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
-                            isValidData = true
-                            var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
-                            var fieldArray = hoursDotMinutes.split(":");
-                            var minutes = Number(fieldArray[0]) + 60 * Number(fieldArray[1]);
-
-                            toHoursAndMinutes(minutes)
-
-                            let obj = {
-                                "item_id": itemm.item_id,
-                                "price": Number(itemm.price.replace('$', '')),
-                                "time_duration": minutes
-                            }
-                            services.push(obj)
-                        } else {
-                            isValidData = false
-                        }
-                    }
-                })
-                if (!isValidData) {
-                    return showToast("Please enter data for selected feilds")
-                }
-            } else {
-                showToast("No items selected")
-            }
-            dispatch(setAddServiceData({
-                data: {
-                    ...addServiceData,
-                    user_id: user.id,
-                    service_id: subService.id,
-                    json_data: {
-                        ...addServiceData.json_data,
-                        services: [...services]
-                    }
-                }
-            }))
-            if (services.length > 0) {
-                props.navigation.navigate('AddLicense', { subService: subService })
-            } else {
-                showToast("No items selected")
-            }
-        } else {
-            showToast("under development")
+        if (!isAddServiceMode && subService && subService.items && subService.items.length > 0) {
+            setPreviousData(newArr)
         }
     }
 
-    function toHoursAndMinutes(minutes) {
-        var mins = minutes % 60; //modulus dividing by 60
-        var hrs = (minutes - mins) / 60; //Now you get an integer division
+    const setPreviousData = (arr) => {
+        let temp = [...arr]
+        arr.forEach((serviceElement, serviceIndex) => {
+            subService.items.forEach((subElement) => {
+                if (serviceElement.item_id == subElement.id) {
+                    let hours = toHoursAndMinutes(subElement.time_duration, 'hours')
+                    let minutes = toHoursAndMinutes(subElement.time_duration, 'minutes')
+                    temp[serviceIndex] = {
+                        "item_id": serviceElement.item_id,
+                        "price": "$"+subElement.price,
+                        "time_duration_h": String(minutes),
+                        "time_duration_m": String(hours),
+                    }
+                    // setCheckedData(null, subElement)
+                }
+            });
+        });
+
+        setServicesData([...temp])
+    }
+
+    const next = () => {
+        let services = []
+        let isValidData = false
+        if (selectedItems.length > 0) {
+            servicesData.forEach((itemm, index) => {
+                if (selectedItems.includes(itemm.item_id)) {
+                    if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
+                        isValidData = true
+                        var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
+                        var fieldArray = hoursDotMinutes.split(":");
+                        var minutes = Number(fieldArray[0]) + 60 * Number(fieldArray[1]);
+
+                        let obj = {
+                            "item_id": itemm.item_id,
+                            "price": Number(itemm.price.replace('$', '')),
+                            "time_duration": minutes
+                        }
+                        services.push(obj)
+                    } else {
+                        isValidData = false
+                    }
+                }
+            })
+            if (!isValidData) {
+                return showToast("Please enter data for selected feilds")
+            }
+        } else {
+            showToast("Select Service first")
+        }
+        dispatch(setAddServiceData({
+            data: {
+                ...addServiceData,
+                user_id: user.id,
+                service_id: subService.id,
+                json_data: {
+                    ...addServiceData.json_data,
+                    services: [...services]
+                }
+            }
+        }))
+        if (services.length > 0) {
+            props.navigation.navigate('AddLicense', { subService: subService })
+        } else {
+            showToast("Select Service first")
+        }
+    }
+
+    function toHoursAndMinutes(minutes, type) {
+        var mins = minutes % 60;
+        var hrs = (minutes - mins) / 60;
         // alert(hrs + ":" + mins);
+        if (type == 'hours') {
+            return hrs
+        } else {
+            return mins
+        }
     }
 
     const setText = (key, text, index) => {
@@ -219,21 +242,46 @@ const ServicesProvided = (props) => {
                             <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Price</Text>
                             <Text style={styles.priceTime}>Time</Text>
                         </View>
-                        {itemList.map(((item, index) => {
-                            return (
-                                <ServiceItem
-                                    item={item}
-                                    index={index}
-                                    onCheckPress={() => setCheckedData(index, item)}
-                                    isSelected={selectedItems.includes(item.id)}
-                                    setText={setText}
-                                    serviceItem={servicesData[index]}
-                                />
-                            )
-                        }))}
+                        {
+                            isAddServiceMode
+                                ?
+                                itemList && itemList.length > 0
+                                    ?
+                                    itemList.map(((item, index) => {
+                                        return (
+                                            <ServiceItem
+                                                item={item}
+                                                index={index}
+                                                onCheckPress={() => setCheckedData(index, item)}
+                                                isSelected={selectedItems.includes(item.id)}
+                                                setText={setText}
+                                                serviceItem={servicesData[index]}
+                                            />
+                                        )
+                                    }))
+                                    :
+                                    null
+                                :
+                                subService && subService.items
+                                    ?
+                                    subService.items.map(((item, index) => {
+                                        return (
+                                            <ServiceItem
+                                                item={item}
+                                                index={index}
+                                                onCheckPress={() => setCheckedData(index, item)}
+                                                isSelected={selectedItems.includes(item.id)}
+                                                setText={setText}
+                                                serviceItem={servicesData[index]}
+                                            />
+                                        )
+                                    }))
+                                    :
+                                    null
+                        }
                     </Content>
                     <View style={{ paddingBottom: '2.5%' }}>
-                        <CustomButton title={isAddServiceMode ? "Next" : "Save"} action={() => next()} />
+                        <CustomButton title={isAddServiceMode ? "Next" : selectedItems.length > 0 ? "Next" : "Edit"} action={() => next()} />
                     </View>
                 </Container>
                 {loading && <Loader />}

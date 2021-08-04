@@ -36,7 +36,8 @@ const DropDown = (props) => {
                     dropdownTextStyle={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.black }}
                     dropdownStyle={[{ borderWidth: 1 }, props.dropdownStyle]}
                     onSelect={props.onChangeValue}
-                    showsVerticalScrollIndicator={false}            
+                    showsVerticalScrollIndicator={false}    
+                    disabled={props.disabled}        
                 />
             </View>
         </>

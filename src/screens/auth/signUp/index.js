@@ -9,6 +9,7 @@ import { globalStyles } from '../../../utils';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import { getUniqueId } from 'react-native-device-info';
+import { CheckBox } from 'react-native-elements';
 
 /* Components */
 import CustomTextInput from '../../../components/customTextInput';
@@ -90,6 +91,7 @@ const SignUpScreen = (props) => {
 
     const [addWorkAddressActive, setAddWorkAddressActive] = useState(false)
     const [addHomeAddressActive, setAddHomeAddressActive] = useState(false)
+    const [isSameAddress, setIsSameAddress] = useState(false)
     const role = useSelector(state => state.authenticate.user_role)
     const [loader, setLoader] = useState(false)
 
@@ -161,6 +163,31 @@ const SignUpScreen = (props) => {
         state: '',
         zip: '',
     })
+
+    useEffect(() => {
+        if (isSameAddress) {
+            setWorkAddressData({
+                ...workAddressData,
+                address_line_1: homeAddressData.address_line_1,
+                address_line_2: homeAddressData.address_line_2,
+                city: homeAddressData.city,
+                state: homeAddressData.state,
+                zip: homeAddressData.zip,
+            })
+            setDropStateValueWork(dropStateValue)
+            setDropCityValueWork(dropCityValue)
+        } else {
+            setWorkAddressData({
+                address_line_1: '',
+                address_line_2: '',
+                city: '',
+                state: '',
+                zip: '',
+            })
+            setDropStateValueWork("State")
+            setDropCityValueWork('')
+        }
+    }, [isSameAddress, homeAddressData])
 
     const [signUpData, setSignUpData] = useState({
         first_name: '',
@@ -235,7 +262,7 @@ const SignUpScreen = (props) => {
             let homekeys = Object.keys(address[0])
             for (let index = 0; index < homekeys.length; index++) {
                 if (homekeys[index] !== 'lat' && homekeys[index] !== 'long' && String(address[0][homekeys[index]]).trim() == '') {
-                    showToast(`${getKeyName(homekeys[index])} is required for home address`, 'danger')
+                    showToast(`${getKeyName(homekeys[index])} is required for ${role == 1 ? 'home' : 'permanent'} address`, 'danger')
                     setLoader(false)
                     return false
                 }
@@ -244,7 +271,7 @@ const SignUpScreen = (props) => {
             let keys = Object.keys(address[1])
             for (let index = 0; index < keys.length; index++) {
                 if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
-                    showToast(`${getKeyName(keys[index])} is required for work address`, 'danger')
+                    showToast(`${getKeyName(keys[index])} is required for ${role == 1 ? 'work' : 'mailing'} address`, 'danger')
                     setLoader(false)
                     return false
                 }
@@ -476,7 +503,7 @@ const SignUpScreen = (props) => {
                                 inputRef={passRef}
                                 returnKeyType="next"
                                 onSubmitEditing={() => confPassRef.current.focus()}
-                                inlineImageLeft={<Entypo name="eye" size={18} />}
+                                inlineImageLeft={<Entypo name={!isPassVisible ? "eye" : 'eye-with-line'} size={18} />}
                                 onLeftPress={() => setIsPassVisible(state => !state)}
                             />
                             <CustomTextInput
@@ -489,7 +516,7 @@ const SignUpScreen = (props) => {
                                 inputRef={confPassRef}
                                 returnKeyType="next"
                                 onSubmitEditing={() => phoneRef.current.focus()}
-                                inlineImageLeft={<Entypo name="eye" size={18} />}
+                                inlineImageLeft={<Entypo name={!isConfPassVisible ? "eye" : 'eye-with-line'} size={18} />}
                                 onLeftPress={() => setIsConfPassVisible(state => !state)}
                             />
                             <CustomTextInput
@@ -521,7 +548,7 @@ const SignUpScreen = (props) => {
                                                 style={{ height: 24, width: 24, resizeMode: "contain" }}
                                                 source={require("../../../assets/plus.png")}
                                             />
-                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS{role == 1 ? '' : "*"}</Text>
+                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {role == 1 ? 'HOME' : 'PERMANENT'} ADDRESS{role == 1 ? '' : "*"}</Text>
                                         </TouchableOpacity>
                                         :
                                         <>
@@ -533,7 +560,7 @@ const SignUpScreen = (props) => {
                                                     style={{ height: 24, width: 24, resizeMode: "contain" }}
                                                     source={require("../../../assets/plus.png")}
                                                 />
-                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS{role == 1 ? '' : "*"}</Text>
+                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {role == 1 ? 'HOME' : 'PERMANENT'} ADDRESS{role == 1 ? '' : "*"}</Text>
                                             </TouchableOpacity>
                                             <View style={{}}>
                                                 <CustomTextInput
@@ -593,28 +620,56 @@ const SignUpScreen = (props) => {
                                 {
                                     !addWorkAddressActive
                                         ?
-                                        <TouchableOpacity
-                                            activeOpacity={0.7}
-                                            onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
-                                            style={{ flexDirection: "row", marginBottom: 15, marginLeft: '12%', alignItems: 'center' }}>
-                                            <Image
-                                                style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                source={require("../../../assets/plus.png")}
-                                            />
-                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS{role == 1 ? '' : "*"}</Text>
-                                        </TouchableOpacity>
-                                        :
-                                        <>
+                                        <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '12%', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <TouchableOpacity
                                                 activeOpacity={0.7}
                                                 onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
-                                                style={{ flexDirection: "row", marginBottom: 15, marginLeft: '12%', alignItems: 'center' }}>
+                                                style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                 <Image
                                                     style={{ height: 24, width: 24, resizeMode: "contain" }}
                                                     source={require("../../../assets/plus.png")}
                                                 />
-                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS{role == 1 ? '' : "*"}</Text>
+                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {role == 1 ? 'WORK' : 'MAILING'} ADDRESS{role == 1 ? '' : "*"}</Text>
                                             </TouchableOpacity>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                <CheckBox
+                                                    style={{}}
+                                                    containerStyle={{ width: 25 }}
+                                                    wrapperStyle={{}}
+                                                    checked={isSameAddress}
+                                                    onPress={() => setIsSameAddress(!isSameAddress)}
+                                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                                />
+                                                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 5 }}>Same address</Text>
+                                            </View>
+                                        </View>
+                                        :
+                                        <>
+                                            <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '12%', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <TouchableOpacity
+                                                    activeOpacity={0.7}
+                                                    onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
+                                                    style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Image
+                                                        style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                        source={require("../../../assets/plus.png")}
+                                                    />
+                                                    <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {role == 1 ? 'WORK' : 'MAILING'} ADDRESS{role == 1 ? '' : "*"}</Text>
+                                                </TouchableOpacity>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <CheckBox
+                                                        style={{}}
+                                                        containerStyle={{ width: 25 }}
+                                                        wrapperStyle={{}}
+                                                        checked={isSameAddress}
+                                                        onPress={() => setIsSameAddress(!isSameAddress)}
+                                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                                    />
+                                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 5 }}>Same address</Text>
+                                                </View>
+                                            </View>
                                             <CustomTextInput
                                                 placeholder="ADDRESS LINE 1"
                                                 value={workAddressData.address_line_1}
@@ -622,6 +677,7 @@ const SignUpScreen = (props) => {
                                                 inputRef={workAddressLine1Ref}
                                                 returnKeyType={"next"}
                                                 onSubmitEditing={() => workAddressLine2Ref.current.focus()}
+                                                editable={!isSameAddress}
                                             />
                                             <CustomTextInput
                                                 placeholder="ADDRESS LINE 2"
@@ -630,6 +686,7 @@ const SignUpScreen = (props) => {
                                                 inputRef={workAddressLine2Ref}
                                                 returnKeyType={"next"}
                                                 onSubmitEditing={() => workAddressStateDropRef.current.show()}
+                                                editable={!isSameAddress}
                                             />
                                             <DropDown
                                                 dropRef={workAddressStateDropRef}
@@ -638,6 +695,7 @@ const SignUpScreen = (props) => {
                                                 onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
                                                 containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                                 dropdownStyle={{ maxHeight: 300 }}
+                                                disabled={isSameAddress}
                                             />
                                             <SearchableDropDown
                                                 dropRef={workAddressCityDropRef}
@@ -648,6 +706,7 @@ const SignUpScreen = (props) => {
                                                 items={dropCityDataMasterWork}
                                                 onTextChange={(text) => setDropCityValueWork(text)}
                                                 value={dropCityValueWork}
+                                                editable={!isSameAddress}
                                             />
                                             <CustomTextInput
                                                 placeholder="Zip code"
@@ -657,6 +716,7 @@ const SignUpScreen = (props) => {
                                                 returnKeyType={Platform.OS == "ios" ? "done" : "next"}
                                                 returnKeyType='done'
                                                 inputRef={workAddressZipRef}
+                                                editable={!isSameAddress}
                                             />
                                         </>
                                 }

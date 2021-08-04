@@ -4,12 +4,14 @@ import { View, StyleSheet, Image, Text, Platform, SafeAreaView, Alert, Touchable
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
-import { globalStyles } from '../../../utils';
+import { getCardImage, globalStyles } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
 import TextInputMask from 'react-native-text-input-mask';
+import { CheckBox } from 'react-native-elements';
+import DropDownPicker from 'react-native-dropdown-picker'
 
 /* Components */
 import Header from '../../../components/header';
@@ -134,6 +136,14 @@ const Profile = (props) => {
         expiry: ''
     })
     const [notificationType, setNotificationType] = useState(getNotificationType(userData.notification_prefrence))
+    const [notifDropOpen, setNotifDropOpen] = useState(false)
+    const [notifItems, setNotifItems] = useState([
+        { label: 'Email', value: 'Email' },
+        { label: 'Push Notification', value: 'Push Notification' },
+        { label: 'Text', value: 'Text' },
+    ]);
+    var creditCardType = require("credit-card-type");
+    var cards = creditCardType(cardDetails.number)
 
     /* State Drop Down */
     const [dropStateValue, setDropStateValue] = useState("State")
@@ -152,11 +162,21 @@ const Profile = (props) => {
     const [dropCityValueWork, setDropCityValueWork] = useState("")
     const [isEmptyCityListWork, setIsEmptyCityListWork] = useState(false)
     const [dropCityDataMasterWork, setDropCityMasterWork] = useState([])
+    const [isSameAddress, setIsSameAddress] = useState(false)
+    const [profilePic, setProfilePic] = useState(require("../../../assets/user.png"))
 
     useEffect(() => {
         setUserData({ ...user })
-        setNotificationType(getNotificationType(userData.notification_prefrence))
+        setNotificationType(getNotificationType(userData.notification_prefrence))              
     }, [user])
+
+    useEffect(() => {
+        if(userData.profile_image){
+            setProfilePic({ uri: BASE_URL + userData.profile_image })
+        }        
+    }, [userData])
+
+    
 
     useEffect(() => {
         setNotificationType(getNotificationType(userData.notification_prefrence))
@@ -196,6 +216,36 @@ const Profile = (props) => {
         state: userData.address[1].state,
         zip: userData.address[1].zip_code,
     })
+
+    useEffect(() => {
+        if (isSameAddress) {
+            setWorkAddressData({
+                ...workAddressData,
+                address_line_1: homeAddressData.address_line_1,
+                address_line_2: homeAddressData.address_line_2,
+                city: homeAddressData.city,
+                state: homeAddressData.state,
+                zip: homeAddressData.zip,
+            })
+            setDropStateValueWork(dropStateValue)
+            setDropCityValueWork(dropCityValue)
+        }
+    }, [isSameAddress, homeAddressData])
+
+    useEffect(() => {
+        if (isSameAddress) {
+            setWorkAddressData({
+                ...workAddressData,
+                address_line_1: homeAddressData.address_line_1,
+                address_line_2: homeAddressData.address_line_2,
+                city: homeAddressData.city,
+                state: homeAddressData.state,
+                zip: homeAddressData.zip,
+            })
+            setDropStateValueWork(dropStateValue)
+            setDropCityValueWork(dropCityValue)
+        }
+    }, [homeAddressData])
 
     const updateProfilePic = (image) => {
         setLoader(true)
@@ -270,19 +320,9 @@ const Profile = (props) => {
                             console.log("Image picker error : ", err)
                         })
                     }
-                },                
+                },
             ]
         );
-        // ImagePicker.openPicker({
-        //     width: 400,
-        //     height: 400,
-        //     cropping: true
-        // }).then(image => {
-        //     console.log(image);
-        //     updateProfilePic(image)
-        // }).catch(err => {
-        //     console.log("Image picker error : ", err)
-        // })
     }
 
     const saveUser = () => {
@@ -339,7 +379,7 @@ const Profile = (props) => {
             let homekeys = Object.keys(address[0])
             for (let index = 0; index < homekeys.length; index++) {
                 if (homekeys[index] !== 'lat' && homekeys[index] !== 'long' && String(address[0][homekeys[index]]).trim() == '') {
-                    showToast(`${getKeyName(homekeys[index])} is required for home address`, 'danger')
+                    showToast(`${getKeyName(homekeys[index])} is required for ${user.user_role == 2 ? 'home' : 'permanent'} address`, 'danger')
                     setLoader(false)
                     return false
                 }
@@ -348,7 +388,7 @@ const Profile = (props) => {
             let keys = Object.keys(address[1])
             for (let index = 0; index < keys.length; index++) {
                 if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
-                    showToast(`${getKeyName(keys[index])} is required for work address`, 'danger')
+                    showToast(`${getKeyName(keys[index])} is required for ${user.user_role == 2 ? 'work' : 'mailing'} address`, 'danger')
                     setLoader(false)
                     return false
                 }
@@ -570,11 +610,11 @@ const Profile = (props) => {
                 <Image
                     resizeMode='contain'
                     style={{ height: '100%', width: '100%', }}
-                    source={userData.profile_image ? { uri: BASE_URL + userData.profile_image } : require("../../../assets/user.png")}
+                    source={profilePic}
                 />
             </TouchableOpacity>
             <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                behavior={Platform.OS === "ios" ? "padding" : null}
                 style={styles.container}>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
@@ -657,7 +697,7 @@ const Profile = (props) => {
                                                 style={{ height: 24, width: 24, resizeMode: "contain" }}
                                                 source={require("../../../assets/plus.png")}
                                             />
-                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
+                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {user.user_role == 2 ? 'HOME' : 'PERMANENT'} ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
                                         </TouchableOpacity>
                                         :
                                         <>
@@ -669,7 +709,7 @@ const Profile = (props) => {
                                                     style={{ height: 24, width: 24, resizeMode: "contain" }}
                                                     source={require("../../../assets/plus.png")}
                                                 />
-                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD HOME ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
+                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {user.user_role == 2 ? 'HOME' : 'PERMANENT'} ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
                                             </TouchableOpacity>
                                             <View style={{}}>
                                                 <CustomInput
@@ -731,28 +771,56 @@ const Profile = (props) => {
                                 {
                                     !addWorkAddressActive
                                         ?
-                                        <TouchableOpacity
-                                            activeOpacity={0.7}
-                                            onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
-                                            style={{ flexDirection: "row", marginBottom: 15, marginLeft: '5%', alignItems: 'center' }}>
-                                            <Image
-                                                style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                source={require("../../../assets/plus.png")}
-                                            />
-                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
-                                        </TouchableOpacity>
-                                        :
-                                        <>
+                                        <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '5%', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <TouchableOpacity
                                                 activeOpacity={0.7}
                                                 onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
-                                                style={{ flexDirection: "row", marginBottom: 15, marginLeft: '5%', alignItems: 'center' }}>
+                                                style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                 <Image
                                                     style={{ height: 24, width: 24, resizeMode: "contain" }}
                                                     source={require("../../../assets/plus.png")}
                                                 />
-                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD WORK ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
+                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {user.user_role == 2 ? 'WORK' : 'MAILING'} ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
                                             </TouchableOpacity>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                <CheckBox
+                                                    style={{}}
+                                                    containerStyle={{ width: 25 }}
+                                                    wrapperStyle={{}}
+                                                    checked={isSameAddress}
+                                                    onPress={() => setIsSameAddress(!isSameAddress)}
+                                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                                />
+                                                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 5 }}>Same address</Text>
+                                            </View>
+                                        </View>
+                                        :
+                                        <>
+                                            <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '5%', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <TouchableOpacity
+                                                    activeOpacity={0.7}
+                                                    onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
+                                                    style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Image
+                                                        style={{ height: 24, width: 24, resizeMode: "contain" }}
+                                                        source={require("../../../assets/plus.png")}
+                                                    />
+                                                    <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {user.user_role == 2 ? 'WORK' : 'MAILING'} ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
+                                                </TouchableOpacity>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <CheckBox
+                                                        style={{}}
+                                                        containerStyle={{ width: 25 }}
+                                                        wrapperStyle={{}}
+                                                        checked={isSameAddress}
+                                                        onPress={() => setIsSameAddress(!isSameAddress)}
+                                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                                    />
+                                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 5 }}>Same address</Text>
+                                                </View>
+                                            </View>
                                             <CustomInput
                                                 text="ADDRESS LINE 1"
                                                 value={workAddressData.address_line_1}
@@ -760,6 +828,7 @@ const Profile = (props) => {
                                                 inpuRef={workAddressLine1Ref}
                                                 returnKeyType={"next"}
                                                 onSubmitEditing={() => workAddressLine2Ref.current._root.focus()}
+                                                editable={!isSameAddress}
                                             />
                                             <CustomInput
                                                 text="ADDRESS LINE 2"
@@ -768,6 +837,7 @@ const Profile = (props) => {
                                                 inpuRef={workAddressLine2Ref}
                                                 returnKeyType={"next"}
                                                 onSubmitEditing={() => workAddressStateDropRef.current.show()}
+                                                editable={!isSameAddress}
                                             />
                                             <View style={{ marginTop: 25 }} />
                                             <DropDown
@@ -777,8 +847,8 @@ const Profile = (props) => {
                                                 onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
                                                 containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                                 dropdownStyle={{ maxHeight: 300 }}
+                                                disabled={isSameAddress}
                                             />
-
                                             <SearchableDropDown
                                                 dropRef={workAddressCityDropRef}
                                                 onItemSelect={(item) => {
@@ -788,8 +858,8 @@ const Profile = (props) => {
                                                 items={dropCityDataMasterWork}
                                                 onTextChange={(text) => setDropCityValueWork(text)}
                                                 value={dropCityValueWork}
+                                                editable={!isSameAddress}
                                             />
-
                                             <CustomInput
                                                 text="Zip code"
                                                 value={workAddressData.zip}
@@ -798,54 +868,103 @@ const Profile = (props) => {
                                                 returnKeyType={Platform.OS == "ios" ? "done" : "next"}
                                                 returnKeyType='done'
                                                 inpuRef={workAddressZipRef}
+                                                editable={!isSameAddress}
                                             />
                                         </>
                                 }
                             </View>
+                            <View style={{ height: 20 }}></View>
                             <View style={{}}>
-                                <DropDown
-                                    title="Notification type"
-                                    item={["Email", "Push Notification", "Text"]}
-                                    value={notificationType}
-                                    onChangeValue={(index, value) => { setNotificationType(value), cardNumberRef.current.focus() }}
-                                    containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                />
+                                {
+                                    Platform.OS == "ios"
+                                        ?
+                                        <DropDownPicker
+                                            open={notifDropOpen}
+                                            value={notificationType}
+                                            items={notifItems}
+                                            showArrowIcon={false}
+                                            setOpen={setNotifDropOpen}
+                                            setValue={setNotificationType}
+                                            setItems={setNotifItems}
+                                            zIndex={99999999}
+                                            style={{
+                                                borderWidth: 0,
+                                                borderColor: LS_COLORS.global.borderColor,
+                                                backgroundColor: 'transparent',
+                                            }}
+                                            containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0, zIndex: 1000000 }}
+                                            labelStyle={{ color: LS_COLORS.global.black, width: '100%', paddingLeft: '7.5%' }}
+                                            textStyle={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}
+                                            dropDownContainerStyle={{ borderWidth: 0.3, borderColor: LS_COLORS.global.grey, borderRadius: 0, zIndex: 9999999999 }}
+                                            listItemContainerStyle={{ zIndex: 999999999 }}
+                                        />
+                                        :
+                                        <DropDown
+                                            title="Notification type"
+                                            item={["Email", "Push Notification", "Text"]}
+                                            value={notificationType}
+                                            onChangeValue={(index, value) => { setNotificationType(value), user.user_role == 2 ? cardNumberRef.current.focus() : null }}
+                                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                            dropdownStyle={{ height: 120 }}
+                                        />
+                                }
+                                <View style={{ height: 40 }}></View>
                             </View>
-                            <View style={{ height: 40 }}></View>
                         </View>
                         {
                             user.user_role == 2
                                 ?
-                                <View style={{ ...styles.personalContainer, marginTop: 20 }}>
+                                <View style={{ ...styles.personalContainer, marginTop: 20, zIndex: -1000 }}>
                                     <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION</Text>
-                                    <TextInputMask
-                                        style={{
-                                            borderRadius: 7,
-                                            borderColor: LS_COLORS.global.textInutBorderColor,
-                                            paddingLeft: 16,
-                                            width: '100%',
-                                            maxWidth: '90%',
-                                            alignSelf: 'center',
-                                            color: LS_COLORS.global.black,
-                                            height: 50,
-                                            fontFamily: LS_FONTS.PoppinsMedium,
-                                            fontSize: 16,
-                                            borderWidth: 1,
-                                            marginTop: 10
-                                        }}
-                                        placeholder={'Credit Card Number'}
-                                        onChangeText={(formatted, extracted) => {
-                                            console.log(formatted)
-                                            console.log(extracted)
-                                            setCardDetails({ ...cardDetails, number: extracted })
-                                        }}
-                                        value={cardDetails.number}
-                                        mask={"[0000] [0000] [0000] [0000]"}
-                                        keyboardType="numeric"
-                                        ref={cardNumberRef}
-                                        returnKeyType="next"
-                                        onSubmitEditing={() => cardNameRef.current.focus()}
-                                    />
+                                    <View style={{
+                                        borderRadius: 7,
+                                        borderColor: LS_COLORS.global.textInutBorderColor,
+                                        paddingLeft: 16,
+                                        width: '100%',
+                                        maxWidth: '90%',
+                                        alignSelf: 'center',
+                                        height: 50,
+                                        borderWidth: 1,
+                                        marginTop: 10,
+                                        flexDirection: 'row',
+                                        alignItems:'center'
+                                    }}>
+                                        <View style={{ flex: 1 }}>
+                                            <TextInputMask
+                                                style={{
+                                                    color: LS_COLORS.global.black,
+                                                    fontFamily: LS_FONTS.PoppinsMedium,
+                                                    fontSize: 16,
+                                                }}
+                                                placeholder={'Credit Card Number'}
+                                                onChangeText={(formatted, extracted) => {
+                                                    console.log(formatted)
+                                                    console.log(extracted)
+                                                    setCardDetails({ ...cardDetails, number: extracted })
+                                                }}
+                                                value={cardDetails.number}
+                                                mask={"[0000] [0000] [0000] [0000]"}
+                                                keyboardType="numeric"
+                                                ref={cardNumberRef}
+                                                returnKeyType="next"
+                                                onSubmitEditing={() => cardNameRef.current.focus()}
+                                            />
+                                        </View>
+                                        <View style={{ height: '100%', aspectRatio: 1, position: 'absolute', right: 15, alignItems: 'center', justifyContent: 'center' }}>
+                                            {
+                                                cardDetails.number.length > 0
+                                                    ?
+                                                    <Image
+                                                        source={getCardImage(cards.length > 0 && cards[0].type !== undefined ? cards[0].type : null)}
+                                                        resizeMode="contain"
+                                                        style={{ height: '90%', aspectRatio: 1 }}
+                                                    />
+                                                    :
+                                                    null
+                                            }
+
+                                        </View>
+                                    </View>
                                     <TextInputMask
                                         style={{
                                             borderRadius: 7,
@@ -872,6 +991,7 @@ const Profile = (props) => {
                                         returnKeyType="next"
                                         onSubmitEditing={() => cardDateRef.current.focus()}
                                     />
+
                                     <TextInputMask
                                         style={{
                                             borderRadius: 7,
@@ -902,7 +1022,7 @@ const Profile = (props) => {
                                     <View style={{ height: 50 }} />
                                 </View>
                                 :
-                                <View style={{ ...styles.personalContainer, paddingVertical: 20, marginTop: 10 }}>
+                                <View style={{ ...styles.personalContainer, paddingVertical: 20, marginTop: 10, zIndex: -1000 }}>
                                     <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Bank Information</Text>
                                     <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
                                         activeOpacity={0.7}

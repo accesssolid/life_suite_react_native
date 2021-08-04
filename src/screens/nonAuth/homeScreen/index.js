@@ -17,6 +17,8 @@ import Loader from '../../../components/loader';
 import { setMyJobs } from '../../../redux/features/provider';
 import { showToast } from '../../../components/validators';
 import { TextInput } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { setAddServiceMode } from '../../../redux/features/services';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
@@ -35,6 +37,13 @@ const HomeScreen = (props) => {
             getMyJobs()
         }
     }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // setIsAddJobActive(false)
+            dispatch(setAddServiceMode({ data: false }))
+        }, [])
+    );
 
     const getServices = () => {
         setLoading(true)
@@ -229,7 +238,7 @@ const HomeScreen = (props) => {
                             />
                             :
                             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>
+                                {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>}
                             </View>
                     :
                     <View style={{ flex: 1, paddingTop: '5%' }}>

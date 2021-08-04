@@ -27,7 +27,8 @@ function CustomInput({
     returnKeyType,
     inpuRef,
     onSubmitEditing,
-    maxLength
+    maxLength,
+    editable
 }) {
     return (
         <Item
@@ -47,7 +48,6 @@ function CustomInput({
                 </Text>
             </View>
             <Input
-                // getRef={inpuRef}
                 ref={inpuRef}
                 keyboardType={keyboardType}
                 secureTextEntry={secureTextEntry}
@@ -63,7 +63,8 @@ function CustomInput({
                 }}                
                 returnKeyType={returnKeyType}
                 onSubmitEditing={onSubmitEditing}
-                maxLength={maxLength}            
+                maxLength={maxLength}
+                editable={editable}       
             />
 
             <TouchableOpacity onPress={action} style={{ right: 10 }}>

@@ -3,19 +3,15 @@ import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platf
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
-import { globalStyles } from '../../../utils';
 import LS_FONTS from '../../../constants/fonts';
-import CustomDropDown from '../../../components/dropDown';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import { CheckBox } from 'react-native-elements'
 import ImagePicker from 'react-native-image-crop-picker';
 
 /* Components */;
 import Header from '../../../components/header';
 import { Container, Content, Row, } from 'native-base'
-import { TextInput } from 'react-native-gesture-handler';
 import { BASE_URL, getApi } from '../../../api/api';
 import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
@@ -23,16 +19,44 @@ import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
 import { setAddServiceMode } from '../../../redux/features/services';
 import { Alert } from 'react-native';
+import { Dimensions } from 'react-native';
 
 const AddLicense = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)
-    const [image, setImage] = useState(require('../../../assets/camera.png'))
     const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
+    const [image, setImage] = useState(require('../../../assets/camera.png'))
     const addServiceData = useSelector(state => state.services.addServiceData)
     const access_token = useSelector(state => state.authenticate.access_token)
+    const [resizeMode, setresizemode] = useState("cover")
+
+    useEffect(() => {
+        toggleResize()
+    }, [])
+
+    useEffect(() => {
+        if(image !== require('../../../assets/camera.png')){
+            toggleResize()
+        }        
+    }, [image])
+
+    const toggleResize = () => {
+        setTimeout(() => {
+            if (resizeMode == "cover") {
+                setresizemode("contain")
+            } else {
+                setresizemode("cover")
+            }
+        }, 1000);
+
+    }
+    useEffect(() => {
+        if (!isAddServiceMode && subService && subService.license_data && subService.license_data.file_url) {
+            setImage({ uri: BASE_URL + subService.license_data.file_url })
+        }
+    }, [])
 
     const pickImage = () => {
         Alert.alert(
@@ -40,14 +64,14 @@ const AddLicense = (props) => {
             "Pick image from...",
             [
                 {
-                    text: "Cancel", onPress: () => {}, style:'cancel'
+                    text: "Cancel", onPress: () => { }, style: 'cancel'
                 },
                 {
                     text: "Camera",
                     onPress: () => {
                         ImagePicker.openCamera({
-                            width: 400,
-                            height: 400,
+                            width: Dimensions.get('screen').width,
+                            height: Dimensions.get('screen').width,
                             cropping: true
                         }).then(image => {
                             setImage({
@@ -61,8 +85,8 @@ const AddLicense = (props) => {
                 {
                     text: "Gallery", onPress: () => {
                         ImagePicker.openPicker({
-                            width: 400,
-                            height: 400,
+                            width: Dimensions.get('screen').width,
+                            height: Dimensions.get('screen').width,
                             cropping: true
                         }).then(image => {
                             setImage({
@@ -74,20 +98,20 @@ const AddLicense = (props) => {
                             console.log("Image picker error : ", err)
                         })
                     }
-                },                
+                },
             ]
         );
     }
 
     const next = () => {
-        if (isAddServiceMode) {
-            saveNewService()
-        } else {
-
-        }
+        saveNewService()
     }
 
     const saveNewService = () => {
+        let img = image
+        if (img.uri && img.uri.startsWith(BASE_URL)) {
+            img = null
+        }
         if (image !== require('../../../assets/camera.png')) {
             setLoading(true)
             let headers = {
@@ -99,11 +123,14 @@ const AddLicense = (props) => {
             formdata.append("user_id", user.id);
             formdata.append("service_id", addServiceData.service_id);
             formdata.append("json_data", JSON.stringify(addServiceData.json_data));
-            formdata.append('license file', {
-                uri: Platform.OS == "ios" ? image.uri.replace('file:///', '') : image.uri,
-                name: image.name,
-                type: image.type,
-            });
+
+            if (img !== null) {
+                formdata.append('license file', {
+                    uri: Platform.OS == "ios" ? image.uri.replace('file:///', '') : image.uri,
+                    name: image.name,
+                    type: image.type,
+                });
+            }
 
             let config = {
                 headers: headers,
@@ -130,7 +157,7 @@ const AddLicense = (props) => {
                 })
         } else {
             setLoading(false)
-            showToast("Please select certificate of licence image")
+            showToast("Please select certificate or licence image")
         }
     }
 
@@ -201,11 +228,15 @@ const AddLicense = (props) => {
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
                     <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                        <Text style={styles.service}>Load your Certificate or License</Text>
+                        <Text style={styles.service}>{isAddServiceMode ? 'Load' : "Update"} your Certificate or License</Text>
                         <View style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                            <View style={{ height: image == require('../../../assets/camera.png') ? 33 : '100%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                <Image style={{ height: '100%', width: '100%' }} resizeMode="cover" source={image} />
-                            </View>
+                            {
+                                image == require('../../../assets/camera.png')
+                                    ?
+                                    <Image style={{ height: '25%', width: '25%' }} resizeMode="contain" source={image} />
+                                    :
+                                    <Image style={{ height: '100%', width: '100%' }} resizeMode={resizeMode} /* resizeMode={image.uri.startsWith(BASE_URL) ? "contain" : "contain"} */ source={image} />
+                            }
                         </View>
                         <View style={{ flex: 1 }} />
                         <View style={{ paddingBottom: '15%' }}>
