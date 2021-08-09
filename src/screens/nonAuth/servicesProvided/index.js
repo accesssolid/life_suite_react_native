@@ -22,15 +22,13 @@ import { showToast } from '../../../components/validators';
 
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
-    const { subService, items } = props.route.params
-    const [itemList, setItemList] = useState([...items])
+    const { subService } = props.route.params
+    const [itemList, setItemList] = useState([])
     const [loading, setLoading] = useState(false)
     const [selectedItems, setSelectedItems] = useState([])
 
     useEffect(() => {
-        if (!items.length > 0) {
-            getServiceItems()
-        }
+        getServiceItems()
     }, [])
 
     const getServiceItems = () => {
@@ -41,7 +39,7 @@ const ServicesProvided = (props) => {
         }
 
         let user_data = {
-            "service_parent_id": subService.id
+            "service_id": subService.id
         }
 
         let config = {

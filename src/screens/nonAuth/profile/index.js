@@ -133,7 +133,8 @@ const Profile = (props) => {
     const [cardDetails, setCardDetails] = useState({
         number: '',
         name: '',
-        expiry: ''
+        expiry: '',
+        cvv: ''
     })
     const [notificationType, setNotificationType] = useState(getNotificationType(userData.notification_prefrence))
     const [notifDropOpen, setNotifDropOpen] = useState(false)
@@ -167,16 +168,16 @@ const Profile = (props) => {
 
     useEffect(() => {
         setUserData({ ...user })
-        setNotificationType(getNotificationType(userData.notification_prefrence))              
+        setNotificationType(getNotificationType(userData.notification_prefrence))
     }, [user])
 
     useEffect(() => {
-        if(userData.profile_image){
+        if (userData.profile_image) {
             setProfilePic({ uri: BASE_URL + userData.profile_image })
-        }        
+        }
     }, [userData])
 
-    
+
 
     useEffect(() => {
         setNotificationType(getNotificationType(userData.notification_prefrence))
@@ -330,7 +331,7 @@ const Profile = (props) => {
 
         let keys = Object.keys(userData)
         for (let index = 0; index < keys.length; index++) {
-            if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '') {
+            if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '' && keys[index] !== 'prefer_name') {
                 showToast(getMessage(keys[index]), 'danger')
                 setLoader(false)
                 return false
@@ -639,6 +640,7 @@ const Profile = (props) => {
                                 inpuRef={fnameRef}
                                 returnKeyType="next"
                                 onSubmitEditing={() => { lnameRef.current._root.focus() }}
+                                required={true}
                             />
                             <CustomInput
                                 text="Last Name"
@@ -649,6 +651,7 @@ const Profile = (props) => {
                                 inpuRef={lnameRef}
                                 returnKeyType="next"
                                 onSubmitEditing={() => prefNameRef.current._root.focus()}
+                                required={true}
                             />
                             <CustomInput
                                 text="Preffered Name"
@@ -669,6 +672,7 @@ const Profile = (props) => {
                                 inpuRef={emailRef}
                                 returnKeyType="next"
                                 onSubmitEditing={() => phoneRef.current._root.focus()}
+                                required={true}
                             />
                             <CustomInput
                                 text="Phone Number"
@@ -684,6 +688,7 @@ const Profile = (props) => {
                                         homeAddressLine1Ref.current._root.focus()
                                     }, 250)
                                 }}
+                                required={true}
                             />
                             <View>
                                 {
@@ -927,7 +932,7 @@ const Profile = (props) => {
                                         borderWidth: 1,
                                         marginTop: 10,
                                         flexDirection: 'row',
-                                        alignItems:'center'
+                                        alignItems: 'center'
                                     }}>
                                         <View style={{ flex: 1 }}>
                                             <TextInputMask
@@ -1015,6 +1020,34 @@ const Profile = (props) => {
                                         }}
                                         value={cardDetails.expiry}
                                         mask={"[00]/[00]"}
+                                        keyboardType="numeric"
+                                        ref={cardDateRef}
+                                        returnKeyType="done"
+                                    />
+
+                                    <TextInputMask
+                                        style={{
+                                            borderRadius: 7,
+                                            borderColor: LS_COLORS.global.textInutBorderColor,
+                                            paddingLeft: 16,
+                                            width: '100%',
+                                            maxWidth: '90%',
+                                            alignSelf: 'center',
+                                            color: LS_COLORS.global.black,
+                                            height: 50,
+                                            fontFamily: LS_FONTS.PoppinsMedium,
+                                            fontSize: 16,
+                                            borderWidth: 1,
+                                            marginTop: 10
+                                        }}
+                                        placeholder={'CVV'}
+                                        onChangeText={(formatted, extracted) => {
+                                            console.log(formatted)
+                                            console.log(extracted)
+                                            setCardDetails({ ...cardDetails, cvv: extracted })
+                                        }}
+                                        value={cardDetails.cvv}
+                                        mask={"[000]"}
                                         keyboardType="numeric"
                                         ref={cardDateRef}
                                         returnKeyType="done"

@@ -28,7 +28,8 @@ function CustomInput({
     inpuRef,
     onSubmitEditing,
     maxLength,
-    editable
+    editable,
+    required
 }) {
     return (
         <Item
@@ -44,7 +45,7 @@ function CustomInput({
             }}>
             <View style={{ position: 'absolute', top: -11, left: 20, paddingHorizontal: 5, backgroundColor: LS_COLORS.global.white }}>
                 <Text style={{ color: LS_COLORS.global.grey, fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular, }}>
-                    {text}
+                    {text}{required == true && '*'}
                 </Text>
             </View>
             <Input
@@ -60,11 +61,11 @@ function CustomInput({
                     height: 50,
                     fontFamily: LS_FONTS.PoppinsMedium,
                     fontSize: 16,
-                }}                
+                }}
                 returnKeyType={returnKeyType}
                 onSubmitEditing={onSubmitEditing}
                 maxLength={maxLength}
-                editable={editable}       
+                editable={editable}
             />
 
             <TouchableOpacity onPress={action} style={{ right: 10 }}>

@@ -21,6 +21,7 @@ import InProgress from '../screens/nonAuth/inProgress';
 import SuspendInProgress from '../screens/nonAuth/suspendInProgress';
 import UpcomingOrder from '../screens/nonAuth/upcomingOrder';
 import CancelConfirmation from '../screens/nonAuth/cancelConfirmation';
+import Search from '../screens/nonAuth/search';
 
 const Stack = createStackNavigator();
 
@@ -41,6 +42,7 @@ const UserStack = () => {
             <Stack.Screen name="SuspendInProgress" component={SuspendInProgress} />
             <Stack.Screen name="UpcomingOrder" component={UpcomingOrder} />
             <Stack.Screen name="CancelConfirmation" component={CancelConfirmation} />
+            <Stack.Screen name="Search" component={Search} />
         </Stack.Navigator>
     )
 }

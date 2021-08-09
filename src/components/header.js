@@ -41,7 +41,7 @@ export default Header;
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        // paddingVertical: 15,
+        paddingVertical: 15,
         justifyContent: 'space-between',
         zIndex: 500,
     },

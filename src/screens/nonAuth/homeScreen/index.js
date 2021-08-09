@@ -160,7 +160,7 @@ const HomeScreen = (props) => {
                         ?
                         <TouchableOpacity style={styles.search}
                             activeOpacity={0.7}
-                            onPress={() => !isSearchActive ? setSearchActive(true) : cancelSearch()}>
+                            onPress={() => { props.navigation.navigate('Search') /* !isSearchActive ? setSearchActive(true) : cancelSearch() */}}>
                             <Image
                                 style={styles.searchImage}
                                 source={require("../../../assets/search.png")}

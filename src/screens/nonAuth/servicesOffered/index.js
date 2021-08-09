@@ -49,7 +49,7 @@ const ServicesProvided = (props) => {
         }
 
         let user_data = {
-            "service_parent_id": subService.id
+            "service_id": subService.id
         }
 
         let config = {

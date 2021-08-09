@@ -207,7 +207,7 @@ const SignUpScreen = (props) => {
 
         let keys = Object.keys(signUpData)
         for (let index = 0; index < keys.length; index++) {
-            if (typeof signUpData[keys[index]] == 'string' && signUpData[keys[index]].trim() == '') {
+            if (typeof signUpData[keys[index]] == 'string' && signUpData[keys[index]].trim() == '' && keys[index] !== 'prefer_name') {
                 showToast(getMessage(keys[index]), 'danger')
                 setLoader(false)
                 return false
@@ -278,7 +278,7 @@ const SignUpScreen = (props) => {
             }
         }
 
-        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address) }
+        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address), phone_number: signUpData.phone_number.replace(/[^\d]/g, "") }
 
         let headers = {
             Accept: "application/json",
@@ -435,6 +435,15 @@ const SignUpScreen = (props) => {
         getCities(selectedItem[0].id, type)
     }
 
+    function formatPhoneNumber(value) {
+        if (!value) return value;
+        const phoneNumber = value.replace(/[^\d]/g, "");
+        const phoneNumberLength = phoneNumber.length;
+        if (phoneNumberLength < 4) return phoneNumber;
+        if (phoneNumberLength < 8) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+        if (phoneNumberLength < 13) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 12)}`;
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <KeyboardAvoidingView
@@ -454,6 +463,8 @@ const SignUpScreen = (props) => {
                         <View style={styles.textInputContainer}>
                             <CustomTextInput
                                 placeholder="First Name"
+                                title="First Name"
+                                required
                                 value={signUpData.first_name}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, first_name: text })
@@ -464,6 +475,8 @@ const SignUpScreen = (props) => {
                             />
                             <CustomTextInput
                                 placeholder="Last Name"
+                                title="Last Name"
+                                required
                                 value={signUpData.last_name}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, last_name: text })
@@ -474,6 +487,7 @@ const SignUpScreen = (props) => {
                             />
                             <CustomTextInput
                                 placeholder="Preferred Name"
+                                title="Preferred Name"
                                 value={signUpData.prefer_name}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, prefer_name: text })
@@ -484,6 +498,8 @@ const SignUpScreen = (props) => {
                             />
                             <CustomTextInput
                                 placeholder="Email"
+                                title="Email"
+                                required
                                 value={signUpData.email}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, email: text })
@@ -495,6 +511,8 @@ const SignUpScreen = (props) => {
                             />
                             <CustomTextInput
                                 placeholder="Password"
+                                title="Password"
+                                required
                                 value={signUpData.password}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, password: text })
@@ -508,6 +526,8 @@ const SignUpScreen = (props) => {
                             />
                             <CustomTextInput
                                 placeholder="Confirm Password"
+                                title="Confirm Password"
+                                required
                                 value={signUpData.password_confirmation}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, password_confirmation: text })
@@ -521,15 +541,17 @@ const SignUpScreen = (props) => {
                             />
                             <CustomTextInput
                                 placeholder="Phone Number"
+                                title="Phone Number"
+                                required
                                 value={signUpData.phone_number}
                                 onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, phone_number: text })
+                                    setSignUpData({ ...signUpData, phone_number: formatPhoneNumber(text) })
                                 }}
                                 keyboardType='numeric'
                                 inputRef={phoneRef}
                                 returnKeyType={Platform.OS == "ios" ? "done" : "next"}
                                 returnKeyLabel="next"
-                                maxLength={10}
+                                maxLength={12}
                                 onSubmitEditing={() => {
                                     setAddHomeAddressActive(true), setTimeout(() => {
                                         homeAddressLine1Ref.current.focus()

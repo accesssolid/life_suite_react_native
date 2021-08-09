@@ -37,9 +37,9 @@ const AddLicense = (props) => {
     }, [])
 
     useEffect(() => {
-        if(image !== require('../../../assets/camera.png')){
+        if (image !== require('../../../assets/camera.png')) {
             toggleResize()
-        }        
+        }
     }, [image])
 
     const toggleResize = () => {
@@ -122,15 +122,17 @@ const AddLicense = (props) => {
             var formdata = new FormData();
             formdata.append("user_id", user.id);
             formdata.append("service_id", addServiceData.service_id);
-            formdata.append("json_data", JSON.stringify(addServiceData.json_data));
+            formdata.append("json_data", JSON.stringify({ ...addServiceData.json_data, products: [] }));
 
             if (img !== null) {
-                formdata.append('license file', {
+                formdata.append('license file', JSON.stringify([{
                     uri: Platform.OS == "ios" ? image.uri.replace('file:///', '') : image.uri,
                     name: image.name,
                     type: image.type,
-                });
+                }]));
             }
+
+            console.log("formdata => ", formdata)
 
             let config = {
                 headers: headers,
