@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, } from 'react-native'
+import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -27,20 +27,24 @@ const AddLicense = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)
     const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
-    const [image, setImage] = useState(require('../../../assets/camera.png'))
     const addServiceData = useSelector(state => state.services.addServiceData)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [resizeMode, setresizemode] = useState("cover")
+    const [images, setImages] = useState([{
+        uri: require('../../../assets/camera.png'),
+        name: '',
+        type: '',
+    }])
 
     useEffect(() => {
         toggleResize()
     }, [])
 
     useEffect(() => {
-        if (image !== require('../../../assets/camera.png')) {
+        if (images[0].uri !== require('../../../assets/camera.png')) {
             toggleResize()
         }
-    }, [image])
+    }, [images])
 
     const toggleResize = () => {
         setTimeout(() => {
@@ -52,9 +56,20 @@ const AddLicense = (props) => {
         }, 1000);
 
     }
+
     useEffect(() => {
-        if (!isAddServiceMode && subService && subService.license_data && subService.license_data.file_url) {
-            setImage({ uri: BASE_URL + subService.license_data.file_url })
+        // return console.log("subService =>>> ",subService)
+        if (!isAddServiceMode && subService && subService.license_data && subService.license_data) {
+            const imageData = subService.license_data.map((item, index) => {
+                return {
+                    id: item.id,
+                    uri: BASE_URL + item.file_url,
+                    name: item.file_url.split("/")[item.file_url.split("/").length - 1],
+                    type: 'image/png',
+                }
+            })
+
+            setImages(imageData)
         }
     }, [])
 
@@ -74,11 +89,21 @@ const AddLicense = (props) => {
                             height: Dimensions.get('screen').width,
                             cropping: true
                         }).then(image => {
-                            setImage({
-                                uri: image.path,
-                                name: image.filename ? image.filename : image.path.split("/").pop(),
-                                type: image.mime,
-                            })
+                            let data = [...images]
+                            if (data.length <= 1) {
+                                data[data.length - 1] = {
+                                    uri: image.path,
+                                    name: image.filename ? image.filename : image.path.split("/").pop(),
+                                    type: image.mime,
+                                }
+                            } else {
+                                data.push({
+                                    uri: image.path,
+                                    name: image.filename ? image.filename : image.path.split("/").pop(),
+                                    type: image.mime,
+                                })
+                            }
+                            setImages([...data])
                         })
                     },
                 },
@@ -89,11 +114,21 @@ const AddLicense = (props) => {
                             height: Dimensions.get('screen').width,
                             cropping: true
                         }).then(image => {
-                            setImage({
-                                uri: image.path,
-                                name: image.filename ? image.filename : image.path.split("/").pop(),
-                                type: image.mime,
-                            })
+                            let data = [...images]
+                            if (data[data.length - 1].uri == require('../../../assets/camera.png')) {
+                                data[data.length - 1] = {
+                                    uri: image.path,
+                                    name: image.filename ? image.filename : image.path.split("/").pop(),
+                                    type: image.mime,
+                                }
+                            } else {
+                                data.push({
+                                    uri: image.path,
+                                    name: image.filename ? image.filename : image.path.split("/").pop(),
+                                    type: image.mime,
+                                })
+                            }
+                            setImages([...data])
                         }).catch(err => {
                             console.log("Image picker error : ", err)
                         })
@@ -108,11 +143,7 @@ const AddLicense = (props) => {
     }
 
     const saveNewService = () => {
-        let img = image
-        if (img.uri && img.uri.startsWith(BASE_URL)) {
-            img = null
-        }
-        if (image !== require('../../../assets/camera.png')) {
+        if (images[0].uri !== require('../../../assets/camera.png')) {
             setLoading(true)
             let headers = {
                 'Content-Type': 'multipart/form-data',
@@ -122,17 +153,17 @@ const AddLicense = (props) => {
             var formdata = new FormData();
             formdata.append("user_id", user.id);
             formdata.append("service_id", addServiceData.service_id);
-            formdata.append("json_data", JSON.stringify({ ...addServiceData.json_data, products: [] }));
+            formdata.append("json_data", JSON.stringify({ ...addServiceData.json_data, products: [] }));     
 
-            if (img !== null) {
-                formdata.append('license file', JSON.stringify([{
-                    uri: Platform.OS == "ios" ? image.uri.replace('file:///', '') : image.uri,
-                    name: image.name,
-                    type: image.type,
-                }]));
-            }
-
-            console.log("formdata => ", formdata)
+            images.forEach((item, index) => {
+                if (!item.uri.startsWith(BASE_URL)) {
+                    formdata.append('license_file[]', {
+                        uri: Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri,
+                        name: item.name,
+                        type: item.type,
+                    })
+                }
+            })
 
             let config = {
                 headers: headers,
@@ -146,7 +177,7 @@ const AddLicense = (props) => {
                     if (response.status == true) {
                         setLoading(false)
                         showToast(response.message, 'success')
-                        getMyJobs()
+                        getMyJobs(true)
                     }
                     else {
                         setLoading(false)
@@ -163,7 +194,7 @@ const AddLicense = (props) => {
         }
     }
 
-    const getMyJobs = () => {
+    const getMyJobs = (shouldNavigate) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -187,11 +218,54 @@ const AddLicense = (props) => {
                     dispatch(setMyJobs({ data: [...response.data] }))
                     dispatch(setAddServiceMode({ data: false }))
                     setLoading(false)
-                    props.navigation.navigate('HomeScreen')
+                    if (shouldNavigate) {
+                        props.navigation.navigate('HomeScreen')
+                    }
                 }
                 else {
                     setLoading(false)
-                    props.navigation.navigate('HomeScreen')
+                    if (shouldNavigate) {
+                        props.navigation.navigate('HomeScreen')
+                    }
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
+    const removeImage = (index) => {
+        let temp = [...images]
+        temp.splice(index, 1)
+        setImages([...temp])
+    }
+
+    const removeLicense = (item, index) => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        }
+
+        let user_data = {
+            "user_id": user.id,
+            "license_id": item.id
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: '/api/licenseRemoved',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    removeImage(index)
+                    getMyJobs(false)
+                }
+                else {
+                    setLoading(false)
                 }
             }).catch(err => {
                 setLoading(false)
@@ -231,19 +305,29 @@ const AddLicense = (props) => {
                 <Container>
                     <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                         <Text style={styles.service}>{isAddServiceMode ? 'Load' : "Update"} your Certificate or License</Text>
-                        <View style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                            {
-                                image == require('../../../assets/camera.png')
-                                    ?
-                                    <Image style={{ height: '25%', width: '25%' }} resizeMode="contain" source={image} />
-                                    :
-                                    <Image style={{ height: '100%', width: '100%' }} resizeMode={resizeMode} /* resizeMode={image.uri.startsWith(BASE_URL) ? "contain" : "contain"} */ source={image} />
-                            }
-                        </View>
+                        {
+                            images.map((item, index) => {
+                                return (
+                                    <View key={index} style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
+                                        {
+                                            item.uri == require('../../../assets/camera.png')
+                                                ?
+                                                <Image style={{ height: '25%', width: '25%' }} resizeMode="contain" source={require('../../../assets/camera.png')} />
+                                                :
+                                                <Image style={{ height: '100%', width: '100%' }} resizeMode={resizeMode} source={{ uri: item.uri }} />
+                                        }
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeLicense(item, index)} style={{ height: 30, aspectRatio: 1, position: 'absolute', top: -15, right: -15 }}>
+                                            <Image source={require('../../../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                        </TouchableOpacity>
+                                    </View>
+                                )
+                            })
+                        }
+
                         <View style={{ flex: 1 }} />
                         <View style={{ paddingBottom: '15%' }}>
                             <CustomButton
-                                title={"Take Picture"}
+                                title={"Add Picture"}
                                 customStyles={{ width: '50%', borderRadius: 6, backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }}
                                 customTextStyles={{ color: LS_COLORS.global.green }}
                                 action={() => pickImage()}

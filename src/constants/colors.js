@@ -13,7 +13,8 @@ const LS_COLORS = {
         textCyan: '#04BFBF',
         divider: '#CFCFCF',
         darkGray: '#5A5A5A',
-        placeholder: '#8f8f8f'
+        placeholder: '#8f8f8f',
+        frameBg: '#ECECEC'
     },
 }
 

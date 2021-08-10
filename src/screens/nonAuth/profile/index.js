@@ -1079,6 +1079,14 @@ const Profile = (props) => {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            style={styles.save}
+                            activeOpacity={0.7}
+                            onPress={() => props.navigation.navigate('Settings')}>
+                            <Text style={styles.saveText}>
+                                Settings
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             style={{ ...styles.save, marginBottom: 15 }}
                             activeOpacity={0.7}
                             onPress={() => {

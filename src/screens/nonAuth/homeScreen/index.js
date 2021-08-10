@@ -40,7 +40,6 @@ const HomeScreen = (props) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            // setIsAddJobActive(false)
             dispatch(setAddServiceMode({ data: false }))
         }, [])
     );
@@ -133,6 +132,11 @@ const HomeScreen = (props) => {
         searchFilterFunction('')
     }
 
+    const goToItems = (item) => {
+        dispatch(setAddServiceMode({ data: true })),
+            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
@@ -160,7 +164,7 @@ const HomeScreen = (props) => {
                         ?
                         <TouchableOpacity style={styles.search}
                             activeOpacity={0.7}
-                            onPress={() => { props.navigation.navigate('Search') /* !isSearchActive ? setSearchActive(true) : cancelSearch() */}}>
+                            onPress={() => { props.navigation.navigate('Search') }}>
                             <Image
                                 style={styles.searchImage}
                                 source={require("../../../assets/search.png")}
@@ -171,7 +175,7 @@ const HomeScreen = (props) => {
                             ?
                             <TouchableOpacity style={styles.search}
                                 activeOpacity={0.7}
-                                onPress={() => !isSearchActive ? setSearchActive(true) : cancelSearch()}>
+                                onPress={() => { props.navigation.navigate('Search') }}>
                                 <Image
                                     style={styles.searchImage}
                                     source={require("../../../assets/search.png")}
@@ -180,7 +184,9 @@ const HomeScreen = (props) => {
                             :
                             null
                     }
-
+                    {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('AddTimeFrame')} style={{ height: 35, aspectRatio: 1 }}>
+                        <Image source={require('../../../assets/wall-clock.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                    </TouchableOpacity>}
                 </View>
                 {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7} onPress={() => setIsAddJobActive(!isAddJobActive)}>
                     <View style={{ height: 30, aspectRatio: 1 }}>
@@ -206,7 +212,7 @@ const HomeScreen = (props) => {
                                             action={() => {
                                                 item.itemsData.length > 0
                                                     ?
-                                                    props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+                                                    goToItems(item)
                                                     :
                                                     props.navigation.navigate("SubServices", { service: item })
                                             }}

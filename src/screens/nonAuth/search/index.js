@@ -68,11 +68,11 @@ const Search = (props) => {
         if (item.data_type == "service") {
             props.navigation.navigate("SubServices", { service: { ...item, name: item.search_title, id: item.search_id } });
         } else if (item.data_type == "sub_service") {
-            showToast("Work in progress")
-            // props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.search_title, id: item.search_id, items: [], image: item.search_image, service_parent_id: item.search_parent_id } });
+            props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.search_title, id: item.search_id, items: [], image: item.search_image, service_parent_id: item.search_parent_id } });
         } else if (item.data_type == "service_item") {
-            showToast("Work in progress")
-            // props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.search_title, id: item.search_id, items: [], image: item.search_image, service_parent_id: item.search_parent_id } });
+            props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.parent_name, id: item.search_parent_id, items: [], image: item.parent_image, service_parent_id: item.search_parent_id } });
+        } else {
+
         }
     }
 

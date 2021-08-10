@@ -22,6 +22,9 @@ import SuspendInProgress from '../screens/nonAuth/suspendInProgress';
 import UpcomingOrder from '../screens/nonAuth/upcomingOrder';
 import CancelConfirmation from '../screens/nonAuth/cancelConfirmation';
 import Search from '../screens/nonAuth/search';
+import Settings from '../screens/nonAuth/settings';
+import ConfirmSetPassCode from '../screens/nonAuth/confirmSetPassCode';
+import SetPassCode from '../screens/nonAuth/setPassCode';
 
 const Stack = createStackNavigator();
 
@@ -43,6 +46,9 @@ const UserStack = () => {
             <Stack.Screen name="UpcomingOrder" component={UpcomingOrder} />
             <Stack.Screen name="CancelConfirmation" component={CancelConfirmation} />
             <Stack.Screen name="Search" component={Search} />
+            <Stack.Screen name="Settings" component={Settings} />
+            <Stack.Screen name="SetPassCode" component={SetPassCode} />
+            <Stack.Screen name="ConfirmSetPassCode" component={ConfirmSetPassCode} />
         </Stack.Navigator>
     )
 }
