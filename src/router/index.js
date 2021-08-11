@@ -16,6 +16,7 @@ import Welcomescreen from '../screens/auth/welcomeScreen';
 import AuthStack from './authStack';
 import UserStack from './userStack';
 import ProviderStack from './providerStack';
+import Passcode from '../screens/nonAuth/passCode';
 
 const Stack = createStackNavigator();
 
@@ -31,6 +32,7 @@ const Router = () => {
           <Stack.Screen name="AuthStack" component={AuthStack} />
           <Stack.Screen name="UserStack" component={UserStack} />
           <Stack.Screen name="ProviderStack" component={ProviderStack} />
+          <Stack.Screen name="Passcode" component={Passcode} />
         </Stack.Navigator>
       </NavigationContainer>
       {loading && <Loader />}

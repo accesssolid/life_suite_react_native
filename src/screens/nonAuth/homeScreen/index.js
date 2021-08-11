@@ -171,18 +171,7 @@ const HomeScreen = (props) => {
                             />
                         </TouchableOpacity>
                         :
-                        user.user_role == 3 && isAddJobActive
-                            ?
-                            <TouchableOpacity style={styles.search}
-                                activeOpacity={0.7}
-                                onPress={() => { props.navigation.navigate('Search') }}>
-                                <Image
-                                    style={styles.searchImage}
-                                    source={require("../../../assets/search.png")}
-                                />
-                            </TouchableOpacity>
-                            :
-                            null
+                        null
                     }
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('AddTimeFrame')} style={{ height: 35, aspectRatio: 1 }}>
                         <Image source={require('../../../assets/wall-clock.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />

@@ -14,7 +14,7 @@ import TextInputMask from 'react-native-text-input-mask';
 
 /* Components */;
 import Header from '../../../components/header';
-import { Container, Content, Row, } from 'native-base'
+import { Container, Content, InputGroup, Row, } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
 import { BASE_URL, getApi } from '../../../api/api';
 import CustomButton from '../../../components/customButton';
@@ -40,6 +40,10 @@ const ServicesProvided = (props) => {
     useEffect(() => {
         setInitialServiceData()
     }, [itemList])
+
+    useEffect(() => {
+        console.log("addServiceData =>> ", addServiceData)
+    },[addServiceData])
 
     const getServiceItems = () => {
         setLoading(true)
@@ -109,11 +113,10 @@ const ServicesProvided = (props) => {
                     let minutes = toHoursAndMinutes(subElement.time_duration, 'minutes')
                     temp[serviceIndex] = {
                         "item_id": serviceElement.item_id,
-                        "price": "$"+subElement.price,
+                        "price": "$" + subElement.price,
                         "time_duration_h": String(minutes),
                         "time_duration_m": String(hours),
                     }
-                    // setCheckedData(null, subElement)
                 }
             });
         });
@@ -123,6 +126,8 @@ const ServicesProvided = (props) => {
 
     const next = () => {
         let services = []
+        let products = [...addServiceData.json_data.products]
+        let newProducts = [...addServiceData.json_data.new_products]
         let isValidData = false
         if (selectedItems.length > 0) {
             servicesData.forEach((itemm, index) => {
@@ -145,11 +150,24 @@ const ServicesProvided = (props) => {
                 }
             })
             if (!isValidData) {
-                return showToast("Please enter data for selected feilds")
+                return showToast("Please enter data for selected services")
             }
         } else {
             showToast("Select Service first")
         }
+
+        products.forEach(item => {
+            if (item.price.replace("$", '').trim() == "") {
+                return showToast("Please enter data for selected Products")
+            }
+        })
+
+        newProducts.forEach(item => {
+            if (item.price.replace("$", '').trim() == "" || item.name.trim() == '') {
+                return showToast("Please enter data for added Products")
+            }
+        })
+
         dispatch(setAddServiceData({
             data: {
                 ...addServiceData,
@@ -161,11 +179,8 @@ const ServicesProvided = (props) => {
                 }
             }
         }))
-        if (services.length > 0) {
-            props.navigation.navigate('AddLicense', { subService: subService })
-        } else {
-            showToast("Select Service first")
-        }
+
+        verifyNewProducts(services)
     }
 
     function toHoursAndMinutes(minutes, type) {
@@ -205,6 +220,59 @@ const ServicesProvided = (props) => {
             : digit
     }
 
+    const verifyNewProducts = (services) => {
+        const products = addServiceData.json_data.new_products.map((item, index) => {
+            return {
+                "item_id": item.item_id,
+                "name": item.name,
+                "price": item.price
+            }
+        })
+
+        if (addServiceData.json_data.new_products.length > 0) {
+            setLoading(true)
+            let headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+
+            let user_data = {
+                "user_id": user.id,
+                "new_products": JSON.stringify([...addServiceData.json_data.new_products])
+            }
+
+            let config = {
+                headers: headers,
+                data: JSON.stringify({ ...user_data }),
+                endPoint: '/api/newProductExist',
+                type: 'post'
+            }
+
+            getApi(config)
+                .then((response) => {
+                    if (response.status == true) {
+                        setLoading(false)
+                        if (services.length > 0) {
+                            props.navigation.navigate('AddLicense', { subService: subService })
+                        } else {
+                            showToast("Select Service first")
+                        }
+                    }
+                    else {
+                        setLoading(false)
+                    }
+                }).catch(err => {
+                    setLoading(false)
+                })
+        } else {
+            if (services.length > 0) {
+                props.navigation.navigate('AddLicense', { subService: subService })
+            } else {
+                showToast("Select Service first")
+            }
+        }
+    }
+
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -238,10 +306,15 @@ const ServicesProvided = (props) => {
                 <Container>
                     <Content showsVerticalScrollIndicator={false}>
                         <Text style={styles.service}>SERVICES</Text>
-                        <View style={styles.price}>
-                            <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Price</Text>
-                            <Text style={styles.priceTime}>Time</Text>
+                        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end', marginBottom: '2%' }}>
+                            <View style={{ alignItems: 'center' }}>
+                                <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Time</Text>
+                            </View>
+                            <View style={{ marginLeft: '5%' }}>
+                                <Text style={styles.priceTime}>Price</Text>
+                            </View>
                         </View>
+
                         {
                             isAddServiceMode
                                 ?
@@ -250,12 +323,14 @@ const ServicesProvided = (props) => {
                                     itemList.map(((item, index) => {
                                         return (
                                             <ServiceItem
+                                                key={index}
                                                 item={item}
                                                 index={index}
                                                 onCheckPress={() => setCheckedData(index, item)}
                                                 isSelected={selectedItems.includes(item.id)}
                                                 setText={setText}
                                                 serviceItem={servicesData[index]}
+                                                subService={subService}
                                             />
                                         )
                                     }))
@@ -267,6 +342,7 @@ const ServicesProvided = (props) => {
                                     subService.items.map(((item, index) => {
                                         return (
                                             <ServiceItem
+                                                key={index}
                                                 item={item}
                                                 index={index}
                                                 onCheckPress={() => setCheckedData(index, item)}

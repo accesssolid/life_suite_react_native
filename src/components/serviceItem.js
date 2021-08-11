@@ -3,9 +3,7 @@ import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platf
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
-import { globalStyles } from '../utils';
 import LS_FONTS from '../constants/fonts';
-import Loader from '../components/loader';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,82 +11,301 @@ import { CheckBox } from 'react-native-elements'
 import TextInputMask from 'react-native-text-input-mask';
 
 /* Components */;
-import Header from '../components/header';
-import { Container, Content, Row, } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
-import { BASE_URL, getApi } from '../api/api';
-import CustomButton from '../components/customButton';
 import { setAddServiceData } from '../redux/features/services';
-import { showToast } from '../components/validators';
+import _ from 'lodash'
 
 const ServiceItem = (props) => {
     const dispatch = useDispatch()
+    const addServiceData = useSelector(state => state.services.addServiceData)
+    const user = useSelector(state => state.authenticate.user)
+
     const priceRef = useRef(null)
     const hourRef = useRef(null)
     const minRef = useRef(null)
+    const nameRef = useRef(null)
+    const priceNewRef = useRef(null)
+
+    /* Products */
+    const [products, setProducts] = useState([])
+    const [selectedItems, setSelectedItems] = useState([])
+
+    /* New Products */
+    const [newProducts, setNewProducts] = useState([])
+    const [selectedNewItems, setSelectedNewItems] = useState([])
+
+    const [isOtherSelected, setIsOtherSelected] = useState(false)
+
+    useEffect(() => {
+        setInitialServiceData()
+    }, [])
+
+    useEffect(() => {
+        updateAddServiceData()
+    }, [products, newProducts, selectedItems, selectedNewItems])
+
+    const setCheckedData = (index, item) => {
+        let arr = [...selectedItems]
+        if (arr.includes(item.id)) {
+            arr.splice(arr.indexOf(item.id), 1)
+        } else {
+            arr.push(item.id)
+        }
+        setSelectedItems([...arr])
+    }
+
+    const setCheckedDataNewItem = (index) => {
+        let arr = [...selectedNewItems]
+
+        if (arr.includes(index)) {
+            arr.splice(arr.indexOf(index), 1)
+        } else {
+            arr.push(index)
+        }
+
+        setSelectedNewItems([...arr])
+    }
+
+    const setInitialServiceData = () => {
+        let newArr = props.item.products.map((item, index) => {
+            return {
+                "id": item.id,
+                "name": item.name,
+                "price": ""
+            }
+        })
+        setProducts([...newArr])
+    }
+
+    const addNewProduct = () => {
+        let temp = [...newProducts]
+        temp.push({
+            "item_id": props.item.id,
+            "name": "",
+            "price": "",
+        })
+        setNewProducts([...temp])
+    }
+
+    const removeNewProduct = (index) => {
+        let temp = [...newProducts]
+
+        temp.splice(index, 1)
+        if (temp.length == 0) {
+            onSelectOther()
+        }
+        setNewProducts([...temp])
+    }
+
+    const onSelectOther = () => {
+        setIsOtherSelected(!isOtherSelected)
+        if (newProducts.length === 0) {
+            addNewProduct()
+        }
+    }
+
+    const onchangeTextProduct = (text, index) => {
+        let temp = _.cloneDeep(products)
+
+        let parsed = conTwoDecDigit(text.replace('$', ''))
+        if (text == '') {
+            temp[index].price = ''
+        } else {
+            temp[index].price = '$' + String(parsed)
+        }
+
+        setProducts([...temp])
+    }
+
+    const onchangeTextNewProduct = (text, index, type) => {
+        let temp = _.cloneDeep(newProducts)
+        if (type == "name") {
+            temp[index].name = text
+        } else {
+            let parsed = conTwoDecDigit(text.replace('$', ''))
+            if (text == '') {
+                temp[index].price = ''
+            } else {
+                temp[index].price = '$' + String(parsed)
+            }
+        }
+        setNewProducts([...temp])
+    }
+
+    const updateAddServiceData = () => {
+        const pro = products.filter(item => selectedItems.includes(item.id))
+        const newpro = newProducts.filter((item, index) => selectedNewItems.includes(index))
+
+        let allProducts = [...addServiceData.json_data.products]
+        let allNewProducts = [...addServiceData.json_data.new_products]
+
+        dispatch(setAddServiceData({
+            data: {
+                ...addServiceData,
+                user_id: user.id,
+                service_id: props.subService.id,
+                json_data: {
+                    ...addServiceData.json_data,
+                    products: [...pro],
+                    new_products: [...newpro]
+                }
+            }
+        }))
+    }
 
     return (
-        <View style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
-            <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
-                <CheckBox
-                    checked={props.isSelected}
-                    onPress={props.onCheckPress}
-                    checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
-                    uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
-                />
-                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%' }}>{props.item.name}</Text>
-            </View>
+        <>
+            <View key={props.index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
+                <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                    <CheckBox
+                        checked={props.isSelected}
+                        onPress={props.onCheckPress}
+                        checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
+                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
+                    />
+                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%' }}>{props.item.name}</Text>
+                </View>
 
-            <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end' }}>
-                <View style={styles.fromContainer}>
-                    <TextInput
-                        style={styles.inputStyle}
-                        color="black"
-                        placeholder="$000"
-                        editable={props.isSelected}
-                        onChangeText={(text) => props.setText("price", text, props.index)}
-                        keyboardType="numeric"
-                        value={props.serviceItem?.price}
-                        ref={priceRef}
-                        returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
-                        onSubmitEditing={() => hourRef.current.focus()}
-                    />
-                </View>
-                <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
-                    <TextInputMask
-                        onChangeText={(formatted, extracted) => {
-                            props.setText("time_duration_h", extracted, props.index)
-                        }}
-                        mask={"[00]"}
-                        color="black"
-                        placeholder="HH"
-                        keyboardType="numeric"
-                        editable={props.isSelected}
-                        style={styles.inputStyle}
-                        value={props.serviceItem?.time_duration_h}
-                        ref={hourRef}
-                        returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
-                        onSubmitEditing={() => minRef.current.focus()}
-                    />
-                </View>
-                <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
-                    <TextInputMask
-                        onChangeText={(formatted, extracted) => {
-                            props.setText("time_duration_m", extracted, props.index)
-                        }}
-                        mask={"[00]"}
-                        color="black"
-                        placeholder="MM"
-                        keyboardType="numeric"
-                        editable={props.isSelected}
-                        style={styles.inputStyle}
-                        value={props.serviceItem?.time_duration_m}
-                        ref={minRef}
-                        returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
-                    />
+                <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end' }}>
+                    <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
+                        <TextInputMask
+                            onChangeText={(formatted, extracted) => {
+                                props.setText("time_duration_h", extracted, props.index)
+                            }}
+                            mask={"[00]"}
+                            color="black"
+                            placeholder="HH"
+                            keyboardType="numeric"
+                            editable={props.isSelected}
+                            style={styles.inputStyle}
+                            value={props.serviceItem?.time_duration_h}
+                            ref={hourRef}
+                            returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
+                            onSubmitEditing={() => minRef.current.focus()}
+                            placeholderTextColor={LS_COLORS.global.placeholder}
+                        />
+                    </View>
+                    <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
+                        <TextInputMask
+                            onChangeText={(formatted, extracted) => {
+                                props.setText("time_duration_m", extracted, props.index)
+                            }}
+                            mask={"[00]"}
+                            color="black"
+                            placeholder="MM"
+                            keyboardType="numeric"
+                            editable={props.isSelected}
+                            style={styles.inputStyle}
+                            value={props.serviceItem?.time_duration_m}
+                            ref={minRef}
+                            returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
+                            onSubmitEditing={() => priceRef.current.focus()}
+                            placeholderTextColor={LS_COLORS.global.placeholder}
+                        />
+                    </View>
+                    <View style={styles.fromContainer}>
+                        <TextInput
+                            style={styles.inputStyle}
+                            color="black"
+                            placeholder="$000"
+                            editable={props.isSelected}
+                            onChangeText={(text) => props.setText("price", text, props.index)}
+                            keyboardType="numeric"
+                            value={props.serviceItem?.price}
+                            ref={priceRef}
+                            numberOfLines={1}
+                            returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
+                            placeholderTextColor={LS_COLORS.global.placeholder}
+                        />
+                    </View>
                 </View>
             </View>
-        </View>
+            {props.isSelected && products.map((item, index) => {
+                return <View key={index} style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                        <CheckBox
+                            checked={selectedItems.includes(item.id)}
+                            onPress={() => setCheckedData(index, item)}
+                            checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
+                            uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
+                        />
+                        <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%' }}>{item.name}</Text>
+                    </View>
+                    <View style={{ ...styles.fromContainer, marginRight: '8%' }}>
+                        <TextInput
+                            style={styles.inputStyle}
+                            color="black"
+                            placeholder="$000"
+                            editable={selectedItems.includes(item.id)}
+                            onChangeText={(text) => onchangeTextProduct(text, index)}
+                            keyboardType="numeric"
+                            value={item.price}
+                            returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
+                            placeholderTextColor={LS_COLORS.global.placeholder}
+                        />
+                    </View>
+                </View>
+            })}
+            {props.isSelected && <View style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                    <CheckBox
+                        checked={isOtherSelected}
+                        onPress={() => onSelectOther()}
+                        checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
+                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
+                    />
+                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Other</Text>
+                </View>
+            </View>}
+            {props.isSelected && isOtherSelected && newProducts.map((item, index) => {
+                return <View key={index} style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                        <CheckBox
+                            checked={selectedNewItems.includes(index)}
+                            onPress={() => setCheckedDataNewItem(index)}
+                            checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
+                            uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
+                        />
+                    </View>
+                    <View style={{ ...styles.fromContainer, marginRight: '2.5%', width: '40%' }}>
+                        <TextInput
+                            style={styles.inputStyle}
+                            color="black"
+                            placeholder="Product name"
+                            editable={selectedNewItems.includes(index)}
+                            onChangeText={(text) => onchangeTextNewProduct(text, index, "name")}
+                            value={item.name}
+                            ref={nameRef}
+                            returnKeyType={"next"}
+                            onSubmitEditing={() => priceNewRef.current.focus()}
+                            placeholderTextColor={LS_COLORS.global.placeholder}
+                        />
+                    </View>
+                    <View style={{ ...styles.fromContainer, marginRight: '2%' }}>
+                        <TextInput
+                            style={styles.inputStyle}
+                            color="black"
+                            placeholder="$000"
+                            editable={selectedNewItems.includes(index)}
+                            onChangeText={(text) => onchangeTextNewProduct(text, index, "price")}
+                            keyboardType="numeric"
+                            value={item.price}
+                            ref={priceNewRef}
+                            returnKeyType={'done'}
+                            placeholderTextColor={LS_COLORS.global.placeholder}
+                        />
+                    </View>
+                    <TouchableOpacity onPress={() => removeNewProduct(index)} activeOpacity={0.7} style={{ height: 40, aspectRatio: 1, padding: 10, marginRight: '2%' }}>
+                        <Image source={require('../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                    </TouchableOpacity>
+                </View>
+            })}
+            {props.isSelected && isOtherSelected && <View style={{ width: '85%', alignItems: 'center', alignSelf: 'flex-end' }}>
+                <TouchableOpacity onPress={() => addNewProduct()} activeOpacity={0.7} style={{ height: 40, aspectRatio: 1, marginRight: '8%', padding: 5 }}>
+                    <Image source={require('../assets/addgreen.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                </TouchableOpacity>
+            </View>}
+        </>
     )
 }
 

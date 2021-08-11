@@ -14,23 +14,33 @@ const serviceSlice = createSlice({
                     //     "time_duration": null
                     // },
                 ],
-                // "time_frame": [
-                //     // {
-                //     //     "date": "2021-07-16",
-                //     //     "from_time": "10:05",
-                //     //     "to_time": "23:00"
-                //     // }
-                // ],
-                // "travel_distance": [
-                //     // {
-                //     //     "travel_distance": "2800",
-                //     //     "address_text": "C-7 Pannu Tower",
-                //     //     "lat": "30.00",
-                //     //     "long": "70.76"
-                //     // }
-                // ]
+                "time_frame": [
+                    // {
+                    //     "date": "2021-07-16",
+                    //     "from_time": "10:05",
+                    //     "to_time": "23:00"
+                    // }
+                ],
+                "travel_distance": {
+                    // "travel_distance": "2800",
+                    // "address_text": "C-7 Pannu Tower",
+                    // "lat": "30.00",
+                    // "long": "70.76"
+                },
+                "products": [
+                    // {
+                    //     "item_product_id": "3",
+                    //     "price": 210
+                    // },
+                    // {
+                    //     "item_product_id": "4",
+                    //     "price": 100
+                    // }
+                ],
+                "new_products": []
             },
-            "license file": null
+            "license file": null,
+            images: []
         },
         isAddServiceMode: false
     },

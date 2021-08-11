@@ -20,6 +20,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Header from '../../../components/header';
 import CustomButton from '../../../components/customButton';
+import { getJsonData, storeJsonData } from '../../../asyncStorage/async';
 
 const ConfirmSetPassCode = (props) => {
     const [Passcode, setPasscode] = useState('')
@@ -42,7 +43,7 @@ const ConfirmSetPassCode = (props) => {
     const confirmPassCode = async () => {
         if (props.route.params.pass == Passcode) {
             let x = await storeJsonData("passcode", Passcode)
-            let y = await storeData("passcodeVerification", true)
+            let y = await storeJsonData("passcodeVerification", true)
             props.navigation.navigate('Settings')
         }
         else {
@@ -52,14 +53,14 @@ const ConfirmSetPassCode = (props) => {
 
     return (
         <>
-            <Header
-                imageUrl={require("../../../assets/back.png")}
-                action={() => props.navigation.pop()}
-                imageUrl1={require("../../../assets/home.png")}
-                action1={() => props.navigation.navigate("HomeScreen")}
-                title="Confirm Set Passcode"
-            />
             <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+                <Header
+                    imageUrl={require("../../../assets/back.png")}
+                    action={() => props.navigation.pop()}
+                    imageUrl1={require("../../../assets/home.png")}
+                    action1={() => props.navigation.navigate("HomeScreen")}
+                    title="Confirm Set Passcode"
+                />
                 <Container>
                     <Content keyboardShouldPersistTaps={'never'} keyboardDismissMode={false}>
                         <View style={{ flex: 1, alignItems: 'center' }}>
@@ -80,7 +81,7 @@ const ConfirmSetPassCode = (props) => {
                             </View>
                             <View style={{ height: 30 }}>
                             </View>
-                            <CustomButton onPress={() => confirmPassCode()} title={'Confirm'} />
+                            <CustomButton action={() => confirmPassCode()} title={'Confirm'} />
                         </View>
                     </Content>
                 </Container>

@@ -17,7 +17,7 @@ import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
-import { setAddServiceMode } from '../../../redux/features/services';
+import { setAddServiceData, setAddServiceMode } from '../../../redux/features/services';
 import { Alert } from 'react-native';
 import { Dimensions } from 'react-native';
 
@@ -58,7 +58,6 @@ const AddLicense = (props) => {
     }
 
     useEffect(() => {
-        // return console.log("subService =>>> ",subService)
         if (!isAddServiceMode && subService && subService.license_data && subService.license_data) {
             const imageData = subService.license_data.map((item, index) => {
                 return {
@@ -139,7 +138,13 @@ const AddLicense = (props) => {
     }
 
     const next = () => {
-        saveNewService()
+        if (images[0].uri !== require('../../../assets/camera.png')) {
+            dispatch(setAddServiceData({ data: { ...addServiceData, images: images } }))
+            props.navigation.navigate('SelectLocation', { subService: subService })
+        } else {
+            showToast("Please select certificate or licence image")
+        }
+        // saveNewService()
     }
 
     const saveNewService = () => {
@@ -153,7 +158,7 @@ const AddLicense = (props) => {
             var formdata = new FormData();
             formdata.append("user_id", user.id);
             formdata.append("service_id", addServiceData.service_id);
-            formdata.append("json_data", JSON.stringify({ ...addServiceData.json_data, products: [] }));     
+            formdata.append("json_data", JSON.stringify({ ...addServiceData.json_data, products: [] }));
 
             images.forEach((item, index) => {
                 if (!item.uri.startsWith(BASE_URL)) {
@@ -270,6 +275,7 @@ const AddLicense = (props) => {
             }).catch(err => {
                 setLoading(false)
             })
+        removeImage(index)
     }
 
     return (
@@ -316,9 +322,9 @@ const AddLicense = (props) => {
                                                 :
                                                 <Image style={{ height: '100%', width: '100%' }} resizeMode={resizeMode} source={{ uri: item.uri }} />
                                         }
-                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeLicense(item, index)} style={{ height: 30, aspectRatio: 1, position: 'absolute', top: -15, right: -15 }}>
+                                        {images.length > 1 && <TouchableOpacity activeOpacity={0.7} onPress={() => removeLicense(item, index)} style={{ height: 30, aspectRatio: 1, position: 'absolute', top: -15, right: -15 }}>
                                             <Image source={require('../../../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
-                                        </TouchableOpacity>
+                                        </TouchableOpacity>}
                                     </View>
                                 )
                             })
@@ -335,7 +341,7 @@ const AddLicense = (props) => {
                         </View>
                         <View style={{ paddingBottom: '2.5%' }}>
                             <CustomButton
-                                title={"Save"}
+                                title={"NEXT"}
                                 customStyles={{ width: '50%', borderRadius: 6 }}
                                 action={() => next()}
                             />

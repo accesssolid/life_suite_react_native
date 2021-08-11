@@ -4,141 +4,125 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     Alert,
     BackHandler,
-    Dimensions,
-    FlatList,
-    Image,
-    ImageBackground,
-    Pressable,
-    ScrollView,
     Text,
-    TextInput,
-    TextInputComponent,
-    TouchableOpacity,
-    useColorScheme,
     View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ReactNativeBiometrics from 'react-native-biometrics'
 import Header from '../../../components/header';
 import CustomButton from '../../../components/customButton';
+import { getJsonData, storeJsonData } from '../../../asyncStorage/async'
 
 const Settings = (props) => {
     const [passcodeVerification, setPassCodeVerification] = useState(false)
     const [biometricVerification, setBiometricVerification] = useState(false)
-    // const getPasscode = async () => {
 
-    //     let pass = await getData(Constants.Passcode)
-    //     let passVerification = await getData(Constants.PasscodeVerification)
-    //     let fingerVerification = await getData(Constants.FingerPrintVerification)
-    //     console.log(passVerification, fingerVerification, '[[[[[', pass)
-    //     if (pass && passVerification) {
-    //         console.log('hhhhhh')
-    //         setPassCodeVerification(true)
-    //     }
-    //     if (pass && passVerification && fingerVerification) {
-    //         setBiometricVerification(true)
-    //     } else if (!passVerification) {
-    //         console.log('lll')
-    //         setPassCodeVerification(false)
-    //     }
-    // }
+    const getPasscode = async () => {
+        let pass = await getJsonData("passcode")
+        let passVerification = await getJsonData("passcodeVerification")
+        let fingerVerification = await getJsonData("fingerPrintVerification")
+        if (pass && passVerification) {
+            setPassCodeVerification(true)
+        }
+        if (pass && passVerification && fingerVerification) {
+            setBiometricVerification(true)
+        } else if (!passVerification) {
+            setPassCodeVerification(false)
+        }
+    }
 
     const setPassCode = async (v) => {
         setPassCodeVerification(v)
-        // let pass = await getData(Constants.Passcode)
-        // let passVerification = await getData(Constants.PasscodeVerification)
-        // if (v) {
-        //     if (pass && !passVerification) {
-        //         let x = await storeData(Constants.PasscodeVerification, '1')
-        //         setPassCodeVerification(true)
-        //     }
-        //     if (!pass) {
-        //         props.navigation.navigate('SetPasscode')
-        //     }
-        // }
-        // else {
-        //     if (passVerification) {
-        //         let x = await storeData(Constants.PasscodeVerification, null)
-        //         let y = await storeData(Constants.FingerPrintVerification, null)
+        let pass = await getJsonData("passcode")
+        let passVerification = await getJsonData("passcodeVerification")
+        if (v) {
+            if (pass && !passVerification) {
+                let x = await storeJsonData("passcodeVerification", true)
+                setPassCodeVerification(true)
+            }
+            if (!pass) {
+                props.navigation.navigate('SetPassCode')
+            }
+        }
+        else {
+            if (passVerification) {
+                let x = await storeJsonData("passcodeVerification", null)
+                let y = await storeJsonData("fingerPrintVerification", null)
 
-        //         setPassCodeVerification(false)
-        //         setBiometricVerification(false)
-
-        //         console.log(x)
-        //     }
-        // }
+                setPassCodeVerification(false)
+                setBiometricVerification(false)
+            }
+        }
     }
 
     const setBiometric = async (v) => {
-        setBiometricVerification(v)
-        // let passVerification = await getData(Constants.PasscodeVerification)
-        // const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
-        // let fingerVerification = await getData(Constants.FingerPrintVerification)
-        // if (v) {
-        //     if (!fingerVerification) {
-        //         let x = await storeData(Constants.FingerPrintVerification, '1')
-        //         setBiometricVerification(true)
-        //     }
-        //     else {
-        //         if (biometryType === ReactNativeBiometrics.TouchID) {
-        //             if (passVerification) {
-        //                 setBiometricVerification(true)
-
-        //             }
-        //             else {
-        //                 Alert.alert('Turn on passcode authentication')
-        //             }
-        //         } else if (biometryType === ReactNativeBiometrics.FaceID) {
-        //             if (passVerification) {
-        //                 setBiometricVerification(true)
-
-        //             }
-        //             else {
-        //                 Alert.alert('Turn on passcode authentication')
-        //             }
-        //         } else if (biometryType === ReactNativeBiometrics.Biometrics) {
-        //             if (passVerification) {
-        //                 setBiometricVerification(true)
-
-        //             }
-        //             else {
-        //                 Alert.alert('Turn on passcode authentication')
-        //             }
-        //         } else {
-        //             Alert.alert('Biometrics are not supported or turned off')
-        //             setBiometricVerification(false)
-        //         }
-        //     }
-        // }
-        // else {
-        //     if (fingerVerification) {
-        //         let x = await storeData(Constants.FingerPrintVerification, null)
-        //         setBiometricVerification(false)
-        //     }
-        // }
+        let passVerification = await getJsonData("passcodeVerification")
+        const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+        let fingerVerification = await getJsonData("fingerPrintVerification")
+        console.log("passVerification => ", passVerification)
+        console.log("fingerVerification => ", fingerVerification)
+        console.log("biometryType => ", biometryType)
+        if (v) {
+            if (!fingerVerification && biometryType !== undefined) {
+                let x = await storeJsonData("fingerPrintVerification", true)
+                setBiometricVerification(true)
+            }
+            else {
+                if (biometryType === ReactNativeBiometrics.TouchID) {
+                    if (passVerification) {
+                        setBiometricVerification(true)
+                    }
+                    else {
+                        Alert.alert('Turn on passcode authentication')
+                    }
+                } else if (biometryType === ReactNativeBiometrics.FaceID) {
+                    if (passVerification) {
+                        setBiometricVerification(true)
+                    }
+                    else {
+                        Alert.alert('Turn on passcode authentication')
+                    }
+                } else if (biometryType === ReactNativeBiometrics.Biometrics) {
+                    if (passVerification) {
+                        setBiometricVerification(true)
+                    }
+                    else {
+                        Alert.alert('Turn on passcode authentication')
+                    }
+                } else {
+                    Alert.alert('Biometrics are not supported or turned off')
+                    setBiometricVerification(false)
+                }
+            }
+        }
+        else {
+            if (fingerVerification) {
+                let x = await storeJsonData("fingerPrintVerification", null)
+                setBiometricVerification(false)
+            }
+        }
     }
 
-    // useFocusEffect(
-    //     React.useCallback(() => {
-    //         getPasscode()
-    //     }, [])
-    // );
+    useFocusEffect(
+        React.useCallback(() => {
+            getPasscode()
+        }, [])
+    );
 
-    // useFocusEffect(
-    //     React.useCallback(() => {
-    //         const backAction = () => {
-    //             props.navigation.goBack()
-    //             return true;
-    //         };
+    useFocusEffect(
+        React.useCallback(() => {
+            const backAction = () => {
+                props.navigation.goBack()
+                return true;
+            };
 
-    //         const backHandler = BackHandler.addEventListener(
-    //             "hardwareBackPress",
-    //             backAction
-    //         );
-    //     }, [])
-    // );
+            const backHandler = BackHandler.addEventListener(
+                "hardwareBackPress",
+                backAction
+            );
+        }, [])
+    );
 
     return (
         <>
@@ -179,7 +163,7 @@ const Settings = (props) => {
                                 {passcodeVerification && <CustomButton
                                     title="Change Passcode"
                                     customStyles={{ width: '60%', marginTop: 10 }}
-                                    onPress={() => props.navigation.navigate('ConfirmSetPassCode')}
+                                    action={() => props.navigation.navigate('SetPassCode')}
                                 />}
                             </View>
                         </View>

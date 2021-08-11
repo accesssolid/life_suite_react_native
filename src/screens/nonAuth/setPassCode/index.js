@@ -1,19 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
     Alert,
-    Image,
-    StatusBar,
     Text,
-    useColorScheme,
     View,
-    NativeModules,
-    Platform,
     TextInput,
     BackHandler,
-    Dimensions,
-    TouchableOpacity,
-    ImageBackground
 } from 'react-native';
 import { Icon, Container, Content } from 'native-base'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -40,7 +32,7 @@ const SetPassCode = (props) => {
 
     const confirmPassCode = async () => {
         if (Passcode.length >= 4) {
-            props.navigation.navigate('ConfirmSetPasscode', { pass: Passcode })
+            props.navigation.navigate('ConfirmSetPassCode', { pass: Passcode })
         }
         else {
             Alert.alert('Passcode length must be greater than 3 digits')
@@ -77,7 +69,7 @@ const SetPassCode = (props) => {
                                 />
                             </View>
                             <View style={{ height: 30 }} />
-                            <CustomButton onPress={() => confirmPassCode()} title={'Set Passcode'} />
+                            <CustomButton action={() => confirmPassCode()} title={'Set Passcode'} />
                         </View>
                     </Content>
                 </Container>
