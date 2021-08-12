@@ -7,7 +7,6 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import ImagePicker from 'react-native-image-crop-picker';
 import MapView, { Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
@@ -20,8 +19,7 @@ import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
-import { setAddServiceData, setAddServiceMode } from '../../../redux/features/services';
-import { Alert } from 'react-native';
+import { setAddServiceMode } from '../../../redux/features/services';
 import { Dimensions } from 'react-native';
 import CustomTextInput from '../../../components/customTextInput';
 

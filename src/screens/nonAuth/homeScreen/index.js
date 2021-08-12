@@ -127,11 +127,6 @@ const HomeScreen = (props) => {
         }
     };
 
-    const cancelSearch = () => {
-        setSearchActive(false)
-        searchFilterFunction('')
-    }
-
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
             props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
@@ -173,9 +168,9 @@ const HomeScreen = (props) => {
                         :
                         null
                     }
-                    {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('AddTimeFrame')} style={{ height: 35, aspectRatio: 1 }}>
+                    {/* {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('AddTimeFrame')} style={{ height: 35, aspectRatio: 1 }}>
                         <Image source={require('../../../assets/wall-clock.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
-                    </TouchableOpacity>}
+                    </TouchableOpacity>} */}
                 </View>
                 {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7} onPress={() => setIsAddJobActive(!isAddJobActive)}>
                     <View style={{ height: 30, aspectRatio: 1 }}>
@@ -260,20 +255,34 @@ const HomeScreen = (props) => {
                             keyExtractor={(item, index) => index}
                         />
                     </View>}
-                {!loading && <View style={styles.orderContainer}>
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => {
-                            user.user_role == 3
-                                ?
-                                props.navigation.navigate("OrderHistory1")
-                                :
-                                props.navigation.navigate("OrderHistory")
-                        }}>
-                        <Text style={styles.order}>
-                            ORDER
-                        </Text>
-                    </TouchableOpacity>
+                {!loading && <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                    <View style={styles.orderContainer}>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => user.user_role == 3 ? props.navigation.navigate("OrderHistory1") : props.navigation.navigate("OrderHistory")}>
+                            <Text style={styles.order}>
+                                ORDER
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    {user.user_role == 3 && <View style={styles.orderContainer}>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => showToast("WORK IN PROGRESS")}>
+                            <Text style={styles.order}>
+                                LOCATION
+                            </Text>
+                        </TouchableOpacity>
+                    </View>}
+                    {user.user_role == 3 && <View style={styles.orderContainer}>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => props.navigation.navigate('AddTimeFrame')}>
+                            <Text style={styles.order}>
+                                SCHEDULE
+                            </Text>
+                        </TouchableOpacity>
+                    </View>}
                 </View>}
             </View>
             {loading && <Loader />}
@@ -312,13 +321,13 @@ const styles = StyleSheet.create({
     orderContainer: {
         justifyContent: "center",
         alignItems: 'center',
-        position: 'absolute',
-        bottom: "4%",
+        // position: 'absolute',
+        // bottom: "4%",
         height: 32,
         width: 111,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
     order: {
         textAlign: "center",

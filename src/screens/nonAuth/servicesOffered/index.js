@@ -32,6 +32,8 @@ const ServicesProvided = (props) => {
     const [selectedItems, setSelectedItems] = useState([])
     const [servicesData, setServicesData] = useState([])
     const [isUpdated, setIsUpdated] = useState(false)
+    const [variants, setVariants] = useState([])
+    const [selectedVariant, setSelectedVariant] = useState(null)
 
     useEffect(() => {
         getServiceItems()
@@ -55,13 +57,14 @@ const ServicesProvided = (props) => {
         }
 
         let user_data = {
-            "service_id": subService.id
+            "service_id": subService.id,
+            "user_id": user.id
         }
 
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint: '/api/subServicesItemList',
+            endPoint: '/api/providerSubServicesItemList',
             type: 'post'
         }
 
@@ -70,6 +73,9 @@ const ServicesProvided = (props) => {
                 if (response.status == true) {
                     setLoading(false)
                     setItemList([...response.data])
+                    if (response.variant_data) {
+                        setVariants(response.variant_data)
+                    }
                 }
                 else {
                     setLoading(false)
@@ -312,6 +318,30 @@ const ServicesProvided = (props) => {
                 <Container>
                     <Content showsVerticalScrollIndicator={false}>
                         <Text style={styles.service}>SERVICES</Text>
+                        <View style={{ marginVertical: 10, flexDirection: 'row', overflow: 'scroll', paddingHorizontal: '5%', justifyContent: 'center' }}>
+                            {variants.length > 0 && variants.map((item, index) => {
+                                return (
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => setSelectedVariant(item.id)} key={index}
+                                        style={{
+                                            backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
+                                            marginHorizontal: 10,
+                                            paddingHorizontal: 15,
+                                            paddingVertical: 5,
+                                            borderRadius: 100,
+                                            borderWidth: selectedVariant == item.id ? 1 : 1,
+                                            borderColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.green
+                                        }}>
+                                        <Text style={{
+                                            fontFamily: LS_FONTS.PoppinsMedium,
+                                            fontSize: 14,
+                                            textTransform: 'uppercase',
+                                            color : selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
+                                        }}>
+                                            {item.name}</Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </View>
                         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end', marginBottom: '2%' }}>
                             <View style={{ alignItems: 'center' }}>
                                 <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Time</Text>

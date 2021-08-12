@@ -31,13 +31,13 @@ const DropDown = (props) => {
                     ref={props.dropRef}
                     defaultValue={props.value}
                     isFullWidth={true}
-                    options={props.item}                    
+                    options={props.item}
                     textStyle={{ fontSize: 14, height: 50, width: "100%", fontFamily: LS_FONTS.PoppinsRegular, paddingLeft: 20, textAlignVertical: "center", lineHeight: 50 }}
                     dropdownTextStyle={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.black }}
                     dropdownStyle={[{ borderWidth: 1 }, props.dropdownStyle]}
                     onSelect={props.onChangeValue}
-                    showsVerticalScrollIndicator={false}    
-                    disabled={props.disabled}        
+                    showsVerticalScrollIndicator={false}
+                    disabled={props.disabled}
                 />
             </View>
         </>
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: LS_COLORS.global.black,
         marginBottom: 12,
-        marginHorizontal:'5%',
-        marginTop:20,
+        marginHorizontal: '5%',
+        marginTop: 20,
     },
     arrow: {
         position: "absolute",

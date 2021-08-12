@@ -26,6 +26,14 @@ const ServicesProvided = (props) => {
     const [itemList, setItemList] = useState([])
     const [loading, setLoading] = useState(false)
     const [selectedItems, setSelectedItems] = useState([])
+    const [selectedProducts, setSelectedProducts] = useState([])
+    const [variants, setVariants] = useState([])
+    const [selectedVariant, setSelectedVariant] = useState(null)
+    const [newProducts, setNewProducts] = useState([])
+    const [selectedNewItems, setSelectedNewItems] = useState([])
+    const [isOtherSelected, setIsOtherSelected] = useState(false)
+    const [isHaveOwnSelected, setIsHaveOwnSelected] = useState(false)
+    const [needRecommendationSelected, setNeedRecommendationSelected] = useState(false)
 
     useEffect(() => {
         getServiceItems()
@@ -54,6 +62,9 @@ const ServicesProvided = (props) => {
                 if (response.status == true) {
                     setLoading(false)
                     setItemList([...response.data])
+                    if (response.variant_data) {
+                        setVariants(response.variant_data)
+                    }
                 }
                 else {
                     setLoading(false)
@@ -63,14 +74,70 @@ const ServicesProvided = (props) => {
             })
     }
 
-    const setCheckedData = (index) => {
+    const setCheckedData = (item) => {
         let arr = [...selectedItems]
-        if (arr.includes(index)) {
-            arr.splice(arr.indexOf(index), 1)
+        if (arr.includes(item.id)) {
+            arr.splice(arr.indexOf(item.id), 1)
         } else {
-            arr.push(index)
+            arr.push(item.id)
         }
         setSelectedItems([...arr])
+    }
+
+    const setCheckedDataProducts = (item) => {
+        let arr = [...selectedProducts]
+        if (arr.includes(item.id)) {
+            arr.splice(arr.indexOf(item.id), 1)
+        } else {
+            arr.push(item.id)
+        }
+        setSelectedProducts([...arr])
+    }
+
+    const next = () => {
+        let servicedata = []
+        itemList.forEach(element => {
+            if (selectedItems.includes(element.id)) {
+                servicedata.push({
+                    "item_id": element.id,
+                    "products": selectedProducts
+                })
+            }
+        });
+        props.navigation.navigate("MechanicLocation", { servicedata: servicedata, subService: subService })
+    }
+
+    const onSelectOther = () => {
+        setIsOtherSelected(!isOtherSelected)
+        // if (newProducts.length === 0) {
+        //     addNewProduct()
+        // }
+    }
+
+    const setCheckedDataNewItem = (item, index) => {
+        let arr = [...selectedNewItems]
+        if (arr.includes(item.temp_id)) {
+            arr.splice(arr.indexOf(item.temp_id), 1)
+        } else {
+            arr.push(item.temp_id)
+        }
+        setSelectedNewItems([...arr])
+    }
+
+    const addNewProduct = () => {
+        let temp = [...newProducts]
+        temp.push('x')
+        setNewProducts(temp)
+    }
+
+    const removeNewProduct = (index) => {
+        let temp = [...newProducts]
+
+        temp.splice(index, 1)
+        if (temp.length == 0) {
+            onSelectOther()
+        }
+        setNewProducts([...temp])
     }
 
     return (
@@ -83,18 +150,16 @@ const ServicesProvided = (props) => {
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                            <View style={{ marginTop: StatusBar.currentHeight + 10 }}>
-                                <Header
-                                    imageUrl={require("../../../assets/backWhite.png")}
-                                    action={() => {
-                                        props.navigation.pop()
-                                    }}
-                                    imageUrl1={require("../../../assets/homeWhite.png")}
-                                    action1={() => {
-                                        props.navigation.navigate("HomeScreen")
-                                    }}
-                                />
-                            </View>
+                            <Header
+                                imageUrl={require("../../../assets/backWhite.png")}
+                                action={() => {
+                                    props.navigation.pop()
+                                }}
+                                imageUrl1={require("../../../assets/homeWhite.png")}
+                                action1={() => {
+                                    props.navigation.navigate("HomeScreen")
+                                }}
+                            />
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
                                 <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
                             </View>
@@ -106,6 +171,30 @@ const ServicesProvided = (props) => {
                 <View style={styles.container}>
                     <Container style={{ marginTop: 26 }}>
                         <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services</Text>
+                        <View style={{ marginVertical: 10, flexDirection: 'row', overflow: 'scroll', paddingHorizontal: '5%', justifyContent: 'center' }}>
+                            {variants.length > 0 && variants.map((item, index) => {
+                                return (
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => setSelectedVariant(item.id)} key={index}
+                                        style={{
+                                            backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
+                                            marginHorizontal: 10,
+                                            paddingHorizontal: 15,
+                                            paddingVertical: 5,
+                                            borderRadius: 100,
+                                            borderWidth: selectedVariant == item.id ? 1 : 1,
+                                            borderColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.green
+                                        }}>
+                                        <Text style={{
+                                            fontFamily: LS_FONTS.PoppinsMedium,
+                                            fontSize: 14,
+                                            textTransform: 'uppercase',
+                                            color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
+                                        }}>
+                                            {item.name}</Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </View>
                         {
                             itemList.length > 0
                                 ?
@@ -118,28 +207,80 @@ const ServicesProvided = (props) => {
                                                     <>
                                                         <View key={index} style={{ flexDirection: "row", paddingLeft: '5%' }}>
                                                             <CheckBox
-                                                                checked={selectedItems.includes(index)}
-                                                                onPress={() => setCheckedData(index)}
+                                                                checked={selectedItems.includes(item.id)}
+                                                                onPress={() => setCheckedData(item)}
                                                                 checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                                                             />
                                                             <Text style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{item.name}</Text>
                                                         </View>
-                                                        {selectedItems.includes(index) && <View>
+                                                        {selectedItems.includes(item.id) && <View>
                                                             {item.products.map((product, indexx) => {
                                                                 return (
                                                                     <View key={indexx} style={{ flexDirection: "row", paddingLeft: '10%' }}>
                                                                         <CheckBox
-                                                                            checked={false}
-                                                                            onPress={() => { }}
+                                                                            checked={selectedProducts.includes(product.id)}
+                                                                            onPress={() => setCheckedDataProducts(product)}
                                                                             checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                                             uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                                                                         />
                                                                         <Text style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{product.name}</Text>
                                                                     </View>
-
                                                                 )
                                                             })}
+                                                            {selectedItems.includes(item.id) && <View style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                                                                    <CheckBox
+                                                                        checked={isOtherSelected}
+                                                                        onPress={() => onSelectOther()}
+                                                                        checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
+                                                                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
+                                                                    />
+                                                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Other</Text>
+                                                                </View>
+                                                            </View>}
+                                                            {selectedItems.includes(item.id) && <View key={index} style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center', }}>
+                                                                <View style={{ ...styles.fromContainer, width: '70%', alignSelf: 'flex-end', marginLeft: '20%' }}>
+                                                                    <TextInput
+                                                                        style={styles.inputStyle}
+                                                                        color="black"
+                                                                        placeholder="other products"
+                                                                        placeholderTextColor={LS_COLORS.global.placeholder}
+                                                                    />
+                                                                </View>
+                                                            </View>}
+                                                            {selectedItems.includes(item.id) && <View style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                                                                    <CheckBox
+                                                                        checked={isHaveOwnSelected}
+                                                                        onPress={() => setIsHaveOwnSelected(!isHaveOwnSelected)}
+                                                                        checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
+                                                                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
+                                                                    />
+                                                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>I have my own</Text>
+                                                                </View>
+                                                            </View>}
+                                                            {selectedItems.includes(item.id) && <View style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center', }}>
+                                                                <View style={{ ...styles.fromContainer, width: '70%', alignSelf: 'flex-end', marginLeft: '20%' }}>
+                                                                    <TextInput
+                                                                        style={styles.inputStyle}
+                                                                        color="black"
+                                                                        placeholder="your products"
+                                                                        placeholderTextColor={LS_COLORS.global.placeholder}
+                                                                    />
+                                                                </View>
+                                                            </View>}
+                                                            {selectedItems.includes(item.id) && <View style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                                                                    <CheckBox
+                                                                        checked={needRecommendationSelected}
+                                                                        onPress={() => setNeedRecommendationSelected(!needRecommendationSelected)}
+                                                                        checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
+                                                                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
+                                                                    />
+                                                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Need recommendation</Text>
+                                                                </View>
+                                                            </View>}
                                                         </View>}
                                                     </>
                                                 )
@@ -153,7 +294,7 @@ const ServicesProvided = (props) => {
                                         onPress={() => {
                                             selectedItems.length > 0
                                                 ?
-                                                props.navigation.navigate("MechanicLocation")
+                                                next()
                                                 :
                                                 showToast("Select service first")
                                         }}>
@@ -224,8 +365,23 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         paddingVertical: 5,
         marginHorizontal: 5
-    }
-
+    },
+    fromContainer: {
+        height: 40,
+        width: 75,
+        alignItems: 'center',
+        borderColor: LS_COLORS.global.lightTextColor,
+        justifyContent: "center",
+        backgroundColor: '#ECECEC',
+        paddingHorizontal: 5,
+        // marginRight: '10%'
+    },
+    inputStyle: {
+        height: '100%',
+        width: '100%',
+        alignItems: 'center',
+        // textAlign: 'center'
+    },
 })
 
 

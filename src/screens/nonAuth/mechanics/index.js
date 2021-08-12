@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
 
 /* Constants */
@@ -17,42 +17,90 @@ import Header from '../../../components/header';
 import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Card, Container, Content, Row, } from 'native-base'
+import Loader from '../../../components/loader';
+import { BASE_URL, getApi } from '../../../api/api';
 
 const Mechanics = (props) => {
-    const [checked, setChecked] = useState(false)
+    const { data, subService } = props.route.params
     const [checked1, setChecked1] = useState(false)
     const [checked2, setChecked2] = useState(false)
     const [checked3, setChecked3] = useState(false)
-    const [checked4, setChecked4] = useState(false)
-    const [checked5, setChecked5] = useState(false)
-    const [checked6, setChecked6] = useState(false)
-    const [checked7, setChecked7] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [providers, setProviders] = useState([])
+    const [selectedProviders, setSelectedProviders] = useState([])
+
+    useEffect(() => {
+        getProviders()
+    }, [])
+
+    const getProviders = () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...data }),
+            endPoint: '/api/orderProviderList',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    let proData = Object.keys(response.data).map((item, index) => {
+                        return response.data[item]
+                    })
+                    setProviders(proData)
+                    setLoading(false)
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
+    const onSelect = (item) => {
+        let temp = [...selectedProviders]
+        if (selectedProviders.includes(item[0].id)) {
+            temp.splice(temp.indexOf(item[0].id), 1)
+        } else {
+            temp.push(item[0].id)
+        }
+        setSelectedProviders(temp)
+    }
 
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
-                    resizeMode="stretch"
-                    source={require("../../../assets/handyMan.png")}
+                    resizeMode="cover"
+                    source={{ uri: BASE_URL + subService.image }}
                     style={styles.image}>
-                    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                        <View style={{ height: "22%", justifyContent: 'flex-end' }}>
-                            <Header
-                                imageUrl={require("../../../assets/backWhite.png")}
-                                action={() => {
-                                    props.navigation.pop()
-                                }}
-                                imageUrl1={require("../../../assets/homeWhite.png")}
-                                action1={() => {
-                                    props.navigation.navigate("HomeScreen")
-                                }}
-                            />
-                        </View>
-                        <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                            <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>MECHANIC</Text>
-                        </View>
-                    </SafeAreaView>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+                            <View style={{ height: "22%", justifyContent: 'flex-end' }}>
+                                <Header
+                                    imageUrl={require("../../../assets/backWhite.png")}
+                                    action={() => {
+                                        props.navigation.pop()
+                                    }}
+                                    imageUrl1={require("../../../assets/homeWhite.png")}
+                                    action1={() => {
+                                        props.navigation.navigate("HomeScreen")
+                                    }}
+                                />
+                            </View>
+                            <View style={{ justifyContent: 'center', alignItems: "center", height: "60%" }}>
+                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                            </View>
+                        </SafeAreaView>
+                    </View>
                 </ImageBackground>
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
@@ -74,186 +122,101 @@ const Mechanics = (props) => {
                                     <Text style={styles.upperText}>Rating</Text>
                                 </View>
                             </View>
-                            <Card style={styles.alexiContainer}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <View>
-                                        <Image
-                                            style={{ height: 100, width: 100, resizeMode: 'contain' }}
-                                            source={require("../../../assets/man.png")}
-                                        />
+                            {
+                                providers.length > 0
+                                    ?
+                                    providers.map((item, index) => {
+                                        console.log("provider_profile_image =>> ", item[0].provider_profile_image)
+                                        return <Card key={index} style={styles.alexiContainer}>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
+                                                    <Image
+                                                        style={{ height: '100%', width: '100%' }}
+                                                        source={item[0].provider_profile_image !== null ? { uri: BASE_URL + item[0].provider_profile_image } : require('../../../assets/user.png')}
+                                                        resizeMode='cover'
+                                                    />
+                                                </View>
+                                                <View style={{ top: "5%", right: 30 }}>
+                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item[0].provider_first_name}</Text>
+                                                    <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
+                                                </View>
+                                                <View style={{}}>
+                                                    <CheckBox
+                                                        checked={selectedProviders.includes(item[0].id)}
+                                                        onPress={() => onSelect(item)}
+                                                        checkedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/checked.png")} />}
+                                                        uncheckedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/unchecked.png")} />}
+                                                    />
+                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginLeft: 20 }}>${item[0].price}</Text>
+                                                </View>
+                                            </View>
+                                            <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>I am a Professional Mechanic having 4y exp.</Text>
+                                            <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>Rating * * * * *</Text>
+                                            <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
+                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                                <Text style={{ marginLeft: 10 }}>
+                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Oil Change   </Text>
+                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>(Service Charge)</Text>
+                                                </Text>
+                                                <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
+                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
+                                                    <CheckBox
+                                                        checked={checked1}
+                                                        onPress={() => {
+                                                            setChecked1(!checked1)
+                                                        }}
+                                                        checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
+                                                        uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
+                                                    />
+                                                </View>
+                                            </View>
+                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                                <View>
+                                                    <Text style={{ marginLeft: 20 }}>
+                                                        <View style={{ height: 10, width: 10, borderRadius: 100, backgroundColor: "#CACACA", justifyContent: "center", alignItems: "center" }}></View>
 
-                                    </View>
-                                    <View style={{ top: "5%", right: 30 }}>
+                                                        <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>5W - 20           </Text>
+                                                        <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsRegular, }}>(Product)</Text>
+                                                    </Text>
+                                                </View>
+                                                <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
+                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$15</Text>
+                                                    <CheckBox
+                                                        checked={checked2}
+                                                        onPress={() => {
+                                                            setChecked2(!checked2)
+                                                        }}
+                                                        checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
+                                                        uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
+                                                    />
+                                                </View>
+                                            </View>
 
-                                        <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Alexi</Text>
-                                        <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
+                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 3</Text>
+                                                <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
+                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$50</Text>
+                                                    <CheckBox
+                                                        checked={checked3}
+                                                        onPress={() => {
+                                                            setChecked3(!checked3)
+                                                        }}
+                                                        checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/checked.png")} />}
+                                                        uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/unchecked.png")} />}
+                                                    />
+                                                </View>
+                                            </View>
+                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Total Time</Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>2.5 hrs</Text>
+                                            </View>
+                                        </Card>
+                                    })
+                                    :
+                                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                        {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16 }}>No Providers Found</Text>}
                                     </View>
-                                    <View style={{}}>
-
-                                    </View>
-                                    <View style={{}}>
-                                        <CheckBox
-                                            checked={checked}
-                                            onPress={() => {
-                                                setChecked(!checked)
-                                            }}
-                                            checkedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                        <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginLeft: 20 }}>$65</Text>
-                                    </View>
-                                </View>
-                                <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>I am a Professional Mechanic having 4y exp.</Text>
-                                <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>Rating * * * * *</Text>
-                                <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
-                                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                    <Text style={{ marginLeft: 10 }}>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Oil Change   </Text>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>(Service Charge)</Text>
-                                    </Text>
-                                    <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
-                                        <CheckBox
-                                            checked={checked1}
-                                            onPress={() => {
-                                                setChecked1(!checked1)
-                                            }}
-                                            checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                    <View>
-                                        <Text style={{ marginLeft: 20 }}>
-                                            <View style={{ height: 10, width: 10, borderRadius: 100, backgroundColor: "#CACACA", justifyContent: "center", alignItems: "center" }}></View>
-
-                                            <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>5W - 20           </Text>
-                                            <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsRegular, }}>(Product)</Text>
-                                        </Text>
-                                    </View>
-                                    <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$15</Text>
-                                        <CheckBox
-                                            checked={checked2}
-                                            onPress={() => {
-                                                setChecked2(!checked2)
-                                            }}
-                                            checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                    </View>
-                                </View>
-
-                                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 3</Text>
-                                    <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$50</Text>
-                                        <CheckBox
-                                            checked={checked3}
-                                            onPress={() => {
-                                                setChecked3(!checked3)
-                                            }}
-                                            checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Total Time</Text>
-                                    <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>2.5 hrs</Text>
-                                </View>
-                            </Card>
-                            <Card style={{ ...styles.alexiContainer, marginTop: 20 }}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <View>
-                                        <Image
-                                            style={{ height: 100, width: 100, resizeMode: 'contain' }}
-                                            source={require("../../../assets/amanda.png")}
-                                        />
-
-                                    </View>
-                                    <View style={{ top: "5%", right: 20 }}>
-
-                                        <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Amanda</Text>
-                                        <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>San Fransisco</Text>
-                                    </View>
-                                    <View style={{}}>
-
-                                    </View>
-                                    <View style={{}}>
-                                        <CheckBox
-                                            checked={checked4}
-                                            onPress={() => {
-                                                setChecked4(!checked4)
-                                            }}
-                                            checkedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                        <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginLeft: 20 }}>$20</Text>
-                                    </View>
-                                </View>
-                                <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>I am a Professional Mechanic having 6y exp.</Text>
-                                <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>Rating * * *</Text>
-                                <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
-                                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                    <Text style={{ marginLeft: 10 }}>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Oil Change   </Text>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>(Service Charge)</Text>
-                                    </Text>
-                                    <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
-                                        <CheckBox
-                                            checked={checked1}
-                                            onPress={() => {
-                                                setChecked1(!checked1)
-                                            }}
-                                            checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                    <View>
-                                        <Text style={{ marginLeft: 20 }}>
-                                            <View style={{ height: 10, width: 10, borderRadius: 100, backgroundColor: "#CACACA", justifyContent: "center", alignItems: "center" }}></View>
-
-                                            <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>5W - 20           </Text>
-                                            <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsRegular, }}>(Product)</Text>
-                                        </Text>
-                                    </View>
-                                    <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$15</Text>
-                                        <CheckBox
-                                            checked={checked2}
-                                            onPress={() => {
-                                                setChecked2(!checked2)
-                                            }}
-                                            checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                    </View>
-                                </View>
-
-                                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 3</Text>
-                                    <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                        <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$50</Text>
-                                        <CheckBox
-                                            checked={checked3}
-                                            onPress={() => {
-                                                setChecked3(!checked3)
-                                            }}
-                                            checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Time</Text>
-                                    <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>1.5 hrs</Text>
-                                </View>
-                            </Card>
+                            }
                             <TouchableOpacity
                                 style={styles.save}
                                 activeOpacity={0.7}
@@ -266,6 +229,7 @@ const Mechanics = (props) => {
                         </Content>
                     </Container>
                 </View>
+                {loading && <Loader />}
             </SafeAreaView>
         </>
     )

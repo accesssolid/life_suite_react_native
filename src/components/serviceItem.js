@@ -185,6 +185,14 @@ const ServiceItem = (props) => {
         }))
     }
 
+    const conTwoDecDigit = (digit) => {
+        return digit.indexOf(".") > 0 ?
+            digit.split(".").length >= 2 ?
+                digit.split(".")[0] + "." + digit.split(".")[1].substring(-1, 2)
+                : digit
+            : digit
+    }
+
     return (
         <>
             <View key={props.index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>

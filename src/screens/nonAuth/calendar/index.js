@@ -21,15 +21,21 @@ import CustomButton from "../../../components/customButton"
 
 const Calendar = (props) => {
     const { setDate } = props.route.params
-    const [selectedStartDate, setSelectedStartDate] = useState(null)
-    const startDate = selectedStartDate ? selectedStartDate.toString() : '';
-    const [date,setDatee] = useState(null)
+    const [date, setDatee] = useState(moment(new Date().getTime()).format("DD MMM YYYY"))
+
     const onDateChange = (date) => {
-        setDatee(date)
         var a = moment(date).format("DD MMM YYYY")
-        setSelectedStartDate(a)
+        setDatee(a)
         setDate(a)
     }
+
+    const confirm = () => {
+        var a = moment(date).format("YYYY-MM-DD")
+        setDatee(a)
+        setDate(a)
+        props.navigation.navigate("MechanicLocation")
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -61,18 +67,15 @@ const Calendar = (props) => {
 
                     <View>
                         <Text style={{ marginTop: 20, marginLeft: 20, fontSize: 16, fontFamily: LS_FONTS.PoppinsBold }}>Date Added</Text>
-                        <View style={{ flexDirection: 'row' }}>
-                            <View style={{ height: 50, width: 50, marginTop: 10, backgroundColor: LS_COLORS.global.green, borderRadius: 100, marginLeft: 20, justifyContent: 'center', alignItems: 'center' }}>
-                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsBold, color: LS_COLORS.global.white, textAlign:'center' }}>{startDate}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ height: 60, width: 60, marginTop: 10, backgroundColor: LS_COLORS.global.green, borderRadius: 100, marginLeft: 20, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsBold, color: LS_COLORS.global.white, textAlign: 'center' }}>{date}</Text>
                             </View>
                             <Text style={{ alignSelf: 'center', fontSize: 14, fontFamily: LS_FONTS.PoppinsLight, marginLeft: 10 }}>Need a Mechanic</Text>
                         </View>
                         <TouchableOpacity
                             style={styles.save}
-                            onPress={() => {
-                                props.navigation.navigate("MechanicLocation",{ "date": date })
-                            }}
-                        >
+                            onPress={() => confirm()}>
                             <Text style={styles.saveText}>Confirm</Text>
                         </TouchableOpacity>
                     </View>
