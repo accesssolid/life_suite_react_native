@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -9,8 +9,7 @@ import Loader from '../../../components/loader';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import { CheckBox } from 'react-native-elements'
-import TextInputMask from 'react-native-text-input-mask';
+import { SafeAreaView } from "react-native-safe-area-context"
 
 /* Components */;
 import Header from '../../../components/header';
@@ -18,7 +17,7 @@ import { Container, Content, InputGroup, Row, } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
 import { BASE_URL, getApi } from '../../../api/api';
 import CustomButton from '../../../components/customButton';
-import { setAddServiceData } from '../../../redux/features/services';
+import services, { setAddServiceData } from '../../../redux/features/services';
 import { showToast } from '../../../components/validators';
 import ServiceItem from '../../../components/serviceItem';
 
@@ -32,18 +31,21 @@ const ServicesProvided = (props) => {
     const [loading, setLoading] = useState(false)
     const [selectedItems, setSelectedItems] = useState([])
     const [servicesData, setServicesData] = useState([])
+    const [isUpdated, setIsUpdated] = useState(false)
 
     useEffect(() => {
         getServiceItems()
     }, [])
 
     useEffect(() => {
-        setInitialServiceData()
-    }, [itemList])
+        if (!isAddServiceMode && subService && subService.items && subService.items.length > 0 && servicesData.length > 0 && !isUpdated) {
+            setPreviousData(servicesData)
+        }
+    }, [servicesData])
 
     useEffect(() => {
-        console.log("addServiceData =>> ", addServiceData)
-    },[addServiceData])
+        setInitialServiceData()
+    }, [itemList])
 
     const getServiceItems = () => {
         setLoading(true)
@@ -99,13 +101,12 @@ const ServicesProvided = (props) => {
             }
         })
         setServicesData([...newArr])
-        if (!isAddServiceMode && subService && subService.items && subService.items.length > 0) {
-            setPreviousData(newArr)
-        }
     }
 
     const setPreviousData = (arr) => {
         let temp = [...arr]
+        let selected = []
+
         arr.forEach((serviceElement, serviceIndex) => {
             subService.items.forEach((subElement) => {
                 if (serviceElement.item_id == subElement.id) {
@@ -117,11 +118,16 @@ const ServicesProvided = (props) => {
                         "time_duration_h": String(minutes),
                         "time_duration_m": String(hours),
                     }
+                    if (!isAddServiceMode) {
+                        selected.push(subElement.id)
+                    }
                 }
             });
         });
 
+        setSelectedItems([...selected])
         setServicesData([...temp])
+        setIsUpdated(true)
     }
 
     const next = () => {
@@ -212,7 +218,7 @@ const ServicesProvided = (props) => {
         setServicesData([...temp])
     }
 
-    conTwoDecDigit = (digit) => {
+    const conTwoDecDigit = (digit) => {
         return digit.indexOf(".") > 0 ?
             digit.split(".").length >= 2 ?
                 digit.split(".")[0] + "." + digit.split(".")[1].substring(-1, 2)
@@ -283,7 +289,7 @@ const ServicesProvided = (props) => {
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                            <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop: StatusBar.currentHeight + 20 }}>
+                            <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop: StatusBar.currentHeight + 10 }}>
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {
@@ -349,6 +355,7 @@ const ServicesProvided = (props) => {
                                                 isSelected={selectedItems.includes(item.id)}
                                                 setText={setText}
                                                 serviceItem={servicesData[index]}
+                                                subService={subService}
                                             />
                                         )
                                     }))

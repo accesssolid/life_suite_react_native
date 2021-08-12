@@ -54,7 +54,6 @@ const AddLicense = (props) => {
                 setresizemode("cover")
             }
         }, 1000);
-
     }
 
     useEffect(() => {

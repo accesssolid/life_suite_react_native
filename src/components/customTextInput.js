@@ -14,7 +14,7 @@ const CustomTextInput = props => {
     return (
         <>
             <Text style={styles.title}>{props.title}{props.required && '*'}</Text>
-            <View style={styles.screen}>
+            <View style={{ ...styles.screen, ...props.customContainerStyle }}>
                 <TextInput
                     style={{
                         width: '100%',
@@ -25,6 +25,7 @@ const CustomTextInput = props => {
                         fontFamily: LS_FONTS.PoppinsRegular,
                         paddingVertical: 15,
                         paddingHorizontal: '14%',
+                        ...props.customInputStyle
                     }}
                     value={props.value}
                     ref={props.inputRef}

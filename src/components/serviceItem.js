@@ -13,11 +13,12 @@ import TextInputMask from 'react-native-text-input-mask';
 /* Components */;
 import { TextInput } from 'react-native-gesture-handler';
 import { setAddServiceData } from '../redux/features/services';
-import _ from 'lodash'
+import _, { forEach } from 'lodash'
 
 const ServiceItem = (props) => {
     const dispatch = useDispatch()
     const addServiceData = useSelector(state => state.services.addServiceData)
+    const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
     const user = useSelector(state => state.authenticate.user)
 
     const priceRef = useRef(null)
@@ -54,26 +55,29 @@ const ServiceItem = (props) => {
         setSelectedItems([...arr])
     }
 
-    const setCheckedDataNewItem = (index) => {
+    const setCheckedDataNewItem = (item, index) => {
         let arr = [...selectedNewItems]
-
-        if (arr.includes(index)) {
-            arr.splice(arr.indexOf(index), 1)
+        if (arr.includes(item.temp_id)) {
+            arr.splice(arr.indexOf(item.temp_id), 1)
         } else {
-            arr.push(index)
+            arr.push(item.temp_id)
         }
-
         setSelectedNewItems([...arr])
     }
 
     const setInitialServiceData = () => {
+        let selectedPrev = []
         let newArr = props.item.products.map((item, index) => {
+            selectedPrev.push(item.id)
             return {
                 "id": item.id,
                 "name": item.name,
-                "price": ""
+                "price": item.price ? item.price : ""
             }
         })
+        if (!isAddServiceMode) {
+            setSelectedItems([...selectedPrev])
+        }
         setProducts([...newArr])
     }
 
@@ -83,6 +87,7 @@ const ServiceItem = (props) => {
             "item_id": props.item.id,
             "name": "",
             "price": "",
+            "temp_id": String(Math.floor((Math.random() * 10000000) + 1000))
         })
         setNewProducts([...temp])
     }
@@ -134,10 +139,37 @@ const ServiceItem = (props) => {
 
     const updateAddServiceData = () => {
         const pro = products.filter(item => selectedItems.includes(item.id))
-        const newpro = newProducts.filter((item, index) => selectedNewItems.includes(index))
+        const newpro = newProducts.filter((item, index) => selectedNewItems.includes(item.temp_id))
 
         let allProducts = [...addServiceData.json_data.products]
         let allNewProducts = [...addServiceData.json_data.new_products]
+
+        products.forEach(element1 => {
+            allProducts.forEach((element2, index) => {
+                if (element1.id == element2.id) {
+                    allProducts.splice(index, 1)
+                }
+            });
+        });
+
+        allNewProducts.forEach((element1, index) => {
+            newProducts.forEach((element2) => {
+                if (element1.temp_id == element2.temp_id) {
+                    allNewProducts.splice(index, 1)
+                }
+            });
+        });
+
+        if (newpro.length == 0) {
+            allNewProducts.forEach((element, index) => {
+                if (element.item_id == props.item.id) {
+                    allNewProducts.splice(index, 1)
+                }
+            })
+        }
+
+        allProducts = [...allProducts, ...pro]
+        allNewProducts = [...allNewProducts, ...newpro]
 
         dispatch(setAddServiceData({
             data: {
@@ -146,8 +178,8 @@ const ServiceItem = (props) => {
                 service_id: props.subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    products: [...pro],
-                    new_products: [...newpro]
+                    products: [...allProducts],
+                    new_products: [...allNewProducts]
                 }
             }
         }))
@@ -156,17 +188,17 @@ const ServiceItem = (props) => {
     return (
         <>
             <View key={props.index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
-                <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', overflow: 'hidden', width: '45%' }}>
                     <CheckBox
                         checked={props.isSelected}
                         onPress={props.onCheckPress}
                         checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                     />
-                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%' }}>{props.item.name}</Text>
+                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '50%' }}>{props.item.name}</Text>
                 </View>
 
-                <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end' }}>
+                <View style={{ flexDirection: 'row', width: '55%', justifyContent: 'flex-end' }}>
                     <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
                         <TextInputMask
                             onChangeText={(formatted, extracted) => {
@@ -261,8 +293,8 @@ const ServiceItem = (props) => {
                 return <View key={index} style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
                         <CheckBox
-                            checked={selectedNewItems.includes(index)}
-                            onPress={() => setCheckedDataNewItem(index)}
+                            checked={selectedNewItems.includes(item.temp_id)}
+                            onPress={() => setCheckedDataNewItem(item, index)}
                             checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                             uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                         />
@@ -272,7 +304,7 @@ const ServiceItem = (props) => {
                             style={styles.inputStyle}
                             color="black"
                             placeholder="Product name"
-                            editable={selectedNewItems.includes(index)}
+                            editable={selectedNewItems.includes(item.temp_id)}
                             onChangeText={(text) => onchangeTextNewProduct(text, index, "name")}
                             value={item.name}
                             ref={nameRef}
@@ -286,7 +318,7 @@ const ServiceItem = (props) => {
                             style={styles.inputStyle}
                             color="black"
                             placeholder="$000"
-                            editable={selectedNewItems.includes(index)}
+                            editable={selectedNewItems.includes(item.temp_id)}
                             onChangeText={(text) => onchangeTextNewProduct(text, index, "price")}
                             keyboardType="numeric"
                             value={item.price}

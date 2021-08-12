@@ -10,6 +10,13 @@ PODS:
     - React-jsi (= 0.64.1)
     - ReactCommon/turbomodule/core (= 0.64.1)
   - glog (0.3.5)
+  - GoogleMaps (3.1.0):
+    - GoogleMaps/Maps (= 3.1.0)
+  - GoogleMaps/Base (3.1.0)
+  - GoogleMaps/Maps (3.1.0):
+    - GoogleMaps/Base
+  - GooglePlaces (3.1.0):
+    - GoogleMaps/Base (= 3.1.0)
   - InputMask (6.1.0)
   - RCT-Folly (2020.01.13.00):
     - boost-for-react-native
@@ -206,6 +213,12 @@ PODS:
   - React-jsinspector (0.64.1)
   - react-native-biometrics (2.1.4):
     - React
+  - react-native-geolocation-service (5.3.0-beta.1):
+    - React
+  - react-native-google-places (3.1.2):
+    - GoogleMaps (~> 3.1.0)
+    - GooglePlaces (~> 3.1.0)
+    - React
   - react-native-maps (0.28.0):
     - React-Core
   - react-native-month-year-picker (1.8.0):
@@ -365,6 +378,8 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-biometrics (from `../node_modules/react-native-biometrics`)
+  - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
+  - react-native-google-places (from `../node_modules/react-native-google-places`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-month-year-picker (from `../node_modules/react-native-month-year-picker`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -399,6 +414,8 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - GoogleMaps
+    - GooglePlaces
     - InputMask
     - Toast
     - TOCropViewController
@@ -436,6 +453,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-biometrics:
     :path: "../node_modules/react-native-biometrics"
+  react-native-geolocation-service:
+    :path: "../node_modules/react-native-geolocation-service"
+  react-native-google-places:
+    :path: "../node_modules/react-native-google-places"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
   react-native-month-year-picker:
@@ -503,6 +524,8 @@ SPEC CHECKSUMS:
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
   FBReactNativeSpec: f0621cf1ff00d85366f9eac23d671a324a950fbb
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
+  GoogleMaps: 5c13302e6fe6bb6e686b267196586b91cd594225
+  GooglePlaces: e874db179f2675c4f3eeda0b686b540273a578b0
   InputMask: 71d291dc54d2deaeac6512afb6ec2304228c0bb7
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: ec2ebc96b7bfba3ca5c32740f5a0c6a014a274d2
@@ -516,6 +539,8 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 124e8f99992490d0d13e0649d950d3e1aae06fe9
   React-jsinspector: 500a59626037be5b3b3d89c5151bc3baa9abf1a9
   react-native-biometrics: 9d3306e5d29c3bc4e6a3c912d759a94e76a2f683
+  react-native-geolocation-service: 4030de78cdeb93ebef1fdc1971668bea6c0bc59b
+  react-native-google-places: 34e976a0e13cb55cc9603ef2fa6764ed534af806
   react-native-maps: 2d405b4e8cee0282e4c02bac434d81450dfea877
   react-native-month-year-picker: 2f00a9c261a86a39e14cafd02f4c319ac0fe7fe6
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
@@ -549,6 +574,6 @@ SPEC CHECKSUMS:
   TOCropViewController: 3105367e808b7d3d886a74ff59bf4804e7d3ab38
   Yoga: a7de31c64fe738607e7a3803e3f591a4b1df7393
 
-PODFILE CHECKSUM: ee4e1fed5a7f2edbff5597bc08a88f995f47131b
+PODFILE CHECKSUM: 607e7c2c2253bd66a1000698b380fb7a7f7f078f
 
 COCOAPODS: 1.10.1
