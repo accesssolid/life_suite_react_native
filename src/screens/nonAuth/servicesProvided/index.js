@@ -153,7 +153,7 @@ const ServicesProvided = (props) => {
                             <Header
                                 imageUrl={require("../../../assets/backWhite.png")}
                                 action={() => {
-                                    props.navigation.pop()
+                                    props.navigation.goBack()
                                 }}
                                 imageUrl1={require("../../../assets/homeWhite.png")}
                                 action1={() => {
@@ -288,26 +288,25 @@ const ServicesProvided = (props) => {
                                             :
                                             null
                                     }
-                                    <TouchableOpacity
-                                        style={styles.save}
-                                        activeOpacity={0.7}
-                                        onPress={() => {
-                                            selectedItems.length > 0
-                                                ?
-                                                next()
-                                                :
-                                                showToast("Select service first")
-                                        }}>
-                                        <Text style={styles.saveText}>Next</Text>
-                                    </TouchableOpacity>
-                                    <View style={{ height: 30 }}></View>
                                 </Content>
                                 :
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                                     {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
                                 </View>
                         }
-
+                        <TouchableOpacity
+                            style={styles.save}
+                            activeOpacity={0.7}
+                            onPress={() => {
+                                selectedItems.length > 0
+                                    ?
+                                    next()
+                                    :
+                                    showToast("Select service first")
+                            }}>
+                            <Text style={styles.saveText}>Next</Text>
+                        </TouchableOpacity>
+                        <View style={{ height: 30 }}></View>
                     </Container>
                 </View>
                 {loading && <Loader />}
@@ -322,7 +321,6 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: LS_COLORS.global.cyan,
-
     },
     container: {
         flex: 1,
@@ -340,7 +338,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
-        marginTop: 40
+        marginTop: 20
     },
     saveText: {
         textAlign: "center",

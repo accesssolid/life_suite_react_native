@@ -17,6 +17,7 @@ import AuthStack from './authStack';
 import UserStack from './userStack';
 import ProviderStack from './providerStack';
 import Passcode from '../screens/nonAuth/passCode';
+import MainDrawer from './mainDrawer';
 
 const Stack = createStackNavigator();
 
@@ -28,11 +29,12 @@ const Router = () => {
       <NavigationContainer>
         <Stack.Navigator headerMode={'none'}>
           <Stack.Screen name="Splash" component={Splash} />
-          <Stack.Screen name="WelcomeScreen" component={Welcomescreen} />  
+          <Stack.Screen name="WelcomeScreen" component={Welcomescreen} />
           <Stack.Screen name="AuthStack" component={AuthStack} />
           <Stack.Screen name="UserStack" component={UserStack} />
           <Stack.Screen name="ProviderStack" component={ProviderStack} />
           <Stack.Screen name="Passcode" component={Passcode} />
+          <Stack.Screen name="MainDrawer" component={MainDrawer} />
         </Stack.Navigator>
       </NavigationContainer>
       {loading && <Loader />}

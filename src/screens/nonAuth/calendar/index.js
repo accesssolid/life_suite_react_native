@@ -42,7 +42,7 @@ const Calendar = (props) => {
                 title="Calendar"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    props.navigation.pop()
+                    props.navigation.goBack()
                 }}
             />
             <View

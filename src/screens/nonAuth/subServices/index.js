@@ -35,7 +35,8 @@ const SubServices = (props) => {
         }
 
         let user_data = {
-            "service_parent_id": service.id
+            "service_parent_id": service.id,
+            "user_id": user.id
         }
 
         let config = {
@@ -65,7 +66,7 @@ const SubServices = (props) => {
                 title={service.name}
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    props.navigation.pop()
+                    props.navigation.goBack()
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {

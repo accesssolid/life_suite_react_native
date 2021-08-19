@@ -51,11 +51,12 @@ const Splash = (props) => {
                 if (response.status == true) {
                     dispatch(loginReducer(response.data))
                     setTimeout(() => {
-                        if (response.data.user_role == 2) {
-                            props.navigation.navigate("UserStack")
-                        } else {
-                            props.navigation.navigate("ProviderStack")
-                        }
+                        props.navigation.navigate("MainDrawer")
+                        // if (response.data.user_role == 2) {
+                        //     props.navigation.navigate("UserStack")
+                        // } else {
+                        //     props.navigation.navigate("ProviderStack")
+                        // }
                     }, 2000);
                 }
                 else {

@@ -73,11 +73,12 @@ const LoginScreen = (props) => {
                     dispatch(loginReducer(response.data))
                     setEmail("")
                     setPassword("")
-                    if (response.data.user_role == 2) {
-                        props.navigation.navigate("UserStack")
-                    } else {
-                        props.navigation.navigate("ProviderStack")
-                    }
+                    props.navigation.navigate("MainDrawer")
+                    // if (response.data.user_role == 2) {
+                    //     props.navigation.navigate("UserStack")
+                    // } else {
+                    //     props.navigation.navigate("ProviderStack")
+                    // }
                 }
                 else {
                     setLoader(false)

@@ -167,7 +167,7 @@ const AddTimeFrame = (props) => {
                 title="Add Time Frames"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    props.navigation.pop()
+                    props.navigation.goBack()
                 }}
             />
             <View style={styles.container}>

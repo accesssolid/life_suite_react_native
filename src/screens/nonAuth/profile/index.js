@@ -22,6 +22,10 @@ import { BASE_URL, getApi } from '../../../api/api';
 import { loadauthentication } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
 import SearchableDropDown from '../../../components/searchableDropDown';
+import { Dimensions } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const getMessage = (name) => {
     switch (name) {
@@ -177,8 +181,6 @@ const Profile = (props) => {
         }
     }, [userData])
 
-
-
     useEffect(() => {
         setNotificationType(getNotificationType(userData.notification_prefrence))
         getStates()
@@ -259,7 +261,7 @@ const Profile = (props) => {
         formdata.append("user_id", user.id);
         formdata.append('profile', {
             uri: Platform.OS == "ios" ? image.path.replace('file:///', '') : image.path,
-            name: image.filename ? image.filename : image.path.split("/").pop(),
+            name: image.filename ? image.filename : image.path.split("/").goBack(),
             type: image.mime,
         });
 
@@ -431,7 +433,7 @@ const Profile = (props) => {
                         setLoader(false)
                         dispatch(loadauthentication(response.data))
                         showToast(response.message, 'success')
-                        props.navigation.pop()
+                        props.navigation.goBack()
                     }
                     else {
                         setLoader(false)
@@ -597,10 +599,10 @@ const Profile = (props) => {
     }
 
     return (
-        <SafeAreaView style={globalStyles.safeAreaView}>
+        <SafeAreaView style={{ ...globalStyles.safeAreaView, backgroundColor: LS_COLORS.global.white }}>
             <Header
                 imageUrl={require("../../../assets/back.png")}
-                action={() => props.navigation.pop()}
+                action={() => props.navigation.goBack()}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => props.navigation.navigate("HomeScreen")}
             />
@@ -623,7 +625,7 @@ const Profile = (props) => {
                     bounces={false}
                     keyboardShouldPersistTaps='handled'
                     style={styles.container}>
-                    <View style={{ marginTop: '15%' }}>
+                    <View style={{ marginTop: '15%', marginBottom: '5%' }}>
                         <View style={{}}>
                             <Text style={styles.text}>MY INFORMATION</Text>
                             <Text style={styles.text1}>{userData.first_name}</Text>
@@ -1070,7 +1072,7 @@ const Profile = (props) => {
                                     </TouchableOpacity>
                                 </View>
                         }
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={() => saveUser()}>
@@ -1097,10 +1099,21 @@ const Profile = (props) => {
                             <Text style={styles.saveText}>
                                 Logout
                             </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
+            <View style={{ flexDirection: 'row', backgroundColor: LS_COLORS.global.transparent, height: Dimensions.get('screen').height / 12, justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: '5%' }}>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => saveUser()} style={{ height: 30, aspectRatio: 1 }}>
+                    <Image source={require('../../../assets/save.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                </TouchableOpacity>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('Settings')} style={{ height: 30, aspectRatio: 1 }}>
+                    <Image source={require('../../../assets/gear.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                </TouchableOpacity>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => { storeItem('user', null), props.navigation.navigate('HomeScreen'), props.navigation.navigate('WelcomeScreen') }} style={{ height: 30, aspectRatio: 1 }}>
+                    <Image source={require('../../../assets/logout.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                </TouchableOpacity>
+            </View>
             {loader && <Loader />}
         </SafeAreaView>
     )

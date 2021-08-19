@@ -56,7 +56,7 @@ const InProgress = (props) => {
                 title="In Progress"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    props.navigation.pop()
+                    props.navigation.goBack()
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {

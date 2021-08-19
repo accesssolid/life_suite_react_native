@@ -32,7 +32,7 @@ const DeclineConfirmation = (props) => {
                 title="DECLINE CONFIRMATION"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    props.navigation.pop()
+                    props.navigation.goBack()
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {

@@ -8,9 +8,11 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
+import SortableGrid from 'react-native-sortable-grid-with-fixed'
 
 /* Components */
 import Cards from '../../../components/cards';
+import UserCards from '../../../components/userCards';
 import { BASE_URL, getApi } from '../../../api/api';
 import { setServices } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
@@ -27,7 +29,6 @@ const HomeScreen = (props) => {
     const myJobs = useSelector(state => state.provider.myJobs)
     const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [isSearchActive, setSearchActive] = useState(false)
     const [items, setItems] = useState([...services])
     const [search, setSearch] = useState('')
 
@@ -51,7 +52,9 @@ const HomeScreen = (props) => {
             "Content-Type": "application/json"
         }
 
-        let user_data = {}
+        let user_data = {
+            "user_id": user.id
+        }
 
         let config = {
             headers: headers,
@@ -138,35 +141,29 @@ const HomeScreen = (props) => {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <TouchableOpacity
                         activeOpacity={0.7}
-                        style={{ ...styles.image, overflow: 'hidden' }}
-                        onPress={() => { props.navigation.navigate("Profile") }}>
+                        style={{ ...styles.image, overflow: 'hidden', /* TEMP -> */ borderRadius: 0, width: 30 /* <- TEMP */ }}
+                        onPress={() => { props.navigation.openDrawer() /* props.navigation.navigate("Profile") */ }}>
                         <Image
                             style={{ width: '100%', height: '100%' }}
                             resizeMode="contain"
-                            source={user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/user.png")}
+                            source={require('../../../assets/menu.png') /* user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/user.png") */}
                         />
                     </TouchableOpacity>
-                    <View style={{ flex: 1, paddingHorizontal: '5%' }}>
-                        {isSearchActive && <TextInput
-                            style={{ backgroundColor: LS_COLORS.global.lightGrey, height: 40, borderRadius: 50, paddingHorizontal: '10%', fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.black }}
-                            placeholder="Search ..."
-                            placeholderTextColor={LS_COLORS.global.placeholder}
-                            onChangeText={searchFilterFunction}
-                            value={search}
-                        />}
+                    <View style={{ flex: 1, paddingHorizontal: '5%' }}>                        
                     </View>
-                    {user.user_role == 2
-                        ?
-                        <TouchableOpacity style={styles.search}
-                            activeOpacity={0.7}
-                            onPress={() => { props.navigation.navigate('Search') }}>
-                            <Image
-                                style={styles.searchImage}
-                                source={require("../../../assets/search.png")}
-                            />
-                        </TouchableOpacity>
-                        :
-                        null
+                    {
+                        user.user_role == 2
+                            ?
+                            <TouchableOpacity style={styles.search}
+                                activeOpacity={0.7}
+                                onPress={() => { props.navigation.navigate('Search') }}>
+                                <Image
+                                    style={styles.searchImage}
+                                    source={require("../../../assets/search.png")}
+                                />
+                            </TouchableOpacity>
+                            :
+                            null
                     }
                     {/* {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('AddTimeFrame')} style={{ height: 35, aspectRatio: 1 }}>
                         <Image source={require('../../../assets/wall-clock.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
@@ -232,28 +229,31 @@ const HomeScreen = (props) => {
                             </View>
                     :
                     <View style={{ flex: 1, paddingTop: '5%' }}>
-                        <FlatList
-                            data={items}
-                            numColumns={2}
-                            columnWrapperStyle={{ justifyContent: 'space-between' }}
-                            renderItem={({ item, index }) => {
-                                return (
-                                    <Cards
+                        <SortableGrid
+                            blockTransitionDuration={200}
+                            activeBlockCenteringDuration={200}
+                            itemsPerRow={2}
+                            dragActivationTreshold={200}
+                            onDragRelease={(itemOrder) => console.log("Drag was released, the blocks are in the following order: ", itemOrder)}
+                            onDragStart={() => console.log("Some block is being dragged now!")}>
+                            {items.map((item, index) =>
+                                <View key={index}
+                                    style={{ alignItems: 'center', justifyContent: 'center' }}
+                                    onTap={() => {
+                                        item.itemsData.length > 0
+                                            ?
+                                            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+                                            :
+                                            props.navigation.navigate("SubServices", { service: item })
+                                    }}>
+                                    <UserCards
                                         title1={item.name}
                                         title2="SERVICES"
                                         imageUrl={{ uri: BASE_URL + item.image }}
-                                        action={() => {
-                                            item.itemsData.length > 0
-                                                ?
-                                                props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
-                                                :
-                                                props.navigation.navigate("SubServices", { service: item })
-                                        }}
                                     />
-                                )
-                            }}
-                            keyExtractor={(item, index) => index}
-                        />
+                                </View>
+                            )}
+                        </SortableGrid>
                     </View>}
                 {!loading && <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                     <View style={styles.orderContainer}>
@@ -301,7 +301,8 @@ const styles = StyleSheet.create({
     image: {
         resizeMode: 'contain',
         width: 44,
-        height: 44,
+        // height: 44,
+        aspectRatio: 1,
         borderRadius: 50
     },
     search: {

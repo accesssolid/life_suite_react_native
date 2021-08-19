@@ -35,7 +35,7 @@ const CnfSch = (props) => {
                             <Header
                                 imageUrl={require("../../../assets/backWhite.png")}
                                 action={() => {
-                                    props.navigation.pop()
+                                    props.navigation.goBack()
                                 }}
                                 imageUrl1={require("../../../assets/homeWhite.png")}
                                 action1={() => {

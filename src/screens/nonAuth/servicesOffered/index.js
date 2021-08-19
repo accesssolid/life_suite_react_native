@@ -299,7 +299,7 @@ const ServicesProvided = (props) => {
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {
-                                        props.navigation.pop()
+                                        props.navigation.goBack()
                                     }}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
@@ -335,7 +335,7 @@ const ServicesProvided = (props) => {
                                             fontFamily: LS_FONTS.PoppinsMedium,
                                             fontSize: 14,
                                             textTransform: 'uppercase',
-                                            color : selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
+                                            color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
                                         }}>
                                             {item.name}</Text>
                                     </TouchableOpacity>
