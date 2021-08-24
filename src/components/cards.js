@@ -14,7 +14,7 @@ const Cards = props => {
         <TouchableOpacity
             activeOpacity={0.7}
             onPress={props.action}
-            style={styles.mainView}>
+            style={{ ...styles.mainView, ...props.customContainerStyle }}>
             <View style={{ flex: 1, borderTopLeftRadius: 10, borderTopEndRadius: 10, overflow: 'hidden' }}>
                 <Image
                     resizeMode="cover"
@@ -22,8 +22,11 @@ const Cards = props => {
                     source={props.imageUrl}
                 />
             </View>
-            <View style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 10 }}>
+            <View style={{ justifyContent: 'space-around', alignItems: 'center', paddingVertical: 10, flexDirection: 'row', }}>
                 <Text style={styles.text}>{props.title1}</Text>
+                {props.showLeft && <TouchableOpacity activeOpacity={0.7} style={{ height: 15, aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <Image source={require('../assets/heartGreen.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                </TouchableOpacity>}
             </View>
         </TouchableOpacity>
     )

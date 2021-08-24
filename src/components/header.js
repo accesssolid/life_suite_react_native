@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
     },
     middleView: {
         alignItems: 'center',
+        justifyContent:'center'
     },
     rightView: {
         right: 20,
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: LS_FONTS.PoppinsMedium,
-        color: LS_COLORS.global.black,
+        color: LS_COLORS.global.darkBlack,
         fontSize: 16,
         textTransform: 'uppercase'
     }

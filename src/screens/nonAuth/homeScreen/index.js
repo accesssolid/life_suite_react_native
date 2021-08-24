@@ -27,6 +27,7 @@ const HomeScreen = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const services = useSelector(state => state.authenticate.services)
     const myJobs = useSelector(state => state.provider.myJobs)
+    const access_token = useSelector(state => state.authenticate.access_token)
     const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState([...services])
@@ -49,7 +50,8 @@ const HomeScreen = (props) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
 
         let user_data = {
