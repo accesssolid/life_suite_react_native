@@ -22,6 +22,7 @@ const SubServices = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const [subServices, setSubServices] = useState([])
     const [loading, setLoading] = useState(false)
+    const access_token = useSelector(state => state.authenticate.access_token)
 
     useEffect(() => {
         getSubServices()
@@ -31,12 +32,13 @@ const SubServices = (props) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
 
         let user_data = {
             "service_parent_id": service.id,
-            "user_id": user.id
+            "user_id": user.id,            
         }
 
         let config = {
@@ -89,7 +91,7 @@ const SubServices = (props) => {
                                             if (user.user_role == 3) {
                                                 dispatch(setAddServiceMode({ data: true }))
                                             }
-                                            props.navigation.navigate("ServicesProvided", { subService: item, items:[] })
+                                            props.navigation.navigate("ServicesProvided", { subService: item, items: [] })
                                         }}
                                     />
                                 )
@@ -98,7 +100,7 @@ const SubServices = (props) => {
                         />
                         :
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            {!loading&&<Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
+                            {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
                         </View>
                 }
             </View>
@@ -114,6 +116,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
         paddingVertical: 20,
-        paddingLeft:'4%'
+        paddingLeft: '4%'
     },
 })

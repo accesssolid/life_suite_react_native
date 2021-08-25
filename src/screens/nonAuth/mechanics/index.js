@@ -28,6 +28,7 @@ const Mechanics = (props) => {
     const [loading, setLoading] = useState(false)
     const [providers, setProviders] = useState([])
     const [selectedProviders, setSelectedProviders] = useState([])
+    const access_token = useSelector(state => state.authenticate.access_token)
 
     useEffect(() => {
         getProviders()
@@ -37,7 +38,8 @@ const Mechanics = (props) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
 
         let config = {

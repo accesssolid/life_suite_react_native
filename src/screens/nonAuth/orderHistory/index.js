@@ -14,6 +14,7 @@ import Header from '../../../components/header';
 import { Card, Container, Content } from 'native-base';
 import DropDown from '../../../components/dropDown';
 import CustomTextInput from '../../../components/customTextInput';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const OrderHistory = (props) => {
     const dispatch = useDispatch()
@@ -52,7 +53,7 @@ const OrderHistory = (props) => {
                     <Text style={{ fontSize: 16, marginTop: 20, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
                     {[1, 2, 3, 4, 5].map((item, index) => {
                         if (selected !== index) {
-                            return (<TouchableOpacity key={index} activeOpacity={0.7} onPress={() => { setselected(index) /* props.navigation.navigate("InProgress") */ }} style={{ height: 72, width: "95%", marginTop: 3, padding: 10, alignSelf: 'center', borderRadius: 12, backgroundColor: "#DCFBBD" }}>
+                            return (<TouchableOpacity key={index} activeOpacity={0.7} onPress={() => { setselected(index) /* props.navigation.navigate("InProgress") */ }} style={{ height: 72, width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <View>
                                         <Image
@@ -73,46 +74,62 @@ const OrderHistory = (props) => {
                         } else {
                             return (
                                 <>
-                                    <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => { setselected(null) /* props.navigation.navigate('UpcomingOrder') */ }}>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => { setselected(null) /* props.navigation.navigate('UpcomingOrder') */ }}>
                                         <Card style={styles.alexiContainer}>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                <View>
-                                                    <Image
-                                                        style={{ height: 100, width: 100, resizeMode: 'contain' }}
-                                                        source={require("../../../assets/mecman.png")}
-                                                    />
-                                                    <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>Rating * * * * *</Text>
-
+                                            <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => { setselected(null) /* props.navigation.navigate("InProgress") */ }} style={{ height: 72, width: "100%", padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                    <View>
+                                                        <Image
+                                                            style={{ height: 50, width: 50, resizeMode: 'contain' }}
+                                                            source={require("../../../assets/mecman.png")}
+                                                        />
+                                                    </View>
+                                                    <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
+                                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Alexi</Text>
+                                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular }}>Mechanic</Text>
+                                                    </View>
+                                                    <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
+                                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
+                                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>April 20 at 10:10 am</Text>
+                                                    </View>
                                                 </View>
-                                                <View style={{ right: 10, top: "8%" }}>
-                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Alexi</Text>
-                                                    <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
-                                                </View>
-                                                <View style={{}}>
-                                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Upcoming</Text>
-                                                </View>
-                                                <View style={{}}>
-                                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>2.5Hrs</Text>
-                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green }}>$15</Text>
-                                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>2/2/2021</Text>
+                                            </TouchableOpacity>
+                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Duration</Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>2.5hrs</Text>
+                                            </View>
+                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Start Time</Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>April 20 at 10:10 am</Text>
+                                            </View>
+                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>End Time</Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>April 20 at 10:10 am</Text>
+                                            </View>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, alignItems: 'center', alignSelf: 'flex-start', paddingLeft: '3%' }}>
+                                                <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.darkBlack, }}>Rating </Text>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    {[1, 2, 3, 4].map((item, index) => {
+                                                        return (<FontAwesome key={index} name="star" size={12} color={LS_COLORS.global.textCyan} style={{ marginRight: 5 }} />)
+                                                    })}
                                                 </View>
                                             </View>
                                             <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 1</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular }}>$10</Text>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 1</Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
                                             </View>
                                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 2</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular }}>$10</Text>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 2</Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
                                             </View>
                                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>Task 3</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>$10</Text>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 3</Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>$10</Text>
                                             </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Time</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>2.5 hrs</Text>
+                                            <View style={{ justifyContent: 'flex-end', flexDirection: 'row', marginTop: 10 }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.darkBlack }}>Total Price : </Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.darkBlack }}>$75</Text>
                                             </View>
                                         </Card>
                                     </TouchableOpacity>
@@ -123,7 +140,7 @@ const OrderHistory = (props) => {
                                             onPress={() => {
                                             }}>
                                             <Text style={styles.saveText}>
-                                                Chat
+                                                Block
                                             </Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
@@ -132,7 +149,7 @@ const OrderHistory = (props) => {
                                             onPress={() => {
                                             }}>
                                             <Text style={styles.saveText}>
-                                                Cancel Order
+                                                Search Again
                                             </Text>
                                         </TouchableOpacity>
                                     </View>

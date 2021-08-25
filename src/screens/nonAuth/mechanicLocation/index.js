@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 /* Components */;
 import Header from '../../../components/header';
@@ -22,14 +23,16 @@ import { Dimensions } from 'react-native';
 import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
 import { useSelector } from 'react-redux';
+import moment from 'moment';
 
 const MechanicLocation = (props) => {
     const fromInputRef = useRef(null)
     const toInputRef = useRef(null)
     const { servicedata, subService } = props.route.params
     const user = useSelector(state => state.authenticate.user)
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const category_array = ['01:00', '02:00', '03:00', '4:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00']
-    const [startTime, setStartTime] = useState('01:00')
+    const [startTime, setStartTime] = useState(moment())
     const [endTime, setEndTime] = useState('01:00')
     const [fromAddress, setFromAddress] = useState("")
     const [toAddress, setToAddress] = useState("")
@@ -57,6 +60,7 @@ const MechanicLocation = (props) => {
     }, [toCoordinates])
 
     useEffect(() => {
+        // subService.location_type : 2 - Both , 1 - From only
         getLocationPermission()
     }, [])
 
@@ -132,11 +136,11 @@ const MechanicLocation = (props) => {
                 if (type == 'from') {
                     fromInputRef.current.blur()
                     setFromAddress(place.address)
-                    setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                    setFromCoordinates({ ...fromCoordinates, latitude: place.location.latitude, longitude: place.location.longitude })
                 } else {
                     toInputRef.current.blur()
                     setToAddress(place.address)
-                    setToCoordinates({ ...toCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                    setToCoordinates({ ...toCoordinates, latitude: place.location.latitude, longitude: place.location.longitude })
                 }
             })
             .catch(error => console.log("openSearchModal error => ", error.message));
@@ -151,22 +155,29 @@ const MechanicLocation = (props) => {
             "order_placed_address": toAddress,
             "order_placed_lat": toCoordinates.latitude,
             "order_placed_long": toCoordinates.longitude,
-            "order_start_time": date + " " + startTime+":00",
+            "order_start_time": date + " " + moment(startTime).format('HH:mm')+ ":00",
             "order_from_lat": fromCoordinates.latitude,
             "order_from_long": fromCoordinates.longitude,
             "order_from_address": fromAddress
         }
 
-        if (data.order_placed_address.trim() == "") {
-            showToast("Please add from address")
-        } else if (data.order_from_address.trim() == "") {
+        console.log("data =>> ", data)
+
+        if (subService.location_type == 2 && data.order_placed_address.trim() == "") {
             showToast("Please add to address")
+        } else if (data.order_from_address.trim() == "") {
+            showToast("Please add from address")
         } else if (date.trim() == "") {
             showToast("Please select date")
         } else {
             props.navigation.navigate("Mechanics", { data: data, subService: subService })
         }
     }
+
+    const handleConfirm = (date) => {
+        setStartTime(date)
+        setDatePickerVisibility(false);
+    };
 
     const renderView = () => {
         return (
@@ -212,7 +223,7 @@ const MechanicLocation = (props) => {
                             </TouchableOpacity>
                         </View>
                         <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>
-                        <View style={styles.fromContainer}>
+                        {subService.location_type == 2 && <View style={styles.fromContainer}>
                             <TextInput
                                 style={styles.inputStyle}
                                 color="black"
@@ -232,7 +243,7 @@ const MechanicLocation = (props) => {
                                     source={require("../../../assets/location.png")}
                                 />
                             </TouchableOpacity>
-                        </View>
+                        </View>}
                         <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>Add Date</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
@@ -258,17 +269,10 @@ const MechanicLocation = (props) => {
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "5%" }}>
                         <View style={{ flex: 1, alignItems: 'center' }}>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>Start Time</Text>
-                            <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10, alignSelf: "center" }}>
-                                <DropDown
-                                    item={category_array}
-                                    value={startTime}
-                                    width={widthPercentageToDP(30)}
-                                    onChangeItem={(t) => setStartTime(t)}
-                                    placeholder="Car"
-                                    dropdownStyle={{ width: '30%', alignItems: 'center' }}
-                                />
-                            </Row>
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
+                            <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility(true)} >
+                                <Text>{moment(startTime).format('HH:mm A')}</Text>
+                            </TouchableOpacity>
                         </View>
                         {/* <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>End Time</Text>
@@ -291,6 +295,12 @@ const MechanicLocation = (props) => {
                         <Text style={styles.saveText}>Submit</Text>
                     </TouchableOpacity>
                     <View style={{ height: 30 }}></View>
+                    <DateTimePickerModal
+                        isVisible={isDatePickerVisible}
+                        mode="time"
+                        onConfirm={handleConfirm}
+                        onCancel={() => setDatePickerVisibility(false)}
+                    />
                 </ScrollView>
             </View>
         )

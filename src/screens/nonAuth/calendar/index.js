@@ -67,8 +67,8 @@ const Calendar = (props) => {
 
                     <View>
                         <Text style={{ marginTop: 20, marginLeft: 20, fontSize: 16, fontFamily: LS_FONTS.PoppinsBold }}>Date Added</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <View style={{ height: 60, width: 60, marginTop: 10, backgroundColor: LS_COLORS.global.green, borderRadius: 100, marginLeft: 20, justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                            <View style={{ height: 60, width: 60, backgroundColor: LS_COLORS.global.green, borderRadius: 100, marginLeft: 20, justifyContent: 'center', alignItems: 'center' }}>
                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsBold, color: LS_COLORS.global.white, textAlign: 'center' }}>{date}</Text>
                             </View>
                             <Text style={{ alignSelf: 'center', fontSize: 14, fontFamily: LS_FONTS.PoppinsLight, marginLeft: 10 }}>Need a Mechanic</Text>
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
-        marginTop: 50
+        marginTop: 20
     },
     saveText: {
         textAlign: "center",
