@@ -38,13 +38,13 @@ const SubServices = (props) => {
 
         let user_data = {
             "service_parent_id": service.id,
-            "user_id": user.id,            
+            "user_id": user.id,
         }
 
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint: '/api/subServicesList',
+            endPoint: user.user_role == 2 ? '/api/subServicesList' : '/api/providerSubServicesList',
             type: 'post'
         }
 

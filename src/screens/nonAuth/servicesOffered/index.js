@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -20,6 +20,7 @@ import CustomButton from '../../../components/customButton';
 import services, { setAddServiceData } from '../../../redux/features/services';
 import { showToast } from '../../../components/validators';
 import ServiceItem from '../../../components/serviceItem';
+import _ from 'lodash';
 
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
@@ -27,28 +28,43 @@ const ServicesProvided = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
     const addServiceData = useSelector(state => state.services.addServiceData)
+    const [itemListMaster, setItemListMaster] = useState([])
     const [itemList, setItemList] = useState([])
     const [loading, setLoading] = useState(false)
+
     const [selectedItems, setSelectedItems] = useState([])
     const [servicesData, setServicesData] = useState([])
+    const [productsData, setProductsData] = useState([])
+    const [newProductsData, setNewProductsData] = useState([])
+    const [selectedProducts, setSelectedProducts] = useState([])
+    const [selectedNewProducts, setSelectedNewProducts] = useState([])
+    const [isOtherSelected, setIsOtherSelected] = useState(false)
+
     const [isUpdated, setIsUpdated] = useState(false)
     const [variants, setVariants] = useState([])
     const [selectedVariant, setSelectedVariant] = useState(null)
     const access_token = useSelector(state => state.authenticate.access_token)
+    const [activeIndex, setActiveIndex] = useState(null)
+    const [activeItem, setActiveItem] = useState(null)
+    const itemRef = useRef(null)
 
     useEffect(() => {
         getServiceItems()
     }, [])
 
     useEffect(() => {
+        setInitialServiceData()
+    }, [itemList])
+
+    useEffect(() => {
+        filterVariants()
+    }, [selectedVariant, itemListMaster])
+
+    useEffect(() => {
         if (!isAddServiceMode && subService && subService.items && subService.items.length > 0 && servicesData.length > 0 && !isUpdated) {
             setPreviousData(servicesData)
         }
     }, [servicesData])
-
-    useEffect(() => {
-        setInitialServiceData()
-    }, [itemList])
 
     const getServiceItems = () => {
         setLoading(true)
@@ -74,9 +90,10 @@ const ServicesProvided = (props) => {
             .then((response) => {
                 if (response.status == true) {
                     setLoading(false)
-                    setItemList([...response.data])
+                    setItemListMaster([...response.data])
                     if (response.variant_data) {
                         setVariants(response.variant_data)
+                        setSelectedVariant(response.variant_data[0].id)
                     }
                 }
                 else {
@@ -100,15 +117,37 @@ const ServicesProvided = (props) => {
     }
 
     const setInitialServiceData = () => {
-        let newArr = itemList.map((item, index) => {
-            return {
-                "item_id": item.id,
-                "price": "",
-                "time_duration_h": "",
-                "time_duration_m": "",
-            }
-        })
-        setServicesData([...newArr])
+        if (!selectedItems.length > 0) {
+            let newArr = itemListMaster.map((item, index) => {
+                return {
+                    "item_id": item.id,
+                    "price": item.price ? item.price : "",
+                    "time_duration_h": "",
+                    "time_duration_m": "",
+                    "variant_data": item.variant_data
+                }
+            })
+            setServicesData([...newArr])
+        }
+
+        setInitialProductsData()
+    }
+
+    const setInitialProductsData = () => {
+        if (!selectedProducts.length > 0 && !selectedNewProducts.length > 0) {
+            let newArr = []
+            itemListMaster.map((item, index) => {
+                item.products.forEach(element => {
+                    newArr.push({
+                        "id": element.id,
+                        "name": element.name,
+                        "price": element.price ? element.price : "",
+                        "item_id": element.item_id
+                    })
+                });
+            })
+            setProductsData([...newArr])
+        }
     }
 
     const setPreviousData = (arr) => {
@@ -140,45 +179,19 @@ const ServicesProvided = (props) => {
 
     const next = () => {
         let services = []
-        let products = [...addServiceData.json_data.products]
-        let newProducts = [...addServiceData.json_data.new_products]
-        let isValidData = false
-        if (selectedItems.length > 0) {
-            servicesData.forEach((itemm, index) => {
-                if (selectedItems.includes(itemm.item_id)) {
-                    if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
-                        isValidData = true
-                        var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
-                        var fieldArray = hoursDotMinutes.split(":");
-                        var minutes = Number(fieldArray[0]) + 60 * Number(fieldArray[1]);
 
-                        let obj = {
-                            "item_id": itemm.item_id,
-                            "price": Number(itemm.price.replace('$', '')),
-                            "time_duration": minutes
-                        }
-                        services.push(obj)
-                    } else {
-                        isValidData = false
-                    }
+        servicesData.forEach((itemm, index) => {
+            if (selectedItems.includes(itemm.item_id)) {
+                var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
+                var fieldArray = hoursDotMinutes.split(":");
+                var minutes = Number(fieldArray[0]) + 60 * Number(fieldArray[1]);
+
+                let obj = {
+                    "item_id": itemm.item_id,
+                    "price": Number(itemm.price.replace('$', '')),
+                    "time_duration": minutes
                 }
-            })
-            if (!isValidData) {
-                return showToast("Please enter data for selected services")
-            }
-        } else {
-            showToast("Select Service first")
-        }
-
-        products.forEach(item => {
-            if (item.price.replace("$", '').trim() == "") {
-                return showToast("Please enter data for selected Products")
-            }
-        })
-
-        newProducts.forEach(item => {
-            if (item.price.replace("$", '').trim() == "" || item.name.trim() == '') {
-                return showToast("Please enter data for added Products")
+                services.push(obj)
             }
         })
 
@@ -189,7 +202,21 @@ const ServicesProvided = (props) => {
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    services: [...services]
+                    services: [...services],
+
+                }
+            }
+        }))
+
+        dispatch(setAddServiceData({
+            data: {
+                ...addServiceData,
+                user_id: user.id,
+                service_id: subService.id,
+                json_data: {
+                    ...addServiceData.json_data,
+                    products: [...productsData],
+                    new_products: [...newProductsData]
                 }
             }
         }))
@@ -208,22 +235,27 @@ const ServicesProvided = (props) => {
         }
     }
 
-    const setText = (key, text, index) => {
-        let temp = [...servicesData]
-        if (key == "price") {
-            let parsed = conTwoDecDigit(text.replace('$', ''))
-            if (text == '') {
-                temp[index].price = ''
-            } else {
-                temp[index].price = '$' + String(parsed)
+    const setText = (key, text, indexx, incomingItem) => {
+        let temp = [...servicesData.filter(item => item.variant_data == selectedVariant)]
+        let otherItems = [...servicesData.filter(item => item.variant_data !== selectedVariant)]
+        temp.forEach((ele, index) => {
+            if (ele.item_id == incomingItem.item_id) {
+                if (key == "price") {
+                    let parsed = conTwoDecDigit(text.replace('$', ''))
+                    if (text == '') {
+                        temp[index].price = ''
+                    } else {
+                        temp[index].price = '$' + String(parsed)
+                    }
+                } else if (key == 'time_duration_h') {
+                    temp[index].time_duration_h = text
+                } else {
+                    temp[index].time_duration_m = text
+                }
             }
-        } else if (key == 'time_duration_h') {
-            temp[index].time_duration_h = text
-        } else {
-            temp[index].time_duration_m = text
-        }
+        })
 
-        setServicesData([...temp])
+        setServicesData([...temp, ...otherItems])
     }
 
     const conTwoDecDigit = (digit) => {
@@ -287,6 +319,215 @@ const ServicesProvided = (props) => {
         }
     }
 
+    const onPressItem = (index, item) => {
+        if (!selectedItems.includes(item.id)) {
+            setCheckedData(null, item)
+        }
+        if (activeItem == null) {
+            setActiveIndex(index)
+            setActiveItem(item)
+        } else {
+            if (getSelectedProducts().length > 0 || getSelectedNewProducts().length > 0) {
+                Alert.alert(
+                    "Lifesuite",
+                    "Remove selected items ?",
+                    [
+                        {
+                            text: "Cancel",
+                            onPress: () => { },
+                            style: "cancel"
+                        },
+                        { text: "OK", onPress: () => discardItem(item) }
+                    ]
+                );
+            } else {
+                setCheckedData(null, item)
+                setActiveIndex(null)
+                setActiveItem(null)
+            }
+        }
+    }
+
+    const discardItem = (item) => {
+        let pdata = selectedProducts.filter(element => element.item_id !== item.id)
+        let pdataNew = selectedNewProducts.filter(itemm => itemm.item_id !== item.id)
+
+        setSelectedProducts([...pdata])
+        setSelectedNewProducts([...pdataNew])
+
+        setActiveItem(null)
+        setActiveIndex(null)
+        setCheckedData(null, item)
+    }
+
+    const saveRequest = () => {
+        if (selectedProducts.length > 0 || selectedNewProducts.length > 0) {
+            let isValidData = false
+            servicesData.filter(item => item.variant_data == selectedVariant).forEach((itemm, index) => {
+                if (selectedItems.includes(itemm.item_id)) {
+                    if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
+                        isValidData = true
+                    } else {
+                        isValidData = false
+                    }
+                }
+            })
+
+            let selected = getSelectedProducts()
+            productsData.filter(item => selected.includes(item.id)).forEach(element => {
+                if (element.price.trim() == "") {
+                    isValidData = false
+                }
+            });
+
+            let selectedNew = getSelectedNewProducts()
+            newProductsData.filter(item => selectedNew.includes(item.id)).forEach(element => {
+                if (element.price.trim() == "" || element.name.trim() == "") {
+                    isValidData = false
+                }
+            });
+
+            if (!isValidData) {
+                return showToast("Please enter data for selected services")
+            } else {
+                setActiveItem(null)
+                setActiveIndex(null)
+            }
+        } else {
+            showToast("Please select at least one item")
+        }
+    }
+
+    const filterVariants = () => {
+        let data = itemListMaster.filter(item => item.variant_data == selectedVariant)
+
+        setItemList([...data])
+    }
+
+    const toggleVariant = (variant) => {
+        if (activeItem !== null) {
+            showToast("Please save or discard current selection")
+        } else {
+            setActiveItem(null)
+            setActiveIndex(null)
+            setSelectedVariant(variant.id)
+        }
+    }
+
+    const onPressProduct = (item) => {
+        let arr = [...selectedProducts]
+        let selectedIndex = null
+        arr.forEach((element, index) => {
+            if (element.id == item.id) {
+                selectedIndex = index
+            }
+        });
+        if (selectedIndex !== null) {
+            arr.splice(selectedIndex, 1)
+        } else {
+            arr.push(item)
+        }
+        setSelectedProducts([...arr])
+    }
+
+    const onPressNewProduct = (item) => {
+        let arr = [...selectedNewProducts]
+        let selectedIndex = null
+        arr.forEach((element, index) => {
+            if (element.temp_id == item.temp_id) {
+                selectedIndex = index
+            }
+        });
+        if (selectedIndex !== null) {
+            arr.splice(selectedIndex, 1)
+        } else {
+            arr.push(item)
+        }
+        setSelectedNewProducts([...arr])
+    }
+
+    const getSelectedProducts = () => {
+        let arr = selectedProducts.filter(item => item.item_id == activeItem.id)
+        let selected = arr.map(item => item.id)
+        return selected;
+    }
+
+    const getSelectedNewProducts = () => {
+        let arr = selectedNewProducts.filter(item => item.item_id == activeItem.id)
+        let selected = arr.map(item => item.temp_id)
+        return selected;
+    }
+
+    const setProductText = (item, text) => {
+        let temp = _.cloneDeep(productsData)
+        temp.forEach((element, index) => {
+            if (element.id == item.id && element.item_id == item.item_id) {
+                let parsed = conTwoDecDigit(text.replace('$', ''))
+                if (text == '') {
+                    temp[index].price = ''
+                } else {
+                    temp[index].price = '$' + String(parsed)
+                }
+            }
+        })
+
+        setProductsData([...temp])
+    }
+
+    const setNewProductText = (item, text, type) => {
+        let temp = _.cloneDeep(newProductsData)
+
+        temp.forEach((element, index) => {
+            if (element.temp_id == item.temp_id && element.item_id == item.item_id) {
+                if (type == "name") {
+                    temp[index].name = text
+                } else {
+                    let parsed = conTwoDecDigit(text.replace('$', ''))
+                    if (text == '') {
+                        temp[index].price = ''
+                    } else {
+                        temp[index].price = '$' + String(parsed)
+                    }
+                }
+            }
+        })
+
+        setNewProductsData([...temp])
+    }
+
+    const onSelectOther = () => {
+        setIsOtherSelected(!isOtherSelected)
+        if (newProductsData.length === 0) {
+            addNewProduct()
+        }
+    }
+
+    const removeNewproduct = (item) => {
+        let temp = _.cloneDeep(newProductsData)
+
+        temp.forEach((element, index) => {
+            if (element.temp_id == item.temp_id && element.item_id == item.item_id) {
+                temp.splice(index, 1)
+            }
+        })
+
+        if (temp.length == 0) {
+            setIsOtherSelected(false)
+        }
+        setNewProductsData([...temp])
+    }
+
+    const addNewProduct = () => {
+        let arr = [...newProductsData]
+        arr.push({
+            "item_id": activeItem.id,
+            "name": "",
+            "price": "",
+            "temp_id": String(Math.floor((Math.random() * 10000000) + 1000))
+        })
+        setNewProductsData([...arr])
+    }
+
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -323,7 +564,7 @@ const ServicesProvided = (props) => {
                         <View style={{ marginVertical: 10, flexDirection: 'row', overflow: 'scroll', paddingHorizontal: '5%', justifyContent: 'center' }}>
                             {variants.length > 0 && variants.map((item, index) => {
                                 return (
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => setSelectedVariant(item.id)} key={index}
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => toggleVariant(item)} key={index}
                                         style={{
                                             backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
                                             marginHorizontal: 10,
@@ -344,16 +585,43 @@ const ServicesProvided = (props) => {
                                 )
                             })}
                         </View>
-                        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end', marginBottom: '2%' }}>
+                        {activeItem !== null && <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end', marginBottom: '2%' }}>
                             <View style={{ alignItems: 'center' }}>
                                 <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Time</Text>
                             </View>
                             <View style={{ marginLeft: '5%' }}>
                                 <Text style={styles.priceTime}>Price</Text>
                             </View>
-                        </View>
+                        </View>}
 
-                        {
+                        {activeItem !== null
+                            ?
+                            <>
+                                <ServiceItem
+                                    ref={itemRef}
+                                    item={activeItem}
+                                    index={activeIndex}
+                                    onCheckPress={() => onPressItem(activeIndex, activeItem)}
+                                    isSelected={selectedItems.includes(activeItem.id)}
+                                    setText={setText}
+                                    setProductText={setProductText}
+                                    setNewProductText={setNewProductText}
+                                    serviceItem={servicesData.filter(item => item.variant_data == selectedVariant)[activeIndex]}
+                                    subService={subService}
+                                    showInputs
+                                    products={productsData.filter(item => item.item_id == activeItem.id)}
+                                    newProducts={newProductsData.filter(item => item.item_id == activeItem.id)}
+                                    selectedProducts={getSelectedProducts()}
+                                    selectedNewProducts={getSelectedNewProducts()}
+                                    onPressProduct={(item) => onPressProduct(item)}
+                                    onPressNewProduct={(item) => onPressNewProduct(item)}
+                                    onSelectOther={onSelectOther}
+                                    isOtherSelected={isOtherSelected}
+                                    removeNewproduct={removeNewproduct}
+                                    addNewProduct={addNewProduct}
+                                />
+                            </>
+                            :
                             isAddServiceMode
                                 ?
                                 itemList && itemList.length > 0
@@ -364,11 +632,8 @@ const ServicesProvided = (props) => {
                                                 key={index}
                                                 item={item}
                                                 index={index}
-                                                onCheckPress={() => setCheckedData(index, item)}
+                                                onCheckPress={() => { onPressItem(index, item) }}
                                                 isSelected={selectedItems.includes(item.id)}
-                                                setText={setText}
-                                                serviceItem={servicesData[index]}
-                                                subService={subService}
                                             />
                                         )
                                     }))
@@ -396,7 +661,12 @@ const ServicesProvided = (props) => {
                         }
                     </Content>
                     <View style={{ paddingBottom: '2.5%' }}>
-                        <CustomButton title={isAddServiceMode ? "Next" : selectedItems.length > 0 ? "Next" : "Edit"} action={() => next()} />
+                        {activeItem == null
+                            ?
+                            <CustomButton title={isAddServiceMode ? "Next" : selectedItems.length > 0 ? "Next" : "Edit"} action={() => next()} />
+                            :
+                            <CustomButton title={"Save"} action={() => saveRequest()} />
+                        }
                     </View>
                 </Container>
                 {loading && <Loader />}

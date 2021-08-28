@@ -61,7 +61,7 @@ const HomeScreen = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint: '/api/servicesList',
+            endPoint: user.user_role == 2 ? '/api/servicesList' : '/api/providerServicesList',
             type: 'post'
         }
 
@@ -96,7 +96,7 @@ const HomeScreen = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint: '/api/providerServicesList',
+            endPoint: '/api/providerAddedServicesList',
             type: 'post'
         }
 

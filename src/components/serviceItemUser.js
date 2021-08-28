@@ -189,10 +189,12 @@ const styles = StyleSheet.create({
         width: 75,
         alignItems: 'center',
         borderColor: LS_COLORS.global.lightTextColor,
+        borderWidth: 0.5,
         justifyContent: "center",
-        backgroundColor: '#ECECEC',
+        backgroundColor: LS_COLORS.global.white,
         paddingHorizontal: 5,
-        marginRight: '10%'
+        marginRight: '10%',
+        borderRadius: 6
     },
     inputStyle: {
         height: '100%',
@@ -200,5 +202,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         textAlign: 'center'
     },
-
 })

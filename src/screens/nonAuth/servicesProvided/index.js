@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -7,20 +7,17 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import { CheckBox } from 'react-native-elements'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /* Components */;
 import Header from '../../../components/header';
 import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
-import { Container, Content, Row, } from 'native-base'
-import { TextInput } from 'react-native-gesture-handler';
+import { Container, Content } from 'native-base'
 import { BASE_URL, getApi } from '../../../api/api';
 import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
 import ServiceItemUser from '../../../components/serviceItemUser';
-import { indexOf } from 'lodash';
 
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
@@ -116,18 +113,39 @@ const ServicesProvided = (props) => {
                 })
             }
         });
-        props.navigation.navigate("MechanicLocation", { servicedata: servicedata, subService: subService })
+        props.navigation.navigate("MechanicLocation", { servicedata: servicedata, subService: subService, extraData: extraData })
     }
 
-    const onPressItem = (item, index) => {
+    const onPressItem = (item) => {
         if (!selectedItems.includes(item.id)) {
             setCheckedData(item)
         }
         if (activeItem == null) {
             setActiveItem(item)
         } else {
-            setActiveItem(null)
+            Alert.alert(
+                "Lifesuite",
+                "Remove selected items ?",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => { },
+                        style: "cancel"
+                    },
+                    { text: "OK", onPress: () => discardItem(item) }
+                ]
+            );
         }
+    }
+
+    const discardItem = (item) => {
+        setActiveItem(null)
+        setCheckedData(item)
+        item.products.forEach(element => {
+            if (selectedProducts.includes(element.id)) {
+                selectedProducts.splice(selectedProducts.indexOf(element.id), 1)
+            }
+        });
     }
 
     const saveRequest = () => {
@@ -194,12 +212,38 @@ const ServicesProvided = (props) => {
         setItemList([...filtered])
     }
 
+    const onChangeVehicleType = (value) => {
+        if (selectedItems.length > 0 && vehicleType !== value) {
+            Alert.alert(
+                "Are you sure ?",
+                "All selected items will be lost.",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => { },
+                        style: "cancel"
+                    },
+                    { text: "OK", onPress: () => resetSelection(value) }
+                ]
+            );
+        } else {
+            setVehicleType(value)
+        }
+    }
+
+    const resetSelection = (value) => {
+        setVehicleType(value)
+        setSelectedItems([])
+        setSelectedProducts([])
+        setExtraDataa([])
+    }
+
     return (
         <>
             <StatusBar translucent={true} backgroundColor="transparent" barStyle="light-content" />
-            <View style={{ width: '100%', height: '30%' }}>
+            <View style={{ width: '100%', height: '25%' }}>
                 <ImageBackground
-                    resizeMode="stretch"
+                    resizeMode="cover"
                     source={{ uri: BASE_URL + subService.image }}
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -223,16 +267,57 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    <Container style={{ marginTop: 26 }}>
+                    <Container style={{ marginTop: 0 }}>
+                        {subService.id == 14 && <View style={{}}>
+                            <DropDown
+                                title="Vehicle Type"
+                                item={['Car', 'Truck', 'Suv', 'Van']}
+                                value={vehicleType}
+                                onChangeValue={(index, value) => onChangeVehicleType(value)}
+                                containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
+                                dropdownStyle={{ maxHeight: 300 }}
+                            />
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: '3.5%' }}>
+                                <View style={{ flex: 1 }}>
+                                    <DropDown
+                                        title="Make"
+                                        item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
+                                        value={'1990'}
+                                        onChangeValue={(index, value) => { }}
+                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
+                                        dropdownStyle={{ maxHeight: 300 }}
+                                    />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <DropDown
+                                        title="Model"
+                                        item={['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']}
+                                        value={'A1'}
+                                        onChangeValue={(index, value) => { }}
+                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
+                                        dropdownStyle={{ maxHeight: 300 }}
+                                    />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <DropDown
+                                        title="Year"
+                                        item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
+                                        value={'2001'}
+                                        onChangeValue={(index, value) => { }}
+                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
+                                        dropdownStyle={{ maxHeight: 300 }}
+                                    />
+                                </View>
+                            </View>
+                        </View>}
                         <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services</Text>
-
                         {
                             activeItem !== null
                                 ?
                                 <>
                                     <ServiceItemUser
                                         item={activeItem}
-                                        onCheckPress={() => setCheckedData(activeItem)}
+                                        onCheckPress={() => onPressItem(activeItem)}
                                         isSelected={selectedItems.includes(activeItem.id)}
                                         selectedProducts={selectedProducts}
                                         onSelectProduct={(product) => setCheckedDataProducts(product)}
@@ -244,48 +329,6 @@ const ServicesProvided = (props) => {
                                 itemListMaster.length > 0
                                     ?
                                     <Content style={{ flex: 1 }}>
-                                        {subService.id == 14 && <View style={{}}>
-                                            <DropDown
-                                                title="Vehicle Type"
-                                                item={['Car', 'Truck', 'Suv', 'Van']}
-                                                value={vehicleType}
-                                                onChangeValue={(index, value) => setVehicleType(value)}
-                                                containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                                dropdownStyle={{ maxHeight: 300 }}
-                                            />
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: '3.5%' }}>
-                                                <View style={{ flex: 1 }}>
-                                                    <DropDown
-                                                        title="Make"
-                                                        item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
-                                                        value={'1990'}
-                                                        onChangeValue={(index, value) => { }}
-                                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
-                                                        dropdownStyle={{ maxHeight: 300 }}
-                                                    />
-                                                </View>
-                                                <View style={{ flex: 1 }}>
-                                                    <DropDown
-                                                        title="Model"
-                                                        item={['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']}
-                                                        value={'A1'}
-                                                        onChangeValue={(index, value) => { }}
-                                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                                        dropdownStyle={{ maxHeight: 300 }}
-                                                    />
-                                                </View>
-                                                <View style={{ flex: 1 }}>
-                                                    <DropDown
-                                                        title="Year"
-                                                        item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
-                                                        value={'2001'}
-                                                        onChangeValue={(index, value) => { }}
-                                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                                        dropdownStyle={{ maxHeight: 300 }}
-                                                    />
-                                                </View>
-                                            </View>
-                                        </View>}
                                         {itemList && itemList.length > 0
                                             ?
                                             itemList.map((item, index) => {

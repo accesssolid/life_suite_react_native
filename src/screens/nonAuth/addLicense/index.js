@@ -213,7 +213,7 @@ const AddLicense = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint: '/api/providerServicesList',
+            endPoint: '/api/providerAddedServicesList',
             type: 'post'
         }
 

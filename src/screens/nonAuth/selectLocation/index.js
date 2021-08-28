@@ -41,6 +41,10 @@ const SelectLocation = (props) => {
     })
 
     useEffect(() => {
+        console.log("subService =>> ", subService)
+    }, [])
+
+    useEffect(() => {
         if (selectedAddress == "current") {
             getLocationPermission()
         } else {
@@ -199,7 +203,19 @@ const SelectLocation = (props) => {
                     "services": addServiceData.json_data.services,
                     "products": [...products],
                     "travel_distance": travel_distance,
-                    "new_products": [...newProd]
+                    "new_products": [...newProd],
+                    "time_frame": [
+                        {
+                            "date": "2021-07-16",
+                            "from_time": "10:00",
+                            "to_time": "23:00"
+                        },
+                        {
+                            "date": "2021-07-17",
+                            "from_time": "10:00",
+                            "to_time": "23:00"
+                        }
+                    ]
                 }));
 
                 addServiceData.images.forEach((item, index) => {
@@ -258,7 +274,7 @@ const SelectLocation = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint: '/api/providerServicesList',
+            endPoint: '/api/providerAddedServicesList',
             type: 'post'
         }
 
