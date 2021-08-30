@@ -26,6 +26,7 @@ import Settings from '../screens/nonAuth/settings';
 import ConfirmSetPassCode from '../screens/nonAuth/confirmSetPassCode';
 import SetPassCode from '../screens/nonAuth/setPassCode';
 import SelectLocation from '../screens/nonAuth/selectLocation';
+import MapScreen from '../screens/nonAuth/map';
 
 const Stack = createStackNavigator();
 
@@ -50,7 +51,7 @@ const UserStack = () => {
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="SetPassCode" component={SetPassCode} />
             <Stack.Screen name="ConfirmSetPassCode" component={ConfirmSetPassCode} />
-            {/* <Stack.Screen name="SelectLocation" component={SelectLocation} /> */}
+            <Stack.Screen name="MapScreen" component={MapScreen} />
         </Stack.Navigator>
     )
 }

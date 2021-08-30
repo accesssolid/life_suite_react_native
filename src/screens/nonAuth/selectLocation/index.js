@@ -41,10 +41,6 @@ const SelectLocation = (props) => {
     })
 
     useEffect(() => {
-        console.log("subService =>> ", subService)
-    }, [])
-
-    useEffect(() => {
         if (selectedAddress == "current") {
             getLocationPermission()
         } else {
@@ -115,14 +111,16 @@ const SelectLocation = (props) => {
     const getCurrentLocation = (hasLocationPermission) => {
         if (isAddServiceMode) {
             if (hasLocationPermission) {
+                console.log("hasLocationPermission =>> ", hasLocationPermission)
                 Geolocation.getCurrentPosition(
                     (position) => {
+                        console.log("position =>>", position);
                         getCurrentPlace()
                     },
                     (error) => {
-                        console.log(error.code, error.message);
+                        console.log("getCurrentPosition error =>>", error.code, error.message);
                     },
-                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                    { /* enableHighAccuracy: true, */ timeout: 15000, /* maximumAge: 10000 */ }
                 );
             } else {
                 setSelectedAddress("saved")
@@ -137,6 +135,7 @@ const SelectLocation = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
+                console.log("getCurrentPlace =>>", results);
                 setAddress(results[0].address)
                 setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
             })
@@ -149,17 +148,6 @@ const SelectLocation = (props) => {
             setTravelDistance(subService.travel_data.travel_distance)
             setCoordinates({ ...coordinates, latitude: Number(subService.travel_data.lat), longitude: Number(subService.travel_data.long) })
         }
-    }
-
-    const openSearchModal = () => {
-        RNGooglePlaces.openAutocompleteModal({
-            type: 'address'
-        }, ['placeID', 'location', 'name', 'address'])
-            .then((place) => {
-                setAddress(place.address)
-                setCoordinates({ ...coordinates, latitude: place.location.latitude, longitude: place.location.longitude })
-            })
-            .catch(error => console.log(error.message));
     }
 
     const next = () => {
@@ -196,27 +184,17 @@ const SelectLocation = (props) => {
                     }
                 })
 
-                var formdata = new FormData();
-                formdata.append("user_id", user.id);
-                formdata.append("service_id", addServiceData.service_id);
-                formdata.append("json_data", JSON.stringify({
+                let json_data = JSON.stringify({
                     "services": addServiceData.json_data.services,
                     "products": [...products],
                     "travel_distance": travel_distance,
                     "new_products": [...newProd],
-                    "time_frame": [
-                        {
-                            "date": "2021-07-16",
-                            "from_time": "10:00",
-                            "to_time": "23:00"
-                        },
-                        {
-                            "date": "2021-07-17",
-                            "from_time": "10:00",
-                            "to_time": "23:00"
-                        }
-                    ]
-                }));
+                    "time_frame": []
+                })
+
+                var formdata = new FormData();
+                formdata.append("user_id", user.id);
+                formdata.append("service_id", addServiceData.service_id);          
 
                 addServiceData.images.forEach((item, index) => {
                     if (!item.uri.startsWith(BASE_URL)) {
@@ -228,75 +206,13 @@ const SelectLocation = (props) => {
                     }
                 })
 
-                let config = {
-                    headers: headers,
-                    data: formdata,
-                    endPoint: '/api/providerServicesAdd',
-                    type: 'post'
-                }
-
-                getApi(config)
-                    .then((response) => {
-                        if (response.status == true) {
-                            setLoading(false)
-                            showToast(response.message, 'success')
-                            getMyJobs(true)
-                        }
-                        else {
-                            setLoading(false)
-                            showToast(response.message, 'danger')
-                        }
-                    })
-                    .catch(err => {
-                        setLoading(false)
-                        console.log("error =>", err)
-                    })
+                return props.navigation.navigate('AddTimeFrame', { serviceData: { json_data, formdata } })
             } catch (error) {
 
             } finally {
                 setLoading(false)
             }
         }
-    }
-
-    const getMyJobs = (shouldNavigate) => {
-        setLoading(true)
-        let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${access_token}`
-        }
-
-        let user_data = {
-            "user_id": user.id
-        }
-
-        let config = {
-            headers: headers,
-            data: JSON.stringify({ ...user_data }),
-            endPoint: '/api/providerAddedServicesList',
-            type: 'post'
-        }
-
-        getApi(config)
-            .then((response) => {
-                if (response.status == true) {
-                    dispatch(setMyJobs({ data: [...response.data] }))
-                    dispatch(setAddServiceMode({ data: false }))
-                    setLoading(false)
-                    if (shouldNavigate) {
-                        props.navigation.navigate('HomeScreen')
-                    }
-                }
-                else {
-                    setLoading(false)
-                    if (shouldNavigate) {
-                        props.navigation.navigate('HomeScreen')
-                    }
-                }
-            }).catch(err => {
-                setLoading(false)
-            })
     }
 
     return (
@@ -345,71 +261,26 @@ const SelectLocation = (props) => {
                             </MapView>
                         </View>
                         <View style={{ flex: 1, padding: 20 }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10 }}>
-                                <CustomButton
-                                    title="Your Address"
-                                    customTextStyles={{ fontSize: 14, color: selectedAddress !== "current" ? LS_COLORS.global.white : LS_COLORS.global.green, }}
-                                    customStyles={{
-                                        width: '100%',
-                                        height: 40,
-                                        paddingHorizontal: '5%',
-                                        backgroundColor: selectedAddress == "current" ? LS_COLORS.global.white : LS_COLORS.global.green,
-                                        borderColor: LS_COLORS.global.green,
-                                        borderWidth: selectedAddress == "current" ? 1 : 0,
-                                    }}
-                                    action={() => setSelectedAddress("saved")}
-                                />
-                                <CustomButton
-                                    title="Current Location"
-                                    customTextStyles={{ fontSize: 14, color: selectedAddress == "current" ? LS_COLORS.global.white : LS_COLORS.global.green, }}
-                                    customStyles={{
-                                        width: '100%',
-                                        height: 40,
-                                        paddingHorizontal: '5%',
-                                        backgroundColor: selectedAddress == "current" ? LS_COLORS.global.green : LS_COLORS.global.white,
-                                        borderColor: LS_COLORS.global.green,
-                                        borderWidth: selectedAddress == "current" ? 0 : 1,
-                                    }}
-                                    action={() => setSelectedAddress("current")}
-                                />
-                            </View>
-                            {selectedAddress !== "current" &&
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10 }}>
-                                    <CustomButton
-                                        title="Permanent"
-                                        customTextStyles={{ fontSize: 14, color: selectedSavedAddress == "permanent" ? LS_COLORS.global.white : LS_COLORS.global.green, }}
-                                        customStyles={{
-                                            width: '100%',
-                                            height: 40,
-                                            paddingHorizontal: '5%',
-                                            backgroundColor: selectedSavedAddress == "permanent" ? LS_COLORS.global.green : LS_COLORS.global.white,
-                                            borderColor: LS_COLORS.global.green,
-                                            borderWidth: selectedSavedAddress == "permanent" ? 0 : 1,
-                                        }}
-                                        action={() => setSelectedSavedAddress("permanent")}
-                                    />
-                                    <CustomButton
-                                        title="Mailing"
-                                        customTextStyles={{ fontSize: 14, color: selectedSavedAddress == "mailing" ? LS_COLORS.global.white : LS_COLORS.global.green, }}
-                                        customStyles={{
-                                            width: '100%',
-                                            height: 40,
-                                            paddingHorizontal: '5%',
-                                            backgroundColor: selectedSavedAddress == "mailing" ? LS_COLORS.global.green : LS_COLORS.global.white,
-                                            borderColor: LS_COLORS.global.green,
-                                            borderWidth: selectedSavedAddress == "mailing" ? 0 : 1,
-                                        }}
-                                        action={() => setSelectedSavedAddress("mailing")}
-                                    />
-                                </View>}
-                            <CustomTextInput
-                                placeholder="Address"
-                                value={address}
-                                inlineImageLeft={<Image source={require('../../../assets/location.png')} resizeMode="contain" style={{ height: '50%', width: '100%', backgroundColor: LS_COLORS.global.lightGrey }} />}
-                                onLeftPress={() => openSearchModal()}
-                                customContainerStyle={{ marginHorizontal: '0%' }}
-                                customInputStyle={{ paddingHorizontal: '7%' }}
-                            />
+                            <TouchableOpacity
+                                style={{
+                                    marginBottom: 30,
+                                    marginHorizontal: '10%',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    width: '100%',
+                                    backgroundColor: LS_COLORS.global.lightGrey,
+                                    borderRadius: 28,
+                                    alignSelf: 'center',
+                                    paddingVertical: 15,
+                                    paddingHorizontal: '10%',
+                                }}
+                                activeOpacity={0.7}
+                                onPress={() => props.navigation.navigate('MapScreen', { onConfirm: setAddress.bind(this) })}>
+                                <Text numberOfLines={1} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, }}>{address}</Text>
+                                <View style={{ aspectRatio: 1, position: 'absolute', right: '5%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Image source={require('../../../assets/location.png')} resizeMode="contain" style={{ height: '70%', width: '100%', backgroundColor: LS_COLORS.global.lightGrey }} />
+                                </View>
+                            </TouchableOpacity>
                             <Text style={{ fontFamily: LS_FONTS.PoppinsMedium }}>Travel Distance to provide service(KM)</Text>
                             <CustomTextInput
                                 placeholder="Travel Distance"
@@ -422,7 +293,7 @@ const SelectLocation = (props) => {
                         </View>
                         <View style={{ paddingBottom: '2.5%' }}>
                             <CustomButton
-                                title={"Save"}
+                                title={"Next"}
                                 customStyles={{ width: '50%', borderRadius: 6 }}
                                 action={() => next()}
                             />

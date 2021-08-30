@@ -114,25 +114,6 @@ const HomeScreen = (props) => {
             })
     }
 
-    const searchFilterFunction = (text) => {
-        if (text) {
-            const newData = services.filter(
-                function (item) {
-                    const itemData = item.name
-                        ? item.name.toUpperCase()
-                        : ''.toUpperCase();
-                    const textData = text.toUpperCase();
-                    return itemData.indexOf(textData) > -1;
-                }
-            );
-            setItems(newData);
-            setSearch(text);
-        } else {
-            setItems(services);
-            setSearch(text);
-        }
-    };
-
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
             props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
@@ -152,7 +133,7 @@ const HomeScreen = (props) => {
                             source={require('../../../assets/menu.png') /* user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/user.png") */}
                         />
                     </TouchableOpacity>
-                    <View style={{ flex: 1, paddingHorizontal: '5%' }}>                        
+                    <View style={{ flex: 1, paddingHorizontal: '5%' }}>
                     </View>
                     {
                         user.user_role == 2
@@ -280,7 +261,7 @@ const HomeScreen = (props) => {
                     {user.user_role == 3 && <View style={styles.orderContainer}>
                         <TouchableOpacity
                             activeOpacity={0.7}
-                            onPress={() => props.navigation.navigate('AddTimeFrame')}>
+                            onPress={() => props.navigation.navigate('AddTimeFrame', { serviceData: {} })}>
                             <Text style={styles.order}>
                                 SCHEDULE
                             </Text>

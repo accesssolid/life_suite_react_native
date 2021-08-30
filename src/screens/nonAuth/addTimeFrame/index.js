@@ -16,12 +16,19 @@ import Header from '../../../components/header';
 import CustomButton from "../../../components/customButton"
 import { TextInput } from 'react-native';
 import Loader from '../../../components/loader';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getApi } from '../../../api/api';
+import { showToast } from '../../../components/validators';
+import { setMyJobs } from '../../../redux/features/provider';
+import { setAddServiceMode } from '../../../redux/features/services';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const AddTimeFrame = (props) => {
+    const dispatch = useDispatch()
+    const { serviceData } = props.route.params
     const [selectedDates, setSelectedDates] = useState([])
     const user = useSelector(state => state.authenticate.user)
+    const access_token = useSelector(state => state.authenticate.access_token)
     const [customDatesStyles, setCustomDatesStyles] = useState([])
     const [loading, setLoading] = useState(false)
 
@@ -51,8 +58,8 @@ const AddTimeFrame = (props) => {
     const removeTimeFrame = (frame) => {
         let dates = [...selectedDates]
         let styles = [...customDatesStyles];
-        dates = dates.filter(item => item !== frame)
-        styles = styles.filter(item => moment(item.date).format("DD/MM/YYYY") !== frame)
+        dates = dates.filter(item => item !== moment(frame.date).format('DD/MM/YYYY'))
+        styles = styles.filter(item => item.date !== frame.date)
         setSelectedDates([...dates])
         setCustomDatesStyles([...styles])
     }
@@ -71,7 +78,8 @@ const AddTimeFrame = (props) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
 
         let data = []
@@ -86,17 +94,22 @@ const AddTimeFrame = (props) => {
             }
         })
 
-        setLoading(false)
-
-        let user_data = {
-            "user_id": user.id,
-            "json_data": JSON.stringify(data)
+        if (data.length == 0) {
+            setLoading(false)
+            return showToast("Invalid time frames data")
         }
+
+        let { json_data, formdata } = serviceData
+
+        json_data = JSON.parse(json_data)
+        json_data['time_frame'] = data
+
+        formdata.append("json_data", JSON.stringify(json_data));
 
         let config = {
             headers: headers,
-            data: JSON.stringify({ ...user_data }),
-            endPoint: '/api/addTimeFrames',
+            data: formdata,
+            endPoint: '/api/providerServicesAdd',
             type: 'post'
         }
 
@@ -104,13 +117,17 @@ const AddTimeFrame = (props) => {
             .then((response) => {
                 if (response.status == true) {
                     setLoading(false)
-                    getTimeFrames()
+                    showToast(response.message, 'success')
+                    getMyJobs(true)
                 }
                 else {
                     setLoading(false)
+                    showToast(response.message, 'danger')
                 }
-            }).catch(err => {
+            })
+            .catch(err => {
                 setLoading(false)
+                console.log("error =>", err)
             })
     }
 
@@ -118,7 +135,8 @@ const AddTimeFrame = (props) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
 
         let user_data = {
@@ -137,19 +155,23 @@ const AddTimeFrame = (props) => {
                 if (response.status == true) {
                     setLoading(false)
                     let styles = [];
-                    let dates = []
-                    response.data.forEach(element => {
-                        dates.push(moment(element.date).format("DD/MM/YYYY"))
-                        styles.push({
-                            date: element.date,
-                            style: { backgroundColor: LS_COLORS.global.green },
-                            textStyle: { color: LS_COLORS.global.white },
-                            containerStyle: [],
-                            allowDisabled: true,
-                            from_time: element.from_time,
-                            to_time: element.to_time
+                    let dates = [];
+
+                    Object.keys(response.data).forEach((ele) => {
+                        response.data[ele].forEach(element => {
+                            dates.push(moment(element.date).format("DD/MM/YYYY"))
+                            styles.push({
+                                date: element.date,
+                                style: { backgroundColor: LS_COLORS.global.green },
+                                textStyle: { color: LS_COLORS.global.white },
+                                containerStyle: [],
+                                allowDisabled: true,
+                                from_time: element.from_time,
+                                to_time: element.to_time
+                            });
                         });
-                    });
+                    })
+
                     setSelectedDates([...dates])
                     setCustomDatesStyles([...styles])
                 }
@@ -161,10 +183,47 @@ const AddTimeFrame = (props) => {
             })
     }
 
+    const getMyJobs = (shouldNavigate) => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let user_data = {
+            "user_id": user.id
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: '/api/providerAddedServicesList',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    dispatch(setMyJobs({ data: [...response.data] }))
+                    dispatch(setAddServiceMode({ data: false }))
+                    setLoading(false)
+                    if (shouldNavigate) {
+                        props.navigation.navigate('HomeScreen')
+                    }
+                } else {
+                    setLoading(false)
+                    showToast(response.message, 'success')
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
-                title="Add Time Frames"
+                title="Time Frames"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.goBack()
@@ -182,7 +241,7 @@ const AddTimeFrame = (props) => {
                         monthYearHeaderWrapperStyle={{
                             fontSize: 18
                         }}
-                        onMonthChange={(res) => console.log("OnMonthChange",res)}
+                        onMonthChange={(res) => console.log("OnMonthChange", res)}
                         selectedDayColor={LS_COLORS.global.green}
                         selectedDayTextColor={LS_COLORS.global.white}
                         textStyle={{
@@ -191,55 +250,57 @@ const AddTimeFrame = (props) => {
                         customDatesStyles={customDatesStyles}
                     />
                 </View>
-                <View style={{ marginVertical: 5 }}>
-                    {selectedDates.map((item, index) => {
-                        return (
-                            <View key={index} style={{ paddingHorizontal: '5%', paddingVertical: 5 }}>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{item}</Text>
-                                <View style={{ flexDirection: 'row', marginTop: 5, height: 50, alignItems: 'center' }}>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
-                                        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
-                                            {/* <TextInput value={customDatesStyles[index].from_time} style={{ width: '85%', paddingHorizontal: 10 }} /> */}
-                                            <TextInputMask
-                                                onChangeText={(formatted, extracted) => {
-                                                    console.log(formatted)
-                                                    setTextData(index, formatted, "from")
-                                                }}
-                                                style={{ width: '85%', paddingHorizontal: 10 }}
-                                                mask={"[00]:[00]"}
-                                            />
-                                            <View style={{ height: 11, aspectRatio: 1 }}>
-                                                <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                <ScrollView>
+                    <View style={{ marginVertical: 5 }}>
+                        {customDatesStyles.map((item, index) => {
+                            return (
+                                <View key={index} style={{ paddingHorizontal: '5%', paddingVertical: 5 }}>
+                                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{item.date}</Text>
+                                    <View style={{ flexDirection: 'row', marginTop: 5, height: 50, alignItems: 'center' }}>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
+                                            <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
+                                                <TextInputMask
+                                                    onChangeText={(formatted, extracted) => {
+                                                        setTextData(index, formatted, "from")
+                                                    }}
+                                                    style={{ width: '85%', paddingHorizontal: 10 }}
+                                                    mask={"[00]:[00]"}
+                                                    value={item.from_time}
+                                                    editable={serviceData.formdata !== undefined}
+                                                />
+                                                <View style={{ height: 11, aspectRatio: 1 }}>
+                                                    <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
-                                        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
-                                            {/* <TextInput value={customDatesStyles[index].to_time} style={{ width: '85%' }} /> */}
-                                            <TextInputMask
-                                                onChangeText={(formatted, extracted) => {
-                                                    console.log(formatted)
-                                                    setTextData(index, formatted, "to")
-                                                }}
-                                                style={{ width: '85%', paddingHorizontal: 10 }}
-                                                mask={"[00]:[00]"}
-                                            />
-                                            <View style={{ height: 11, aspectRatio: 1 }}>
-                                                <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
+                                            <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
+                                                <TextInputMask
+                                                    onChangeText={(formatted, extracted) => {
+                                                        setTextData(index, formatted, "to")
+                                                    }}
+                                                    style={{ width: '85%', paddingHorizontal: 10 }}
+                                                    mask={"[00]:[00]"}
+                                                    value={item.to_time}
+                                                    editable={serviceData.formdata !== undefined}
+                                                />
+                                                <View style={{ height: 11, aspectRatio: 1 }}>
+                                                    <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                                </View>
                                             </View>
                                         </View>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeTimeFrame(item)} style={{ height: '100%', aspectRatio: 1, padding: '4%' }}>
+                                            <Image source={require('../../../assets/delete.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                        </TouchableOpacity>
                                     </View>
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => removeTimeFrame(item)} style={{ height: '100%', aspectRatio: 1, padding: '4%' }}>
-                                        <Image source={require('../../../assets/delete.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
-                                    </TouchableOpacity>
                                 </View>
-                            </View>
-                        )
-                    })}
-                </View>
-                {selectedDates.length > 0 && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginTop: 10 }} action={() => save()} />}
+                            )
+                        })}
+                    </View>
+                </ScrollView>
+                {selectedDates.length > 0 && serviceData.formdata && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginTop: 10 }} action={() => save()} />}
             </View>
             {loading && <Loader />}
         </SafeAreaView>

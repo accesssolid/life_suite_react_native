@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const CustomTextInput = props => {
     return (
         <>
-            <Text style={styles.title}>{props.title}{props.required && '*'}</Text>
+            {props.title && <Text style={styles.title}>{props.title}{props.required && '*'}</Text>}
             <View style={{ ...styles.screen, ...props.customContainerStyle }}>
                 <TextInput
                     style={{
@@ -42,9 +42,11 @@ const CustomTextInput = props => {
                     onChangeText={props.onChangeText}
                     secureTextEntry={props.secureTextEntry}
                     editable={props.editable}
+                    multiline={props.multiline}
+                    numberOfLines={props.numberOfLines}
                 />
                 {
-                    props.inlineImageLeft && <TouchableOpacity activeOpacity={0.7} onPress={props.onLeftPress} style={{ aspectRatio: 1, position: 'absolute', right: '5%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                    props.inlineImageLeft && <TouchableOpacity activeOpacity={0.7} onPress={props.onLeftPress} style={{ aspectRatio: 1, position: 'absolute', right: '5%', height: '100%', alignItems: 'center', justifyContent: 'center', ...props.customImageStyles }}>
                         {props.inlineImageLeft}
                     </TouchableOpacity>
                 }

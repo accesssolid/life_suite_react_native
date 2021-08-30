@@ -40,7 +40,6 @@ const ServicesProvided = (props) => {
     const [selectedNewProducts, setSelectedNewProducts] = useState([])
     const [isOtherSelected, setIsOtherSelected] = useState(false)
 
-    const [isUpdated, setIsUpdated] = useState(false)
     const [variants, setVariants] = useState([])
     const [selectedVariant, setSelectedVariant] = useState(null)
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -59,12 +58,6 @@ const ServicesProvided = (props) => {
     useEffect(() => {
         filterVariants()
     }, [selectedVariant, itemListMaster])
-
-    useEffect(() => {
-        if (!isAddServiceMode && subService && subService.items && subService.items.length > 0 && servicesData.length > 0 && !isUpdated) {
-            setPreviousData(servicesData)
-        }
-    }, [servicesData])
 
     const getServiceItems = () => {
         setLoading(true)
@@ -121,7 +114,7 @@ const ServicesProvided = (props) => {
             let newArr = itemListMaster.map((item, index) => {
                 return {
                     "item_id": item.id,
-                    "price": item.price ? item.price : "",
+                    "price": "",
                     "time_duration_h": "",
                     "time_duration_m": "",
                     "variant_data": item.variant_data
@@ -130,56 +123,85 @@ const ServicesProvided = (props) => {
             setServicesData([...newArr])
         }
 
+        if (!isAddServiceMode) {
+            let arr = []
+            let selected = []
+            itemListMaster.forEach((item, index) => {
+                subService.items.forEach((ele, ind) => {
+                    if (item.id == ele.id && item.variant_data == ele.variant_data) {
+                        let hours = toHoursAndMinutes(ele.time_duration, 'hours')
+                        let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
+                        arr.push({
+                            "item_id": item.id,
+                            "price": "$" + ele.price,
+                            "time_duration_h": String(minutes),
+                            "time_duration_m": String(hours),
+                            "variant_data": item.variant_data
+                        })
+                        selected.push(ele.id)
+                    } else {
+                        arr.push({
+                            "item_id": item.id,
+                            "price": "",
+                            "time_duration_h": "",
+                            "time_duration_m": "",
+                            "variant_data": item.variant_data
+                        })
+                    }
+                });
+            });
+
+            setServicesData([...arr])
+            setSelectedItems([...selected])
+        }
+
         setInitialProductsData()
     }
 
     const setInitialProductsData = () => {
         if (!selectedProducts.length > 0 && !selectedNewProducts.length > 0) {
             let newArr = []
+            let selected = []
             itemListMaster.map((item, index) => {
                 item.products.forEach(element => {
                     newArr.push({
                         "id": element.id,
                         "name": element.name,
-                        "price": element.price ? element.price : "",
+                        "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
                         "item_id": element.item_id
                     })
+                    if (getPrice(element.item_id, element.id) !== "") {
+                        selected.push({
+                            "id": element.id,
+                            "name": element.name,
+                            "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
+                            "item_id": element.item_id
+                        })
+                    }
                 });
             })
+
             setProductsData([...newArr])
+            setSelectedProducts([...selected])
         }
     }
 
-    const setPreviousData = (arr) => {
-        let temp = [...arr]
-        let selected = []
+    const getPrice = (item_id, id) => {
+        let price = ""
 
-        arr.forEach((serviceElement, serviceIndex) => {
-            subService.items.forEach((subElement) => {
-                if (serviceElement.item_id == subElement.id) {
-                    let hours = toHoursAndMinutes(subElement.time_duration, 'hours')
-                    let minutes = toHoursAndMinutes(subElement.time_duration, 'minutes')
-                    temp[serviceIndex] = {
-                        "item_id": serviceElement.item_id,
-                        "price": "$" + subElement.price,
-                        "time_duration_h": String(minutes),
-                        "time_duration_m": String(hours),
-                    }
-                    if (!isAddServiceMode) {
-                        selected.push(subElement.id)
-                    }
+        subService.items.forEach(element => {
+            element.products.forEach(prod => {
+                if (prod.id == id && prod.item_id == item_id) {
+                    price = prod.price
                 }
             });
         });
 
-        setSelectedItems([...selected])
-        setServicesData([...temp])
-        setIsUpdated(true)
+        return price
     }
 
     const next = () => {
         let services = []
-
         servicesData.forEach((itemm, index) => {
             if (selectedItems.includes(itemm.item_id)) {
                 var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
@@ -202,21 +224,9 @@ const ServicesProvided = (props) => {
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    services: [...services],
-
-                }
-            }
-        }))
-
-        dispatch(setAddServiceData({
-            data: {
-                ...addServiceData,
-                user_id: user.id,
-                service_id: subService.id,
-                json_data: {
-                    ...addServiceData.json_data,
                     products: [...productsData],
-                    new_products: [...newProductsData]
+                    new_products: [...newProductsData],
+                    services: [...services],
                 }
             }
         }))
@@ -267,14 +277,6 @@ const ServicesProvided = (props) => {
     }
 
     const verifyNewProducts = (services) => {
-        const products = addServiceData.json_data.new_products.map((item, index) => {
-            return {
-                "item_id": item.item_id,
-                "name": item.name,
-                "price": item.price
-            }
-        })
-
         if (addServiceData.json_data.new_products.length > 0) {
             setLoading(true)
             let headers = {
@@ -368,6 +370,7 @@ const ServicesProvided = (props) => {
                     if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
                         isValidData = true
                     } else {
+                        console.log("itemm servicesData ==>> ", itemm)
                         isValidData = false
                     }
                 }
@@ -376,6 +379,7 @@ const ServicesProvided = (props) => {
             let selected = getSelectedProducts()
             productsData.filter(item => selected.includes(item.id)).forEach(element => {
                 if (element.price.trim() == "") {
+                    // console.log("element  productsData ==>> ", element)
                     isValidData = false
                 }
             });
@@ -383,6 +387,7 @@ const ServicesProvided = (props) => {
             let selectedNew = getSelectedNewProducts()
             newProductsData.filter(item => selectedNew.includes(item.id)).forEach(element => {
                 if (element.price.trim() == "" || element.name.trim() == "") {
+                    // console.log("itemm newProductsData ==>> ", element)
                     isValidData = false
                 }
             });
@@ -593,7 +598,6 @@ const ServicesProvided = (props) => {
                                 <Text style={styles.priceTime}>Price</Text>
                             </View>
                         </View>}
-
                         {activeItem !== null
                             ?
                             <>
@@ -622,43 +626,21 @@ const ServicesProvided = (props) => {
                                 />
                             </>
                             :
-                            isAddServiceMode
+                            itemList && itemList.length > 0
                                 ?
-                                itemList && itemList.length > 0
-                                    ?
-                                    itemList.map(((item, index) => {
-                                        return (
-                                            <ServiceItem
-                                                key={index}
-                                                item={item}
-                                                index={index}
-                                                onCheckPress={() => { onPressItem(index, item) }}
-                                                isSelected={selectedItems.includes(item.id)}
-                                            />
-                                        )
-                                    }))
-                                    :
-                                    null
+                                itemList.map(((item, index) => {
+                                    return (
+                                        <ServiceItem
+                                            key={index}
+                                            item={item}
+                                            index={index}
+                                            onCheckPress={() => { onPressItem(index, item) }}
+                                            isSelected={selectedItems.includes(item.id)}
+                                        />
+                                    )
+                                }))
                                 :
-                                subService && subService.items
-                                    ?
-                                    subService.items.map(((item, index) => {
-                                        return (
-                                            <ServiceItem
-                                                key={index}
-                                                item={item}
-                                                index={index}
-                                                onCheckPress={() => setCheckedData(index, item)}
-                                                isSelected={selectedItems.includes(item.id)}
-                                                setText={setText}
-                                                serviceItem={servicesData[index]}
-                                                subService={subService}
-                                            />
-                                        )
-                                    }))
-                                    :
-                                    null
-                        }
+                                null}
                     </Content>
                     <View style={{ paddingBottom: '2.5%' }}>
                         {activeItem == null

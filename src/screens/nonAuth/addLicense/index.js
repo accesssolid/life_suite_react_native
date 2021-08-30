@@ -248,7 +248,8 @@ const AddLicense = (props) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
 
         let user_data = {
@@ -266,16 +267,13 @@ const AddLicense = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    removeImage(index)
                     getMyJobs(false)
                 }
-                else {
-                    setLoading(false)
-                }
             }).catch(err => {
+            }).finally(() => {
                 setLoading(false)
+                removeImage(index)
             })
-        removeImage(index)
     }
 
     return (

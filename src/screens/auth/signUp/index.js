@@ -72,6 +72,7 @@ const SignUpScreen = (props) => {
     const fnameRef = useRef(null)
     const lnameRef = useRef(null)
     const prefNameRef = useRef(null)
+    const bioRef = useRef(null)
     const emailRef = useRef(null)
     const passRef = useRef(null)
     const confPassRef = useRef(null)
@@ -193,6 +194,7 @@ const SignUpScreen = (props) => {
         first_name: '',
         last_name: '',
         prefer_name: '',
+        bio: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -278,7 +280,7 @@ const SignUpScreen = (props) => {
             }
         }
 
-        let user_data = { ...signUpData, email: signUpData.email.toLowerCase(), address: JSON.stringify(address), phone_number: signUpData.phone_number.replace(/[^\d]/g, "") }
+        let user_data = { ...signUpData, about: signUpData.bio ,email: signUpData.email.toLowerCase(), address: JSON.stringify(address), phone_number: signUpData.phone_number.replace(/[^\d]/g, "") }
 
         let headers = {
             Accept: "application/json",
@@ -494,7 +496,26 @@ const SignUpScreen = (props) => {
                                 }}
                                 inputRef={prefNameRef}
                                 returnKeyType="next"
-                                onSubmitEditing={() => emailRef.current.focus()}
+                                onSubmitEditing={() => bioRef.current.focus()}
+                            />
+                            <CustomTextInput
+                                inputRef={bioRef}
+                                placeholder="Bio..."
+                                title="Bio"
+                                value={signUpData.bio}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, bio: text })
+                                }}
+                                multiline
+                                maxLength={255}
+                                numberOfLines={3}
+                                customContainerStyle={{}}
+                                customInputStyle={{ height: 100, paddingTop: '5%', paddingHorizontal: '10%', }}
+                                customImageStyles={{ bottom: '-65%', right: '0%' }}
+                                inlineImageLeft={<Text
+                                    style={{ fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black, fontSize: 12 }}>
+                                    {signUpData.bio.length}/255
+                                </Text>}
                             />
                             <CustomTextInput
                                 placeholder="Email"

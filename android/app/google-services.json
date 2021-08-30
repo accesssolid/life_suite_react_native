@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "143754571862",
+    "project_id": "lifesuite-4a9c5",
+    "storage_bucket": "lifesuite-4a9c5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143754571862:android:27e37348425c0ce6760bf7",
+        "android_client_info": {
+          "package_name": "com.lifesuite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143754571862-362npqdls3i6jt0467s4bvgravsm1kis.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lifesuite",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "143754571862-nadjs9odve6p8agprpj62shcgih4ff83.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe4FAT5KGMGh4Ozt57Kb_mhtt5UbulXu4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143754571862-nadjs9odve6p8agprpj62shcgih4ff83.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

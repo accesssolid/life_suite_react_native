@@ -38,10 +38,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
         let selectedPrev = []
         props.item.products.map((item, index) => {
             selectedPrev.push(item.id)
-        })
-        if (!isAddServiceMode) {
-            setSelectedItems([...selectedPrev])
-        }
+        })     
     }
 
     return (
