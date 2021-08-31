@@ -5,22 +5,15 @@ import { View, Image, Text, TouchableOpacity } from 'react-native'
 /* Constants */
 import LS_COLORS from '../constants/colors';
 import LS_FONTS from '../constants/fonts';
-import { globalStyles } from '../utils';
-
-/* Packages */
-import { useDispatch, useSelector } from 'react-redux';
-import { baseProps } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlers';
 
 function CustomInput({
     text,
     numberOfLines,
     secureTextEntry,
     placeholder,
-    height,
     value,
     onChangeText,
     keyboardType,
-    image,
     action,
     imageUrl,
     width,
@@ -29,7 +22,11 @@ function CustomInput({
     onSubmitEditing,
     maxLength,
     editable,
-    required
+    required,
+    multiline,
+    customContainerStyles,
+    customInputStyles,
+    bottomText
 }) {
     return (
         <Item
@@ -42,6 +39,7 @@ function CustomInput({
                 width: width,
                 maxWidth: '90%',
                 alignSelf: 'center',
+                ...customContainerStyles
             }}>
             <View style={{ position: 'absolute', top: -11, left: 20, paddingHorizontal: 5, backgroundColor: LS_COLORS.global.white }}>
                 <Text style={{ color: LS_COLORS.global.grey, fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular, }}>
@@ -61,11 +59,13 @@ function CustomInput({
                     height: 50,
                     fontFamily: LS_FONTS.PoppinsMedium,
                     fontSize: 16,
+                    ...customInputStyles
                 }}
                 returnKeyType={returnKeyType}
                 onSubmitEditing={onSubmitEditing}
                 maxLength={maxLength}
                 editable={editable}
+                multiline={multiline}
             />
 
             <TouchableOpacity onPress={action} style={{ right: 10 }}>
@@ -78,7 +78,9 @@ function CustomInput({
                     source={imageUrl}
                 />
             </TouchableOpacity>
+            {bottomText && <Text style={{ paddingRight:10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.black, fontSize:12 }}>{bottomText}</Text>}
         </Item>
     );
 }
+
 export default CustomInput;

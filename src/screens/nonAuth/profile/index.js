@@ -108,6 +108,7 @@ const Profile = (props) => {
     const fnameRef = useRef(null)
     const lnameRef = useRef(null)
     const prefNameRef = useRef(null)
+    const bioRef = useRef(null)
     const emailRef = useRef(null)
     const phoneRef = useRef(null)
 
@@ -415,6 +416,7 @@ const Profile = (props) => {
         formdata.append("first_name", userData.first_name);
         formdata.append("last_name", userData.last_name);
         formdata.append("phone_number", userData.phone_number);
+        formdata.append("about", userData.about);
         formdata.append("prefer_name", userData.prefer_name);
         formdata.append("notification_prefrence", notifType);
         formdata.append("address", JSON.stringify(addr));
@@ -663,8 +665,26 @@ const Profile = (props) => {
                                 }}
                                 inpuRef={prefNameRef}
                                 returnKeyType="next"
-                                onSubmitEditing={() => emailRef.current._root.focus()}
+                                onSubmitEditing={() => bioRef.current._root.focus()}
                             />
+
+                            <CustomInput
+                                required
+                                text="Bio"
+                                value={userData?.about}
+                                onChangeText={(text) => {
+                                    setUserData({ ...userData, about: text })
+                                }}
+                                inpuRef={bioRef}
+                                returnKeyType="default"
+                                customContainerStyles={{ paddingVertical:'2.5%' }}
+                                customInputStyles={{ height: 75 }}
+                                multiline
+                                maxLength={255}
+                                numberOfLines={3}
+                                bottomText={userData?.about.length + "/255"}
+                            />
+
                             <CustomInput
                                 text="Email Address"
                                 value={userData.email}

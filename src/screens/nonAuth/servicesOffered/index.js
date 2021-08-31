@@ -124,6 +124,7 @@ const ServicesProvided = (props) => {
         }
 
         if (!isAddServiceMode) {
+            console.log("A")
             let arr = []
             let selected = []
             itemListMaster.forEach((item, index) => {
@@ -188,14 +189,15 @@ const ServicesProvided = (props) => {
 
     const getPrice = (item_id, id) => {
         let price = ""
-
-        subService.items.forEach(element => {
-            element.products.forEach(prod => {
-                if (prod.id == id && prod.item_id == item_id) {
-                    price = prod.price
-                }
+        if (subService.items) {
+            subService.items.forEach(element => {
+                element.products.forEach(prod => {
+                    if (prod.id == id && prod.item_id == item_id) {
+                        price = prod.price
+                    }
+                });
             });
-        });
+        }
 
         return price
     }
