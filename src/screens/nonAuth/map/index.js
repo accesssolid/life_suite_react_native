@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, SafeAreaView, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid } from 'react-native'
+import { View, StyleSheet, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -11,14 +11,17 @@ import MapView from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /* Components */;
 import { Container } from 'native-base'
 import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const MapScreen = (props) => {
     const dispatch = useDispatch()
+    const inputRef = useRef(null)
     const queryString = require('query-string');
     const { onConfirm } = props.route.params
     const placesRef = useRef();
@@ -99,7 +102,7 @@ const MapScreen = (props) => {
 
     const reverseGeocode = (lat, lng) => {
         let params = {
-            key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+            key: 'AIzaSyBoK4icaIuqCEWdbq-D4LdrsbK4X_Fa1Fg',
             latlng: `${lat},${lng}`,
         };
         let qs = queryString.stringify(params);
@@ -107,11 +110,14 @@ const MapScreen = (props) => {
             `https://maps.googleapis.com/maps/api/geocode/json?${qs}`)
             .then((res) => res.json())
             .then((json) => {
-                console.log("reverseGeocode =>> ", json)
                 if (json.status !== 'OK') {
-                    // throw new Error(`Geocode error: ${json.status}`);
+                    throw new Error(`Geocode error: ${json.status}`);
                 }
-                return json;
+                // console.log("geometry =>> ", json.results[0].geometry.location.lat)
+                // console.log("geometry =>> ", json.results[0].geometry.location.lng)
+                console.log("formatted_address =>> ", json.results[0].formatted_address)
+                setAddress(json.results[0].formatted_address)
+                placesRef.current.setAddressText(json.results[0].formatted_address)
             });
     }
 
@@ -119,38 +125,42 @@ const MapScreen = (props) => {
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
             <SafeAreaView style={styles.safeArea}>
-                <Container style={{ zIndex: 0 }}>
-                    <View style={{ backgroundColor: LS_COLORS.global.cyan, flexDirection: 'row', height: 60, paddingHorizontal: '5%', paddingVertical: 10, justifyContent: 'space-between', zIndex: 100 }}>
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.goBack()} style={{ height: '100%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            <Image style={{ height: '70%', width: '70%' }} resizeMode="contain" source={require('../../../assets/backWhite.png')} />
-                        </TouchableOpacity>
-                        <View style={{ flex: 1, width: '90%', position: 'absolute', right: '5%', top: '20%' }}>
-                            <GooglePlacesAutocomplete
-                                ref={placesRef}
-                                styles={{
-                                    container: { borderColor: "green", zIndex: 10000000 },
-                                    listView: { paddingVertical: 5, zIndex: 10000 },
-                                    separator: {}
-                                }}
-                                placeholder='Search'
-                                fetchDetails={true}
-                                onPress={(data, details) => {
-                                    setCoordinates({
-                                        ...coordinates,
-                                        latitude: details?.geometry?.location?.lat,
-                                        longitude: details.geometry?.location?.lng
-                                    })
-                                    placesRef.current.blur()
-                                }}
-                                query={{
-                                    key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
-                                    language: 'en',
-                                }}
-                            />
-                        </View>
-                    </View>
+                <Container>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => props.navigation.goBack()}
+                        style={{ height: 50, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', position: 'absolute', zIndex: 1000, backgroundColor: LS_COLORS.global.green, top: '2.5%', left: '4%', borderRadius: 6 }}>
+                        <Image style={{ height: '50%', width: '50%' }} resizeMode="contain" source={require('../../../assets/backWhite.png')} />
+                    </TouchableOpacity>
+                    <GooglePlacesAutocomplete
+                        ref={placesRef}
+                        styles={{
+                            container: { borderColor: "green", borderWidth: 1, position: 'absolute', width: '75%', zIndex: 500, alignSelf: 'flex-end', right: '5%', top: '2.5%', backgroundColor: LS_COLORS.global.white, borderRadius: 6 },
+                            listView: { paddingVertical: 5 },
+                            separator: {}
+                        }}
+                        placeholder='Search'
+                        fetchDetails={true}
+                        onPress={(data, details) => {
+                            setCoordinates({
+                                ...coordinates,
+                                latitude: details?.geometry?.location?.lat,
+                                longitude: details.geometry?.location?.lng
+                            })
+                            setAddress(data?.description)
+                            placesRef.current.blur()
+                        }}
+                        textInputProps={{
+                            // selection: !placesRef?.current?.isFocused() ? { start: 0, end: address.length } : null
+                        }}
+                        query={{
+                            key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                            language: 'en',
+                        }}
+                    />
+                    {/* </ScrollView> */}
                     <View style={styles.mapContainer}>
-                        <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: 0, zIndex: 100000000, alignItems: 'center', paddingHorizontal: '10%' }}>
+                        <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: 0, alignItems: 'center', paddingHorizontal: '10%' }}>
                             <CustomButton
                                 title={user.user_role == 2 ? "Home" : "Permanent"}
                                 customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
@@ -192,14 +202,14 @@ const MapScreen = (props) => {
                         <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}>
                             <Image pointerEvents="none" style={{ height: 40, aspectRatio: 1 }} source={require('../../../assets/pin.png')} />
                         </View>
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => getLocationPermission()} style={{ position: 'absolute', height: 50, aspectRatio: 1, bottom: '5%', right: '5%' }}>
-                            <Image style={{ height: '100%', aspectRatio: 1 }} source={require('../../../assets/gps.png')} resizeMode="contain" />
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => getLocationPermission()} style={{ position: 'absolute', height: 30, aspectRatio: 1, bottom: '15%', right: '10%' }}>
+                            <Image style={{ height: '100%', aspectRatio: 1, tintColor: LS_COLORS.global.green }} source={require('../../../assets/gps.png')} resizeMode="contain" />
                         </TouchableOpacity>
                         <View style={{ paddingBottom: '5%', position: 'absolute', bottom: 0, width: '100%' }}>
                             <CustomButton
                                 title={"Submit"}
                                 customStyles={{ width: '50%', borderRadius: 6 }}
-                                action={() => { onConfirm(address), props.navigation.goBack() }}
+                                action={() => { onConfirm(address, coordinates), props.navigation.goBack() }}
                             />
                         </View>
                     </View>
@@ -229,7 +239,6 @@ const styles = StyleSheet.create({
     mapContainer: {
         // height: Dimensions.get('window').height,
         // width: Dimensions.get('window').width,
-        zIndex: 50,
         flex: 1
     },
     map: {

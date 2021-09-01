@@ -262,7 +262,7 @@ const Profile = (props) => {
         formdata.append("user_id", user.id);
         formdata.append('profile', {
             uri: Platform.OS == "ios" ? image.path.replace('file:///', '') : image.path,
-            name: image.filename ? image.filename : image.path.split("/").goBack(),
+            name: image.filename ? image.filename : image.path.split("/").pop(),
             type: image.mime,
         });
 
@@ -677,12 +677,12 @@ const Profile = (props) => {
                                 }}
                                 inpuRef={bioRef}
                                 returnKeyType="default"
-                                customContainerStyles={{ paddingVertical:'2.5%' }}
+                                customContainerStyles={{ paddingVertical: '2.5%' }}
                                 customInputStyles={{ height: 75 }}
                                 multiline
                                 maxLength={255}
                                 numberOfLines={3}
-                                bottomText={userData?.about.length + "/255"}
+                                bottomText={userData?.about?.length + "/255"}
                             />
 
                             <CustomInput

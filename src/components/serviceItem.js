@@ -38,20 +38,20 @@ const ServiceItem = React.forwardRef((props, ref) => {
         let selectedPrev = []
         props.item.products.map((item, index) => {
             selectedPrev.push(item.id)
-        })     
+        })
     }
 
     return (
         <>
             <View key={props.index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', overflow: 'hidden', width: '45%' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', overflow: 'hidden', width: props.showInputs ? '45%' : '90%' }}>
                     <CheckBox
                         checked={props.isSelected}
                         onPress={props.onCheckPress}
-                        checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
-                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
+                        checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../assets/checked.png")} />}
+                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../assets/unchecked.png")} />}
                     />
-                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '50%' }}>{props.item.name}</Text>
+                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: props.showInputs ? '50%' : '100%' }}>{props.item.name}</Text>
                 </View>
 
                 {props.showInputs && <View style={{ flexDirection: 'row', width: '55%', justifyContent: 'flex-end' }}>
@@ -68,8 +68,9 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             style={styles.inputStyle}
                             value={props.serviceItem?.time_duration_h}
                             ref={hourRef}
-                            returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
-                            onSubmitEditing={() => minRef.current.focus()}
+                            // returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
+                            returnKeyType={'done'}
+                            // onSubmitEditing={() => minRef.current.focus()}
                             placeholderTextColor={LS_COLORS.global.placeholder}
                         />
                     </View>
@@ -86,8 +87,9 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             style={styles.inputStyle}
                             value={props.serviceItem?.time_duration_m}
                             ref={minRef}
-                            returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
-                            onSubmitEditing={() => priceRef.current.focus()}
+                            // returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
+                            // onSubmitEditing={() => priceRef.current.focus()}
+                            returnKeyType={'done'}
                             placeholderTextColor={LS_COLORS.global.placeholder}
                         />
                     </View>
@@ -102,7 +104,8 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             value={props.serviceItem?.price}
                             ref={priceRef}
                             numberOfLines={1}
-                            returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
+                            // returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
+                            returnKeyType={'done'}
                             placeholderTextColor={LS_COLORS.global.placeholder}
                         />
                     </View>

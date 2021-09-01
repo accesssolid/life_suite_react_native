@@ -13,13 +13,11 @@ import RNGooglePlaces from 'react-native-google-places';
 
 /* Components */;
 import Header from '../../../components/header';
-import { Container, Content, Row, } from 'native-base'
-import { BASE_URL, getApi } from '../../../api/api';
+import { Container, Content } from 'native-base'
+import { BASE_URL } from '../../../api/api';
 import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
-import { setMyJobs } from '../../../redux/features/provider';
-import { setAddServiceMode } from '../../../redux/features/services';
 import { Dimensions } from 'react-native';
 import CustomTextInput from '../../../components/customTextInput';
 
@@ -33,41 +31,35 @@ const SelectLocation = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const [address, setAddress] = useState('')
     const [travelDistance, setTravelDistance] = useState('')
-    const [selectedAddress, setSelectedAddress] = useState("current")
-    const [selectedSavedAddress, setSelectedSavedAddress] = useState("permanent")
+
     const [coordinates, setCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
+        latitudeDelta: 0.25,
+        longitudeDelta: 0.012134,
     })
 
     useEffect(() => {
-        if (selectedAddress == "current") {
-            getLocationPermission()
-        } else {
-            if (selectedSavedAddress == "permanent") {
-                let workAddress = `${user.address[0].address_line_1}, ${user.address[0].city_name}, ${user.address[0].state_name}, ${user.address[0].zip_code}, ${user.address[0].country_name}`
-                setAddress(workAddress)
-            } else {
-                let mailingAddress = `${user.address[1].address_line_1}, ${user.address[1].city_name}, ${user.address[1].state_name}, ${user.address[1].zip_code}, ${user.address[1].country_name}`
-                setAddress(mailingAddress)
-            }
-            setSelectedSavedAddress("permanent")
-        }
-    }, [selectedAddress])
-
-    useEffect(() => {
-        if (selectedSavedAddress == "permanent") {
-            let workAddress = `${user.address[0].address_line_1}, ${user.address[0].city_name}, ${user.address[0].state_name}, ${user.address[0].zip_code}, ${user.address[0].country_name}`
-            setAddress(workAddress)
-        } else {
-            let mailingAddress = `${user.address[1].address_line_1}, ${user.address[1].city_name}, ${user.address[1].state_name}, ${user.address[1].zip_code}, ${user.address[1].country_name}`
-            setAddress(mailingAddress)
-        }
-    }, [selectedSavedAddress])
+        setCoordinates({
+            ...coordinates,
+            latitudeDelta: 0.25,
+            longitudeDelta: 0.012134,
+        })
+    }, [travelDistance])
 
     useEffect(() => {
         getLocationPermission()
     }, [])
+
+    const setInitialData = () => {
+        let coords = {
+            latitude: Number(subService.travel_data.lat),
+            longitude: Number(subService.travel_data.long),
+        }
+        setAddress(subService.travel_data?.address_text)
+        setCoordinates({ ...coordinates, ...coords })
+        setTravelDistance(String(subService.travel_data?.travel_distance))
+    }
 
     const getLocationPermission = async () => {
         let hasLocationPermission = false
@@ -111,7 +103,6 @@ const SelectLocation = (props) => {
     const getCurrentLocation = (hasLocationPermission) => {
         if (isAddServiceMode) {
             if (hasLocationPermission) {
-                console.log("hasLocationPermission =>> ", hasLocationPermission)
                 Geolocation.getCurrentPosition(
                     (position) => {
                         console.log("position =>>", position);
@@ -123,11 +114,10 @@ const SelectLocation = (props) => {
                     { /* enableHighAccuracy: true, */ timeout: 15000, /* maximumAge: 10000 */ }
                 );
             } else {
-                setSelectedAddress("saved")
                 showToast("Location permission not granted")
             }
         } else {
-            setSelectedAddress("saved")
+            setInitialData()
             setPreviousAddress()
         }
     }
@@ -180,13 +170,13 @@ const SelectLocation = (props) => {
                 let products = addServiceData.json_data.products.map(item => {
                     return {
                         "item_product_id": item.id,
-                        "price": item.price
+                        "price": item.price.replace("$", '')
                     }
                 })
 
                 let json_data = JSON.stringify({
                     "services": addServiceData.json_data.services,
-                    "products": [...products],
+                    "products": [...products.filter(item => item.price !== '')],
                     "travel_distance": travel_distance,
                     "new_products": [...newProd],
                     "time_frame": []
@@ -194,12 +184,13 @@ const SelectLocation = (props) => {
 
                 var formdata = new FormData();
                 formdata.append("user_id", user.id);
-                formdata.append("service_id", addServiceData.service_id);          
+                formdata.append("service_id", addServiceData.service_id);
 
                 addServiceData.images.forEach((item, index) => {
+                    let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
                     if (!item.uri.startsWith(BASE_URL)) {
                         formdata.append('license_file[]', {
-                            uri: Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri,
+                            uri: PATH_TO_THE_FILE,
                             name: item.name,
                             type: item.type,
                         })
@@ -213,6 +204,15 @@ const SelectLocation = (props) => {
                 setLoading(false)
             }
         }
+    }
+
+    const onLocation = (location, coords) => {
+        setAddress(location)
+        setCoordinates({
+            ...coords,
+            latitudeDelta: 0.25,
+            longitudeDelta: 0.012134,
+        })
     }
 
     return (
@@ -252,9 +252,15 @@ const SelectLocation = (props) => {
                                 style={styles.map}
                                 region={{
                                     ...coordinates,
-                                    latitudeDelta: 0.015,
-                                    longitudeDelta: 0.0121,
                                 }}>
+                                {travelDistance !== '' && <MapView.Circle
+                                    key={(coordinates.latitude + coordinates.longitude).toString()}
+                                    center={coordinates}
+                                    radius={Number(travelDistance * 1.60934) * 1000}
+                                    strokeWidth={1}
+                                    strokeColor={'red'}
+                                    fillColor={'rgba(230,238,255,0.1)'}
+                                />}
                                 <Marker
                                     coordinate={{ ...coordinates }}
                                 />
@@ -275,13 +281,13 @@ const SelectLocation = (props) => {
                                     paddingHorizontal: '10%',
                                 }}
                                 activeOpacity={0.7}
-                                onPress={() => props.navigation.navigate('MapScreen', { onConfirm: setAddress.bind(this) })}>
+                                onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this) })}>
                                 <Text numberOfLines={1} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, }}>{address}</Text>
                                 <View style={{ aspectRatio: 1, position: 'absolute', right: '5%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                                     <Image source={require('../../../assets/location.png')} resizeMode="contain" style={{ height: '70%', width: '100%', backgroundColor: LS_COLORS.global.lightGrey }} />
                                 </View>
                             </TouchableOpacity>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium }}>Travel Distance to provide service(KM)</Text>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium }}>Travel Distance to provide service(Miles)</Text>
                             <CustomTextInput
                                 placeholder="Travel Distance"
                                 value={travelDistance}

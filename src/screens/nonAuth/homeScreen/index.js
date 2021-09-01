@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
         width: 111,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,
-        alignSelf: 'center',
+        alignSelf: 'center', width: '30%'
     },
     order: {
         textAlign: "center",

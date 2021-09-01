@@ -52,6 +52,10 @@ const ServicesProvided = (props) => {
     }, [])
 
     useEffect(() => {
+        console.log("selectedItems ==>> ", selectedItems)
+    }, [selectedItems])
+
+    useEffect(() => {
         setInitialServiceData()
     }, [itemList])
 
@@ -124,7 +128,6 @@ const ServicesProvided = (props) => {
         }
 
         if (!isAddServiceMode) {
-            console.log("A")
             let arr = []
             let selected = []
             itemListMaster.forEach((item, index) => {
@@ -193,7 +196,7 @@ const ServicesProvided = (props) => {
             subService.items.forEach(element => {
                 element.products.forEach(prod => {
                     if (prod.id == id && prod.item_id == item_id) {
-                        price = prod.price
+                        price = "$" + prod.price
                     }
                 });
             });
@@ -359,6 +362,55 @@ const ServicesProvided = (props) => {
         setSelectedProducts([...pdata])
         setSelectedNewProducts([...pdataNew])
 
+        let newArr = []
+        itemListMaster.map((item, index) => {
+            item.products.forEach(element => {
+                if (element.item_id == item.id) {
+                    newArr.push({
+                        "id": element.id,
+                        "name": element.name,
+                        "price": "",
+                        "item_id": element.item_id
+                    })
+                } else {
+                    newArr.push({
+                        "id": element.id,
+                        "name": element.name,
+                        "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
+                        "item_id": element.item_id
+                    })
+                }
+            });
+        })
+        setProductsData([...newArr])
+
+        let temp = []
+        temp.forEach((element, index) => {
+            if (element.item_id == item.id) {
+                if (type == "name") {
+                    temp[index].name = ''
+                    temp[index].price = ''
+                }
+            }
+        })
+        setNewProductsData([...temp])
+
+        let arr = itemListMaster.map((ele, index) => {
+            if (ele.id == item.id) {
+                return {
+                    "item_id": item.id,
+                    "price": "",
+                    "time_duration_h": "",
+                    "time_duration_m": "",
+                    "variant_data": item.variant_data
+                }
+            } else {
+                return ele
+            }
+        })
+        setServicesData([...arr])
+
+        setIsOtherSelected(false)
         setActiveItem(null)
         setActiveIndex(null)
         setCheckedData(null, item)
@@ -647,7 +699,7 @@ const ServicesProvided = (props) => {
                     <View style={{ paddingBottom: '2.5%' }}>
                         {activeItem == null
                             ?
-                            <CustomButton title={isAddServiceMode ? "Next" : selectedItems.length > 0 ? "Next" : "Edit"} action={() => next()} />
+                            selectedItems.length > 0 && <CustomButton title={"Next"} action={() => next()} />
                             :
                             <CustomButton title={"Save"} action={() => saveRequest()} />
                         }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, Dimensions, SafeAreaView, StatusBar, TouchableOpacity, Platform } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -10,6 +10,7 @@ import { globalStyles } from '../../../utils';
 import CalendarPicker from 'react-native-calendar-picker';
 import moment from "moment";
 import TextInputMask from 'react-native-text-input-mask';
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 /* Components */
 import Header from '../../../components/header';
@@ -42,7 +43,7 @@ const AddTimeFrame = (props) => {
         if (!dates.includes(moment(date).format("DD/MM/YYYY"))) {
             dates.push(moment(date).format("DD/MM/YYYY"))
             styles.push({
-                date: date,
+                date: moment(date).format("YYYY-MM-DD"),
                 style: { backgroundColor: LS_COLORS.global.green },
                 textStyle: { color: LS_COLORS.global.white },
                 containerStyle: [],
@@ -78,7 +79,7 @@ const AddTimeFrame = (props) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json",
+            'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
         }
 
@@ -112,7 +113,7 @@ const AddTimeFrame = (props) => {
             endPoint: '/api/providerServicesAdd',
             type: 'post'
         }
-
+        
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -250,16 +251,16 @@ const AddTimeFrame = (props) => {
                         customDatesStyles={customDatesStyles}
                     />
                 </View>
-                <ScrollView>
+                <ScrollView style={{ flex: 1 }}>
                     <View style={{ marginVertical: 5 }}>
                         {customDatesStyles.map((item, index) => {
                             return (
                                 <View key={index} style={{ paddingHorizontal: '5%', paddingVertical: 5 }}>
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{item.date}</Text>
-                                    <View style={{ flexDirection: 'row', marginTop: 5, height: 50, alignItems: 'center' }}>
+                                    <View style={{ flexDirection: 'row', marginTop: 5, height: 60, alignItems: 'center' }}>
                                         <View style={{ flex: 1 }}>
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
-                                            <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
+                                            <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
                                                 <TextInputMask
                                                     onChangeText={(formatted, extracted) => {
                                                         setTextData(index, formatted, "from")
@@ -291,7 +292,7 @@ const AddTimeFrame = (props) => {
                                                 </View>
                                             </View>
                                         </View>
-                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeTimeFrame(item)} style={{ height: '100%', aspectRatio: 1, padding: '4%' }}>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeTimeFrame(item)} style={{ height: '100%', aspectRatio: 1, padding: '5%' }}>
                                             <Image source={require('../../../assets/delete.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                         </TouchableOpacity>
                                     </View>

@@ -76,6 +76,20 @@ const MainDrawer = () => {
                     }}
                 />
                 <Drawer.Screen
+                    name="About Us"
+                    component={Test}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/aboutUs.png')} style={{ height: 20, width: 20 }} />,
+                    }}
+                />
+                <Drawer.Screen
+                    name="Contact Us"
+                    component={Test}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/contactUs.png')} style={{ height: 20, width: 20 }} />,
+                    }}
+                />
+                <Drawer.Screen
                     name="Home"
                     component={user.user_role == 2 ? UserStack : ProviderStack}
                     options={{

@@ -57,7 +57,8 @@ const AddLicense = (props) => {
     }
 
     useEffect(() => {
-        if (!isAddServiceMode && subService && subService.license_data && subService.license_data) {
+        console.log("subService.license_data ==>> ", subService.license_data)
+        if (!isAddServiceMode && subService && subService.license_data && subService.license_data.length > 0) {
             const imageData = subService.license_data.map((item, index) => {
                 return {
                     id: item.id,
@@ -65,9 +66,11 @@ const AddLicense = (props) => {
                     name: item.file_url.split("/")[item.file_url.split("/").length - 1],
                     type: 'image/png',
                 }
-            })
+            })            
 
-            setImages(imageData)
+            if (imageData.length > 0) {
+                setImages(imageData)
+            }
         }
     }, [])
 
