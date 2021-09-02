@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, Touchable, TouchableOpacity, FlatList } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, FlatList, BackHandler } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -18,12 +18,12 @@ import { setServices } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
 import { setMyJobs } from '../../../redux/features/provider';
 import { showToast } from '../../../components/validators';
-import { TextInput } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setAddServiceMode } from '../../../redux/features/services';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
+    const navigation = useNavigation();
     const user = useSelector(state => state.authenticate.user)
     const services = useSelector(state => state.authenticate.services)
     const myJobs = useSelector(state => state.provider.myJobs)
@@ -31,7 +31,25 @@ const HomeScreen = (props) => {
     const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState([...services])
-    const [search, setSearch] = useState('')
+
+    useEffect(() => {
+        const backAction = () => {
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
+
+    React.useEffect(() => (
+        navigation.addListener('beforeRemove', (e) => {
+            e.preventDefault();
+        })
+    ), [navigation]);
 
     useEffect(() => {
         getServices()

@@ -82,6 +82,9 @@ const getNotificationTypeNumber = (type) => {
         case "Text":
             return 3
 
+        case "All":
+            return 4
+
         default:
             1;
     }
@@ -147,6 +150,7 @@ const Profile = (props) => {
         { label: 'Email', value: 'Email' },
         { label: 'Push Notification', value: 'Push Notification' },
         { label: 'Text', value: 'Text' },
+        { label: 'All', value: 'All' },
     ]);
     var creditCardType = require("credit-card-type");
     var cards = creditCardType(cardDetails.number)
@@ -609,7 +613,18 @@ const Profile = (props) => {
                 action1={() => props.navigation.navigate("HomeScreen")}
             />
             <TouchableOpacity
-                style={{ height: 100, aspectRatio: 1, alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%", overflow: 'hidden', borderRadius: 70 }}
+                style={{
+                    height: 100,
+                    aspectRatio: 1,
+                    alignSelf: 'center',
+                    position: 'absolute',
+                    zIndex: 100,
+                    top: Platform.OS === 'ios' ? "6%" : "1%",
+                    overflow: 'hidden',
+                    borderRadius: 70,
+                    borderWidth: 0.5,
+                    borderColor: LS_COLORS.global.grey,
+                }}
                 activeOpacity={0.7}
                 onPress={() => pickImage()}>
                 <Image

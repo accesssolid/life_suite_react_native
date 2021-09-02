@@ -13,6 +13,7 @@ import { retrieveItem, showToast } from '../../components/validators';
 import { loginReducer, setAuthToken } from '../../redux/features/loginReducer';
 import { getApi } from '../../api/api';
 import { getJsonData, storeJsonData } from '../../asyncStorage/async'
+import { StackActions, NavigationActions, CommonActions } from '@react-navigation/native';
 
 const Splash = (props) => {
     const dispatch = useDispatch()
@@ -51,7 +52,16 @@ const Splash = (props) => {
                 if (response.status == true) {
                     dispatch(loginReducer(response.data))
                     setTimeout(() => {
-                        props.navigation.navigate("MainDrawer")
+                        props.navigation.dispatch(
+                            CommonActions.reset({
+                                index: 1,
+                                routes: [
+                                    { name: "MainDrawer" },
+                                ],
+                            })
+                        );
+
+                        // props.navigation.navigate("MainDrawer")
                         // if (response.data.user_role == 2) {
                         //     props.navigation.navigate("UserStack")
                         // } else {

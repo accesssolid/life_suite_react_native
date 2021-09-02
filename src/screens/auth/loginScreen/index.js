@@ -22,6 +22,7 @@ import { loginReducer, setAuthToken, setUserRole } from '../../../redux/features
 
 /* Icons */
 import Entypo from 'react-native-vector-icons/Entypo'
+import { CommonActions } from '@react-navigation/native';
 
 const LoginScreen = (props) => {
     const dispatch = useDispatch()
@@ -73,6 +74,14 @@ const LoginScreen = (props) => {
                     dispatch(loginReducer(response.data))
                     setEmail("")
                     setPassword("")
+                    props.navigation.dispatch(
+                        CommonActions.reset({
+                            index: 1,
+                            routes: [
+                                { name: "MainDrawer" },
+                            ],
+                        })
+                    );
                     props.navigation.navigate("MainDrawer")
                     // if (response.data.user_role == 2) {
                     //     props.navigation.navigate("UserStack")

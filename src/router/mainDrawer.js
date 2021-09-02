@@ -116,14 +116,14 @@ const CustomDrawerContent = (props) => {
             </View>
             <DrawerItemList {...props} />
             <DrawerItem
-                style={{ marginTop: '-10%' }}
+                style={{ marginTop: -25 }}
                 label="Legal"
                 labelStyle={{
                     fontFamily: LS_FONTS.PoppinsMedium,
                     fontSize: 14,
                     color: LS_COLORS.global.darkBlack,
                 }}
-                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/legal.png')} style={{ height: 15, width: 15 }} />}
+                icon={({ focused, color }) => <Image resizeMode="cover" source={require('../assets/legal.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => null}
             />
             <View style={{ width: '84%', alignSelf: 'flex-end' }}>
@@ -133,7 +133,7 @@ const CustomDrawerContent = (props) => {
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 11,
                         color: LS_COLORS.global.darkBlack,
-                        marginLeft: '-15%'
+                        marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/termsIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => { props.navigation.toggleDrawer(), props.setTermsVisible(true) }}
@@ -144,7 +144,7 @@ const CustomDrawerContent = (props) => {
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 11,
                         color: LS_COLORS.global.darkBlack,
-                        marginLeft: '-15%'
+                        marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/copyIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => props.navigation.toggleDrawer()}
@@ -155,7 +155,7 @@ const CustomDrawerContent = (props) => {
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 11,
                         color: LS_COLORS.global.darkBlack,
-                        marginLeft: '-15%'
+                        marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/privacyIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => props.navigation.toggleDrawer()}
@@ -166,7 +166,7 @@ const CustomDrawerContent = (props) => {
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 11,
                         color: LS_COLORS.global.darkBlack,
-                        marginLeft: '-15%'
+                        marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/licenceIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => props.navigation.toggleDrawer()}

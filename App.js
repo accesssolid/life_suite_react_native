@@ -10,7 +10,7 @@ import { Root } from 'native-base';
 import LS_COLORS from './src/constants/colors';
 
 /* Redux Store */
-import store from './src/redux/store'
+import store from './src/redux/store';
 
 /* Root Navigator */
 import Router from './src/router';
