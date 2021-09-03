@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, FlatList, BackHandler } from 'react-native'
 
 /* Constants */
@@ -31,21 +31,24 @@ const HomeScreen = (props) => {
     const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState([...services])
+    const [order, setOrder] = useState([])
+    const [orders, setOrders] = useState()
+
+    console.log(order)
+    
 
     useEffect(() => {
         const backAction = () => {
             return true;
         };
-
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
             backAction
         );
-
         return () => backHandler.remove();
     }, []);
 
-    React.useEffect(() => (
+    useEffect(() => (
         navigation.addListener('beforeRemove', (e) => {
             e.preventDefault();
         })
@@ -59,7 +62,7 @@ const HomeScreen = (props) => {
     }, [])
 
     useFocusEffect(
-        React.useCallback(() => {
+        useCallback(() => {
             dispatch(setAddServiceMode({ data: false }))
         }, [])
     );
@@ -71,24 +74,61 @@ const HomeScreen = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let user_data = {
             "user_id": user.id
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
             endPoint: user.user_role == 2 ? '/api/servicesList' : '/api/providerServicesList',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     dispatch(setServices({ data: [...response.data] }))
                     setItems([...response.data])
                     setLoading(false)
+                }
+                else {
+                    showToast(response.message, 'danger')
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
+    const getList = (item) => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        order?.map((i) => {
+            let arr1 = []
+            arr1.push(i.toString())
+            setOrders([arr1])
+        })
+        console.log(orders)
+
+        let user_data = {
+            "services_json": orders
+        }
+        console.log(order[0])
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: user.user_role == 2 ? '/api/customerServicesListingAdd' : '/api/customerServicesListingAdd',
+            type: 'post'
+        }
+        console.log(config)
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    getServices()
                 }
                 else {
                     showToast(response.message, 'danger')
@@ -106,18 +146,15 @@ const HomeScreen = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let user_data = {
             "user_id": user.id
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
             endPoint: '/api/providerAddedServicesList',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -231,12 +268,24 @@ const HomeScreen = (props) => {
                             </View>
                     :
                     <View style={{ flex: 1, paddingTop: '5%' }}>
+
                         <SortableGrid
                             blockTransitionDuration={200}
                             activeBlockCenteringDuration={200}
                             itemsPerRow={2}
                             dragActivationTreshold={200}
-                            onDragRelease={(itemOrder) => console.log("Drag was released, the blocks are in the following order: ", itemOrder)}
+                            onDragRelease={(itemOrder) => {
+                                let arr = []
+                                itemOrder.itemOrder.map((itemData,) => {
+                                    arr.push(items[itemData.key].id)
+                                    setOrder(arr)
+                                })
+                                setTimeout(() => {
+                                    getList()
+                                }, 500)
+
+                                console.log("Drag was released, the blocks are in the following order: ", arr)
+                            }}
                             onDragStart={() => console.log("Some block is being dragged now!")}>
                             {items.map((item, index) =>
                                 <View key={index}
@@ -248,6 +297,7 @@ const HomeScreen = (props) => {
                                             :
                                             props.navigation.navigate("SubServices", { service: item })
                                     }}>
+                                    {console.log(item)}
                                     <UserCards
                                         title1={item.name}
                                         title2="SERVICES"

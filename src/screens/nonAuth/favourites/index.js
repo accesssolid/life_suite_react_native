@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, FlatList } from 'react-native'
 
 /* Constants */
@@ -15,11 +15,106 @@ import { Card, Container, Content } from 'native-base';
 import DropDown from '../../../components/dropDown';
 import CustomTextInput from '../../../components/customTextInput';
 import Cards from '../../../components/cards';
+import { BASE_URL, getApi } from '../../../api/api';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Favourites = (props) => {
     const dispatch = useDispatch()
     const [selected, setselected] = useState(null)
     const [activeTab, setActivetab] = useState(0)
+    const user = useSelector(state => state.authenticate.user)
+    const [loading, setLoading] = useState(false)
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const [services, setServices] = useState([])
+    console.log(services)
+
+    useFocusEffect(useCallback(() => {
+        getService()
+    }, []))
+    
+    const like = (id) => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let user_data = {
+            "service_id": id,
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: user.user_role == 2 ? '/api/customerServiceAddFavourite' : '/api/customerServiceAddFavourite',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                    console.log(response)
+                    getService()
+                }
+                else {
+                    
+                }
+            }).catch(err => {
+            })
+    }
+
+    const getService = () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let config = {
+            headers: headers,
+            endPoint: user.user_role == 2 ? '/api/customerFavouriteServices' : '/api/customerFavouriteServices',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setLoading(false)
+                    setServices([...response.data])
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
+    const getServiceProvider = () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let config = {
+            headers: headers,
+            endPoint: user.user_role == 2 ? '/api/customerFavouriteServices' : '/api/customerFavouriteServices',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setLoading(false)
+                    setServices([...response.data])
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -59,18 +154,19 @@ const Favourites = (props) => {
                     activeTab == 0
                         ?
                         <FlatList
-                            data={[1, 2, 3, 4, 5]}
+                            data={services}
                             numColumns={3}
                             columnWrapperStyle={{ justifyContent: 'flex-start' }}
                             renderItem={({ item, index }) => {
                                 return (
                                     <Cards
-                                        title1={"Plumbing"}
+                                        title1={item.name}
                                         title2="SERVICES"
-                                        imageUrl={{ uri: 'https://picsum.photos/300/300' }}
-                                        action={() => { }}
+                                        imageUrl={{ uri: BASE_URL + item.image}}
+                                        action={() => {   props.navigation.navigate("ServicesProvided", { subService: item, items: [] })}}
                                         showLeft
                                         customContainerStyle={{ width: '30%', marginLeft: '2.5%' }}
+                                        favorite = {() => {like(item.id)}}
                                     />
                                 )
                             }}

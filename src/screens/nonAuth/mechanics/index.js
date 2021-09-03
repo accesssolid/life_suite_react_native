@@ -19,6 +19,7 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Card, Container, Content, Row, } from 'native-base'
 import Loader from '../../../components/loader';
 import { BASE_URL, getApi } from '../../../api/api';
+var _ = require('lodash');
 
 const Mechanics = (props) => {
     const { data, subService } = props.route.params
@@ -29,6 +30,16 @@ const Mechanics = (props) => {
     const [providers, setProviders] = useState([])
     const [selectedProviders, setSelectedProviders] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
+    const user = useSelector(state => state.authenticate.user)
+    const [price, setPrice] = useState(false)
+    const [time, setTime] = useState(false)
+    const [rating, setRating] = useState(false)
+
+    useEffect(() => {
+        const apple = [...providers]
+        apple.sort((a, b) => b.price - a.price)
+        console.log(apple, "jadnfjkl")
+    }, [providers])
 
     useEffect(() => {
         getProviders()
@@ -48,12 +59,11 @@ const Mechanics = (props) => {
             endPoint: '/api/orderProviderList',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
-                        return response.data[item]
+                        return response.data[item][0]
                     })
                     setProviders(proData)
                     setLoading(false)
@@ -66,14 +76,44 @@ const Mechanics = (props) => {
             })
     }
 
+
     const onSelect = (item) => {
         let temp = [...selectedProviders]
-        if (selectedProviders.includes(item[0].id)) {
-            temp.splice(temp.indexOf(item[0].id), 1)
+        if (selectedProviders.includes(item.id)) {
+            temp.splice(temp.indexOf(item.id), 1)
         } else {
-            temp.push(item[0].id)
+            temp.push(item.id)
         }
         setSelectedProviders(temp)
+    }
+    const like = (id) => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let user_data = {
+            "provider_id": id,
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: user.user_role == 2 ? '/api/favouriteProviderAdd' : '/api/favouriteProviderAdd',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    getProviders()
+                }
+                else {
+
+                }
+            }).catch(err => {
+            })
     }
 
     return (
@@ -114,46 +154,62 @@ const Mechanics = (props) => {
                                     style={{ alignSelf: 'center', height: 30, width: 30, resizeMode: 'contain' }}
                                     source={require("../../../assets/filter.png")}
                                 />
-                                <View style={styles.upper} >
+                                <TouchableOpacity onPress={() => { setPrice(!price), price ? providers.sort((a, b) => a.price - b.price) : providers.sort((a, b) => b.price - a.price) }} style={styles.upper} >
                                     <Text style={styles.upperText}>Price</Text>
-                                </View>
-                                <View style={styles.upper} >
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => { setTime(!time), time ? providers.sort((a, b) => a.time_duration - b.time_duration) : providers.sort((a, b) => b.time_duration - a.time_duration) }} style={styles.upper} >
                                     <Text style={styles.upperText}>Time</Text>
-                                </View>
-                                <View style={styles.upper} >
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => { setRating(!rating), rating ? providers.sort((a, b) => a.provider_rating - b.provider_rating) : providers.sort((a, b) => b.provider_rating - a.provider_rating) }} style={styles.upper} >
                                     <Text style={styles.upperText}>Rating</Text>
-                                </View>
+                                </TouchableOpacity>
                             </View>
                             {
                                 providers.length > 0
                                     ?
                                     providers.map((item, index) => {
-                                        console.log("provider_profile_image =>> ", item[0].provider_profile_image)
+                                        console.log(item.rating)
+                                        let x = item.time_duration / 60
+                                        let time_format = ""
+                                        if (x > 1) {
+                                            time_format = parseInt(x) + " hr " + item.time_duration % 60 + " min"
+                                        } else {
+                                            time_format = item.time_duration + " min"
+                                        }
+                                        let y = new Array(parseInt(item.provider_rating)).fill("*").join("")
+
                                         return <Card key={index} style={styles.alexiContainer}>
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                                 <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
                                                     <Image
                                                         style={{ height: '100%', width: '100%' }}
-                                                        source={item[0].provider_profile_image !== null ? { uri: BASE_URL + item[0].provider_profile_image } : require('../../../assets/user.png')}
+                                                        source={item.provider_profile_image !== null ? { uri: BASE_URL + item.provider_profile_image } : require('../../../assets/user.png')}
                                                         resizeMode='cover'
                                                     />
                                                 </View>
                                                 <View style={{ top: "5%", right: 30 }}>
-                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item[0].provider_first_name}</Text>
+                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item.provider_first_name}</Text>
                                                     <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
                                                 </View>
-                                                <View style={{}}>
-                                                    <CheckBox
-                                                        checked={selectedProviders.includes(item[0].id)}
-                                                        onPress={() => onSelect(item)}
-                                                        checkedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/checked.png")} />}
-                                                        uncheckedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/unchecked.png")} />}
+                                                <TouchableOpacity onPress={() => { like(item.user_id) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center', position: "absolute", right: 5 }}>
+                                                    <Image
+                                                        style={{ height: 18, width: 21, }}
+                                                        source={require('../../../assets/whiteHeart.png')}
+                                                        resizeMode="cover"
                                                     />
-                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginLeft: 20 }}>${item[0].price}</Text>
+                                                </TouchableOpacity>
+                                                <View style={{ flexDirection: "row", marginTop: 20 }}>
+                                                    <CheckBox
+                                                        checked={selectedProviders.includes(item.id)}
+                                                        onPress={() => onSelect(item)}
+                                                        checkedIcon={<Image style={{ height: 23, width: 23, }} source={require("../../../assets/checked.png")} />}
+                                                        uncheckedIcon={<Image style={{ height: 23, width: 23, }} source={require("../../../assets/unchecked.png")} />}
+                                                    />
+                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15 }}>${item.price}</Text>
                                                 </View>
                                             </View>
                                             <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>I am a Professional Mechanic having 4y exp.</Text>
-                                            <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>Rating * * * * *</Text>
+                                            <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}> {"Rating" + y}</Text>
                                             <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                                 <Text style={{ marginLeft: 10 }}>
@@ -210,7 +266,7 @@ const Mechanics = (props) => {
                                             </View>
                                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                                 <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Total Time</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>2.5 hrs</Text>
+                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{time_format}</Text>
                                             </View>
                                         </Card>
                                     })

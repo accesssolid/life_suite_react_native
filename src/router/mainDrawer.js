@@ -17,17 +17,25 @@ import OrderHistory from '../screens/nonAuth/orderHistory';
 import OrderHistory1 from '../screens/nonAuth/orderHistory1';
 import Favourites from '../screens/nonAuth/favourites';
 import TermsModal from '../components/termsModal';
+import PrivacyModal from '../components/privacyModal';
+import CopyRightModal from '../components/copyrightModal';
+import SoftwareModal from '../components/softwareModal';
+import AboutUsModal from '../components/aboutUsModal';
+import AboutUs from '../screens/nonAuth/aboutUs';
 
 const Drawer = createDrawerNavigator();
 
 const MainDrawer = () => {
     const user = useSelector(state => state.authenticate.user)
     const [termsVisible, setTermsVisible] = useState(false)
+    const [privacyVisible, setPrivacyVisible] = useState(false)
+    const [copyVisible, setCopyVisible] = useState(false)
+    const [softwareVisible, setSoftwareVisible] = useState(false)
 
     return (
         <>
             <Drawer.Navigator
-                drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} />}
+                drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} setPrivacyVisible={setPrivacyVisible} setCopyVisible={setCopyVisible} setSoftwareVisible={setSoftwareVisible} />}
                 drawerStyle={{
                     width: Dimensions.get('screen').width / 1.3
                 }}
@@ -77,7 +85,7 @@ const MainDrawer = () => {
                 />
                 <Drawer.Screen
                     name="About Us"
-                    component={Test}
+                    component={AboutUs}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/aboutUs.png')} style={{ height: 20, width: 20 }} />,
                     }}
@@ -101,6 +109,18 @@ const MainDrawer = () => {
             <TermsModal
                 isVisible={termsVisible}
                 setVisible={setTermsVisible}
+            />
+            <PrivacyModal
+                isVisible={privacyVisible}
+                setVisible={setPrivacyVisible}
+            />
+            <CopyRightModal
+                isVisible={copyVisible}
+                setVisible={setCopyVisible}
+            />
+            <SoftwareModal
+                isVisible={softwareVisible}
+                setVisible={setSoftwareVisible}
             />
         </>
     )
@@ -147,7 +167,7 @@ const CustomDrawerContent = (props) => {
                         marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/copyIcon.png')} style={{ height: 15, width: 15 }} />}
-                    onPress={() => props.navigation.toggleDrawer()}
+                    onPress={() => {props.navigation.toggleDrawer(), props.setCopyVisible(true) }}
                 />
                 <DrawerItem
                     label="Privacy Policy"
@@ -158,7 +178,7 @@ const CustomDrawerContent = (props) => {
                         marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/privacyIcon.png')} style={{ height: 15, width: 15 }} />}
-                    onPress={() => props.navigation.toggleDrawer()}
+                    onPress={() => {props.navigation.toggleDrawer(), props.setPrivacyVisible(true)}}
                 />
                 <DrawerItem
                     label="Software license"
@@ -169,7 +189,7 @@ const CustomDrawerContent = (props) => {
                         marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/licenceIcon.png')} style={{ height: 15, width: 15 }} />}
-                    onPress={() => props.navigation.toggleDrawer()}
+                    onPress={() => {props.navigation.toggleDrawer(), props.setSoftwareVisible(true)}}
                 />
             </View>
         </DrawerContentScrollView>

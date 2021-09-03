@@ -8,15 +8,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getApi } from '../api/api';
 import { setAddServiceData } from '../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
-import { WebView } from "react-native-webview"
-
-const TermsModal = (props) => {
+import { WebView} from "react-native-webview"
+const PrivacyModal = (props) => {
     const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
     const [data, setData] = useState("")
 
     useEffect(() => {
-        getTerms()
+        getPrivacy()
     }, [])
 
     // var regex = /(<([^>]+)>)/ig
@@ -24,7 +23,7 @@ const TermsModal = (props) => {
     // console.log(rename)
 
 
-    const getTerms = () => {
+    const getPrivacy = () => {
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -33,7 +32,7 @@ const TermsModal = (props) => {
 
         let config = {
             headers: headers,
-            endPoint: '/api/termsCondition',
+            endPoint: '/api/privacyPolicy',
             type: 'post'
         }
 
@@ -43,6 +42,7 @@ const TermsModal = (props) => {
                     setData([response.data.text_data])
                 }
                 else {
+
                 }
             }).catch(err => {
                 console.log(err)
@@ -51,8 +51,6 @@ const TermsModal = (props) => {
 
     return (
         <Modal
-            backdropOpacity={.5}
-            backdropColor="rgba(0,0,0,0.5)"
             onBackButtonPress={() => props.setVisible(false)}
             onBackdropPress={() => props.setVisible(false)}
             hasBackdrop={true}
@@ -61,8 +59,9 @@ const TermsModal = (props) => {
                 <TouchableOpacity style={{ backgroundColor: "blue" }} activeOpacity={0.7} onPress={() => props.setVisible(false)} style={{ height: 25, aspectRatio: 1, position: 'absolute', top: '1%', right: '3%' }}>
                     <Image source={require('../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                 </TouchableOpacity>
-                <Text style={styles.title}>TERMS & CONDITIONS</Text>
+                <Text style={styles.title}>PRIVACY POLICY</Text>
                 <WebView
+                textZoom 
                     showsVerticalScrollIndicator={false}
                     style={{ flex: 1, height: 5000, width: 300 }}
                     source={{
@@ -80,13 +79,14 @@ const TermsModal = (props) => {
     )
 }
 
-export default TermsModal;
+export default PrivacyModal;
 
 const styles = StyleSheet.create({
     wrapper: {
         position: 'absolute',
         height: '100%',
         width: '100%',
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
     container: {
         // height: '50%',
