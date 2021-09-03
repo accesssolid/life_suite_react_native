@@ -21,9 +21,9 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 const MapScreen = (props) => {
     const dispatch = useDispatch()
-    const inputRef = useRef(null)
+    const mapRef = useRef(null)
     const queryString = require('query-string');
-    const { onConfirm } = props.route.params
+    const { onConfirm, coords } = props.route.params
     const placesRef = useRef();
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)
@@ -32,16 +32,25 @@ const MapScreen = (props) => {
     const [coordinates, setCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
     })
 
     useEffect(() => {
-        getLocationPermission()
+        if (coords == null) {
+            getLocationPermission()
+        } else {
+            setCoordinates(coords)
+            mapRef.current.animateToRegion({
+                ...coords
+            })
+        }
+
     }, [])
 
     const getLocationPermission = async () => {
         let hasLocationPermission = false
         if (Platform.OS == "ios") {
-
             Geolocation.requestAuthorization('always').then((res) => {
                 if (res == "granted") {
                     hasLocationPermission = true
@@ -93,6 +102,7 @@ const MapScreen = (props) => {
                 setAddress(results[0].address)
                 placesRef.current.setAddressText(results[0].address)
                 setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                mapRef.current.animateToRegion({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
             })
             .catch((error) => console.log("results error => ", error.message))
             .finally(() => {
@@ -101,24 +111,25 @@ const MapScreen = (props) => {
     }
 
     const reverseGeocode = (lat, lng) => {
-        let params = {
-            key: 'AIzaSyBoK4icaIuqCEWdbq-D4LdrsbK4X_Fa1Fg',
-            latlng: `${lat},${lng}`,
-        };
-        let qs = queryString.stringify(params);
-        return fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?${qs}`)
-            .then((res) => res.json())
-            .then((json) => {
-                if (json.status !== 'OK') {
-                    throw new Error(`Geocode error: ${json.status}`);
-                }
-                // console.log("geometry =>> ", json.results[0].geometry.location.lat)
-                // console.log("geometry =>> ", json.results[0].geometry.location.lng)
-                console.log("formatted_address =>> ", json.results[0].formatted_address)
-                setAddress(json.results[0].formatted_address)
-                placesRef.current.setAddressText(json.results[0].formatted_address)
-            });
+        try {
+            let params = {
+                key: 'AIzaSyBoK4icaIuqCEWdbq-D4LdrsbK4X_Fa1Fg',
+                latlng: `${lat},${lng}`,
+            };
+            let qs = queryString.stringify(params);
+            return fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?${qs}`)
+                .then((res) => res.json())
+                .then((json) => {
+                    if (json.status !== 'OK') {
+                        throw new Error(`Geocode error: ${json.status}`);
+                    }
+                    setAddress(json.results[0].formatted_address)
+                    placesRef.current.setAddressText(json.results[0].formatted_address)
+                });
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
@@ -149,9 +160,14 @@ const MapScreen = (props) => {
                             })
                             setAddress(data?.description)
                             placesRef.current.blur()
+                            mapRef.current.animateToRegion({
+                                ...coordinates,
+                                latitude: details?.geometry?.location?.lat,
+                                longitude: details.geometry?.location?.lng
+                            })
                         }}
                         textInputProps={{
-                            // selection: !placesRef?.current?.isFocused() ? { start: 0, end: address.length } : null
+
                         }}
                         query={{
                             key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -160,7 +176,7 @@ const MapScreen = (props) => {
                     />
                     {/* </ScrollView> */}
                     <View style={styles.mapContainer}>
-                        <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: 0, alignItems: 'center', paddingHorizontal: '10%' }}>
+                        <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: '10%', alignItems: 'center', paddingHorizontal: '10%', zIndex: 1000 }}>
                             <CustomButton
                                 title={user.user_role == 2 ? "Home" : "Permanent"}
                                 customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
@@ -191,13 +207,12 @@ const MapScreen = (props) => {
                             />
                         </View>
                         <MapView
+                            ref={mapRef}
+                            // initialRegion={{ ...coordinates }}
+                            // camera={{ ...coordinates }}
                             style={styles.map}
-                            onRegionChangeComplete={(reg) => { setCoordinates({ ...reg }), reverseGeocode(reg.latitude, reg.longitude) }}
-                            region={{
-                                ...coordinates,
-                                // latitudeDelta: 0.015,
-                                // longitudeDelta: 0.0121,
-                            }}>
+                            onRegionChange={(reg) => { setCoordinates({ ...reg, }) }}
+                            onRegionChangeComplete={(reg) => reverseGeocode(reg.latitude, reg.longitude)}>
                         </MapView>
                         <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}>
                             <Image pointerEvents="none" style={{ height: 40, aspectRatio: 1 }} source={require('../../../assets/pin.png')} />

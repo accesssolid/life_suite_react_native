@@ -280,7 +280,14 @@ const SignUpScreen = (props) => {
             }
         }
 
-        let user_data = { ...signUpData, about: signUpData.bio ,email: signUpData.email.toLowerCase(), address: JSON.stringify(address), phone_number: signUpData.phone_number.replace(/[^\d]/g, "") }
+        let user_data = {
+            ...signUpData,
+            about: signUpData.bio,
+            email: signUpData.email.toLowerCase(),
+            address: JSON.stringify(address),
+            phone_number: signUpData.phone_number.replace(/[^\d]/g, ""),
+            is_same_address: isSameAddress ? 1 : 0
+        }
 
         let headers = {
             Accept: "application/json",

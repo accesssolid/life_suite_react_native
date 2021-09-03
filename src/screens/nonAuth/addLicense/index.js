@@ -57,7 +57,7 @@ const AddLicense = (props) => {
     }
 
     useEffect(() => {
-        console.log("subService.license_data ==>> ", subService.license_data)
+        console.log("subService.license_data ==>> ", subService)
         if (!isAddServiceMode && subService && subService.license_data && subService.license_data.length > 0) {
             const imageData = subService.license_data.map((item, index) => {
                 return {
@@ -66,7 +66,7 @@ const AddLicense = (props) => {
                     name: item.file_url.split("/")[item.file_url.split("/").length - 1],
                     type: 'image/png',
                 }
-            })            
+            })
 
             if (imageData.length > 0) {
                 setImages(imageData)
@@ -130,6 +130,54 @@ const AddLicense = (props) => {
                                 })
                             }
                             setImages([...data])
+                        }).catch(err => {
+                            console.log("Image picker error : ", err)
+                        })
+                    }
+                },
+            ]
+        );
+    }
+
+    const updateImage = (index) => {
+        let imagesData = [...images]
+        Alert.alert(
+            "LifeSuite",
+            "Pick image from...",
+            [
+                {
+                    text: "Cancel", onPress: () => { }, style: 'cancel'
+                },
+                {
+                    text: "Camera",
+                    onPress: () => {
+                        ImagePicker.openCamera({
+                            width: Dimensions.get('screen').width,
+                            height: Dimensions.get('screen').width,
+                            cropping: true
+                        }).then(image => {
+                            imagesData[index] = {
+                                uri: image.path,
+                                name: image.filename ? image.filename : image.path.split("/").pop(),
+                                type: image.mime,
+                            }
+                            setImages([...imagesData])
+                        })
+                    },
+                },
+                {
+                    text: "Gallery", onPress: () => {
+                        ImagePicker.openPicker({
+                            width: Dimensions.get('screen').width,
+                            height: Dimensions.get('screen').width,
+                            cropping: true
+                        }).then(image => {
+                            imagesData[index] = {
+                                uri: image.path,
+                                name: image.filename ? image.filename : image.path.split("/").pop(),
+                                type: image.mime,
+                            }
+                            setImages([...imagesData])
                         }).catch(err => {
                             console.log("Image picker error : ", err)
                         })
@@ -279,6 +327,14 @@ const AddLicense = (props) => {
             })
     }
 
+    const onImagePress = (image, index) => {
+        if (images[0].uri == require('../../../assets/camera.png')) {
+            pickImage()
+        } else {
+            updateImage(index)
+        }
+    }
+
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -311,11 +367,11 @@ const AddLicense = (props) => {
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
                     <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                        <Text style={styles.service}>{isAddServiceMode ? 'Load' : "Update"} your Certificate or License</Text>
+                        <Text style={styles.service}>{subService.upload_type == 2 ? "Upload Driver or State License" : "Upload Certificate or Business Certificate"}</Text>
                         {
                             images.map((item, index) => {
                                 return (
-                                    <View key={index} style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => onImagePress(item, index)} key={index} style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
                                         {
                                             item.uri == require('../../../assets/camera.png')
                                                 ?
@@ -326,7 +382,7 @@ const AddLicense = (props) => {
                                         {images.length > 1 && <TouchableOpacity activeOpacity={0.7} onPress={() => removeLicense(item, index)} style={{ height: 30, aspectRatio: 1, position: 'absolute', top: -15, right: -15 }}>
                                             <Image source={require('../../../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                         </TouchableOpacity>}
-                                    </View>
+                                    </TouchableOpacity>
                                 )
                             })
                         }

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useImperativeHandle, useReducer } from 'react';
-import { View, StyleSheet, Text, Platform, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Platform, Image, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -9,9 +9,10 @@ import LS_FONTS from '../constants/fonts';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckBox } from 'react-native-elements';
 import TextInputMask from 'react-native-text-input-mask';
+import { Container, Content, InputGroup, Row, } from 'native-base'
 
 /* Components */;
-import { TextInput } from 'react-native-gesture-handler';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import _ from 'lodash';
 
 const ServiceItem = React.forwardRef((props, ref) => {
@@ -111,6 +112,11 @@ const ServiceItem = React.forwardRef((props, ref) => {
                     </View>
                 </View>}
             </View>
+            {/* <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={styles.container}>
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={{}} showsVerticalScrollIndicator={false}> */}
+            {/* <Content showsVerticalScrollIndicator={false}> */}
             {props.showInputs && props.products.map((item, index) => {
                 return <View key={index} style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
@@ -167,8 +173,8 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             onChangeText={(text) => props.setNewProductText(item, text, "name")}
                             value={item.name}
                             ref={nameRef}
-                            returnKeyType={"next"}
-                            onSubmitEditing={() => priceNewRef.current.focus()}
+                            returnKeyType={"default"}
+                            // onSubmitEditing={() => priceNewRef.current.focus()}
                             placeholderTextColor={LS_COLORS.global.placeholder}
                         />
                     </View>
@@ -196,6 +202,9 @@ const ServiceItem = React.forwardRef((props, ref) => {
                     <Image source={require('../assets/addgreen.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                 </TouchableOpacity>
             </View>}
+            {/* </Content> */}
+            {/* </ScrollView>
+            </KeyboardAvoidingView> */}
         </>
     )
 })

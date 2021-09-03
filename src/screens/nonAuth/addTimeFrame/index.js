@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native'
 
 /* Constants */
@@ -10,7 +10,8 @@ import { globalStyles } from '../../../utils';
 import CalendarPicker from 'react-native-calendar-picker';
 import moment from "moment";
 import TextInputMask from 'react-native-text-input-mask';
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView } from 'react-native-safe-area-context';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 /* Components */
 import Header from '../../../components/header';
@@ -27,14 +28,20 @@ import { ScrollView } from 'react-native-gesture-handler';
 const AddTimeFrame = (props) => {
     const dispatch = useDispatch()
     const { serviceData } = props.route.params
+    const calendarRef = useRef(null)
     const [selectedDates, setSelectedDates] = useState([])
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [customDatesStyles, setCustomDatesStyles] = useState([])
     const [loading, setLoading] = useState(false)
+    const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
+    const [dateType, setDateType] = useState(null)
+    const [activeIndex, setActiveIndex] = useState(null)
 
     useEffect(() => {
-        getTimeFrames()
+        if (!isAddServiceMode)
+            getTimeFrames()
     }, [])
 
     const onDateChange = (date) => {
@@ -63,16 +70,7 @@ const AddTimeFrame = (props) => {
         styles = styles.filter(item => item.date !== frame.date)
         setSelectedDates([...dates])
         setCustomDatesStyles([...styles])
-    }
-
-    const setTextData = (index, text, type) => {
-        let styles = [...customDatesStyles];
-        if (type == "from") {
-            styles[index].from_time = text
-        } else {
-            styles[index].to_time = text
-        }
-        setCustomDatesStyles([...styles])
+        calendarRef.current.resetSelections()
     }
 
     const save = () => {
@@ -113,7 +111,7 @@ const AddTimeFrame = (props) => {
             endPoint: '/api/providerServicesAdd',
             type: 'post'
         }
-        
+
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -160,19 +158,21 @@ const AddTimeFrame = (props) => {
 
                     Object.keys(response.data).forEach((ele) => {
                         response.data[ele].forEach(element => {
-                            dates.push(moment(element.date).format("DD/MM/YYYY"))
-                            styles.push({
-                                date: element.date,
-                                style: { backgroundColor: LS_COLORS.global.green },
-                                textStyle: { color: LS_COLORS.global.white },
-                                containerStyle: [],
-                                allowDisabled: true,
-                                from_time: element.from_time,
-                                to_time: element.to_time
-                            });
+                            if (element.service_id == serviceData.formdata._parts[1][1]) {
+                                dates.push(moment(element.date).format("DD/MM/YYYY"))
+                                styles.push({
+                                    date: element.date,
+                                    style: { backgroundColor: LS_COLORS.global.green },
+                                    textStyle: { color: LS_COLORS.global.white },
+                                    containerStyle: [],
+                                    allowDisabled: true,
+                                    from_time: element.from_time,
+                                    to_time: element.to_time
+                                });
+                            }
                         });
                     })
-
+                    console.log("dates =>> ", dates)
                     setSelectedDates([...dates])
                     setCustomDatesStyles([...styles])
                 }
@@ -221,6 +221,23 @@ const AddTimeFrame = (props) => {
             })
     }
 
+    const setTime = (type, index) => {
+        setDateType(type)
+        setActiveIndex(index)
+        setDatePickerVisibility(true)
+    }
+
+    const handleConfirm = (date) => {
+        setDatePickerVisibility(false)
+        let styles = [...customDatesStyles];
+        if (dateType == "from") {
+            styles[activeIndex].from_time = moment(date).format('HH:mm')
+        } else {
+            styles[activeIndex].to_time = moment(date).format('HH:mm')
+        }
+        setCustomDatesStyles([...styles])
+    };
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -233,7 +250,7 @@ const AddTimeFrame = (props) => {
             <View style={styles.container}>
                 <View style={styles.calendar}>
                     <CalendarPicker
-                        date
+                        ref={calendarRef}
                         onDateChange={onDateChange}
                         previousTitle="<"
                         nextTitle=">"
@@ -261,15 +278,18 @@ const AddTimeFrame = (props) => {
                                         <View style={{ flex: 1 }}>
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
-                                                <TextInputMask
-                                                    onChangeText={(formatted, extracted) => {
-                                                        setTextData(index, formatted, "from")
-                                                    }}
-                                                    style={{ width: '85%', paddingHorizontal: 10 }}
-                                                    mask={"[00]:[00]"}
-                                                    value={item.from_time}
-                                                    editable={serviceData.formdata !== undefined}
-                                                />
+                                                <TouchableOpacity style={{ width: '85%', paddingHorizontal: 10 }} disabled={serviceData.formdata == undefined} activeOpacity={0.7} onPress={() => setTime("from", index)}>
+                                                    {/* <TextInputMask
+                                                        onChangeText={(formatted, extracted) => {
+                                                            setTextData(index, formatted, "from")
+                                                        }}
+                                                        style={{ width: '100%' }}
+                                                        mask={"[00]:[00]"}
+                                                        value={}
+                                                        editable={false}
+                                                    /> */}
+                                                    <Text>{item.from_time}</Text>
+                                                </TouchableOpacity>
                                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                 </View>
@@ -278,21 +298,24 @@ const AddTimeFrame = (props) => {
                                         <View style={{ flex: 1 }}>
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
-                                                <TextInputMask
-                                                    onChangeText={(formatted, extracted) => {
-                                                        setTextData(index, formatted, "to")
-                                                    }}
-                                                    style={{ width: '85%', paddingHorizontal: 10 }}
-                                                    mask={"[00]:[00]"}
-                                                    value={item.to_time}
-                                                    editable={serviceData.formdata !== undefined}
-                                                />
+                                                <TouchableOpacity style={{ width: '85%', paddingHorizontal: 10 }} disabled={serviceData.formdata == undefined} activeOpacity={0.7} onPress={() => setTime("to", index)}>
+                                                    {/* <TextInputMask
+                                                        onChangeText={(formatted, extracted) => {
+                                                            setTextData(index, formatted, "to")
+                                                        }}
+                                                        style={{ width: '100%' }}
+                                                        mask={"[00]:[00]"}
+                                                        value={item.to_time}
+                                                        editable={false}
+                                                    /> */}
+                                                    <Text>{item.to_time}</Text>
+                                                </TouchableOpacity>
                                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                 </View>
                                             </View>
                                         </View>
-                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeTimeFrame(item)} style={{ height: '100%', aspectRatio: 1, padding: '5%' }}>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeTimeFrame(item)} style={{ height: '100%', aspectRatio: 1, padding: 15 }}>
                                             <Image source={require('../../../assets/delete.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                         </TouchableOpacity>
                                     </View>
@@ -301,7 +324,13 @@ const AddTimeFrame = (props) => {
                         })}
                     </View>
                 </ScrollView>
-                {selectedDates.length > 0 && serviceData.formdata && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginTop: 10 }} action={() => save()} />}
+                <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="time"
+                    onConfirm={handleConfirm}
+                    onCancel={() => setDatePickerVisibility(false)}
+                />
+                {selectedDates.length > 0 && serviceData.formdata && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginVertical: 10 }} action={() => save()} />}
             </View>
             {loading && <Loader />}
         </SafeAreaView>

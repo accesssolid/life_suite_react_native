@@ -14,7 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context"
 /* Components */;
 import Header from '../../../components/header';
 import { Container, Content, InputGroup, Row, } from 'native-base'
-import { TextInput } from 'react-native-gesture-handler';
 import { BASE_URL, getApi } from '../../../api/api';
 import CustomButton from '../../../components/customButton';
 import services, { setAddServiceData } from '../../../redux/features/services';
@@ -50,10 +49,6 @@ const ServicesProvided = (props) => {
     useEffect(() => {
         getServiceItems()
     }, [])
-
-    useEffect(() => {
-        console.log("selectedItems ==>> ", selectedItems)
-    }, [selectedItems])
 
     useEffect(() => {
         setInitialServiceData()
@@ -167,6 +162,7 @@ const ServicesProvided = (props) => {
             let newArr = []
             let selected = []
             itemListMaster.map((item, index) => {
+                console.log("item =>> ", item)
                 item.products.forEach(element => {
                     newArr.push({
                         "id": element.id,
@@ -184,7 +180,7 @@ const ServicesProvided = (props) => {
                     }
                 });
             })
-
+            console.log("products =>> ", newArr)
             setProductsData([...newArr])
             setSelectedProducts([...selected])
         }
@@ -286,7 +282,8 @@ const ServicesProvided = (props) => {
             setLoading(true)
             let headers = {
                 Accept: "application/json",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${access_token}`
             }
 
             let user_data = {
@@ -310,8 +307,8 @@ const ServicesProvided = (props) => {
                         } else {
                             showToast("Select Service first")
                         }
-                    }
-                    else {
+                    } else {
+                        showToast(response.message)
                         setLoading(false)
                     }
                 }).catch(err => {
@@ -333,6 +330,12 @@ const ServicesProvided = (props) => {
         if (activeItem == null) {
             setActiveIndex(index)
             setActiveItem(item)
+            let filtered = selectedNewProducts.filter(itemm => itemm.item_id == item.id)
+            if (filtered.length > 0) {
+                setIsOtherSelected(true)
+            } else {
+                setIsOtherSelected(false)
+            }
         } else {
             if (getSelectedProducts().length > 0 || getSelectedNewProducts().length > 0) {
                 Alert.alert(
@@ -417,43 +420,48 @@ const ServicesProvided = (props) => {
     }
 
     const saveRequest = () => {
-        if (selectedProducts.length > 0 || selectedNewProducts.length > 0) {
-            let isValidData = false
-            servicesData.filter(item => item.variant_data == selectedVariant).forEach((itemm, index) => {
-                if (selectedItems.includes(itemm.item_id)) {
-                    if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
-                        isValidData = true
-                    } else {
-                        console.log("itemm servicesData ==>> ", itemm)
-                        isValidData = false
-                    }
-                }
-            })
-
-            let selected = getSelectedProducts()
-            productsData.filter(item => selected.includes(item.id)).forEach(element => {
-                if (element.price.trim() == "") {
-                    // console.log("element  productsData ==>> ", element)
-                    isValidData = false
-                }
-            });
-
-            let selectedNew = getSelectedNewProducts()
-            newProductsData.filter(item => selectedNew.includes(item.id)).forEach(element => {
-                if (element.price.trim() == "" || element.name.trim() == "") {
-                    // console.log("itemm newProductsData ==>> ", element)
-                    isValidData = false
-                }
-            });
-
-            if (!isValidData) {
-                return showToast("Please enter data for selected services")
-            } else {
-                setActiveItem(null)
-                setActiveIndex(null)
+        let hasSubProducts = false
+        const selectedItemsss = itemListMaster.filter(item => selectedItems.includes(item.id))
+        selectedItemsss.forEach(element => {
+            if (element.products.length > 0) {
+                hasSubProducts = true
             }
+        });
+
+        if (hasSubProducts && selectedProducts.length == 0 && selectedNewProducts.length == 0) {
+            return showToast("Please select at least one item")
+        }
+
+        let isValidData = false
+        servicesData.filter(item => item.variant_data == selectedVariant).forEach((itemm, index) => {
+            if (selectedItems.includes(itemm.item_id)) {
+                if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
+                    isValidData = true
+                } else {
+                    isValidData = false
+                }
+            }
+        })
+
+        let selected = getSelectedProducts()
+        productsData.filter(item => selected.includes(item.id)).forEach(element => {
+            if (element.price.trim() == "") {
+                isValidData = false
+            }
+        });
+
+        let selectedNew = getSelectedNewProducts()
+        newProductsData.filter(item => selectedNew.includes(item.id)).forEach(element => {
+            if (element.price.trim() == "" || element.name.trim() == "") {
+                isValidData = false
+            }
+        });
+
+        if (!isValidData) {
+            return showToast("Please enter data for selected services")
         } else {
-            showToast("Please select at least one item")
+            setActiveItem(null)
+            setActiveIndex(null)
         }
     }
 
@@ -470,6 +478,7 @@ const ServicesProvided = (props) => {
             setActiveItem(null)
             setActiveIndex(null)
             setSelectedVariant(variant.id)
+            setIsOtherSelected(false)
         }
     }
 
@@ -556,7 +565,8 @@ const ServicesProvided = (props) => {
 
     const onSelectOther = () => {
         setIsOtherSelected(!isOtherSelected)
-        if (newProductsData.length === 0) {
+        let filtered = newProductsData.filter(item => item.item_id == activeItem.id)
+        if (filtered.length === 0) {
             addNewProduct()
         }
     }
@@ -585,6 +595,18 @@ const ServicesProvided = (props) => {
             "temp_id": String(Math.floor((Math.random() * 10000000) + 1000))
         })
         setNewProductsData([...arr])
+        let filtered = arr.filter(item => item.item_id == activeItem.id)
+        if (filtered.length == 1) {
+            onPressNewProduct(filtered[0])
+        }
+    }
+
+    const onBackPress = () => {
+        if (activeItem !== null) {
+            onPressItem(activeIndex, activeItem)
+        } else {
+            props.navigation.goBack()
+        }
     }
 
     return (
@@ -600,9 +622,7 @@ const ServicesProvided = (props) => {
                             <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop: StatusBar.currentHeight + 10 }}>
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
-                                    action={() => {
-                                        props.navigation.goBack()
-                                    }}
+                                    action={() => onBackPress()}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
                                         props.navigation.navigate("HomeScreen")
@@ -618,83 +638,77 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
-                    <Content showsVerticalScrollIndicator={false}>
-                        <Text style={styles.service}>SERVICES</Text>
-                        <View style={{ marginVertical: 10, flexDirection: 'row', overflow: 'scroll', paddingHorizontal: '5%', justifyContent: 'center' }}>
-                            {variants.length > 0 && variants.map((item, index) => {
-                                return (
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => toggleVariant(item)} key={index}
-                                        style={{
-                                            backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
-                                            marginHorizontal: 10,
-                                            paddingHorizontal: 15,
-                                            paddingVertical: 5,
-                                            borderRadius: 100,
-                                            borderWidth: selectedVariant == item.id ? 1 : 1,
-                                            borderColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.green
-                                        }}>
-                                        <Text style={{
-                                            fontFamily: LS_FONTS.PoppinsMedium,
-                                            fontSize: 14,
-                                            textTransform: 'uppercase',
-                                            color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
-                                        }}>
-                                            {item.name}</Text>
-                                    </TouchableOpacity>
-                                )
-                            })}
+                    <Text style={styles.service}>SERVICES</Text>
+                    <View style={{ marginVertical: 10, flexDirection: 'row', overflow: 'scroll', paddingHorizontal: '5%', justifyContent: 'center' }}>
+                        {variants.length > 0 && variants.map((item, index) => {
+                            return (
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => toggleVariant(item)} key={index}
+                                    style={{
+                                        backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
+                                        marginHorizontal: 10,
+                                        paddingHorizontal: 15,
+                                        paddingVertical: 5,
+                                        borderRadius: 100,
+                                        borderWidth: selectedVariant == item.id ? 1 : 1,
+                                        borderColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.green
+                                    }}>
+                                    <Text style={{
+                                        fontFamily: LS_FONTS.PoppinsMedium,
+                                        fontSize: 14,
+                                        textTransform: 'uppercase',
+                                        color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
+                                    }}>
+                                        {item.name}
+                                    </Text>
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </View>
+                    {activeItem !== null && <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: '2%' }}>
+                        <View style={{ alignItems: 'center' }}>
+                            <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Time</Text>
                         </View>
-                        {activeItem !== null && <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-end', marginBottom: '2%' }}>
-                            <View style={{ alignItems: 'center' }}>
-                                <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Time</Text>
-                            </View>
-                            <View style={{ marginLeft: '5%' }}>
-                                <Text style={styles.priceTime}>Price</Text>
-                            </View>
-                        </View>}
-                        {activeItem !== null
-                            ?
-                            <>
-                                <ServiceItem
-                                    ref={itemRef}
-                                    item={activeItem}
-                                    index={activeIndex}
-                                    onCheckPress={() => onPressItem(activeIndex, activeItem)}
-                                    isSelected={selectedItems.includes(activeItem.id)}
-                                    setText={setText}
-                                    setProductText={setProductText}
-                                    setNewProductText={setNewProductText}
-                                    serviceItem={servicesData.filter(item => item.variant_data == selectedVariant)[activeIndex]}
-                                    subService={subService}
-                                    showInputs
-                                    products={productsData.filter(item => item.item_id == activeItem.id)}
-                                    newProducts={newProductsData.filter(item => item.item_id == activeItem.id)}
-                                    selectedProducts={getSelectedProducts()}
-                                    selectedNewProducts={getSelectedNewProducts()}
-                                    onPressProduct={(item) => onPressProduct(item)}
-                                    onPressNewProduct={(item) => onPressNewProduct(item)}
-                                    onSelectOther={onSelectOther}
-                                    isOtherSelected={isOtherSelected}
-                                    removeNewproduct={removeNewproduct}
-                                    addNewProduct={addNewProduct}
-                                />
-                            </>
-                            :
-                            itemList && itemList.length > 0
-                                ?
-                                itemList.map(((item, index) => {
-                                    return (
-                                        <ServiceItem
-                                            key={index}
-                                            item={item}
-                                            index={index}
-                                            onCheckPress={() => { onPressItem(index, item) }}
-                                            isSelected={selectedItems.includes(item.id)}
-                                        />
-                                    )
-                                }))
-                                :
-                                null}
+                        <View style={{ marginLeft: '5%' }}>
+                            <Text style={styles.priceTime}>Price</Text>
+                        </View>
+                    </View>}
+                    <Content showsVerticalScrollIndicator={false}>
+                        {activeItem !== null &&
+                            <ServiceItem
+                                ref={itemRef}
+                                item={activeItem}
+                                index={activeIndex}
+                                onCheckPress={() => onPressItem(activeIndex, activeItem)}
+                                isSelected={selectedItems.includes(activeItem.id)}
+                                setText={setText}
+                                setProductText={setProductText}
+                                setNewProductText={setNewProductText}
+                                serviceItem={servicesData.filter(item => item.variant_data == selectedVariant)[activeIndex]}
+                                subService={subService}
+                                showInputs
+                                products={productsData.filter(item => item.item_id == activeItem.id)}
+                                newProducts={newProductsData.filter(item => item.item_id == activeItem.id)}
+                                selectedProducts={getSelectedProducts()}
+                                selectedNewProducts={getSelectedNewProducts()}
+                                onPressProduct={(item) => onPressProduct(item)}
+                                onPressNewProduct={(item) => onPressNewProduct(item)}
+                                onSelectOther={onSelectOther}
+                                isOtherSelected={isOtherSelected}
+                                removeNewproduct={removeNewproduct}
+                                addNewProduct={addNewProduct}
+                            />}
+                        {activeItem == null && itemList && itemList.length > 0 &&
+                            itemList.map(((item, index) => {
+                                return (
+                                    <ServiceItem
+                                        key={index}
+                                        item={item}
+                                        index={index}
+                                        onCheckPress={() => { onPressItem(index, item) }}
+                                        isSelected={selectedItems.includes(item.id)}
+                                    />
+                                )
+                            }))}
                     </Content>
                     <View style={{ paddingBottom: '2.5%' }}>
                         {activeItem == null

@@ -23,9 +23,7 @@ import { loadauthentication } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
 import SearchableDropDown from '../../../components/searchableDropDown';
 import { Dimensions } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFocusEffect } from '@react-navigation/native';
 
 const getMessage = (name) => {
     switch (name) {
@@ -66,8 +64,8 @@ const getNotificationType = (type) => {
         case 3:
             return "Text"
 
-        default:
-            "Push Notification";
+        case 4:
+            return "All"
     }
 }
 
@@ -144,7 +142,7 @@ const Profile = (props) => {
         expiry: '',
         cvv: ''
     })
-    const [notificationType, setNotificationType] = useState(getNotificationType(userData.notification_prefrence))
+    const [notificationType, setNotificationType] = useState(getNotificationType(user.notification_prefrence))
     const [notifDropOpen, setNotifDropOpen] = useState(false)
     const [notifItems, setNotifItems] = useState([
         { label: 'Email', value: 'Email' },
@@ -177,7 +175,7 @@ const Profile = (props) => {
 
     useEffect(() => {
         setUserData({ ...user })
-        setNotificationType(getNotificationType(userData.notification_prefrence))
+        setNotificationType(getNotificationType(user.notification_prefrence))
     }, [user])
 
     useEffect(() => {
@@ -186,10 +184,14 @@ const Profile = (props) => {
         }
     }, [userData])
 
-    useEffect(() => {
-        setNotificationType(getNotificationType(userData.notification_prefrence))
-        getStates()
-    }, [])
+    useFocusEffect(
+        React.useCallback(() => {
+            getStates()
+            setUserData({ ...user })
+            setIsSameAddress(user.is_same_address == 1 ? true : false)
+            setNotificationType(getNotificationType(user.notification_prefrence))
+        }, [])
+    );
 
     useEffect(() => {
         const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValue)
@@ -423,6 +425,7 @@ const Profile = (props) => {
         formdata.append("about", userData.about);
         formdata.append("prefer_name", userData.prefer_name);
         formdata.append("notification_prefrence", notifType);
+        formdata.append("is_same_address", isSameAddress ? 1 : 0);
         formdata.append("address", JSON.stringify(addr));
 
         let config = {
@@ -604,6 +607,15 @@ const Profile = (props) => {
         }
     }
 
+    function formatPhoneNumber(value) {
+        if (!value) return value;
+        const phoneNumber = value.replace(/[^\d]/g, "");
+        const phoneNumberLength = phoneNumber.length;
+        if (phoneNumberLength < 4) return phoneNumber;
+        if (phoneNumberLength < 8) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+        if (phoneNumberLength < 13) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 12)}`;
+    }
+
     return (
         <SafeAreaView style={{ ...globalStyles.safeAreaView, backgroundColor: LS_COLORS.global.white }}>
             <Header
@@ -713,13 +725,13 @@ const Profile = (props) => {
                             />
                             <CustomInput
                                 text="Phone Number"
-                                value={userData.phone_number}
+                                value={formatPhoneNumber(userData.phone_number)}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, phone_number: text })
                                 }}
                                 inpuRef={phoneRef}
                                 returnKeyType={Platform.OS == "ios" ? "done" : "next"}
-                                maxLength={10}
+                                maxLength={12}
                                 onSubmitEditing={() => {
                                     setAddHomeAddressActive(true), setTimeout(() => {
                                         homeAddressLine1Ref.current._root.focus()
@@ -924,7 +936,7 @@ const Profile = (props) => {
                                             open={notifDropOpen}
                                             value={notificationType}
                                             items={notifItems}
-                                            showArrowIcon={false}
+                                            showArrowIcon={true}
                                             setOpen={setNotifDropOpen}
                                             setValue={setNotificationType}
                                             setItems={setNotifItems}
@@ -934,6 +946,9 @@ const Profile = (props) => {
                                                 borderColor: LS_COLORS.global.borderColor,
                                                 backgroundColor: 'transparent',
                                             }}
+                                            arrowIconContainerStyle={{ marginRight: '5%' }}
+                                            arrowIconStyle={{ tintColor: LS_COLORS.global.green }}
+                                            tickIconStyle={{ tintColor: LS_COLORS.global.green }}
                                             containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0, zIndex: 1000000 }}
                                             labelStyle={{ color: LS_COLORS.global.black, width: '100%', paddingLeft: '7.5%' }}
                                             textStyle={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}

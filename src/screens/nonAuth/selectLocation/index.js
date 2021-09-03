@@ -281,7 +281,7 @@ const SelectLocation = (props) => {
                                     paddingHorizontal: '10%',
                                 }}
                                 activeOpacity={0.7}
-                                onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this) })}>
+                                onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords : coordinates })}>
                                 <Text numberOfLines={1} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, }}>{address}</Text>
                                 <View style={{ aspectRatio: 1, position: 'absolute', right: '5%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                                     <Image source={require('../../../assets/location.png')} resizeMode="contain" style={{ height: '70%', width: '100%', backgroundColor: LS_COLORS.global.lightGrey }} />

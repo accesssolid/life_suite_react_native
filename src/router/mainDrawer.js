@@ -26,13 +26,14 @@ const MainDrawer = () => {
 
     return (
         <>
-            <Drawer.Navigator
+            <Drawer.Navigator        
                 drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} />}
                 drawerStyle={{
                     width: Dimensions.get('screen').width / 1.3
                 }}
                 initialRouteName="Home"
                 screenOptions={{
+                    unmountOnBlur:true
                 }}
                 drawerContentOptions={{
                     labelStyle: {
