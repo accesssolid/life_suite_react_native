@@ -54,7 +54,7 @@ const AboutUsModal = (props) => {
             hasBackdrop={true}
             isVisible={props.isVisible}>
             <View style={styles.container}>
-                <TouchableOpacity style={{ backgroundColor: "blue" }} activeOpacity={0.7} onPress={() => props.setVisible(false)} style={{ height: 25, aspectRatio: 1, position: 'absolute', top: '3%', right: '3%' }}>
+                <TouchableOpacity style={{ backgroundColor: "blue" }} activeOpacity={0.7} onPress={() => {props.setVisible(false)}} style={{ height: 25, aspectRatio: 1, position: 'absolute', top: '3%', right: '3%' }}>
                     <Image source={require('../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                 </TouchableOpacity>
                 <Text style={styles.title}>ABOUT US</Text>

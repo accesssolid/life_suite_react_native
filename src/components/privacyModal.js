@@ -61,7 +61,6 @@ const PrivacyModal = (props) => {
                 </TouchableOpacity>
                 <Text style={styles.title}>PRIVACY POLICY</Text>
                 <WebView
-                textZoom 
                     showsVerticalScrollIndicator={false}
                     style={{ flex: 1, height: 5000, width: 300 }}
                     source={{

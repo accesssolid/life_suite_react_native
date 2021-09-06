@@ -26,10 +26,11 @@ const Favourites = (props) => {
     const [loading, setLoading] = useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [services, setServices] = useState([])
-    console.log(services)
+    const [provider, setProvider] = useState([])
 
     useFocusEffect(useCallback(() => {
         getService()
+        getServiceProvider()
     }, []))
     
     const like = (id) => {
@@ -50,10 +51,36 @@ const Favourites = (props) => {
         }
         getApi(config)
             .then((response) => {
+                if (response.status == true) {
+                    getService()
+                }
+                else {
+                }
+            }).catch(err => {
+            })
+    }
+
+    const providerLike = (id) => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let user_data = {
+            "provider_id": id,
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: user.user_role == 2 ? '/api/favouriteProviderAdd' : '/api/favouriteProviderAdd',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
                 console.log(response)
                 if (response.status == true) {
                     console.log(response)
-                    getService()
+                    getServiceProvider()
                 }
                 else {
                     
@@ -83,6 +110,7 @@ const Favourites = (props) => {
                 }
                 else {
                     setLoading(false)
+                    setServices([])
                 }
             }).catch(err => {
                 setLoading(false)
@@ -96,20 +124,21 @@ const Favourites = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let config = {
             headers: headers,
-            endPoint: user.user_role == 2 ? '/api/customerFavouriteServices' : '/api/customerFavouriteServices',
+            endPoint: user.user_role == 2 ? '/api/favouriteProviders' : '/api/favouriteProviders',
             type: 'post'
         }
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     setLoading(false)
-                    setServices([...response.data])
+                    setProvider([...response.data])
                 }
                 else {
                     setLoading(false)
+                    setProvider([])
                 }
             }).catch(err => {
                 setLoading(false)
@@ -173,22 +202,23 @@ const Favourites = (props) => {
                             keyExtractor={(item, index) => index}
                         />
                         :
-                        <Content>
-                            {[1, 2, 3, 4, 5].map((item, index) => {
+                        <Content showsVerticalScrollIndicator = {false} >
+                            {provider.map((item, index) => {
+                                console.log(item)
                                 return (
                                     <View key={index} style={{ flexDirection: 'row', marginBottom: 30, height: 50, alignItems: 'center' }}>
                                         <View style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
-                                            <Image source={{ uri: 'https://picsum.photos/300/300' }} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                                            <Image source={ item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
                                         </View>
                                         <View style={{ flex: 1, paddingLeft: 10, justifyContent: 'center' }}>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>Carlos</Text>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Plumber</Text>
+                                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
+                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>{item.last_name}</Text>
                                         </View>
                                         <View>
-                                            <Text>Price: $25/hr</Text>
-                                            <Text>Ratings: 4.2</Text>
+                                            {/* <Text>Price: $25/hr</Text> */}
+                                            <Text>Rating: {parseInt(item.rating)}</Text>
                                         </View>
-                                        <TouchableOpacity activeOpacity={0.7} onPress={() => { }} style={{ height: '100%', aspectRatio: 1, padding: '4%' }}>
+                                        <TouchableOpacity  onPress = {() => {providerLike(item.id)}} activeOpacity={0.7} style={{ height: '100%', aspectRatio: 1, padding: '4%' }}>
                                             <Image source={require('../../../assets/heartGreen.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
                                         </TouchableOpacity>
                                     </View>

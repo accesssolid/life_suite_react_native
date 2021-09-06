@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     },
     text: {
         textAlign: 'center',
-        fontSize: 12,
+        fontSize: 10,
         lineHeight: 16,
         fontFamily: LS_FONTS.PoppinsMedium,
         left:4

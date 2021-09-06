@@ -34,9 +34,6 @@ const HomeScreen = (props) => {
     const [order, setOrder] = useState([])
     const [orders, setOrders] = useState()
 
-    console.log(order)
-    
-
     useEffect(() => {
         const backAction = () => {
             return true;
@@ -67,6 +64,16 @@ const HomeScreen = (props) => {
         }, [])
     );
 
+    // useEffect(() => {
+    //     order?.map((i) => {
+    //         let arr1 = []
+    //         arr1.push(i.toString())
+    //         setOrders([arr1])
+    //     })
+    //     console.log("ydagkgfdsj", orders)
+
+    // }, [order])
+
     const getServices = () => {
         setLoading(true)
         let headers = {
@@ -85,6 +92,7 @@ const HomeScreen = (props) => {
         }
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     dispatch(setServices({ data: [...response.data] }))
                     setItems([...response.data])
@@ -106,29 +114,23 @@ const HomeScreen = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
+        //    const order1 = JSON.stringify(order)
+        let z = order.map(x => String(x))
+        console.log("hsbdjk", order)
+        var formdata = new FormData();
+        formdata.append("services_json", JSON.stringify(order));
 
-        order?.map((i) => {
-            let arr1 = []
-            arr1.push(i.toString())
-            setOrders([arr1])
-        })
-        console.log(orders)
-
-        let user_data = {
-            "services_json": orders
-        }
-        console.log(order[0])
         let config = {
             headers: headers,
-            data: JSON.stringify(user_data),
-            endPoint: user.user_role == 2 ? '/api/customerServicesListingAdd' : '/api/customerServicesListingAdd',
+            data: formdata,
+            endPoint: '/api/customerServicesListingAdd',
             type: 'post'
         }
-        console.log(config)
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
-                    getServices()
+                    setLoading(false)
                 }
                 else {
                     showToast(response.message, 'danger')
@@ -168,12 +170,10 @@ const HomeScreen = (props) => {
                 setLoading(false)
             })
     }
-
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
             props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
     }
-
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
@@ -268,7 +268,6 @@ const HomeScreen = (props) => {
                             </View>
                     :
                     <View style={{ flex: 1, paddingTop: '5%' }}>
-
                         <SortableGrid
                             blockTransitionDuration={200}
                             activeBlockCenteringDuration={200}
@@ -280,10 +279,7 @@ const HomeScreen = (props) => {
                                     arr.push(items[itemData.key].id)
                                     setOrder(arr)
                                 })
-                                setTimeout(() => {
-                                    getList()
-                                }, 500)
-
+                                getList()
                                 console.log("Drag was released, the blocks are in the following order: ", arr)
                             }}
                             onDragStart={() => console.log("Some block is being dragged now!")}>
@@ -297,7 +293,6 @@ const HomeScreen = (props) => {
                                             :
                                             props.navigation.navigate("SubServices", { service: item })
                                     }}>
-                                    {console.log(item)}
                                     <UserCards
                                         title1={item.name}
                                         title2="SERVICES"
