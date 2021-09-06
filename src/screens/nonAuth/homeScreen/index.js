@@ -107,7 +107,7 @@ const HomeScreen = (props) => {
             })
     }
 
-    const getList = (item) => {
+    const getList = (a) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -118,7 +118,7 @@ const HomeScreen = (props) => {
         let z = order.map(x => String(x))
         console.log("hsbdjk", order)
         var formdata = new FormData();
-        formdata.append("services_json", JSON.stringify(order));
+        formdata.append("services_json", JSON.stringify(a));
 
         let config = {
             headers: headers,
@@ -279,7 +279,7 @@ const HomeScreen = (props) => {
                                     arr.push(items[itemData.key].id)
                                     setOrder(arr)
                                 })
-                                getList()
+                                getList(arr)
                                 console.log("Drag was released, the blocks are in the following order: ", arr)
                             }}
                             onDragStart={() => console.log("Some block is being dragged now!")}>

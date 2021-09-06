@@ -166,13 +166,13 @@ const Mechanics = (props) => {
                             </View>
                             {providers.length > 0 ?
                                 providers.map((item, index) => {
-                                    // let x = item.time_duration / 60
-                                    // let time_format = ""
-                                    // if (x > 1) {
-                                    //     time_format = parseInt(x) + " hr " + item.time_duration % 60 + " min"
-                                    // } else {
-                                    //     time_format = item.time_duration + " min"
-                                    // }
+                                    let x = item.timeDuration / 60
+                                    let time_format = ""
+                                    if (x > 1) {
+                                        time_format = parseInt(x) + " hr " + item.timeDuration % 60 + " min"
+                                    } else {
+                                        time_format = item.time_duration + " min"
+                                    }
 
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -211,7 +211,7 @@ const Mechanics = (props) => {
                                                     checkedIcon={<Image style={{ height: 23, width: 23, }} source={require("../../../assets/checked.png")} />}
                                                     uncheckedIcon={<Image style={{ height: 23, width: 23, }} source={require("../../../assets/unchecked.png")} />}
                                                 />
-                                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15 }}>$</Text>
+                                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15 }}>{ "$" + item.totalPrice}</Text>
                                             </View>
                                         </View>
                                         {!open ?
@@ -287,7 +287,7 @@ const Mechanics = (props) => {
                                         </View>
                                         <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                             <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Total Time</Text>
-                                            <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>skmdlf</Text>
+                                            <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{time_format}</Text>
                                         </View>
                                     </Card>
                                 })
