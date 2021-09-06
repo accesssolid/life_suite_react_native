@@ -61,6 +61,38 @@ const SubServices = (props) => {
                 setLoading(false)
             })
     }
+    
+    const like = (id) => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let user_data = {
+            "service_id": id,
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: user.user_role == 2 ? '/api/customerServiceAddFavourite' : '/api/customerServiceAddFavourite',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                    console.log(response)
+                    getSubServices()
+                }
+                else {
+                    
+                }
+            }).catch(err => {
+            })
+    }
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -83,6 +115,7 @@ const SubServices = (props) => {
                             data={[...subServices]}
                             numColumns={3}
                             renderItem={({ item, index }) => {
+                                console.log("hsabdghfbhsdbfbsdbhfbdsfjbhds",item.isFavourite)
                                 return (
                                     <SmallCards
                                         title1={item.name}
@@ -93,6 +126,8 @@ const SubServices = (props) => {
                                             }
                                             props.navigation.navigate("ServicesProvided", { subService: item, items: [] })
                                         }}
+                                        favorite = {() => {like(item.id)}}
+                                        favStatus = {item.isFavourite}
                                     />
                                 )
                             }}

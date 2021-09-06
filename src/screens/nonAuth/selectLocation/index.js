@@ -199,7 +199,6 @@ const SelectLocation = (props) => {
 
                 return props.navigation.navigate('AddTimeFrame', { serviceData: { json_data, formdata, subService } })
             } catch (error) {
-
             } finally {
                 setLoading(false)
             }

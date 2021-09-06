@@ -22,9 +22,9 @@ const Cards = props => {
                     source={props.imageUrl}
                 />
             </View>
-            <View style={{ justifyContent: 'space-around', alignItems: 'center', paddingVertical: 10, flexDirection: 'row', }}>
+            <View style={{ justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10, flexDirection: 'row', }}>
                 <Text style={styles.text}>{props.title1}</Text>
-                {props.showLeft && <TouchableOpacity activeOpacity={0.7} style={{ height: 15, aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}>
+                {props.showLeft && <TouchableOpacity onPress ={props.favorite} activeOpacity={0.7} style={{ height: 15, aspectRatio: 1, alignItems: 'center', justifyContent: 'center' ,right:2}}>
                     <Image source={require('../assets/heartGreen.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                 </TouchableOpacity>}
             </View>
@@ -51,9 +51,10 @@ const styles = StyleSheet.create({
     },
     text: {
         textAlign: 'center',
-        fontSize: 12,
+        fontSize: 10,
         lineHeight: 16,
-        fontFamily: LS_FONTS.PoppinsMedium
+        fontFamily: LS_FONTS.PoppinsMedium,
+        left:4
     },
     room: {
         width: '100%',

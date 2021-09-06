@@ -22,8 +22,24 @@ const SmallCards = props => {
                     resizeMode="cover"
                 />
             </View>
-            <View style={{ height: 30, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ height: 30, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
                 <Text style={styles.text}>{props.title1}</Text>
+                <TouchableOpacity onPress={props.favorite}>
+                    {props.favStatus == 1 ?
+                        <Image
+                            style={{ height: 18, width: 21, right: 5 }}
+                            source={require('../assets/heartGreen.png')}
+                            resizeMode="cover"
+                        />
+                        :
+                        <Image
+                            style={{ height: 18, width: 21, right: 5 }}
+                            source={require('../assets/whiteHeart.png')}
+                            resizeMode="cover"
+                        />
+                    }
+
+                </TouchableOpacity>
             </View>
         </TouchableOpacity>
     )
@@ -49,7 +65,8 @@ const styles = StyleSheet.create({
     text: {
         textAlign: 'center',
         fontSize: 10,
-        fontFamily: LS_FONTS.PoppinsMedium
+        fontFamily: LS_FONTS.PoppinsMedium,
+        left: 2
     },
     room: {
         height: '100%',

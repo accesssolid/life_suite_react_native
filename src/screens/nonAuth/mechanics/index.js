@@ -19,9 +19,11 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Card, Container, Content, Row, } from 'native-base'
 import Loader from '../../../components/loader';
 import { BASE_URL, getApi } from '../../../api/api';
+import { Rating, AirbnbRating } from 'react-native-ratings';
+var _ = require('lodash');
 
 const Mechanics = (props) => {
-    const { data, subService } = props.route.params
+    const { data, subService, extraData } = props.route.params
     const [checked1, setChecked1] = useState(false)
     const [checked2, setChecked2] = useState(false)
     const [checked3, setChecked3] = useState(false)
@@ -29,6 +31,16 @@ const Mechanics = (props) => {
     const [providers, setProviders] = useState([])
     const [selectedProviders, setSelectedProviders] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
+    const user = useSelector(state => state.authenticate.user)
+    const [price, setPrice] = useState(false)
+    const [time, setTime] = useState(false)
+    const [open, setOpen] = useState(false)
+    const [rating, setRating] = useState(false)
+
+    useEffect(() => {
+        const apple = [...providers]
+        apple.sort((a, b) => b.price - a.price)
+    }, [providers])
 
     useEffect(() => {
         getProviders()
@@ -41,16 +53,15 @@ const Mechanics = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...data }),
-            endPoint: '/api/orderProviderList',
+            endPoint: '/api/providerListOrder',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
+                console.log("abdsf", response.data)
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -66,14 +77,44 @@ const Mechanics = (props) => {
             })
     }
 
+
     const onSelect = (item) => {
         let temp = [...selectedProviders]
-        if (selectedProviders.includes(item[0].id)) {
-            temp.splice(temp.indexOf(item[0].id), 1)
+        if (selectedProviders.includes(item.id)) {
+            temp.splice(temp.indexOf(item.id), 1)
         } else {
-            temp.push(item[0].id)
+            temp.push(item.id)
         }
         setSelectedProviders(temp)
+    }
+    const like = (id) => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let user_data = {
+            "provider_id": id,
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: user.user_role == 2 ? '/api/favouriteProviderAdd' : '/api/favouriteProviderAdd',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    getProviders()
+                }
+                else {
+
+                }
+            }).catch(err => {
+            })
     }
 
     return (
@@ -108,116 +149,152 @@ const Mechanics = (props) => {
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
                     <Container style={{ marginTop: 26 }}>
-                        <Content>
-                            <View style={{ height: 40, width: '90%', left: 10, justifyContent: 'space-between', flexDirection: 'row' }}>
-                                <Image
-                                    style={{ alignSelf: 'center', height: 30, width: 30, resizeMode: 'contain' }}
-                                    source={require("../../../assets/filter.png")}
-                                />
-                                <View style={styles.upper} >
+                        <Content showsVerticalScrollIndicator={false} bounces={false} >
+                            <View style={{ height: 40, width: '90%', alignSelf: "center", justifyContent: 'space-between', flexDirection: 'row' }}>
+                                <TouchableOpacity onPress={() => { setPrice(!price), price ? providers.sort((a, b) => a.price - b.price) : providers.sort((a, b) => b.price - a.price) }} style={styles.upper} >
                                     <Text style={styles.upperText}>Price</Text>
-                                </View>
-                                <View style={styles.upper} >
+                                    <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => { setTime(!time), time ? providers.sort((a, b) => a.time_duration - b.time_duration) : providers.sort((a, b) => b.time_duration - a.time_duration) }} style={styles.upper} >
                                     <Text style={styles.upperText}>Time</Text>
-                                </View>
-                                <View style={styles.upper} >
+                                    <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => { setRating(!rating), rating ? providers.sort((a, b) => a.provider_rating - b.provider_rating) : providers.sort((a, b) => b.provider_rating - a.provider_rating) }} style={styles.upper} >
                                     <Text style={styles.upperText}>Rating</Text>
-                                </View>
+                                    <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
+                                </TouchableOpacity>
                             </View>
-                            {
-                                providers.length > 0
-                                    ?
-                                    providers.map((item, index) => {
-                                        console.log("provider_profile_image =>> ", item[0].provider_profile_image)
-                                        return <Card key={index} style={styles.alexiContainer}>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
-                                                    <Image
-                                                        style={{ height: '100%', width: '100%' }}
-                                                        source={item[0].provider_profile_image !== null ? { uri: BASE_URL + item[0].provider_profile_image } : require('../../../assets/user.png')}
-                                                        resizeMode='cover'
-                                                    />
-                                                </View>
-                                                <View style={{ top: "5%", right: 30 }}>
-                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item[0].provider_first_name}</Text>
-                                                    <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
-                                                </View>
-                                                <View style={{}}>
-                                                    <CheckBox
-                                                        checked={selectedProviders.includes(item[0].id)}
-                                                        onPress={() => onSelect(item)}
-                                                        checkedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/checked.png")} />}
-                                                        uncheckedIcon={<Image style={{ height: 23, width: 23, alignSelf: "flex-end" }} source={require("../../../assets/unchecked.png")} />}
-                                                    />
-                                                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginLeft: 20 }}>${item[0].price}</Text>
-                                                </View>
+                            {providers.length > 0 ?
+                                providers.map((item, index) => {
+                                    // let x = item.time_duration / 60
+                                    // let time_format = ""
+                                    // if (x > 1) {
+                                    //     time_format = parseInt(x) + " hr " + item.time_duration % 60 + " min"
+                                    // } else {
+                                    //     time_format = item.time_duration + " min"
+                                    // }
+
+                                    return <Card key={index} style={styles.alexiContainer}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
+                                                <Image
+                                                    style={{ height: '100%', width: '100%' }}
+                                                    source={item.profile_image !== null ? { uri: BASE_URL + item.provider_profile_image } : require('../../../assets/user.png')}
+                                                    resizeMode='cover'
+                                                />
                                             </View>
-                                            <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>I am a Professional Mechanic having 4y exp.</Text>
-                                            <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}>Rating * * * * *</Text>
-                                            <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ marginLeft: 10 }}>
-                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Oil Change   </Text>
-                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>(Service Charge)</Text>
+                                            <View style={{ top: "5%", right: 30 }}>
+                                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item.first_name}</Text>
+                                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>Australia</Text>
+                                            </View>
+                                            <TouchableOpacity onPress={() => { like(item.id) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center', position: "absolute", right: 5 }}>
+                                                {
+                                                    item.is_favourite === 1
+                                                        ?
+                                                        <Image
+                                                            style={{ height: 18, width: 21 }}
+                                                            source={require('../../../assets/heartGreen.png')}
+                                                            resizeMode="cover"
+                                                        />
+                                                        :
+                                                        <Image
+                                                            style={{ height: 18, width: 21 }}
+                                                            source={require('../../../assets/whiteHeart.png')}
+                                                            resizeMode="cover"
+                                                        />
+                                                }
+                                            </TouchableOpacity>
+                                            <View style={{ flexDirection: "row", marginTop: 20 }}>
+                                                <CheckBox
+                                                    checked={selectedProviders.includes(item.id)}
+                                                    onPress={() => onSelect(item)}
+                                                    checkedIcon={<Image style={{ height: 23, width: 23, }} source={require("../../../assets/checked.png")} />}
+                                                    uncheckedIcon={<Image style={{ height: 23, width: 23, }} source={require("../../../assets/unchecked.png")} />}
+                                                />
+                                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15 }}>$</Text>
+                                            </View>
+                                        </View>
+                                        {!open ?
+                                            <Text numberOfLines={1} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.about}</Text>
+                                            :
+                                            <Text onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.about}</Text>
+                                        }
+                                        <View style={{ width: 120, flexDirection: "row", overflow: "hidden", justifyContent: "space-evenly", alignItems: "center" }}>
+                                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}> {"Rating"}</Text>
+                                            {/* <Rating
+                                                readonly={true}
+                                                imageSize={10}
+                                                type="custom"
+                                                ratingBackgroundColor="white"
+                                                ratingColor="#04BFBF"
+                                                tintColor="white"
+                                                startingValue={parseInt(item.provider_rating)}
+                                            /> */}
+                                        </View>
+                                        <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
+                                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                            <Text style={{ marginLeft: 10 }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Oil Change   </Text>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, }}>(Service Charge)</Text>
+                                            </Text>
+                                            <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
+                                                <CheckBox
+                                                    checked={checked1}
+                                                    onPress={() => {
+                                                        setChecked1(!checked1)
+                                                    }}
+                                                    checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
+                                                    uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
+                                                />
+                                            </View>
+                                        </View>
+                                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                            <View>
+                                                <Text style={{ marginLeft: 20 }}>
+                                                    <View style={{ height: 10, width: 10, borderRadius: 100, backgroundColor: "#CACACA", justifyContent: "center", alignItems: "center" }}></View>
+
+                                                    <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>5W - 20           </Text>
+                                                    <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsRegular, }}>(Product)</Text>
                                                 </Text>
-                                                <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
-                                                    <CheckBox
-                                                        checked={checked1}
-                                                        onPress={() => {
-                                                            setChecked1(!checked1)
-                                                        }}
-                                                        checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
-                                                        uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
-                                                    />
-                                                </View>
                                             </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <View>
-                                                    <Text style={{ marginLeft: 20 }}>
-                                                        <View style={{ height: 10, width: 10, borderRadius: 100, backgroundColor: "#CACACA", justifyContent: "center", alignItems: "center" }}></View>
+                                            <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$15</Text>
+                                                <CheckBox
+                                                    checked={checked2}
+                                                    onPress={() => {
+                                                        setChecked2(!checked2)
+                                                    }}
+                                                    checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
+                                                    uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
+                                                />
+                                            </View>
+                                        </View>
 
-                                                        <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>5W - 20           </Text>
-                                                        <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsRegular, }}>(Product)</Text>
-                                                    </Text>
-                                                </View>
-                                                <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$15</Text>
-                                                    <CheckBox
-                                                        checked={checked2}
-                                                        onPress={() => {
-                                                            setChecked2(!checked2)
-                                                        }}
-                                                        checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
-                                                        uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
-                                                    />
-                                                </View>
+                                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 3</Text>
+                                            <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
+                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$50</Text>
+                                                <CheckBox
+                                                    checked={checked3}
+                                                    onPress={() => {
+                                                        setChecked3(!checked3)
+                                                    }}
+                                                    checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/checked.png")} />}
+                                                    uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/unchecked.png")} />}
+                                                />
                                             </View>
-
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 3</Text>
-                                                <View style={{ height: 20, width: "20%", flexDirection: "row" }}>
-                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$50</Text>
-                                                    <CheckBox
-                                                        checked={checked3}
-                                                        onPress={() => {
-                                                            setChecked3(!checked3)
-                                                        }}
-                                                        checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/checked.png")} />}
-                                                        uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5, right: 3 }} source={require("../../../assets/unchecked.png")} />}
-                                                    />
-                                                </View>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Total Time</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>2.5 hrs</Text>
-                                            </View>
-                                        </Card>
-                                    })
-                                    :
-                                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                        {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16 }}>No Providers Found</Text>}
-                                    </View>
+                                        </View>
+                                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Total Time</Text>
+                                            <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>skmdlf</Text>
+                                        </View>
+                                    </Card>
+                                })
+                                :
+                                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                    {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16 }}>No Providers Found</Text>}
+                                </View>
                             }
                             <TouchableOpacity
                                 style={styles.save}
@@ -280,11 +357,13 @@ const styles = StyleSheet.create({
     upper: {
         justifyContent: "center",
         alignItems: 'center',
-        height: 25,
-        width: 75,
+        height: 30,
+        width: 100,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 100,
-        alignSelf: 'center'
+        alignSelf: 'center',
+        flexDirection: "row",
+        justifyContent: "space-evenly"
     },
     upperText: {
         textAlign: "center",

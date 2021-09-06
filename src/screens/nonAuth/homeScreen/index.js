@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, FlatList, BackHandler } from 'react-native'
 
 /* Constants */
@@ -31,21 +31,21 @@ const HomeScreen = (props) => {
     const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState([...services])
+    const [order, setOrder] = useState([])
+    const [orders, setOrders] = useState()
 
     useEffect(() => {
         const backAction = () => {
             return true;
         };
-
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
             backAction
         );
-
         return () => backHandler.remove();
     }, []);
 
-    React.useEffect(() => (
+    useEffect(() => (
         navigation.addListener('beforeRemove', (e) => {
             e.preventDefault();
         })
@@ -59,10 +59,20 @@ const HomeScreen = (props) => {
     }, [])
 
     useFocusEffect(
-        React.useCallback(() => {
+        useCallback(() => {
             dispatch(setAddServiceMode({ data: false }))
         }, [])
     );
+
+    // useEffect(() => {
+    //     order?.map((i) => {
+    //         let arr1 = []
+    //         arr1.push(i.toString())
+    //         setOrders([arr1])
+    //     })
+    //     console.log("ydagkgfdsj", orders)
+
+    // }, [order])
 
     const getServices = () => {
         setLoading(true)
@@ -71,23 +81,55 @@ const HomeScreen = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let user_data = {
             "user_id": user.id
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
             endPoint: user.user_role == 2 ? '/api/servicesList' : '/api/providerServicesList',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     dispatch(setServices({ data: [...response.data] }))
                     setItems([...response.data])
+                    setLoading(false)
+                }
+                else {
+                    showToast(response.message, 'danger')
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
+    const getList = (item) => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        //    const order1 = JSON.stringify(order)
+        let z = order.map(x => String(x))
+        console.log("hsbdjk", order)
+        var formdata = new FormData();
+        formdata.append("services_json", JSON.stringify(order));
+
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: '/api/customerServicesListingAdd',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
                     setLoading(false)
                 }
                 else {
@@ -106,18 +148,15 @@ const HomeScreen = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let user_data = {
             "user_id": user.id
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
             endPoint: '/api/providerAddedServicesList',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -131,12 +170,10 @@ const HomeScreen = (props) => {
                 setLoading(false)
             })
     }
-
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
             props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
     }
-
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
@@ -236,7 +273,15 @@ const HomeScreen = (props) => {
                             activeBlockCenteringDuration={200}
                             itemsPerRow={2}
                             dragActivationTreshold={200}
-                            onDragRelease={(itemOrder) => console.log("Drag was released, the blocks are in the following order: ", itemOrder)}
+                            onDragRelease={(itemOrder) => {
+                                let arr = []
+                                itemOrder.itemOrder.map((itemData,) => {
+                                    arr.push(items[itemData.key].id)
+                                    setOrder(arr)
+                                })
+                                getList()
+                                console.log("Drag was released, the blocks are in the following order: ", arr)
+                            }}
                             onDragStart={() => console.log("Some block is being dragged now!")}>
                             {items.map((item, index) =>
                                 <View key={index}

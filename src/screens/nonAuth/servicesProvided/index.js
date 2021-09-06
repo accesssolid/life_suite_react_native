@@ -113,6 +113,7 @@ const ServicesProvided = (props) => {
                 })
             }
         });
+
         props.navigation.navigate("MechanicLocation", { servicedata: servicedata, subService: subService, extraData: extraData })
     }
 

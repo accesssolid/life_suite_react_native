@@ -31,12 +31,14 @@ const MechanicLocation = (props) => {
     const { servicedata, subService } = props.route.params
     const user = useSelector(state => state.authenticate.user)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
     const category_array = ['01:00', '02:00', '03:00', '4:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00']
     const [startTime, setStartTime] = useState(moment())
-    const [endTime, setEndTime] = useState('01:00')
+    const [endTime, setEndTime] = useState(moment())
     const [fromAddress, setFromAddress] = useState("")
     const [toAddress, setToAddress] = useState("")
     const [date, setDate] = useState("")
+
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -150,18 +152,20 @@ const MechanicLocation = (props) => {
         let data = {
             "user_id": user.id,
             "json_data": JSON.stringify({
-                "items": [...servicedata]
+                "items": [servicedata[0].item_id],
+                "products" : servicedata[0].products
             }),
             "order_placed_address": toAddress,
             "order_placed_lat": toCoordinates.latitude,
             "order_placed_long": toCoordinates.longitude,
-            "order_start_time": date + " " + moment(startTime).format('HH:mm')+ ":00",
+            "order_start_time": date + " " + moment(startTime).format('HH:mm') + ":00",
+            "order_end_time": date + " " + moment(endTime).format('HH:mm') + ":00",
             "order_from_lat": fromCoordinates.latitude,
             "order_from_long": fromCoordinates.longitude,
             "order_from_address": fromAddress
         }
 
-        console.log("data =>> ", data)
+        console.log("data =>> ", data.json_data)
 
         if (subService.location_type == 2 && data.order_placed_address.trim() == "") {
             showToast("Please add to address")
@@ -179,10 +183,15 @@ const MechanicLocation = (props) => {
         setDatePickerVisibility(false);
     };
 
+    const handleConfirm1 = (date) => {
+        setEndTime(date)
+        setDatePickerVisibility1(false);
+    };
+
     const renderView = () => {
         return (
             <View style={{ flex: 1 }}>
-                <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps='handled'>
+                <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false} bounces={false} >
                     <View style={styles.mapContainer}>
                         <MapView
                             style={styles.map}
@@ -273,6 +282,10 @@ const MechanicLocation = (props) => {
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility(true)} >
                                 <Text>{moment(startTime).format('HH:mm A')}</Text>
                             </TouchableOpacity>
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 30, marginBottom: 10 }}>End Time</Text>
+                            <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility1(true)} >
+                                <Text>{moment(endTime).format('HH:mm A')}</Text>
+                            </TouchableOpacity>
                         </View>
                         {/* <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>End Time</Text>
@@ -300,6 +313,12 @@ const MechanicLocation = (props) => {
                         mode="time"
                         onConfirm={handleConfirm}
                         onCancel={() => setDatePickerVisibility(false)}
+                    />
+                    <DateTimePickerModal
+                        isVisible={isDatePickerVisible1}
+                        mode="time"
+                        onConfirm={handleConfirm1}
+                        onCancel={() => setDatePickerVisibility1(false)}
                     />
                 </ScrollView>
             </View>
