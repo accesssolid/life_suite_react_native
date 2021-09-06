@@ -11,7 +11,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
 import TextInputMask from 'react-native-text-input-mask';
 import { CheckBox } from 'react-native-elements';
-import DropDownPicker from 'react-native-dropdown-picker'
+import DropDownPicker from 'react-native-dropdown-picker';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 /* Components */
 import Header from '../../../components/header';
@@ -129,6 +130,9 @@ const Profile = (props) => {
     const cardNumberRef = useRef(null)
     const cardDateRef = useRef(null)
 
+    const homeAddressRef = useRef(null)
+    const workAddressRef = useRef(null)
+
     const [addWorkAddressActive, setAddWorkAddressActive] = useState(false)
     const [addHomeAddressActive, setAddHomeAddressActive] = useState(false)
 
@@ -176,6 +180,7 @@ const Profile = (props) => {
     useEffect(() => {
         setUserData({ ...user })
         setNotificationType(getNotificationType(user.notification_prefrence))
+        homeAddressRef.current.setAddressText(homeAddressData.address_line_1)
     }, [user])
 
     useEffect(() => {
@@ -186,7 +191,7 @@ const Profile = (props) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            getStates()
+            // getStates()
             setUserData({ ...user })
             setIsSameAddress(user.is_same_address == 1 ? true : false)
             setNotificationType(getNotificationType(user.notification_prefrence))
@@ -217,6 +222,8 @@ const Profile = (props) => {
         city: userData.address[0].city,
         state: userData.address[0].state,
         zip: userData.address[0].zip_code,
+        lat: userData.address[0].lat,
+        lon: userData.address[0].long
     })
 
     const [workAddressData, setWorkAddressData] = useState({
@@ -225,6 +232,8 @@ const Profile = (props) => {
         city: userData.address[1].city,
         state: userData.address[1].state,
         zip: userData.address[1].zip_code,
+        lat: userData.address[1].lat,
+        lon: userData.address[1].long
     })
 
     useEffect(() => {
@@ -236,9 +245,12 @@ const Profile = (props) => {
                 city: homeAddressData.city,
                 state: homeAddressData.state,
                 zip: homeAddressData.zip,
+                lat: homeAddressData.lat,
+                lon: homeAddressData.lon
             })
-            setDropStateValueWork(dropStateValue)
-            setDropCityValueWork(dropCityValue)
+            workAddressRef.current.setAddressText(homeAddressData.address_line_1)
+            // setDropStateValueWork(dropStateValue)
+            // setDropCityValueWork(dropCityValue)
         }
     }, [isSameAddress, homeAddressData])
 
@@ -368,8 +380,8 @@ const Profile = (props) => {
                 "address_line_1": homeAddressData.address_line_1,
                 "address_line_2": homeAddressData.address_line_2,
                 "address_type": "home",
-                "lat": "",
-                "long": "",
+                "lat": homeAddressData.lat,
+                "long": homeAddressData.lon,
                 "zip_code": homeAddressData.zip,
             },
             {
@@ -379,8 +391,8 @@ const Profile = (props) => {
                 "address_line_1": workAddressData.address_line_1,
                 "address_line_2": workAddressData.address_line_2,
                 "address_type": "work",
-                "lat": "",
-                "long": "",
+                "lat": workAddressData.lat,
+                "long": workAddressData.lon,
                 "zip_code": workAddressData.zip,
             }
         ]
@@ -388,7 +400,7 @@ const Profile = (props) => {
         if (userData.user_role == 3) {
             let homekeys = Object.keys(address[0])
             for (let index = 0; index < homekeys.length; index++) {
-                if (homekeys[index] !== 'lat' && homekeys[index] !== 'long' && String(address[0][homekeys[index]]).trim() == '') {
+                if (homekeys[index] !== 'state' && homekeys[index] !== 'city' && String(address[0][homekeys[index]]).trim() == '' && homekeys[index] !== 'zip_code' && homekeys[index] !== 'address_line_2' && homekeys[index] !== 'lat' && homekeys[index] !== 'long') {
                     showToast(`${getKeyName(homekeys[index])} is required for ${user.user_role == 2 ? 'home' : 'permanent'} address`, 'danger')
                     setLoader(false)
                     return false
@@ -397,7 +409,7 @@ const Profile = (props) => {
 
             let keys = Object.keys(address[1])
             for (let index = 0; index < keys.length; index++) {
-                if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
+                if (keys[index] !== 'state' && keys[index] !== 'city' && String(address[0][keys[index]]).trim() == '' && keys[index] !== 'zip_code' && keys[index] !== 'address_line_2' && keys[index] !== 'lat' && keys[index] !== 'long') {
                     showToast(`${getKeyName(keys[index])} is required for ${user.user_role == 2 ? 'work' : 'mailing'} address`, 'danger')
                     setLoader(false)
                     return false
@@ -739,8 +751,57 @@ const Profile = (props) => {
                                 }}
                                 required={true}
                             />
-                            <View>
-                                {
+                            <View style={{ marginTop: 25 }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%', marginBottom: 10 }}>
+                                    <Text style={{
+                                        fontFamily: LS_FONTS.PoppinsMedium,
+                                        marginHorizontal: '10%',
+                                        color: LS_COLORS.global.black
+                                    }}>
+                                        {user.user_role == 1 ? 'Home' : 'Permanent'} Address{user.user_role == 1 ? '' : "*"}
+                                    </Text>
+                                </View>
+                                <GooglePlacesAutocomplete
+                                    ref={homeAddressRef}
+                                    styles={{
+                                        container: {
+                                            width: '80%',
+                                            backgroundColor: LS_COLORS.global.lightGrey,
+                                            borderRadius: 28,
+                                            alignSelf: 'center',
+                                            fontSize: 14,
+                                            fontFamily: LS_FONTS.PoppinsRegular,
+                                            paddingTop: 5,
+                                            paddingHorizontal: '10%',
+                                            maxHeight: 200
+                                        },
+                                        textInput: {
+                                            backgroundColor: LS_COLORS.global.lightGrey,
+
+                                        },
+                                        listView: { paddingVertical: 5 },
+                                        separator: {}
+                                    }}
+                                    placeholder={`${user.user_role == 1 ? 'Home' : 'Permanent'} address${user.user_role == 1 ? '' : "*"}`}
+                                    fetchDetails={true}
+                                    onPress={(data, details) => {
+                                        setHomeAddressData({
+                                            ...homeAddressData,
+                                            address_line_1: data.description,
+                                            lat: details.geometry.location.lat,
+                                            lon: details.geometry.location.lng
+                                        })
+                                    }}
+                                    textInputProps={{
+                                        onSubmitEditing: () => workAddressRef.current.focus(),
+                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                    }}
+                                    query={{
+                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        language: 'en',
+                                    }}
+                                />
+                                {/* {
                                     !addHomeAddressActive
                                         ?
                                         <TouchableOpacity
@@ -819,10 +880,70 @@ const Profile = (props) => {
                                                 />
                                             </View>
                                         </>
-                                }
+                                } */}
                             </View>
                             <View style={{ marginTop: 10 }}>
-                                {
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%' }}>
+                                    <Text style={{
+                                        fontFamily: LS_FONTS.PoppinsMedium,
+                                        marginHorizontal: '10%',
+                                        color: LS_COLORS.global.black
+                                    }}>
+                                        {user.user_role == 1 ? 'Work' : 'Mailing'} Address{user.user_role == 1 ? '' : "*"}
+                                    </Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <CheckBox
+                                            style={{}}
+                                            containerStyle={{ width: 25 }}
+                                            wrapperStyle={{}}
+                                            checked={isSameAddress}
+                                            onPress={() => setIsSameAddress(!isSameAddress)}
+                                            checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                            uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                        />
+                                        <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same address</Text>
+                                    </View>
+                                </View>
+                                <GooglePlacesAutocomplete
+                                    ref={workAddressRef}
+                                    styles={{
+                                        container: {
+                                            width: '80%',
+                                            backgroundColor: LS_COLORS.global.lightGrey,
+                                            borderRadius: 28,
+                                            alignSelf: 'center',
+                                            fontSize: 14,
+                                            fontFamily: LS_FONTS.PoppinsRegular,
+                                            paddingTop: 5,
+                                            paddingHorizontal: '10%',
+                                            maxHeight: 200
+                                        },
+                                        textInput: {
+                                            backgroundColor: LS_COLORS.global.lightGrey,
+                                        },
+                                        listView: { paddingVertical: 5 },
+                                        separator: {}
+                                    }}
+                                    placeholder={`${user.user_role == 1 ? 'Work' : 'Mailing'} Address${user.user_role == 1 ? '' : "*"}`}
+                                    fetchDetails={true}
+                                    onPress={(data, details) => {
+                                        setWorkAddressData({
+                                            ...workAddressData,
+                                            address_line_1: data.description,
+                                            lat: details.geometry.location.lat,
+                                            lon: details.geometry.location.lng
+                                        })
+                                    }}
+                                    textInputProps={{
+                                        editable: !isSameAddress,
+                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                    }}
+                                    query={{
+                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        language: 'en',
+                                    }}
+                                />
+                                {/* {
                                     !addWorkAddressActive
                                         ?
                                         <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '5%', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -925,7 +1046,7 @@ const Profile = (props) => {
                                                 editable={!isSameAddress}
                                             />
                                         </>
-                                }
+                                } */}
                             </View>
                             <View style={{ height: 20 }}></View>
                             <View style={{}}>
@@ -958,7 +1079,7 @@ const Profile = (props) => {
                                         :
                                         <DropDown
                                             title="Notification type"
-                                            item={["Email", "Push Notification", "Text"]}
+                                            item={["Email", "Push Notification", "Text", "All"]}
                                             value={notificationType}
                                             onChangeValue={(index, value) => { setNotificationType(value), user.user_role == 2 ? cardNumberRef.current.focus() : null }}
                                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}

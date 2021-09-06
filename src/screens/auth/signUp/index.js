@@ -10,6 +10,7 @@ import { globalStyles } from '../../../utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUniqueId } from 'react-native-device-info';
 import { CheckBox } from 'react-native-elements';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 /* Components */
 import CustomTextInput from '../../../components/customTextInput';
@@ -96,6 +97,9 @@ const SignUpScreen = (props) => {
     const role = useSelector(state => state.authenticate.user_role)
     const [loader, setLoader] = useState(false)
 
+    const homeAddressRef = useRef(null)
+    const workAddressRef = useRef(null)
+
     /* State Drop Down */
     const [dropStateValue, setDropStateValue] = useState("State")
     const [dropStateData, setDropStateData] = useState([])
@@ -122,7 +126,7 @@ const SignUpScreen = (props) => {
     }, [])
 
     useEffect(() => {
-        getStates()
+        // getStates()
     }, [])
 
     useEffect(() => {
@@ -155,6 +159,8 @@ const SignUpScreen = (props) => {
         city: '',
         state: '',
         zip: '',
+        lat: '',
+        lon: ''
     })
 
     const [workAddressData, setWorkAddressData] = useState({
@@ -163,6 +169,8 @@ const SignUpScreen = (props) => {
         city: '',
         state: '',
         zip: '',
+        lat: '',
+        lon: '',
     })
 
     useEffect(() => {
@@ -174,9 +182,12 @@ const SignUpScreen = (props) => {
                 city: homeAddressData.city,
                 state: homeAddressData.state,
                 zip: homeAddressData.zip,
+                lat: homeAddressData.lat,
+                lon: homeAddressData.lon
             })
-            setDropStateValueWork(dropStateValue)
-            setDropCityValueWork(dropCityValue)
+            workAddressRef.current.setAddressText(homeAddressData.address_line_1)
+            // setDropStateValueWork(dropStateValue)
+            // setDropCityValueWork(dropCityValue)
         } else {
             setWorkAddressData({
                 address_line_1: '',
@@ -184,9 +195,12 @@ const SignUpScreen = (props) => {
                 city: '',
                 state: '',
                 zip: '',
+                lat: '',
+                lon: ''
             })
-            setDropStateValueWork("State")
-            setDropCityValueWork('')
+            workAddressRef.current.setAddressText('')
+            // setDropStateValueWork("State")
+            // setDropCityValueWork('')
         }
     }, [isSameAddress, homeAddressData])
 
@@ -243,8 +257,8 @@ const SignUpScreen = (props) => {
                 "address_line_1": homeAddressData.address_line_1,
                 "address_line_2": homeAddressData.address_line_2,
                 "address_type": "home",
-                "lat": "",
-                "long": "",
+                "lat": homeAddressData.lat,
+                "long": homeAddressData.lon,
                 "zip_code": homeAddressData.zip,
             },
             {
@@ -254,8 +268,8 @@ const SignUpScreen = (props) => {
                 "address_line_1": workAddressData.address_line_1,
                 "address_line_2": workAddressData.address_line_2,
                 "address_type": "work",
-                "lat": "",
-                "long": "",
+                "lat": workAddressData.lat,
+                "long": workAddressData.lon,
                 "zip_code": workAddressData.zip,
             }
         ]
@@ -263,7 +277,7 @@ const SignUpScreen = (props) => {
         if (role == 2) {
             let homekeys = Object.keys(address[0])
             for (let index = 0; index < homekeys.length; index++) {
-                if (homekeys[index] !== 'lat' && homekeys[index] !== 'long' && String(address[0][homekeys[index]]).trim() == '') {
+                if (homekeys[index] !== 'state' && homekeys[index] !== 'city' && String(address[0][homekeys[index]]).trim() == '' && homekeys[index] !== 'zip_code' && homekeys[index] !== 'address_line_2' && homekeys[index] !== 'lat' && homekeys[index] !== 'long') {
                     showToast(`${getKeyName(homekeys[index])} is required for ${role == 1 ? 'home' : 'permanent'} address`, 'danger')
                     setLoader(false)
                     return false
@@ -272,7 +286,7 @@ const SignUpScreen = (props) => {
 
             let keys = Object.keys(address[1])
             for (let index = 0; index < keys.length; index++) {
-                if (keys[index] !== 'lat' && keys[index] !== 'long' && String(address[1][keys[index]]).trim() == '') {
+                if (keys[index] !== 'state' && keys[index] !== 'city' && String(address[0][keys[index]]).trim() == '' && keys[index] !== 'zip_code' && keys[index] !== 'address_line_2' && keys[index] !== 'lat' && keys[index] !== 'long') {
                     showToast(`${getKeyName(keys[index])} is required for ${role == 1 ? 'work' : 'mailing'} address`, 'danger')
                     setLoader(false)
                     return false
@@ -517,7 +531,7 @@ const SignUpScreen = (props) => {
                                 maxLength={255}
                                 numberOfLines={3}
                                 customContainerStyle={{}}
-                                customInputStyle={{ height: 100, paddingTop: '5%', paddingHorizontal: '10%', }}
+                                customInputStyle={{ height: 100, paddingTop: '5%', paddingHorizontal: '10%', textAlignVertical: 'top' }}
                                 customImageStyles={{ bottom: '-65%', right: '0%' }}
                                 inlineImageLeft={<Text
                                     style={{ fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black, fontSize: 12 }}>
@@ -582,12 +596,60 @@ const SignUpScreen = (props) => {
                                 maxLength={12}
                                 onSubmitEditing={() => {
                                     setAddHomeAddressActive(true), setTimeout(() => {
-                                        homeAddressLine1Ref.current.focus()
+                                        homeAddressRef.current.focus()
                                     }, 250)
                                 }}
                             />
-                            <View>
-                                {
+                            <View style={{}}>
+                                <Text style={{
+                                    fontFamily: LS_FONTS.PoppinsMedium,
+                                    marginHorizontal: '10%',
+                                    marginBottom: 5,
+                                    color: LS_COLORS.global.black
+                                }}>
+                                    {role == 1 ? 'Home' : 'Permanent'} Address{role == 1 ? '' : "*"}
+                                </Text>
+                                <GooglePlacesAutocomplete
+                                    ref={homeAddressRef}
+                                    styles={{
+                                        container: {
+                                            width: '80%',
+                                            backgroundColor: LS_COLORS.global.lightGrey,
+                                            borderRadius: 28,
+                                            alignSelf: 'center',
+                                            fontSize: 14,
+                                            fontFamily: LS_FONTS.PoppinsRegular,
+                                            paddingTop: 5,
+                                            paddingHorizontal: '10%',
+                                            maxHeight: 200
+                                        },
+                                        textInput: {
+                                            backgroundColor: LS_COLORS.global.lightGrey,
+
+                                        },
+                                        listView: { paddingVertical: 5 },
+                                        separator: {}
+                                    }}
+                                    placeholder={`${role == 1 ? 'Home' : 'Permanent'} address${role == 1 ? '' : "*"}`}
+                                    fetchDetails={true}
+                                    onPress={(data, details) => {
+                                        setHomeAddressData({
+                                            ...homeAddressData,
+                                            address_line_1: data.description,
+                                            lat: details.geometry.location.lat,
+                                            lon: details.geometry.location.lng
+                                        })
+                                    }}
+                                    textInputProps={{
+                                        onSubmitEditing: () => workAddressRef.current.focus(),
+                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                    }}
+                                    query={{
+                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        language: 'en',
+                                    }}
+                                />
+                                {/* {
                                     !addHomeAddressActive
                                         ?
                                         <TouchableOpacity
@@ -664,10 +726,71 @@ const SignUpScreen = (props) => {
                                                 />
                                             </View>
                                         </>
-                                }
+                                } */}
                             </View>
-                            <View style={{ marginTop: 10 }}>
-                                {
+                            <View style={{ marginTop: 10, marginBottom: 25 }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%' }}>
+                                    <Text style={{
+                                        fontFamily: LS_FONTS.PoppinsMedium,
+                                        marginHorizontal: '10%',
+                                        color: LS_COLORS.global.black
+                                    }}>
+                                        {role == 1 ? 'Work' : 'Mailing'} Address{role == 1 ? '' : "*"}
+                                    </Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <CheckBox
+                                            style={{}}
+                                            containerStyle={{ width: 25 }}
+                                            wrapperStyle={{}}
+                                            checked={isSameAddress}
+                                            onPress={() => setIsSameAddress(!isSameAddress)}
+                                            checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                            uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                        />
+                                        <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same address</Text>
+                                    </View>
+                                </View>
+
+                                <GooglePlacesAutocomplete
+                                    ref={workAddressRef}
+                                    styles={{
+                                        container: {
+                                            width: '80%',
+                                            backgroundColor: LS_COLORS.global.lightGrey,
+                                            borderRadius: 28,
+                                            alignSelf: 'center',
+                                            fontSize: 14,
+                                            fontFamily: LS_FONTS.PoppinsRegular,
+                                            paddingTop: 5,
+                                            paddingHorizontal: '10%',
+                                            maxHeight: 200
+                                        },
+                                        textInput: {
+                                            backgroundColor: LS_COLORS.global.lightGrey,
+                                        },
+                                        listView: { paddingVertical: 5 },
+                                        separator: {}
+                                    }}
+                                    placeholder={`${role == 1 ? 'Work' : 'Mailing'} Address${role == 1 ? '' : "*"}`}
+                                    fetchDetails={true}
+                                    onPress={(data, details) => {
+                                        setWorkAddressData({
+                                            ...workAddressData,
+                                            address_line_1: data.description,
+                                            lat: details.geometry.location.lat,
+                                            lon: details.geometry.location.lng
+                                        })
+                                    }}
+                                    textInputProps={{
+                                        editable: !isSameAddress,
+                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                    }}
+                                    query={{
+                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        language: 'en',
+                                    }}
+                                />
+                                {/* {
                                     !addWorkAddressActive
                                         ?
                                         <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '12%', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -769,7 +892,7 @@ const SignUpScreen = (props) => {
                                                 editable={!isSameAddress}
                                             />
                                         </>
-                                }
+                                } */}
                             </View>
                         </View>
                         <View style={styles.buttonContainer}>

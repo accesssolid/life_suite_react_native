@@ -25,7 +25,7 @@ const DropDown = (props) => {
             }
             <View style={[styles.container, props.containerStyle]}>
                 <View style={styles.arrow}>
-                    <AntDesign name="down" />
+                    <AntDesign name="down" color={LS_COLORS.global.green} />
                 </View>
                 <ModalDropdown
                     ref={props.dropRef}
@@ -38,6 +38,12 @@ const DropDown = (props) => {
                     onSelect={props.onChangeValue}
                     showsVerticalScrollIndicator={false}
                     disabled={props.disabled}
+                    renderRow={(item) => {
+                        return (<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 40, paddingHorizontal: '5%', backgroundColor: LS_COLORS.global.white }}>
+                            <Text style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12 }}>{item}</Text>
+                            {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}
+                        </View>)
+                    }}
                 />
             </View>
         </>

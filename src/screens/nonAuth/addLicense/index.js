@@ -395,15 +395,15 @@ const AddLicense = (props) => {
                                 customTextStyles={{ color: LS_COLORS.global.green }}
                                 action={() => pickImage()}
                             />
-                        </View>
-                        <View style={{ paddingBottom: '2.5%' }}>
+                        </View>                        
+                    </Content>
+                    <View style={{ paddingBottom: '2.5%', }}>
                             <CustomButton
                                 title={"NEXT"}
                                 customStyles={{ width: '50%', borderRadius: 6 }}
                                 action={() => next()}
                             />
                         </View>
-                    </Content>
                 </Container>
                 {loading && <Loader />}
             </SafeAreaView >

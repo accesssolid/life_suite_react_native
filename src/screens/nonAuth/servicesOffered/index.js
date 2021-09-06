@@ -162,7 +162,6 @@ const ServicesProvided = (props) => {
             let newArr = []
             let selected = []
             itemListMaster.map((item, index) => {
-                console.log("item =>> ", item)
                 item.products.forEach(element => {
                     newArr.push({
                         "id": element.id,
@@ -180,7 +179,6 @@ const ServicesProvided = (props) => {
                     }
                 });
             })
-            console.log("products =>> ", newArr)
             setProductsData([...newArr])
             setSelectedProducts([...selected])
         }
@@ -624,9 +622,7 @@ const ServicesProvided = (props) => {
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => onBackPress()}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
-                                    action1={() => {
-                                        props.navigation.navigate("HomeScreen")
-                                    }}
+                                    action1={() => props.navigation.navigate("HomeScreen")}
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>

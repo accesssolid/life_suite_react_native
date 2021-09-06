@@ -29,6 +29,7 @@ const MapScreen = (props) => {
     const [loading, setLoading] = useState(false)
     const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
     const [address, setAddress] = useState('')
+    const [focused, setFocused] = useState(false)
     const [coordinates, setCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -167,7 +168,10 @@ const MapScreen = (props) => {
                             })
                         }}
                         textInputProps={{
-
+                            onFocus: () => setFocused(true),
+                            onblur: () => setFocused(false),
+                            blurOnSubmit: true,
+                            onSubmitEditing: () => setFocused(false),
                         }}
                         query={{
                             key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -176,7 +180,7 @@ const MapScreen = (props) => {
                     />
                     {/* </ScrollView> */}
                     <View style={styles.mapContainer}>
-                        <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: '10%', alignItems: 'center', paddingHorizontal: '10%', zIndex: 1000 }}>
+                        <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: focused ? '15%' : '10%', alignItems: 'center', paddingHorizontal: '10%', zIndex: 1 }}>
                             <CustomButton
                                 title={user.user_role == 2 ? "Home" : "Permanent"}
                                 customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
@@ -187,8 +191,18 @@ const MapScreen = (props) => {
                                     backgroundColor: LS_COLORS.global.green,
                                 }}
                                 action={() => {
-                                    setAddress(`${user.address[0].address_line_1}, ${user.address[0].city_name}, ${user.address[0].state_name}, ${user.address[0].zip_code}, ${user.address[0].country_name}`)
-                                    placesRef.current.setAddressText(`${user.address[0].address_line_1}, ${user.address[0].city_name}, ${user.address[0].state_name}, ${user.address[0].zip_code}, ${user.address[0].country_name}`)
+                                    setAddress(`${user.address[0].address_line_1}`)
+                                    placesRef.current.setAddressText(`${user.address[0].address_line_1}`)
+                                    setCoordinates({
+                                        ...coordinates,
+                                        latitude: Number(user?.address[0]?.lat),
+                                        longitude: Number(user?.address[0]?.long)
+                                    })
+                                    mapRef.current.animateToRegion({
+                                        ...coordinates,
+                                        latitude: Number(user?.address[0]?.lat),
+                                        longitude: Number(user?.address[0]?.long)
+                                    })
                                 }}
                             />
                             <CustomButton
@@ -201,8 +215,18 @@ const MapScreen = (props) => {
                                     backgroundColor: LS_COLORS.global.green,
                                 }}
                                 action={() => {
-                                    setAddress(`${user.address[1].address_line_1}, ${user.address[1].city_name}, ${user.address[1].state_name}, ${user.address[1].zip_code}, ${user.address[1].country_name}`)
-                                    placesRef.current.setAddressText(`${user.address[1].address_line_1}, ${user.address[1].city_name}, ${user.address[1].state_name}, ${user.address[1].zip_code}, ${user.address[1].country_name}`)
+                                    setAddress(`${user.address[1].address_line_1}`)
+                                    placesRef.current.setAddressText(`${user.address[1].address_line_1}`)
+                                    setCoordinates({
+                                        ...coordinates,
+                                        latitude: Number(user?.address[1]?.lat),
+                                        longitude: Number(user?.address[1]?.long)
+                                    })
+                                    mapRef.current.animateToRegion({
+                                        ...coordinates,
+                                        latitude: Number(user?.address[1]?.lat),
+                                        longitude: Number(user?.address[1]?.long)
+                                    })
                                 }}
                             />
                         </View>
