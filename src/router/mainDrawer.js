@@ -41,6 +41,7 @@ const MainDrawer = () => {
                 }}
                 initialRouteName="Home"
                 screenOptions={{
+                    unmountOnBlur: true
                 }}
                 drawerContentOptions={{
                     labelStyle: {
