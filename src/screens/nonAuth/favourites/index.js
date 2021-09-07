@@ -4,7 +4,7 @@ import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, FlatList
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
-import { globalStyles } from '../../../utils';
+import { globalStyles, showToast } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ import CustomTextInput from '../../../components/customTextInput';
 import Cards from '../../../components/cards';
 import { BASE_URL, getApi } from '../../../api/api';
 import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/core';
 
 const Favourites = (props) => {
     const dispatch = useDispatch()
@@ -28,11 +29,13 @@ const Favourites = (props) => {
     const [services, setServices] = useState([])
     const [provider, setProvider] = useState([])
 
+    const navigation = useNavigation()
+
     useFocusEffect(useCallback(() => {
         getService()
         getServiceProvider()
     }, []))
-    
+
     const like = (id) => {
         let headers = {
             Accept: "application/json",
@@ -52,6 +55,7 @@ const Favourites = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
+                    showToast(response.message)
                     getService()
                 }
                 else {
@@ -79,11 +83,11 @@ const Favourites = (props) => {
             .then((response) => {
                 console.log(response)
                 if (response.status == true) {
-                    console.log(response)
+                    showToast(response.message)
                     getServiceProvider()
                 }
                 else {
-                    
+
                 }
             }).catch(err => {
             })
@@ -155,17 +159,19 @@ const Favourites = (props) => {
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
-                    props.navigation.navigate("HomeScreen")
+                    navigation.navigate("HomeScreen")
                 }}
             />
             <Container style={styles.container}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 30 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', marginVertical: 30 }}>
                     <TouchableOpacity activeOpacity={0.7} onPress={() => setActivetab(0)} style={{
                         backgroundColor: activeTab === 0 ? LS_COLORS.global.cyan : LS_COLORS.global.transparent,
                         borderRadius: 21,
                         paddingVertical: 12,
                         alignItems: 'center',
-                        width: '40%'
+                        width: '40%',
+                        borderWidth: 1,
+                        borderColor: LS_COLORS.global.cyan
                     }}>
                         <Text style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service</Text>
                     </TouchableOpacity>
@@ -174,7 +180,9 @@ const Favourites = (props) => {
                         borderRadius: 21,
                         paddingVertical: 12,
                         alignItems: 'center',
-                        width: '40%'
+                        width: '40%',
+                        borderWidth: 1,
+                        borderColor: LS_COLORS.global.cyan
                     }}>
                         <Text style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service Provider</Text>
                     </TouchableOpacity>
@@ -191,24 +199,24 @@ const Favourites = (props) => {
                                     <Cards
                                         title1={item.name}
                                         title2="SERVICES"
-                                        imageUrl={{ uri: BASE_URL + item.image}}
-                                        action={() => {   props.navigation.navigate("ServicesProvided", { subService: item, items: [] })}}
+                                        imageUrl={{ uri: BASE_URL + item.image }}
+                                        action={() => { navigation.navigate("ServicesProvided", { subService: item, items: [] }) }}
                                         showLeft
                                         customContainerStyle={{ width: '30%', marginLeft: '2.5%' }}
-                                        favorite = {() => {like(item.id)}}
+                                        favorite={() => { like(item.id) }}
                                     />
                                 )
                             }}
                             keyExtractor={(item, index) => index}
                         />
                         :
-                        <Content showsVerticalScrollIndicator = {false} >
+                        <Content showsVerticalScrollIndicator={false} >
                             {provider.map((item, index) => {
                                 console.log(item)
                                 return (
                                     <View key={index} style={{ flexDirection: 'row', marginBottom: 30, height: 50, alignItems: 'center' }}>
                                         <View style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
-                                            <Image source={ item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                                            <Image source={item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
                                         </View>
                                         <View style={{ flex: 1, paddingLeft: 10, justifyContent: 'center' }}>
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
@@ -218,7 +226,7 @@ const Favourites = (props) => {
                                             {/* <Text>Price: $25/hr</Text> */}
                                             <Text>Rating: {parseInt(item.rating)}</Text>
                                         </View>
-                                        <TouchableOpacity  onPress = {() => {providerLike(item.id)}} activeOpacity={0.7} style={{ height: '100%', aspectRatio: 1, padding: '4%' }}>
+                                        <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: '100%', aspectRatio: 1, padding: '4%' }}>
                                             <Image source={require('../../../assets/heartGreen.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
                                         </TouchableOpacity>
                                     </View>

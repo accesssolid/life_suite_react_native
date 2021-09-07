@@ -15,25 +15,25 @@ const SmallCards = props => {
             activeOpacity={0.7}
             onPress={props.action}
             style={styles.mainView}>
-            <View style={{ height: '75%', width: '100%', overflow: 'hidden' }}>
+            <View style={{ height: '75%', width: '100%', overflow: 'hidden'}}>
                 <Image
                     style={styles.room}
                     source={props.imageUrl}
                     resizeMode="cover"
                 />
             </View>
-            <View style={{ height: 30, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
+            <View style={{height:"25%" ,justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row',alignContent:'center' }}>
                 <Text style={styles.text}>{props.title1}</Text>
-                <TouchableOpacity onPress={props.favorite}>
+                <TouchableOpacity style = {{height:50,width:23,justifyContent:"center",alignItems:"center",right:3}} onPress={props.favorite}>
                     {props.favStatus == 1 ?
                         <Image
-                            style={{ height: 18, width: 21, right: 5 }}
+                            style={{ height: 20, width: 22,resizeMode:'contain' }}
                             source={require('../assets/heartGreen.png')}
                             resizeMode="cover"
                         />
                         :
                         <Image
-                            style={{ height: 18, width: 21, right: 5 }}
+                            style={{ height: 20, width: 23, }}
                             source={require('../assets/whiteHeart.png')}
                             resizeMode="cover"
                         />
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 10,
         fontFamily: LS_FONTS.PoppinsMedium,
-        left: 2
+        left: 3
     },
     room: {
         height: '100%',

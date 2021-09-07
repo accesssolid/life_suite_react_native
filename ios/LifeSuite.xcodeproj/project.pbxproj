@@ -609,7 +609,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8U4D2VUU8U;
+				DEVELOPMENT_TEAM = S94D73XQXZ;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = LifeSuite/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -621,7 +621,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite.app;
+				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite;
 				PRODUCT_NAME = LifeSuite;
 				PROVISIONING_PROFILE_SPECIFIER = "LifeSuite Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeSuite-Bridging-Header.h";
@@ -642,7 +642,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Kapil D (P6NZ4LK2W3)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8U4D2VUU8U;
+				DEVELOPMENT_TEAM = S94D73XQXZ;
 				INFOPLIST_FILE = LifeSuite/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -653,7 +653,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite.app;
+				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite;
 				PRODUCT_NAME = LifeSuite;
 				PROVISIONING_PROFILE_SPECIFIER = "LifeSuite Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeSuite-Bridging-Header.h";

@@ -24,6 +24,7 @@ import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
+import SureModal from '../../../components/sureModal';
 
 const MechanicLocation = (props) => {
     const fromInputRef = useRef(null)
@@ -38,6 +39,7 @@ const MechanicLocation = (props) => {
     const [fromAddress, setFromAddress] = useState("")
     const [toAddress, setToAddress] = useState("")
     const [date, setDate] = useState("")
+    const [open, setOpen] = useState(false)
 
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
@@ -121,6 +123,7 @@ const MechanicLocation = (props) => {
         }
     }
 
+
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
@@ -153,7 +156,7 @@ const MechanicLocation = (props) => {
             "user_id": user.id,
             "json_data": JSON.stringify({
                 "items": [servicedata[0].item_id],
-                "products" : servicedata[0].products
+                "products": servicedata[0].products
             }),
             "order_placed_address": toAddress,
             "order_placed_lat": toCoordinates.latitude,
@@ -164,15 +167,15 @@ const MechanicLocation = (props) => {
             "order_from_long": fromCoordinates.longitude,
             "order_from_address": fromAddress
         }
-
         console.log("data =>> ", data.json_data)
-
         if (subService.location_type == 2 && data.order_placed_address.trim() == "") {
             showToast("Please add to address")
         } else if (data.order_from_address.trim() == "") {
             showToast("Please add from address")
         } else if (date.trim() == "") {
             showToast("Please select date")
+        } else if (startTime.toString() === endTime.toString()) {
+            showToast("Start Time and End Time Cannot Be Same")
         } else {
             props.navigation.navigate("Mechanics", { data: data, subService: subService })
         }
@@ -192,6 +195,15 @@ const MechanicLocation = (props) => {
         return (
             <View style={{ flex: 1 }}>
                 <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false} bounces={false} >
+                    <SureModal
+                        pressHandler={() => {
+                            setOpen(!open);
+                        }}
+                        visible={open}
+                        action1={() => {
+                            setOpen(!open);
+                        }}
+                    />
                     <View style={styles.mapContainer}>
                         <MapView
                             style={styles.map}
@@ -282,7 +294,10 @@ const MechanicLocation = (props) => {
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility(true)} >
                                 <Text>{moment(startTime).format('HH:mm A')}</Text>
                             </TouchableOpacity>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 30, marginBottom: 10 }}>End Time</Text>
+
+                        </View>
+                        <View style={{ flex: 1, alignItems: 'center' }} >
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility1(true)} >
                                 <Text>{moment(endTime).format('HH:mm A')}</Text>
                             </TouchableOpacity>

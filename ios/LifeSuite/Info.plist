@@ -39,15 +39,12 @@
 	<string>For uploading profile picture</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>For login suing face id</string>
-<!--  NSLocationWhenInUseUsageDescription-->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>For customer and provider locations</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>For customer and provider locations</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>For customer and provider locations</string>
-<!--  NSLocationAlwaysAndWhenInUseUsageDescription-->
-  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-  <string>For customer and provider locations</string>
-<!--  NSLocationAlwaysUsageDescription-->
-  <key>NSLocationAlwaysUsageDescription</key>
-  <string>For customer and provider locations</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>For uploading profile picture</string>
 	<key>UIAppFonts</key>

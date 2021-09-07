@@ -62,12 +62,12 @@ const PrivacyModal = (props) => {
                 <Text style={styles.title}>PRIVACY POLICY</Text>
                 <WebView
                     showsVerticalScrollIndicator={false}
-                    style={{ flex: 1, height: 5000, width: 300 }}
+                    style={{ flex: 1 }}
                     source={{
                         html: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
                             <HTML>
                             <HEAD></HEAD>                            
-                            <BODY style="font-size:40px">
+                            <BODY style="font-size:30px">
                             ${data}
                             </BODY>
                             </HTML>`
@@ -88,9 +88,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     container: {
-        // height: '50%',
+        width: '90%',
         alignSelf: 'center',
-        alignItems: 'center',
         padding: '4%',
         backgroundColor: LS_COLORS.global.white,
         borderRadius: 10,
@@ -104,6 +103,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.32,
         color: LS_COLORS.global.darkBlack,
         textTransform: 'uppercase',
+        textAlign:"center"
     },
     desc: {
         marginTop: 25,

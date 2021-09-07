@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, Dimensions, SafeAreaView, FlatList, Text } fro
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
-import { globalStyles } from '../../../utils';
+import { globalStyles, showToast } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
@@ -85,6 +85,7 @@ const SubServices = (props) => {
                 console.log(response)
                 if (response.status == true) {
                     console.log(response)
+                    showToast(response.message)
                     getSubServices()
                 }
                 else {

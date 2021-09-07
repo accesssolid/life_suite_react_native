@@ -64,12 +64,12 @@ const TermsModal = (props) => {
                 <Text style={styles.title}>TERMS & CONDITIONS</Text>
                 <WebView
                     showsVerticalScrollIndicator={false}
-                    style={{ flex: 1, height: 5000, width: 300 }}
+                    style={{flex:1}}
                     source={{
                         html: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
                             <HTML>
                             <HEAD></HEAD>                            
-                            <BODY style="font-size:40px">
+                            <BODY style="font-size:30px">
                             ${data}
                             </BODY>
                             </HTML>`
@@ -91,13 +91,12 @@ const styles = StyleSheet.create({
     container: {
         // height: '50%',
         alignSelf: 'center',
-        alignItems: 'center',
         padding: '4%',
         backgroundColor: LS_COLORS.global.white,
         borderRadius: 10,
         paddingVertical: 10,
-        overflow: 'hidden',
-        height: '75%'
+        height: '75%',
+        width:"90%"
     },
     title: {
         fontFamily: LS_FONTS.PoppinsBold,
@@ -105,6 +104,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.32,
         color: LS_COLORS.global.darkBlack,
         textTransform: 'uppercase',
+        alignSelf:"center"
     },
     desc: {
         marginTop: 25,

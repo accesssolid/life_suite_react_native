@@ -88,7 +88,7 @@ const MainDrawer = () => {
                     name="About Us"
                     component={AboutUs}
                     options={{
-                        drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/aboutUs.png')} style={{ height: 20, width: 20 }} />,
+                        drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/aboutUs.png')} style={{ height: 20, width: 20 }} />
                     }}
                 />
                 <Drawer.Screen
