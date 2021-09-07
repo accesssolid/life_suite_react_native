@@ -157,6 +157,10 @@ const ServicesProvided = (props) => {
             }
         });
 
+        if(activeItem.products.length == 0){
+            isSelected = true
+        }
+
         if (isSelected) {
             setActiveItem(null)
         } else {

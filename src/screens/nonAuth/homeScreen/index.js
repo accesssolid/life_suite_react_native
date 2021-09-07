@@ -114,9 +114,7 @@ const HomeScreen = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-        //    const order1 = JSON.stringify(order)
-        let z = order.map(x => String(x))
-        console.log("hsbdjk", order)
+        console.log(a)
         var formdata = new FormData();
         formdata.append("services_json", JSON.stringify(a));
 
@@ -126,6 +124,7 @@ const HomeScreen = (props) => {
             endPoint: '/api/customerServicesListingAdd',
             type: 'post'
         }
+        
         getApi(config)
             .then((response) => {
                 console.log(response)

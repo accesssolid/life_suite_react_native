@@ -212,7 +212,7 @@ const Mechanics = (props) => {
                                     if (x > 1) {
                                         time_format = parseInt(x) + " hr " + item.timeDuration % 60 + " min"
                                     } else {
-                                        time_format = item.time_duration + " min"
+                                        time_format = item.timeDuration + " min"
                                     }
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

@@ -10,7 +10,7 @@ import { View } from 'native-base';
 import UserStack from './userStack';
 import { useSelector } from 'react-redux';
 import ProviderStack from './providerStack';
-import { Dimensions, Image, Text } from 'react-native';
+import { Dimensions, Image, Text, TouchableOpacity } from 'react-native';
 import Profile from '../screens/nonAuth/profile';
 import OrderHistory from '../screens/nonAuth/orderHistory';
 import Favourites from '../screens/nonAuth/favourites';
@@ -19,15 +19,18 @@ import PrivacyModal from '../components/privacyModal';
 import CopyRightModal from '../components/copyrightModal';
 import SoftwareModal from '../components/softwareModal';
 import AboutUs from '../screens/nonAuth/aboutUs';
+import { Header } from 'react-native/Libraries/NewAppScreen';
+import { useNavigation } from '@react-navigation/core';
 
 const Drawer = createDrawerNavigator();
 
-const MainDrawer = () => {
+const MainDrawer = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const [termsVisible, setTermsVisible] = useState(false)
     const [privacyVisible, setPrivacyVisible] = useState(false)
     const [copyVisible, setCopyVisible] = useState(false)
     const [softwareVisible, setSoftwareVisible] = useState(false)
+    const navigation = useNavigation()
 
     return (
         <>
@@ -127,6 +130,7 @@ const MainDrawer = () => {
 export default MainDrawer;
 
 const CustomDrawerContent = (props) => {
+    const navigation = useNavigation()
     return (
         <DrawerContentScrollView {...props}>
             <View style={{ height: Dimensions.get('screen').height / 7, padding: '7%' }}>
@@ -195,7 +199,13 @@ const CustomDrawerContent = (props) => {
 }
 
 const Test = () => {
-    return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    const navigation = useNavigation()
+    return <View style={{ flex: 1, alignItems: 'center',justifyContent:"center" }}>
+        <TouchableOpacity onPress = {() => navigation.goBack()} style = {{position:"absolute",top:30,left:20}}> 
+            <Image 
+            source = {require('../assets/back.png')}/>
+        </TouchableOpacity>
         <Text>WORK IN PROGRESS</Text>
+
     </View>
 }
