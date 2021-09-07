@@ -16,7 +16,6 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 /* Components */
 import Header from '../../../components/header';
 import CustomButton from "../../../components/customButton"
-import { TextInput } from 'react-native';
 import Loader from '../../../components/loader';
 import { useDispatch, useSelector } from 'react-redux';
 import { getApi } from '../../../api/api';
@@ -38,6 +37,7 @@ const AddTimeFrame = (props) => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
     const [dateType, setDateType] = useState(null)
     const [activeIndex, setActiveIndex] = useState(null)
+    const [initialDate, setInitialDate] = useState(new Date())
 
     useEffect(() => {
         if (!isAddServiceMode)
@@ -67,9 +67,9 @@ const AddTimeFrame = (props) => {
     const removeTimeFrame = (frame) => {
         if (frame.id == '') {
             let dates = [...selectedDates]
-            let styles = [...customDatesStyles];
+            let styles = [...customDatesStyles]
             dates = dates.filter(item => item !== moment(frame.date).format('DD/MM/YYYY'))
-            styles = styles.filter(item => item.id !== frame.id)
+            styles = styles.filter(item => item.date !== frame.date)
             setSelectedDates([...dates])
             setCustomDatesStyles([...styles])
             calendarRef.current.resetSelections()
@@ -163,7 +163,6 @@ const AddTimeFrame = (props) => {
 
                     Object.keys(response.data).forEach((ele) => {
                         response.data[ele].forEach(element => {
-                            console.log("element => ",)
                             dates.push(moment(element.date).format("DD/MM/YYYY"))
                             styles.push({
                                 id: element.id,
@@ -231,6 +230,7 @@ const AddTimeFrame = (props) => {
         setDateType(type)
         setActiveIndex(index)
         setDatePickerVisibility(true)
+        setInitialDate(new Date(moment(`${customDatesStyles[index].date} ${type == "from" ? customDatesStyles[index].from_time : customDatesStyles[index].to_time}`)))
     }
 
     const handleConfirm = (date) => {
@@ -367,6 +367,7 @@ const AddTimeFrame = (props) => {
                     </View>
                 </ScrollView>
                 <DateTimePickerModal
+                    date={initialDate}
                     isVisible={isDatePickerVisible}
                     mode="time"
                     onConfirm={handleConfirm}

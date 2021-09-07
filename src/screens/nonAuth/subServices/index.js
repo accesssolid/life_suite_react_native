@@ -76,7 +76,7 @@ const SubServices = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint: user.user_role == 2 ? '/api/customerServiceAddFavourite' : '/api/customerServiceAddFavourite',
+            endPoint: user.user_role == 2 ? '/api/customerServiceAddFavourite' : '/api/providerServiceAddFavourite',
             type: 'post'
         }
 

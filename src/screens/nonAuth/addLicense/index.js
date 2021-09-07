@@ -57,7 +57,6 @@ const AddLicense = (props) => {
     }
 
     useEffect(() => {
-        console.log("subService.license_data ==>> ", subService)
         if (!isAddServiceMode && subService && subService.license_data && subService.license_data.length > 0) {
             const imageData = subService.license_data.map((item, index) => {
                 return {

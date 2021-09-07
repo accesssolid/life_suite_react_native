@@ -12,15 +12,12 @@ import { useSelector } from 'react-redux';
 import ProviderStack from './providerStack';
 import { Dimensions, Image, Text } from 'react-native';
 import Profile from '../screens/nonAuth/profile';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import OrderHistory from '../screens/nonAuth/orderHistory';
-import OrderHistory1 from '../screens/nonAuth/orderHistory1';
 import Favourites from '../screens/nonAuth/favourites';
 import TermsModal from '../components/termsModal';
 import PrivacyModal from '../components/privacyModal';
 import CopyRightModal from '../components/copyrightModal';
 import SoftwareModal from '../components/softwareModal';
-import AboutUsModal from '../components/aboutUsModal';
 import AboutUs from '../screens/nonAuth/aboutUs';
 
 const Drawer = createDrawerNavigator();
@@ -39,7 +36,7 @@ const MainDrawer = () => {
                 drawerStyle={{
                     width: Dimensions.get('screen').width / 1.3
                 }}
-                initialRouteName="Home"
+                initialRouteName="HomeScreen"
                 screenOptions={{
                     unmountOnBlur: true
                 }}
@@ -99,7 +96,7 @@ const MainDrawer = () => {
                     }}
                 />
                 <Drawer.Screen
-                    name="Home"
+                    name="HomeScreen"
                     component={user.user_role == 2 ? UserStack : ProviderStack}
                     options={{
                         drawerIcon: ({ focused, color }) => null,
@@ -168,7 +165,7 @@ const CustomDrawerContent = (props) => {
                         marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/copyIcon.png')} style={{ height: 15, width: 15 }} />}
-                    onPress={() => {props.navigation.toggleDrawer(), props.setCopyVisible(true) }}
+                    onPress={() => { props.navigation.toggleDrawer(), props.setCopyVisible(true) }}
                 />
                 <DrawerItem
                     label="Privacy Policy"
@@ -179,7 +176,7 @@ const CustomDrawerContent = (props) => {
                         marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/privacyIcon.png')} style={{ height: 15, width: 15 }} />}
-                    onPress={() => {props.navigation.toggleDrawer(), props.setPrivacyVisible(true)}}
+                    onPress={() => { props.navigation.toggleDrawer(), props.setPrivacyVisible(true) }}
                 />
                 <DrawerItem
                     label="Software license"
@@ -190,7 +187,7 @@ const CustomDrawerContent = (props) => {
                         marginLeft: -20
                     }}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/licenceIcon.png')} style={{ height: 15, width: 15 }} />}
-                    onPress={() => {props.navigation.toggleDrawer(), props.setSoftwareVisible(true)}}
+                    onPress={() => { props.navigation.toggleDrawer(), props.setSoftwareVisible(true) }}
                 />
             </View>
         </DrawerContentScrollView>

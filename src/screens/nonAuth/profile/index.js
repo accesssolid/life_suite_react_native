@@ -263,9 +263,12 @@ const Profile = (props) => {
                 city: homeAddressData.city,
                 state: homeAddressData.state,
                 zip: homeAddressData.zip,
+                lat: homeAddressData.lat,
+                lon: homeAddressData.lon
             })
-            setDropStateValueWork(dropStateValue)
-            setDropCityValueWork(dropCityValue)
+            workAddressRef.current.setAddressText(homeAddressData.address_line_1)
+            // setDropStateValueWork(dropStateValue)
+            // setDropCityValueWork(dropCityValue)
         }
     }, [homeAddressData])
 
@@ -352,11 +355,17 @@ const Profile = (props) => {
 
         let keys = Object.keys(userData)
         for (let index = 0; index < keys.length; index++) {
-            if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '' && keys[index] !== 'prefer_name') {
+            if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '' && keys[index] !== 'prefer_name' && keys[index] !== "about") {
                 showToast(getMessage(keys[index]), 'danger')
                 setLoader(false)
                 return false
             }
+        }
+
+        if (user.user_role == 3 && userData.about.trim() == "") {
+            showToast("Bio is required", 'danger')
+            setLoader(false)
+            return false
         }
 
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -434,7 +443,9 @@ const Profile = (props) => {
         formdata.append("first_name", userData.first_name);
         formdata.append("last_name", userData.last_name);
         formdata.append("phone_number", userData.phone_number);
-        formdata.append("about", userData.about);
+        if (user.user_role == 3) {
+            formdata.append("about", userData.about);
+        }
         formdata.append("prefer_name", userData.prefer_name);
         formdata.append("notification_prefrence", notifType);
         formdata.append("is_same_address", isSameAddress ? 1 : 0);
@@ -707,7 +718,7 @@ const Profile = (props) => {
                                 onSubmitEditing={() => bioRef.current._root.focus()}
                             />
 
-                            <CustomInput
+                            {user.user_role == 3 && <CustomInput
                                 required
                                 text="Bio"
                                 value={userData?.about}
@@ -722,7 +733,7 @@ const Profile = (props) => {
                                 maxLength={255}
                                 numberOfLines={3}
                                 bottomText={userData?.about?.length + "/255"}
-                            />
+                            />}
 
                             <CustomInput
                                 text="Email Address"

@@ -223,11 +223,17 @@ const SignUpScreen = (props) => {
 
         let keys = Object.keys(signUpData)
         for (let index = 0; index < keys.length; index++) {
-            if (typeof signUpData[keys[index]] == 'string' && signUpData[keys[index]].trim() == '' && keys[index] !== 'prefer_name') {
+            if (typeof signUpData[keys[index]] == 'string' && signUpData[keys[index]].trim() == '' && keys[index] !== 'prefer_name' && keys[index] !== 'bio') {
                 showToast(getMessage(keys[index]), 'danger')
                 setLoader(false)
                 return false
             }
+        }
+
+        if (signUpData.bio.trim() == "" && role !== 1) {
+            showToast("Bio is required", 'danger')
+            setLoader(false)
+            return false
         }
 
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -519,7 +525,7 @@ const SignUpScreen = (props) => {
                                 returnKeyType="next"
                                 onSubmitEditing={() => bioRef.current.focus()}
                             />
-                            <CustomTextInput
+                            {role !== 1 && <CustomTextInput
                                 inputRef={bioRef}
                                 placeholder="Bio..."
                                 title="Bio"
@@ -537,7 +543,7 @@ const SignUpScreen = (props) => {
                                     style={{ fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black, fontSize: 12 }}>
                                     {signUpData.bio.length}/255
                                 </Text>}
-                            />
+                            />}
                             <CustomTextInput
                                 placeholder="Email"
                                 title="Email"
