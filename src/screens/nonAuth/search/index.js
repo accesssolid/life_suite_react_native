@@ -18,11 +18,10 @@ import CustomTextInput from '../../../components/customTextInput';
 import { showToast } from '../../../components/validators';
 
 const Search = (props) => {
-    const dispatch = useDispatch()
-    const user = useSelector(state => state.authenticate.user)
     const [services, setServices] = useState([])
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(false)
+    const access_token = useSelector(state => state.authenticate.access_token)
 
     const onChange = (text) => {
         setSearch(text)
@@ -35,7 +34,8 @@ const Search = (props) => {
     function getSearchResults(text) {
         let headers = {
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
 
         let search_data = {
@@ -129,5 +129,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
+        paddingTop: 10
     },
 })

@@ -18,6 +18,7 @@ import { Container } from 'native-base'
 import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import { ScrollView } from 'react-native-gesture-handler';
+import { showToast } from '../../../components/validators';
 
 const MapScreen = (props) => {
     const dispatch = useDispatch()
@@ -127,9 +128,12 @@ const MapScreen = (props) => {
                     }
                     setAddress(json.results[0].formatted_address)
                     placesRef.current.setAddressText(json.results[0].formatted_address)
-                });
+                }).catch(err => {
+                    console.log("reverseGeocode err => ", err)
+                    showToast("Error fetching location details, please try again")
+                })
         } catch (error) {
-            console.log(error)
+            console.log("reverseGeocode err => ", error)
         }
     }
 
@@ -166,6 +170,9 @@ const MapScreen = (props) => {
                                 latitude: details?.geometry?.location?.lat,
                                 longitude: details.geometry?.location?.lng
                             })
+                            if (Platform.OS == "ios") {
+                                setFocused(false)
+                            }
                         }}
                         textInputProps={{
                             onFocus: () => setFocused(true),

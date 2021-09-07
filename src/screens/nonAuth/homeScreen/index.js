@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, FlatList, BackHandler } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -20,6 +20,8 @@ import { setMyJobs } from '../../../redux/features/provider';
 import { showToast } from '../../../components/validators';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setAddServiceMode } from '../../../redux/features/services';
+import Geolocation from 'react-native-geolocation-service';
+import RNGooglePlaces from 'react-native-google-places';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
@@ -59,20 +61,18 @@ const HomeScreen = (props) => {
     }, [])
 
     useFocusEffect(
+        React.useCallback(() => {
+            if (user.user_role == 3) {
+                getLocationPermission()
+            }
+        }, [])
+    );
+
+    useFocusEffect(
         useCallback(() => {
             dispatch(setAddServiceMode({ data: false }))
         }, [])
     );
-
-    // useEffect(() => {
-    //     order?.map((i) => {
-    //         let arr1 = []
-    //         arr1.push(i.toString())
-    //         setOrders([arr1])
-    //     })
-    //     console.log("ydagkgfdsj", orders)
-
-    // }, [order])
 
     const getServices = () => {
         setLoading(true)
@@ -174,6 +174,95 @@ const HomeScreen = (props) => {
         dispatch(setAddServiceMode({ data: true })),
             props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
     }
+
+    const getLocationPermission = async () => {
+        let hasLocationPermission = false
+        if (Platform.OS == "ios") {
+            Geolocation.requestAuthorization('always').then((res) => {
+                if (res == "granted") {
+                    hasLocationPermission = true
+                    getCurrentLocation(hasLocationPermission)
+                } else {
+                    hasLocationPermission = false
+                    getCurrentLocation(hasLocationPermission)
+                }
+            })
+        } else {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        title: "Lifesuite Location Permission",
+                        message:
+                            "Lifesuite needs to access your location ",
+                        buttonNeutral: "Ask Me Later",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK"
+                    }
+                );
+
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    hasLocationPermission = true
+                    getCurrentLocation(hasLocationPermission)
+                } else {
+                    hasLocationPermission = false
+                    getCurrentLocation(hasLocationPermission)
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+    }
+
+    const getCurrentLocation = (hasLocationPermission) => {
+        if (hasLocationPermission) {
+            getCurrentPlace()
+        } else {
+            alert("Location permission denied")
+        }
+    }
+
+    const getCurrentPlace = () => {
+        RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
+            .then((results) => {
+                let locationData = {
+                    lat: results[0].location.latitude,
+                    long: results[0].location.longitude,
+                    address: results[0].address
+                }
+                updateLocation(locationData)
+            })
+            .catch((error) => console.log("results error => ", error.message))
+            .finally(() => {
+            })
+    }
+
+    const updateLocation = (data) => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        var formdata = new FormData();
+        formdata.append("address", data.address);
+        formdata.append("lat", data.lat);
+        formdata.append("long", data.long);
+
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: '/api/provider_location_update',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+            }).catch(err => {
+                console.log("updateLocation err =>> ", err)
+            })
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
@@ -203,10 +292,7 @@ const HomeScreen = (props) => {
                             </TouchableOpacity>
                             :
                             null
-                    }
-                    {/* {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('AddTimeFrame')} style={{ height: 35, aspectRatio: 1 }}>
-                        <Image source={require('../../../assets/wall-clock.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
-                    </TouchableOpacity>} */}
+                    }                    
                 </View>
                 {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7} onPress={() => setIsAddJobActive(!isAddJobActive)}>
                     <View style={{ height: 30, aspectRatio: 1 }}>

@@ -47,6 +47,11 @@ const ServicesProvided = (props) => {
     const itemRef = useRef(null)
 
     useEffect(() => {
+        console.log("servicesData =>> ", servicesData)
+    }, [servicesData])
+
+    useEffect(() => {
+        setServicesData([])
         getServiceItems()
     }, [])
 
@@ -111,12 +116,21 @@ const ServicesProvided = (props) => {
     const setInitialServiceData = () => {
         if (!selectedItems.length > 0) {
             let newArr = itemListMaster.map((item, index) => {
-                return {
-                    "item_id": item.id,
-                    "price": "",
-                    "time_duration_h": "",
-                    "time_duration_m": "",
-                    "variant_data": item.variant_data
+                if (variants.length > 0) {
+                    return {
+                        "item_id": item.id,
+                        "price": "",
+                        "time_duration_h": "",
+                        "time_duration_m": "",
+                        "variant_data": item.variant_data
+                    }
+                } else {
+                    return {
+                        "item_id": item.id,
+                        "price": "",
+                        "time_duration_h": "",
+                        "time_duration_m": "",
+                    }
                 }
             })
             setServicesData([...newArr])
@@ -125,20 +139,26 @@ const ServicesProvided = (props) => {
         if (!isAddServiceMode) {
             let arr = []
             let selected = []
-            itemListMaster.forEach((item, index) => {
-                subService.items.forEach((ele, ind) => {
-                    if (item.id == ele.id && item.variant_data == ele.variant_data) {
-                        let hours = toHoursAndMinutes(ele.time_duration, 'hours')
-                        let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
-                        arr.push({
-                            "item_id": item.id,
-                            "price": "$" + ele.price,
-                            "time_duration_h": String(minutes),
-                            "time_duration_m": String(hours),
-                            "variant_data": item.variant_data
-                        })
-                        selected.push(ele.id)
-                    } else {
+            if (variants.length > 0) {
+                itemListMaster.forEach((item, index) => {
+                    subService.items.forEach((ele, ind) => {
+                        if (item.id == ele.id && item.variant_data == ele.variant_data) {
+                            let hours = toHoursAndMinutes(ele.time_duration, 'hours')
+                            let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
+                            arr.push({
+                                "item_id": item.id,
+                                "price": "$" + ele.price,
+                                "time_duration_h": String(minutes),
+                                "time_duration_m": String(hours),
+                                "variant_data": item.variant_data
+                            })
+                            selected.push(ele.id)
+                        }
+                    });
+                });
+
+                itemListMaster.forEach(item => {
+                    if (!selected.includes(item.id)) {
                         arr.push({
                             "item_id": item.id,
                             "price": "",
@@ -147,8 +167,35 @@ const ServicesProvided = (props) => {
                             "variant_data": item.variant_data
                         })
                     }
+                })
+            } else {
+                itemListMaster.forEach((item, index) => {
+                    subService.items.forEach((ele, ind) => {
+                        if (item.id == ele.id) {
+                            let hours = toHoursAndMinutes(ele.time_duration, 'hours')
+                            let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
+                            arr.push({
+                                "item_id": item.id,
+                                "price": "$" + ele.price,
+                                "time_duration_h": String(minutes),
+                                "time_duration_m": String(hours),
+                            })
+                            selected.push(ele.id)
+                        }
+                    });
                 });
-            });
+
+                itemListMaster.forEach(item => {
+                    if (!selected.includes(item.id)) {
+                        arr.push({
+                            "item_id": item.id,
+                            "price": "",
+                            "time_duration_h": "",
+                            "time_duration_m": "",
+                        })
+                    }
+                })
+            }
 
             setServicesData([...arr])
             setSelectedItems([...selected])
@@ -179,6 +226,7 @@ const ServicesProvided = (props) => {
                     }
                 });
             })
+
             setProductsData([...newArr])
             setSelectedProducts([...selected])
         }
@@ -190,7 +238,7 @@ const ServicesProvided = (props) => {
             subService.items.forEach(element => {
                 element.products.forEach(prod => {
                     if (prod.id == id && prod.item_id == item_id) {
-                        price = "$" + prod.price
+                        price = prod.price.startsWith("$") ? prod.price : "$" + prod.price
                     }
                 });
             });
@@ -200,6 +248,20 @@ const ServicesProvided = (props) => {
     }
 
     const next = () => {
+        dispatch(setAddServiceData({
+            data: {
+                ...addServiceData,
+                user_id: user.id,
+                service_id: subService.id,
+                json_data: {
+                    ...addServiceData.json_data,
+                    products: [],
+                    new_products: [],
+                    services: [],
+                }
+            }
+        }))
+
         let services = []
         servicesData.forEach((itemm, index) => {
             if (selectedItems.includes(itemm.item_id)) {
@@ -245,26 +307,52 @@ const ServicesProvided = (props) => {
     }
 
     const setText = (key, text, indexx, incomingItem) => {
-        let temp = [...servicesData.filter(item => item.variant_data == selectedVariant)]
-        let otherItems = [...servicesData.filter(item => item.variant_data !== selectedVariant)]
-        temp.forEach((ele, index) => {
-            if (ele.item_id == incomingItem.item_id) {
-                if (key == "price") {
-                    let parsed = conTwoDecDigit(text.replace('$', ''))
-                    if (text == '') {
-                        temp[index].price = ''
+        if (variants.length > 0) {
+            let temp = [...servicesData.filter(item => item.variant_data == selectedVariant)]
+            let otherItems = [...servicesData.filter(item => item.variant_data !== selectedVariant)]
+            temp.forEach((ele, index) => {
+                if (ele.item_id == incomingItem.item_id) {
+                    if (key == "price") {
+                        let parsed = conTwoDecDigit(text.replace('$', ''))
+                        if (text == '') {
+                            temp[index].price = ''
+                        } else {
+                            temp[index].price = '$' + String(parsed)
+                        }
+                    } else if (key == 'time_duration_h') {
+                        temp[index].time_duration_h = text
                     } else {
-                        temp[index].price = '$' + String(parsed)
+                        temp[index].time_duration_m = text
                     }
-                } else if (key == 'time_duration_h') {
-                    temp[index].time_duration_h = text
-                } else {
-                    temp[index].time_duration_m = text
                 }
-            }
-        })
+            })
 
-        setServicesData([...temp, ...otherItems])
+            setServicesData([...temp, ...otherItems])
+        } else {
+            let temp = [...servicesData]
+            let item = temp.filter(item => item.item_id == incomingItem.item_id)[0]
+
+            if (key == "price") {
+                let parsed = conTwoDecDigit(text.replace('$', ''))
+                if (text == '') {
+                    item['price'] = ''
+                } else {
+                    item['price'] = '$' + String(parsed)
+                }
+            } else if (key == 'time_duration_h') {
+                item['time_duration_h'] = text
+            } else {
+                item['time_duration_m'] = text
+            }
+
+            temp.forEach((element, index) => {
+                if (element.item_id == incomingItem.item_id) {
+                    temp[index] = item
+                }
+            });
+
+            setServicesData([...temp])
+        }
     }
 
     const conTwoDecDigit = (digit) => {
@@ -409,8 +497,8 @@ const ServicesProvided = (props) => {
                 return ele
             }
         })
-        setServicesData([...arr])
 
+        setServicesData([...arr])
         setIsOtherSelected(false)
         setActiveItem(null)
         setActiveIndex(null)
@@ -431,17 +519,31 @@ const ServicesProvided = (props) => {
         }
 
         let isValidData = false
-        servicesData.filter(item => item.variant_data == selectedVariant).forEach((itemm, index) => {
-            if (selectedItems.includes(itemm.item_id)) {
-                if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
-                    isValidData = true
-                } else {
-                    isValidData = false
+        if (variants.length > 0) {
+            servicesData.filter(item => item.variant_data == selectedVariant).forEach((itemm, index) => {
+                if (selectedItems.includes(itemm.item_id)) {
+                    if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
+                        isValidData = true
+                    } else {
+                        isValidData = false
+                    }
                 }
-            }
-        })
+            })
+        } else {
+            servicesData.forEach((itemm, index) => {
+                if (selectedItems.includes(itemm.item_id)) {
+                    console.log("itemm =>> ", itemm)
+                    if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
+                        isValidData = true
+                    } else {
+                        isValidData = false
+                    }
+                }
+            })
+        }
 
         let selected = getSelectedProducts()
+        console.log("selected =>> ", selected)
         productsData.filter(item => selected.includes(item.id)).forEach(element => {
             if (element.price.trim() == "") {
                 isValidData = false
@@ -449,6 +551,7 @@ const ServicesProvided = (props) => {
         });
 
         let selectedNew = getSelectedNewProducts()
+        console.log("selectedNew =>> ", selectedNew)
         newProductsData.filter(item => selectedNew.includes(item.id)).forEach(element => {
             if (element.price.trim() == "" || element.name.trim() == "") {
                 isValidData = false
@@ -679,7 +782,7 @@ const ServicesProvided = (props) => {
                                 setText={setText}
                                 setProductText={setProductText}
                                 setNewProductText={setNewProductText}
-                                serviceItem={servicesData.filter(item => item.variant_data == selectedVariant)[activeIndex]}
+                                serviceItem={variants.length > 0 ? servicesData.filter(item => item.variant_data == selectedVariant && item.item_id == activeItem.id)[0] : servicesData.filter(item => item.item_id == activeItem.id)[0]}
                                 subService={subService}
                                 showInputs
                                 products={productsData.filter(item => item.item_id == activeItem.id)}
