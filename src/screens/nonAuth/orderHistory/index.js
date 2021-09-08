@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Platform } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -15,6 +15,7 @@ import { Card, Container, Content } from 'native-base';
 import DropDown from '../../../components/dropDown';
 import CustomTextInput from '../../../components/customTextInput';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const OrderHistory = (props) => {
     const dispatch = useDispatch()
@@ -37,14 +38,24 @@ const OrderHistory = (props) => {
                 <Content
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}>
+                    {Platform.OS ==="ios" ?
+                         <DropDown
+                         item={["Declined", "Completed", "In progress"]}
+                         value={'Declined'}
+                         // onChangeValue={(index, value) => { setNotificationType(value), user.user_role == 2 ? cardNumberRef.current.focus() : null }}
+                         containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
+                         dropdownStyle={{ height: 120 }}
+                     />
+                        :
+                        <DropDown
+                            item={["Declined", "Completed", "In progress"]}
+                            value={'Declined'}
+                            // onChangeValue={(index, value) => { setNotificationType(value), user.user_role == 2 ? cardNumberRef.current.focus() : null }}
+                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
+                            dropdownStyle={{ height: 120 }}
+                        />
+                    }
 
-                    <DropDown
-                        item={["Declined", "Completed", "In progress"]}
-                        value={'Declined'}
-                        // onChangeValue={(index, value) => { setNotificationType(value), user.user_role == 2 ? cardNumberRef.current.focus() : null }}
-                        containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
-                        dropdownStyle={{ height: 120 }}
-                    />
                     <CustomTextInput
                         placeholder="Search"
                         customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 }}

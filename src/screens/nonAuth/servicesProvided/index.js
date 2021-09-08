@@ -315,7 +315,7 @@ const ServicesProvided = (props) => {
                                 </View>
                             </View>
                         </View>}
-                        <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services</Text>
+                        <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
                         {
                             activeItem !== null
                                 ?

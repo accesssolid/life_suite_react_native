@@ -33,7 +33,7 @@ const Calendar = (props) => {
         var a = moment(date).format("YYYY-MM-DD")
         setDatee(a)
         setDate(a)
-        props.navigation.navigate("MechanicLocation")
+        props.navigation.navigate("MechanicLocation",{data : date})
     }
 
     return (

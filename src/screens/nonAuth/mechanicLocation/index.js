@@ -27,6 +27,7 @@ import moment from 'moment';
 import SureModal from '../../../components/sureModal';
 
 const MechanicLocation = (props) => {
+    const DATE = props.route.params.data
     const fromInputRef = useRef(null)
     const toInputRef = useRef(null)
     const { servicedata, subService } = props.route.params
@@ -40,7 +41,7 @@ const MechanicLocation = (props) => {
     const [toAddress, setToAddress] = useState("")
     const [date, setDate] = useState("")
     const [open, setOpen] = useState(false)
-
+    
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -93,7 +94,6 @@ const MechanicLocation = (props) => {
                         buttonPositive: "OK"
                     }
                 );
-
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     hasLocationPermission = true
                     getCurrentLocation(hasLocationPermission)
@@ -133,24 +133,6 @@ const MechanicLocation = (props) => {
             .catch((error) => console.log(error.message));
     }
 
-    const openSearchModal = (type) => {
-        RNGooglePlaces.openAutocompleteModal({
-            type: 'address'
-        }, ['placeID', 'location', 'name', 'address'])
-            .then((place) => {
-                if (type == 'from') {
-                    fromInputRef.current.blur()
-                    setFromAddress(place.address)
-                    setFromCoordinates({ ...fromCoordinates, latitude: place.location.latitude, longitude: place.location.longitude })
-                } else {
-                    toInputRef.current.blur()
-                    setToAddress(place.address)
-                    setToCoordinates({ ...toCoordinates, latitude: place.location.latitude, longitude: place.location.longitude })
-                }
-            })
-            .catch(error => console.log("openSearchModal error => ", error.message));
-    }
-
     const submit = () => {
         let data = {
             "user_id": user.id,
@@ -161,8 +143,8 @@ const MechanicLocation = (props) => {
             "order_placed_address": toAddress,
             "order_placed_lat": toCoordinates.latitude,
             "order_placed_long": toCoordinates.longitude,
-            "order_start_time": date + " " + moment(startTime).format('HH:mm') + ":00",
-            "order_end_time": date + " " + moment(endTime).format('HH:mm') + ":00",
+            "order_start_time": moment(date).format("YYYY-MM-DD") + " " + moment(startTime).format('HH:mm') + ":00",
+            "order_end_time": moment(date).format("YYYY-MM-DD") + " " + moment(endTime).format('HH:mm') + ":00",
             "order_from_lat": fromCoordinates.latitude,
             "order_from_long": fromCoordinates.longitude,
             "order_from_address": fromAddress
@@ -190,6 +172,27 @@ const MechanicLocation = (props) => {
         setEndTime(date)
         setDatePickerVisibility1(false);
     };
+
+
+    const onLocation = (location, coords) => {
+        setFromAddress(location)
+        setFromCoordinates({
+            ...coords,
+            latitudeDelta: 0.25,
+            longitudeDelta: 0.012134,
+        })
+    }
+
+    const onLocation1 = (location, coords) => {
+        setToAddress(location)
+        setToCoordinates({
+            ...coords,
+            latitudeDelta: 0.25,
+            longitudeDelta: 0.012134,
+        })
+    }
+
+
 
     const renderView = () => {
         return (
@@ -230,11 +233,11 @@ const MechanicLocation = (props) => {
                                 onChangeText={setFromAddress}
                                 placeholder="From Address"
                                 placeholderTextColor={LS_COLORS.global.placeholder}
-                                onChangeText={() => openSearchModal('from')}
+                                onChangeText={() =>props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
                                 ref={fromInputRef}
                             />
                             <TouchableOpacity
-                                onPress={() => openSearchModal('from')}
+                                onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
                                 style={{ alignSelf: "center", height: '100%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}
                                 activeOpacity={0.7}>
                                 <Image
@@ -252,11 +255,11 @@ const MechanicLocation = (props) => {
                                 onChangeText={setToAddress}
                                 placeholder="To Address"
                                 placeholderTextColor={LS_COLORS.global.placeholder}
-                                onChangeText={() => openSearchModal('to')}
+                                onChangeText={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                                 ref={toInputRef}
                             />
                             <TouchableOpacity
-                                onPress={() => openSearchModal('to')}
+                                onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                                 style={{ alignSelf: "center", height: '100%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}
                                 activeOpacity={0.7}>
                                 <Image
@@ -270,7 +273,7 @@ const MechanicLocation = (props) => {
                             <TextInput
                                 style={styles.inputStyle}
                                 color="black"
-                                value={date}
+                                value={moment(DATE).format("MM-DD-YYYY")}
                                 editable={false}
                                 placeholder="Select date"
                                 placeholderTextColor={LS_COLORS.global.placeholder}
@@ -292,29 +295,31 @@ const MechanicLocation = (props) => {
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility(true)} >
-                                <Text>{moment(startTime).format('HH:mm A')}</Text>
+                                <Text>{moment(startTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
 
                         </View>
                         <View style={{ flex: 1, alignItems: 'center' }} >
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility1(true)} >
-                                <Text>{moment(endTime).format('HH:mm A')}</Text>
+                                <Text>{moment(endTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
                         </View>
-                        {/* <View style={{ flex: 1, alignItems: 'center' }}>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>End Time</Text>
-                            <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10 }}>
-                                <DropDown
-                                    item={category_array}
-                                    value={endTime}
-                                    width={widthPercentageToDP(30)}
-                                    onChangeItem={(t) => setEndTime(t)}
-                                    placeholder="Car"
-                                    dropdownStyle={{ width: '30%', alignItems: 'center' }}
-                                />
-                            </Row>
-                        </View> */}
+                        {
+                            /* <View style={{ flex: 1, alignItems: 'center' }}>
+                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>End Time</Text>
+                                <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10 }}>
+                                    <DropDown
+                                        item={category_array}
+                                        value={endTime}
+                                        width={widthPercentageToDP(30)}
+                                        onChangeItem={(t) => setEndTime(t)}
+                                        placeholder="Car"
+                                        dropdownStyle={{ width: '30%', alignItems: 'center' }}
+                                    />
+                                </Row>
+                            </View> */
+                        }
                     </View>
                     <TouchableOpacity
                         style={styles.save}
@@ -443,6 +448,7 @@ const styles = StyleSheet.create({
     },
     inputStyle: {
         height: '100%',
+        width:"90%"
     },
     mapContainer: {
         height: Dimensions.get('screen').height / 4,

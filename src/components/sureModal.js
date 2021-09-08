@@ -23,9 +23,9 @@ const SureModal = props => {
       <Pressable onPress={props.pressHandler} style={styles.modalScreen}>
         <View
           style={{
-            height: 354,
+            height: "50%",
             backgroundColor: 'white',
-            width: 327,
+            width: "80%",
             borderRadius: 10,
             padding: 20,
           }}>

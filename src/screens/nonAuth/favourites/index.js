@@ -212,7 +212,6 @@ const Favourites = (props) => {
                         :
                         <Content showsVerticalScrollIndicator={false} >
                             {provider.map((item, index) => {
-                                console.log(item)
                                 return (
                                     <Card key={index} style={{ flexDirection: 'row', marginBottom: 20, alignItems: 'center', height: 70, paddingHorizontal: 10, borderRadius: 12 }}>
                                         <View style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
@@ -226,8 +225,8 @@ const Favourites = (props) => {
                                             {/* <Text>Price: $25/hr</Text> */}
                                             <Text>Rating: {parseInt(item.rating)}</Text>
                                         </View>
-                                        <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: 50, aspectRatio: 1, padding: '4%' }}>
-                                            <Image source={require('../../../assets/heartGreen.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                                        <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: 50,justifyContent:'center',alignItems:"center",marginLeft:10}}>
+                                            <Image source={require('../../../assets/heartGreen.png')} style={{ height: 25, width:25 }} resizeMode="contain" />
                                         </TouchableOpacity>
                                     </Card>
                                 )

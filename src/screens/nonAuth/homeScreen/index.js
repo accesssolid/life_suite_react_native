@@ -278,8 +278,7 @@ const HomeScreen = (props) => {
                     </TouchableOpacity>
                     <View style={{ flex: 1, paddingHorizontal: '5%' }}>
                     </View>
-                    {
-                        user.user_role == 2
+                    {   user.user_role == 2
                             ?
                             <TouchableOpacity style={styles.search}
                                 activeOpacity={0.7}

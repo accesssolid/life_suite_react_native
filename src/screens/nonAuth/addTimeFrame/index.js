@@ -237,9 +237,9 @@ const AddTimeFrame = (props) => {
         let styles = [...customDatesStyles];
         setDatePickerVisibility(false)
         if (dateType == "from") {
-            styles[activeIndex].from_time = moment(date).format('HH:mm')
+            styles[activeIndex].from_time = moment(date).format('hh:mm')
         } else {
-            styles[activeIndex].to_time = moment(date).format('HH:mm')
+            styles[activeIndex].to_time = moment(date).format('hh:mm')
         }
 
         setCustomDatesStyles([...styles])
@@ -333,7 +333,7 @@ const AddTimeFrame = (props) => {
                         {customDatesStyles.map((item, index) => {
                             return (
                                 <View key={index} style={{ paddingHorizontal: '5%', paddingVertical: 5 }}>
-                                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{item.date}</Text>
+                                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{moment(item.date).format("MM-DD-YYYY")}</Text>
                                     <View style={{ flexDirection: 'row', marginTop: 5, height: 60, alignItems: 'center' }}>
                                         <View style={{ flex: 1 }}>
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>

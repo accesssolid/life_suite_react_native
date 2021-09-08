@@ -23,13 +23,12 @@ import { Rating, AirbnbRating } from 'react-native-ratings';
 var _ = require('lodash');
 import SureModal from '../../../components/sureModal';
 import SureModal1 from '../../../components/sureModal1';
+import FilterModal from '../../../components/filterModal';
+import FilterType from '../../../components/filterType';
 
 
 const Mechanics = (props) => {
     const { data, subService, extraData } = props.route.params
-    const [checked1, setChecked1] = useState(false)
-    const [checked2, setChecked2] = useState(false)
-    const [checked3, setChecked3] = useState(false)
     const [loading, setLoading] = useState(false)
     const [providers, setProviders] = useState([])
     const [selectedProviders, setSelectedProviders] = useState([])
@@ -40,9 +39,12 @@ const Mechanics = (props) => {
     const [open, setOpen] = useState(false)
     const [rating, setRating] = useState(false)
     const [open1, setOpen1] = useState(false)
+    const [open2, setOpen2] = useState(false)
+    const [open3, setOpen3] = useState(false)
+    const [open4, setOpen4] = useState(false)
+    const [open5, setOpen5] = useState(false)
     const [selectedItems, setSelectedItems] = useState([])
     const [selectedProducts, setSelectedProducts] = useState([])
-    console.log("SElected",selectedItems)
 
     useEffect(() => {
         const apple = [...providers]
@@ -68,6 +70,7 @@ const Mechanics = (props) => {
         }
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -76,7 +79,7 @@ const Mechanics = (props) => {
                     setLoading(false)
                 }
                 else {
-                    setOpen1(true)
+                    setOpen1(!open)
                     setLoading(false)
                 }
             }).catch(err => {
@@ -160,6 +163,65 @@ const Mechanics = (props) => {
                         setOpen1(!open1);
                     }}
                 />
+                <FilterModal
+                    title="Filter By Price"
+                    save="Apply"
+                    cancel="Cancel"
+                    pressHandler={() => {
+                        setOpen3(!open3);
+                    }}
+                    visible={open1}
+                    action={() => {
+                        setOpen3(!open3);
+                    }}
+
+                />
+                <FilterModal
+                    title="Filter By Time"
+                    save="Apply"
+                    cancel="Cancel"
+                    pressHandler={() => {
+                        setOpen4(!open4);
+                    }}
+                    visible={open4}
+                    action={() => {
+                        setOpen4(!open4);
+                    }}
+
+                />
+                <FilterModal
+                    title="Filter By Rating"
+                    save="Apply"
+                    cancel="Cancel"
+                    pressHandler={() => {
+                        setOpen5(!open5);
+                    }}
+                    visible={open5}
+                    action={() => {
+                        setOpen5(!open5);
+                    }}
+
+                />
+                <FilterType
+                    title="Filter"
+                    type1="Price"
+                    type2="Time"
+                    type3="Rating"
+                    pressHandler={() => {
+                        setOpen2(!open2);
+                    }}
+                    visible={open2}
+                    action1={() => {
+                        setOpen3(!open3)
+                    }}
+
+                    action2={() => {
+                        setOpen3(!open3)
+                    }}
+                    action3={() => {
+                        setOpen3(!open3)
+                    }}
+                />
                 <ImageBackground
                     resizeMode="cover"
                     source={{ uri: BASE_URL + subService.image }}
@@ -190,6 +252,9 @@ const Mechanics = (props) => {
                     <Container style={{ marginTop: 26 }}>
                         <Content showsVerticalScrollIndicator={false} bounces={false} >
                             <View style={{ height: 40, width: '90%', alignSelf: "center", justifyContent: 'space-between', flexDirection: 'row' }}>
+                                {/* <TouchableOpacity onPress={() => { setOpen2(!open2) }} style={{ justifyContent: "center", alignItems: "center" }}>
+                                    <Image style={{ height: 30, width: 30, alignSelf: "center" }} source={require("../../../assets/filter.png")} />
+                                </TouchableOpacity> */}
                                 <TouchableOpacity onPress={() => { setPrice(!price), price ? providers.sort((a, b) => a.totalPrice - b.totalPrice) : providers.sort((a, b) => b.totalPrice - a.totalPrice) }} style={styles.upper} >
                                     <Text style={styles.upperText}>Price</Text>
                                     <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
@@ -316,7 +381,7 @@ const Mechanics = (props) => {
                                             })
                                         }
                                         <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Total Time</Text>
+                                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Estimated Time</Text>
                                             <Text style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{time_format}</Text>
                                         </View>
                                     </Card>

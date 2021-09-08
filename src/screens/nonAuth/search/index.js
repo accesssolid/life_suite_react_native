@@ -37,23 +37,31 @@ const Search = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let search_data = {
             "search_text": text
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...search_data }),
             endPoint: '/api/filterServices',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     setLoading(false)
-                    setServices([...response.data])
+                    let x = []
+                    let z = []
+                    for (let index = 0; index < response.data.length; index++) {
+                        const element = response.data[index];
+                        if (!x.includes(element.search_title)) {
+                            x.push(element.search_title)
+                            z.push(element)
+                        }
+
+                    }
+                    setServices([...z])
+                    console.log(response.data)
                 }
                 else {
                     setServices([])
@@ -72,7 +80,6 @@ const Search = (props) => {
         } else if (item.data_type == "service_item") {
             props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.parent_name, id: item.search_parent_id, items: [], image: item.parent_image, service_parent_id: item.search_parent_id } });
         } else {
-
         }
     }
 
