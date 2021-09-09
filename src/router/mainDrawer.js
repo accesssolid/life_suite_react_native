@@ -21,6 +21,8 @@ import SoftwareModal from '../components/softwareModal';
 import AboutUs from '../screens/nonAuth/aboutUs';
 import { Header } from 'react-native/Libraries/NewAppScreen';
 import { useNavigation } from '@react-navigation/core';
+import ChatUsers from '../screens/nonAuth/chatUsers';
+import Notification from '../screens/nonAuth/notification';
 
 const Drawer = createDrawerNavigator();
 
@@ -72,7 +74,7 @@ const MainDrawer = (props) => {
                 />
                 <Drawer.Screen
                     name="Messages"
-                    component={Test}
+                    component={ChatUsers}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/message.png')} style={{ height: 20, width: 20 }} />,
                     }}
@@ -80,6 +82,13 @@ const MainDrawer = (props) => {
                 <Drawer.Screen
                     name="Favorites"
                     component={Favourites}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />,
+                    }}
+                />
+                <Drawer.Screen
+                    name="Notification"
+                    component={Notification}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />,
                     }}

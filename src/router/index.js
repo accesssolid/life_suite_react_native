@@ -18,6 +18,8 @@ import UserStack from './userStack';
 import ProviderStack from './providerStack';
 import Passcode from '../screens/nonAuth/passCode';
 import MainDrawer from './mainDrawer';
+import ChatScreen from '../screens/nonAuth/chatScreen';
+import ChatMembers from '../screens/nonAuth/chatMembers';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +37,8 @@ const Router = () => {
           <Stack.Screen name="ProviderStack" component={ProviderStack} />
           <Stack.Screen name="Passcode" component={Passcode} />
           <Stack.Screen name="MainDrawer" component={MainDrawer} />
+          <Stack.Screen name="ChatScreen" component={ChatScreen} />
+          <Stack.Screen name="ChatMembers" component={ChatMembers} />
         </Stack.Navigator>
       </NavigationContainer>
       {loading && <Loader />}

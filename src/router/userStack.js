@@ -27,6 +27,7 @@ import ConfirmSetPassCode from '../screens/nonAuth/confirmSetPassCode';
 import SetPassCode from '../screens/nonAuth/setPassCode';
 import SelectLocation from '../screens/nonAuth/selectLocation';
 import MapScreen from '../screens/nonAuth/map';
+import ChatScreen from '../screens/nonAuth/chatScreen';
 
 const Stack = createStackNavigator();
 

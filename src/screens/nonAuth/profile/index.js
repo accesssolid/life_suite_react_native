@@ -709,7 +709,7 @@ const Profile = (props) => {
                             />
                             <CustomInput
                                 text="Preffered Name"
-                                value={userData.prefer_name}
+                                value= {userData?.prefer_name === "null" ? "" : userData.prefer_name}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, prefer_name: text })
                                 }}

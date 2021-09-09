@@ -28,7 +28,7 @@ const Header = (props) => {
                 onPress={props.action1}
                 activeOpacity={0.7}>
                 <Image
-                    style={{ height: 25, width: 25, resizeMode: 'contain' }}
+                    style={{ height: 25, width: 25, resizeMode: 'contain',tintColor:"black" }}
                     source={props.imageUrl1}
                 />
             </TouchableOpacity>
