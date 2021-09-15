@@ -188,7 +188,7 @@ const MapScreen = (props) => {
                     {/* </ScrollView> */}
                     <View style={styles.mapContainer}>
                         <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: focused ? '15%' : '10%', alignItems: 'center', paddingHorizontal: '10%', zIndex: 1 }}>
-                            <CustomButton
+                            {user?.address[0]?.address_line_1 !== '' && <CustomButton
                                 title={user.user_role == 2 ? "Home" : "Permanent"}
                                 customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
                                 customStyles={{
@@ -211,8 +211,8 @@ const MapScreen = (props) => {
                                         longitude: Number(user?.address[0]?.long)
                                     })
                                 }}
-                            />
-                            <CustomButton
+                            />}
+                            {user?.address[1]?.address_line_1 !== '' && <CustomButton
                                 title={user.user_role == 2 ? "Work" : "Mailing"}
                                 customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
                                 customStyles={{
@@ -235,7 +235,7 @@ const MapScreen = (props) => {
                                         longitude: Number(user?.address[1]?.long)
                                     })
                                 }}
-                            />
+                            />}
                         </View>
                         <MapView
                             ref={mapRef}

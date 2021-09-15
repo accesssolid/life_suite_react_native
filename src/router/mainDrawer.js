@@ -23,6 +23,11 @@ import { Header } from 'react-native/Libraries/NewAppScreen';
 import { useNavigation } from '@react-navigation/core';
 import ChatUsers from '../screens/nonAuth/chatUsers';
 import Notification from '../screens/nonAuth/notification';
+import ServicesProvided from '../screens/nonAuth/servicesOffered';
+import AddLicense from '../screens/nonAuth/addLicense';
+import SelectLocation from '../screens/nonAuth/selectLocation';
+import MapScreen from '../screens/nonAuth/map';
+import AddTimeFrame from '../screens/nonAuth/addTimeFrame';
 
 const Drawer = createDrawerNavigator();
 
@@ -115,6 +120,46 @@ const MainDrawer = (props) => {
                         drawerLabel: ({ focused, color }) => null,
                     }}
                 />
+                <Drawer.Screen
+                    name="ServicesProvided"
+                    component={ServicesProvided}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <View style={{ height: 0 }} />,
+                        drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
+                    }}
+                />
+                <Drawer.Screen
+                    name="AddLicense"
+                    component={AddLicense}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <View style={{ height: 0 }} />,
+                        drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
+                    }}
+                />
+                <Drawer.Screen
+                    name="SelectLocation"
+                    component={SelectLocation}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <View style={{ height: 0 }} />,
+                        drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
+                    }}
+                />
+                <Drawer.Screen
+                    name="MapScreen"
+                    component={MapScreen}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <View style={{ height: 0 }} />,
+                        drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
+                    }}
+                />
+                <Drawer.Screen
+                    name="AddTimeFrame"
+                    component={AddTimeFrame}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <View style={{ height: 0 }} />,
+                        drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
+                    }}
+                />
             </Drawer.Navigator>
             <TermsModal
                 isVisible={termsVisible}
@@ -147,7 +192,7 @@ const CustomDrawerContent = (props) => {
             </View>
             <DrawerItemList {...props} />
             <DrawerItem
-                style={{ marginTop: -25 }}
+                style={{ marginTop: -155 }}
                 label="Legal"
                 labelStyle={{
                     fontFamily: LS_FONTS.PoppinsMedium,
@@ -209,10 +254,10 @@ const CustomDrawerContent = (props) => {
 
 const Test = () => {
     const navigation = useNavigation()
-    return <View style={{ flex: 1, alignItems: 'center',justifyContent:"center" }}>
-        <TouchableOpacity onPress = {() => navigation.goBack()} style = {{position:"absolute",top:30,left:20}}> 
-            <Image 
-            source = {require('../assets/back.png')}/>
+    return <View style={{ flex: 1, alignItems: 'center', justifyContent: "center" }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ position: "absolute", top: 30, left: 20 }}>
+            <Image
+                source={require('../assets/back.png')} />
         </TouchableOpacity>
         <Text>WORK IN PROGRESS</Text>
 

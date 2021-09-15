@@ -8,6 +8,7 @@ import { globalStyles } from '../../../utils';
 
 /* Packages */
 import CalendarPicker from 'react-native-calendar-picker';
+import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import moment from "moment";
 import TextInputMask from 'react-native-text-input-mask';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,13 +39,23 @@ const AddTimeFrame = (props) => {
     const [dateType, setDateType] = useState(null)
     const [activeIndex, setActiveIndex] = useState(null)
     const [initialDate, setInitialDate] = useState(new Date())
+    const [markedDates, setMarkedDates] = useState({})
 
     useEffect(() => {
         if (!isAddServiceMode)
             getTimeFrames()
     }, [])
 
+    // "start_date" : "2021-07-16",  
+    // "end_date" : "2021-07-16", 
+    // "from_time" : "10:05",
+    // "to_time" : "23:00"
+
     const onDateChange = (date) => {
+        let marked = { ...markedDates }
+        marked[date.dateString] = { selected: true, selectedColor: 'blue' }
+        setMarkedDates({ ...marked })
+        return
         let dates = [...selectedDates]
         let styles = [...customDatesStyles];
         if (!dates.includes(moment(date).format("DD/MM/YYYY"))) {
@@ -309,7 +320,7 @@ const AddTimeFrame = (props) => {
             />
             <View style={styles.container}>
                 <View style={styles.calendar}>
-                    <CalendarPicker
+                    {/* <CalendarPicker
                         ref={calendarRef}
                         onDateChange={onDateChange}
                         previousTitle="<"
@@ -326,6 +337,37 @@ const AddTimeFrame = (props) => {
                             fontFamily: LS_FONTS.PoppinsLight,
                         }}
                         customDatesStyles={customDatesStyles}
+                        allowRangeSelection
+                    /> */}
+                    <Calendar
+                        current={new Date()}
+                        // minDate={'2012-05-10'}
+                        // maxDate={'2012-05-30'}
+                        onDayPress={(day) => onDateChange(day)}
+                        // onDayLongPress={(day) => { console.log('selected day', day) }}
+                        // monthFormat={'yyyy MM'}                    
+                        // onMonthChange={(month) => { console.log('month changed', month) }}
+                        hideArrows={false}
+                        // renderArrow={(direction) => (<Arrow />)}
+                        // Do not show days of other months in month page. Default = false
+                        hideExtraDays={true}
+                        disableMonthChange={false}
+                        firstDay={1}
+                        hideDayNames={false}
+                        showWeekNumbers={true}
+                        onPressArrowLeft={subtractMonth => subtractMonth()}
+                        onPressArrowRight={addMonth => addMonth()}
+                        disableArrowLeft={false}
+                        disableArrowRight={false}
+                        disableAllTouchEventsForDisabledDays={true}
+                        renderHeader={(date) => {
+                            return (
+                                <Text style={{}}>{moment(date).format('DD-MM-YYYY')}</Text>
+                            )
+                        }}
+                        enableSwipeMonths={false}
+
+                        markedDates={{ ...markedDates }}
                     />
                 </View>
                 <ScrollView style={{ flex: 1 }}>

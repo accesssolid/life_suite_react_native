@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, FlatList } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, FlatList, Dimensions } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -18,6 +18,7 @@ import Cards from '../../../components/cards';
 import { BASE_URL, getApi } from '../../../api/api';
 import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/core';
+import { setAddServiceMode } from '../../../redux/features/services';
 
 const Favourites = (props) => {
     const dispatch = useDispatch()
@@ -49,7 +50,7 @@ const Favourites = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint: user.user_role == 2 ? '/api/customerServiceAddFavourite' : '/api/customerServiceAddFavourite',
+            endPoint: user.user_role == 2 ? '/api/customerServiceAddFavourite' : '/api/providerServiceAddFavourite',
             type: 'post'
         }
         getApi(config)
@@ -103,7 +104,7 @@ const Favourites = (props) => {
 
         let config = {
             headers: headers,
-            endPoint: user.user_role == 2 ? '/api/customerFavouriteServices' : '/api/customerFavouriteServices',
+            endPoint: user.user_role == 2 ? '/api/customerFavouriteServices' : '/api/providerFavouriteServices',
             type: 'post'
         }
         getApi(config)
@@ -149,89 +150,105 @@ const Favourites = (props) => {
             })
     }
 
+    const onItemPress = (item) => {
+        dispatch(setAddServiceMode({ data: true }))
+        navigation.navigate("ServicesProvided", { subService: item, items: [] })
+    }
+
+    const goBack = () => {
+        dispatch(setAddServiceMode({ data: false }))
+        props.navigation.goBack()
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
                 title="Favorites"
                 imageUrl={require("../../../assets/back.png")}
-                action={() => {
-                    props.navigation.goBack()
-                }}
+                action={() => goBack()}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
                     navigation.navigate("HomeScreen")
                 }}
             />
             <Container style={styles.container}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', marginVertical: 30 }}>
-                    <TouchableOpacity activeOpacity={0.7} onPress={() => setActivetab(0)} style={{
-                        backgroundColor: activeTab === 0 ? LS_COLORS.global.cyan : LS_COLORS.global.transparent,
-                        borderRadius: 21,
-                        paddingVertical: 12,
-                        alignItems: 'center',
-                        width: '40%',
-                        borderWidth: 1,
-                        borderColor: LS_COLORS.global.cyan
-                    }}>
-                        <Text style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} onPress={() => setActivetab(1)} style={{
-                        backgroundColor: activeTab === 1 ? LS_COLORS.global.cyan : LS_COLORS.global.transparent,
-                        borderRadius: 21,
-                        paddingVertical: 12,
-                        alignItems: 'center',
-                        width: '40%',
-                        borderWidth: 1,
-                        borderColor: LS_COLORS.global.cyan
-                    }}>
-                        <Text style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service Provider</Text>
-                    </TouchableOpacity>
-                </View>
-                {
-                    activeTab == 0
-                        ?
-                        <FlatList
-                            data={services}
-                            numColumns={3}
-                            columnWrapperStyle={{ justifyContent: 'flex-start' }}
-                            renderItem={({ item, index }) => {
-                                return (
-                                    <Cards
-                                        title1={item.name}
-                                        title2="SERVICES"
-                                        imageUrl={{ uri: BASE_URL + item.image }}
-                                        action={() => navigation.navigate("ServicesProvided", { subService: item, items: [] })}
-                                        showLeft
-                                        customContainerStyle={{ width: '30%', marginLeft: '2.5%' }}
-                                        favorite={() => { like(item.id) }}
-                                    />
-                                )
-                            }}
-                            keyExtractor={(item, index) => index}
-                        />
-                        :
-                        <Content showsVerticalScrollIndicator={false} >
-                            {provider.map((item, index) => {
-                                return (
-                                    <Card key={index} style={{ flexDirection: 'row', marginBottom: 20, alignItems: 'center', height: 70, paddingHorizontal: 10, borderRadius: 12 }}>
-                                        <View style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
-                                            <Image source={item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
-                                        </View>
-                                        <View style={{ flex: 1, paddingLeft: 10, justifyContent: 'center' }}>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>{item.last_name}</Text>
-                                        </View>
-                                        <View>
-                                            {/* <Text>Price: $25/hr</Text> */}
-                                            <Text>Rating: {parseInt(item.rating)}</Text>
-                                        </View>
-                                        <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: 50,justifyContent:'center',alignItems:"center",marginLeft:10}}>
-                                            <Image source={require('../../../assets/heartGreen.png')} style={{ height: 25, width:25 }} resizeMode="contain" />
-                                        </TouchableOpacity>
-                                    </Card>
-                                )
-                            })}
-                        </Content>
+                {user.user_role == 2 &&
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', marginVertical: 30 }}>
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => setActivetab(0)} style={{
+                            backgroundColor: activeTab === 0 ? LS_COLORS.global.cyan : LS_COLORS.global.transparent,
+                            borderRadius: 21,
+                            paddingVertical: 12,
+                            alignItems: 'center',
+                            width: '40%',
+                            borderWidth: 1,
+                            borderColor: LS_COLORS.global.cyan
+                        }}>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => setActivetab(1)} style={{
+                            backgroundColor: activeTab === 1 ? LS_COLORS.global.cyan : LS_COLORS.global.transparent,
+                            borderRadius: 21,
+                            paddingVertical: 12,
+                            alignItems: 'center',
+                            width: '40%',
+                            borderWidth: 1,
+                            borderColor: LS_COLORS.global.cyan
+                        }}>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service Provider</Text>
+                        </TouchableOpacity>
+                    </View>}
+
+                {activeTab == 0
+                    ?
+                    <FlatList
+                        data={services}
+                        numColumns={3}
+                        contentContainerStyle={{ paddingTop: user.user_role == 2 ? 0 : '5%' }}
+                        columnWrapperStyle={{ justifyContent: 'flex-start' }}
+                        renderItem={({ item, index }) => {
+                            return (
+                                <Cards
+                                    title1={item.name}
+                                    title2="SERVICES"
+                                    imageUrl={{ uri: BASE_URL + item.image }}
+                                    action={() => onItemPress(item)}
+                                    showLeft
+                                    customContainerStyle={{ width: '30%', marginLeft: '2.5%' }}
+                                    favorite={() => { like(item.id) }}
+                                />
+                            )
+                        }}
+                        keyExtractor={(item, index) => index}
+                        ListEmptyComponent={() => {
+                            return (<View style={{ flex: 1, width: '100%', height: Dimensions.get('screen').height / 1.25, alignItems: 'center', justifyContent: 'center' }}>
+                                <Text>No Favourites</Text>
+                            </View>)
+
+                        }}
+                    />
+                    :
+                    <Content showsVerticalScrollIndicator={false} >
+                        {provider.map((item, index) => {
+                            return (
+                                <Card key={index} style={{ flexDirection: 'row', marginBottom: 20, alignItems: 'center', height: 70, paddingHorizontal: 10, borderRadius: 12 }}>
+                                    <View style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
+                                        <Image source={item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                                    </View>
+                                    <View style={{ flex: 1, paddingLeft: 10, justifyContent: 'center' }}>
+                                        <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
+                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>{item.last_name}</Text>
+                                    </View>
+                                    <View>
+                                        {/* <Text>Price: $25/hr</Text> */}
+                                        <Text>Rating: {parseInt(item.rating)}</Text>
+                                    </View>
+                                    <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: 50, justifyContent: 'center', alignItems: "center", marginLeft: 10 }}>
+                                        <Image source={require('../../../assets/heartGreen.png')} style={{ height: 25, width: 25 }} resizeMode="contain" />
+                                    </TouchableOpacity>
+                                </Card>
+                            )
+                        })}
+                    </Content>
 
                 }
                 <View style={{ height: 30 }}></View>

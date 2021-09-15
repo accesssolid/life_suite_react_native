@@ -116,7 +116,6 @@ const SubServices = (props) => {
                             data={[...subServices]}
                             numColumns={3}
                             renderItem={({ item, index }) => {
-                                console.log("hsabdghfbhsdbfbsdbhfbdsfjbhds",item.isFavourite)
                                 return (
                                     <SmallCards
                                         title1={item.name}

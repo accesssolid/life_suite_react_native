@@ -47,10 +47,6 @@ const ServicesProvided = (props) => {
     const itemRef = useRef(null)
 
     useEffect(() => {
-        console.log("servicesData =>> ", servicesData)
-    }, [servicesData])
-
-    useEffect(() => {
         setServicesData([])
         getServiceItems()
     }, [])
@@ -141,7 +137,7 @@ const ServicesProvided = (props) => {
             let selected = []
             if (variants.length > 0) {
                 itemListMaster.forEach((item, index) => {
-                    subService.items.forEach((ele, ind) => {
+                    subService?.items?.forEach((ele, ind) => {
                         if (item.id == ele.id && item.variant_data == ele.variant_data) {
                             let hours = toHoursAndMinutes(ele.time_duration, 'hours')
                             let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
@@ -170,7 +166,7 @@ const ServicesProvided = (props) => {
                 })
             } else {
                 itemListMaster.forEach((item, index) => {
-                    subService.items.forEach((ele, ind) => {
+                    subService?.items?.forEach((ele, ind) => {
                         if (item.id == ele.id) {
                             let hours = toHoursAndMinutes(ele.time_duration, 'hours')
                             let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')

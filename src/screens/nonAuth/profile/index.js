@@ -709,7 +709,7 @@ const Profile = (props) => {
                             />
                             <CustomInput
                                 text="Preffered Name"
-                                value= {userData?.prefer_name === "null" ? "" : userData.prefer_name}
+                                value={userData?.prefer_name === "null" ? "" : userData.prefer_name}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, prefer_name: text })
                                 }}
@@ -769,7 +769,7 @@ const Profile = (props) => {
                                         marginHorizontal: '10%',
                                         color: LS_COLORS.global.black
                                     }}>
-                                        {user.user_role == 1 ? 'Home' : 'Permanent'} Address{user.user_role == 1 ? '' : "*"}
+                                        {user.user_role == 2 ? 'Home' : 'Permanent'} Address{user.user_role == 2 ? '' : "*"}
                                     </Text>
                                 </View>
                                 <GooglePlacesAutocomplete
@@ -793,7 +793,7 @@ const Profile = (props) => {
                                         listView: { paddingVertical: 5 },
                                         separator: {}
                                     }}
-                                    placeholder={`${user.user_role == 1 ? 'Home' : 'Permanent'} address${user.user_role == 1 ? '' : "*"}`}
+                                    placeholder={`${user.user_role == 2 ? 'Home' : 'Permanent'} address${user.user_role == 2 ? '' : "*"}`}
                                     fetchDetails={true}
                                     onPress={(data, details) => {
                                         setHomeAddressData({
@@ -900,7 +900,7 @@ const Profile = (props) => {
                                         marginHorizontal: '10%',
                                         color: LS_COLORS.global.black
                                     }}>
-                                        {user.user_role == 1 ? 'Work' : 'Mailing'} Address{user.user_role == 1 ? '' : "*"}
+                                        {user.user_role == 2 ? 'Work' : 'Mailing'} Address{user.user_role == 2 ? '' : "*"}
                                     </Text>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <CheckBox
@@ -935,7 +935,7 @@ const Profile = (props) => {
                                         listView: { paddingVertical: 5 },
                                         separator: {}
                                     }}
-                                    placeholder={`${user.user_role == 1 ? 'Work' : 'Mailing'} Address${user.user_role == 1 ? '' : "*"}`}
+                                    placeholder={`${user.user_role == 2 ? 'Work' : 'Mailing'} Address${user.user_role == 2 ? '' : "*"}`}
                                     fetchDetails={true}
                                     onPress={(data, details) => {
                                         setWorkAddressData({
