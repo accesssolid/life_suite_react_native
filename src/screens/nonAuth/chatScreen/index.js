@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, TextInput, StatusBar, Alert, Image, TouchableOpacity, FlatList } from 'react-native'
+import { View, StyleSheet, Text, TextInput, StatusBar, Modal, Image, TouchableOpacity, FlatList, Platform } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -28,22 +28,142 @@ import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import uuid from 'react-native-uuid';
 import FastImage from 'react-native-fast-image'
+import DocumentPicker from 'react-native-document-picker'
+import RNFetchBlob from 'rn-fetch-blob';
+import FileViewer from 'react-native-file-viewer';
+import Loader from '../../../components/loader';
 
 const ChatScreen = (props) => {
-
     const data = props.route.params.item
     const user = useSelector(state => state.authenticate.user)
     const [messages, setMessages] = useState("");
     const flatlistRef = useRef();
-
+    const [visible, setVisible] = useState(false)
     const [arr, setArr] = useState([])
     const [read, setRead] = useState(0)
+    const [loader, setLoader] = useState(false)
 
     const getRoomName = () => {
         let temp = [user.id.toString(), data.id.toString()].sort()
         let roomname = temp.join('_');
         return roomname
     }
+    
+    const getPermissons = async () => {
+        let x = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
+    }
+
+    useEffect(() => {
+        if (Platform.OS == "android") {
+            getPermissons()
+        }
+    }, [])
+
+    const pickImage = () => {
+        ImagePicker.openPicker({
+            width: 300,
+            height: 300,
+            cropping: true
+        }).then(image => {
+            uploadImage(image)
+            setVisible(!visible)
+        }).catch(err => {
+        })
+    }
+
+    const CaptureImage = () => {
+        ImagePicker.openCamera({
+            width: 300,
+            height: 300,
+            cropping: true
+        }).then(image => {
+            uploadImage(image)
+            setVisible(!visible)
+        }).catch(err => {
+        })
+    }
+
+    const PickDocument = async () => {
+        // Opening Document Picker to select one file
+        try {
+            const fileDetails = await DocumentPicker.pick({
+                // Provide which type of file you want user to pick
+                type: [DocumentPicker.types.allFiles],
+                copyTo: "documentDirectory"
+            });
+            // Setting the state for selected File
+            uploadFile(...fileDetails)
+            setVisible(false)
+
+        } catch (error) {
+            // If user canceled the document selection
+            alert(
+                DocumentPicker.isCancel(error)
+                    ? "Canceled"
+                    : "Unknown Error: " + JSON.stringify(error)
+            );
+        }
+    };
+
+
+    const uploadFile = async (filePath) => {
+        setLoader(true)
+        if (Platform.OS == "android") {
+            const stat = await RNFetchBlob.fs.stat(filePath.fileCopyUri)
+            const task = storage()
+                .ref(
+                    `/myfiles/${stat.filename}`
+                )
+                .putFile(stat.path);
+            try {
+                await task;
+            } catch (e) {
+                console.error(e);
+                setLoader(false)
+            }
+        }
+        else {
+            const task = storage()
+                .ref(
+                    `/myfiles/${filePath.name}`
+                )
+                .putFile(filePath.uri.replace("file://", ""));
+            try {
+                await task;
+            } catch (e) {
+                console.error(e);
+                setLoader(false)
+            }
+        }
+        const url = await storage()
+            .ref(
+                `/myfiles/${filePath.name}`
+            )
+            .getDownloadURL();
+        setLoader(false)
+        handleMessage(url, 'document')
+    }
+
+    const uploadImage = async (data) => {
+        setLoader(true)
+        const filename = data.path.split('/').pop();
+        const uploadUri = Platform.OS === 'ios' ? data.path.replace('file://', '') : data.path;
+        const task = storage()
+            .ref(filename)
+            .putFile(uploadUri);
+        try {
+            await task;
+            setLoader(false)
+        } catch (e) {
+            console.error(e);
+            setLoader(false)
+        }
+        const url = await storage()
+            .ref(filename)
+            .getDownloadURL();
+        setLoader(false)
+        handleMessage(url, 'image')
+    };
 
     useEffect(() => {
         let arr1 = 0
@@ -72,7 +192,6 @@ const ChatScreen = (props) => {
                                 'readOffSet.user1.read': querySnapshot._data.readOffSet.user1.read
                             })
                             .then(() => {
-
                             });
                     }
                 }
@@ -83,6 +202,75 @@ const ChatScreen = (props) => {
         return () => messagesListener();
     }, []);
 
+    const renderAddmodal = props => {
+        return (
+            <Modal
+                visible={visible}
+                transparent={true}
+                style={{ flex: 1 }}
+            >
+                <View style={{ flex: 1, width: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={{ height: 250, width: '90%', backgroundColor: "ghostwhite", borderColor: "#ACF0F2", borderWidth: 2, borderRadius: 10, justifyContent: 'space-evenly' }} >
+                        <Text style={{ textAlign: 'center', fontFamily: LS_FONTS.PoppinsMedium, padding: 10, fontSize: 18 }} >Upload Attachements</Text>
+                        <TouchableOpacity onPress={() => {
+                            pickImage()
+
+                        }} style={{ flexDirection: 'row', paddingHorizontal: 20, alignItems: "center" }} >
+                            <Image source={require('../../../assets/cameraChat.png')} style={{ height: 25, width: 25, resizeMode: 'contain', alignItems: 'center', }} />
+                            <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Gallery</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                CaptureImage()
+
+                            }}
+                            style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }} >
+                            <Image source={require('../../../assets/gallery.png')} style={{ height: 25, width: 25, resizeMode: 'contain', alignItems: 'center', }} />
+                            <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Camera</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                PickDocument()
+
+                            }}
+                            style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }} >
+                            <Image source={require('../../../assets/documents.png')} style={{ height: 25, width: 25, resizeMode: 'contain', alignItems: 'center', }} />
+                            <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Document</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        )
+    }
+
+    const showFile = (fileUrl) => {
+        const ext = fileUrl.split(/[#?]/)[0].split('.').pop().trim();
+        return new Promise((resolve, reject) => {
+            RNFetchBlob.config({
+                fileCache: true,
+                appendExt: ext,
+            })
+                .fetch('GET', fileUrl)
+                .then(res => {
+                    const downloadFile =
+                        Platform.OS === 'android'
+                            ? 'file://' + res.path()
+                            : '' + res.path();
+                    setTimeout(() => {
+                        FileViewer.open(downloadFile, {
+                            showOpenWithDialog: true,
+                            onDismiss: () => RNFetchBlob.fs.unlink(res.path()),
+                        });
+                    }, 350);
+                    resolve(true);
+                })
+                .catch(err => {
+                    setLoading(false);
+                    showToast('Unable to open it!');
+                    reject(err);
+                });
+        });
+    };
 
     async function handleMessage(text, type) {
         const text1 = text
@@ -97,17 +285,13 @@ const ChatScreen = (props) => {
             user1 = data
             user2 = user
         }
-
-
         let newMessage = {
             message: text1,
             sender: user,
             time: new Date().getTime(),
             type: type,
             show: false
-
         }
-
         if (text1.trim() !== '') {
             firestore()
                 .collection(`Chats`)
@@ -139,10 +323,17 @@ const ChatScreen = (props) => {
         setMessages('')
     }
 
+
+
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
             <SafeAreaView style={{ flex: 1, backgroundColor: "#ACF0F2" }} edges={["top"]}>
+
+                {/* <RenderAddmodal
+                visible = {visible}
+                /> */}
+                {renderAddmodal()}
                 <Header
                     title={data.first_name}
                     imageUrl={require("../../../assets/back.png")}
@@ -150,7 +341,8 @@ const ChatScreen = (props) => {
                         props.navigation.goBack()
                     }}
                 />
-                <View style={{ flex: 1,backgroundColor:"white" }}>
+                <View style={{ flex: 1, backgroundColor: "white" }}>
+                   
                     <FlatList
                         contentContainerStyle={{ justifyContent: 'flex-end' }}
                         showsVerticalScrollIndicator={false}
@@ -167,7 +359,7 @@ const ChatScreen = (props) => {
                                                 style={{
                                                     flexDirection: 'row',
                                                     justifyContent: 'flex-end',
-                                                    marginTop: '10%',
+                                                    marginTop: '5%',
                                                     width: '90%',
                                                     alignSelf: 'center'
                                                 }}>
@@ -175,7 +367,7 @@ const ChatScreen = (props) => {
                                                     style={{
                                                         maxHeight: 75,
                                                         maxWidth: '70%',
-                                                        backgroundColor:"#F5FEFF",
+                                                        backgroundColor: "#F5FEFF",
                                                         right: '5%',
                                                         padding: 20,
                                                         borderRadius: 9,
@@ -225,7 +417,7 @@ const ChatScreen = (props) => {
                                                 style={{
                                                     flexDirection: 'row',
                                                     justifyContent: 'flex-start',
-                                                    marginTop: '10%',
+                                                    marginTop: '5%',
                                                     width: '90%',
                                                     alignSelf: 'center'
                                                 }}>
@@ -268,7 +460,7 @@ const ChatScreen = (props) => {
                                                         fontSize: 11,
                                                         lineHeight: 13,
                                                         color: '#63697B',
-                                                        fontFamily:LS_FONTS.PoppinsRegular,
+                                                        fontFamily: LS_FONTS.PoppinsRegular,
                                                     }}>
                                                     {moment(itemData.item.time).format('hh:mm A')}
                                                 </Text>
@@ -277,10 +469,103 @@ const ChatScreen = (props) => {
                                     )
                                 }
                             }
+                            else if (itemData.item.type == 'document') {
+                                if (user.id === itemData.item.sender.id) {
+                                    return (
+                                        <View>
+                                            <TouchableOpacity onPress={() => {
+                                                showFile(itemData.item.message)
+                                            }}
+                                                style={{ marginTop: '3%', borderColor: "#ACF0F2", alignItems: 'center', borderWidth: 1, padding: 10, justifyContent: "space-between", flexDirection: 'row', width: '50%', alignSelf: 'flex-end', marginRight: '5%', borderRadius: 5, overflow: 'hidden' }}>
+                                                <Image
+                                                    style={styles.file}
+                                                    source={require('../../../assets/document.png')}
+                                                />
+                                                <Text
+                                                    numberOfLines={1}
+                                                    style={{
+                                                        width: '90%',
+                                                        fontFamily: LS_FONTS.PoppinsRegular,
+                                                        fontSize: 10,
+                                                        marginLeft: 5
+                                                    }}>
+                                                    {itemData.item.message}
+                                                </Text>
+                                            </TouchableOpacity>
+                                            <View
+                                                style={{
+                                                    flexDirection: 'row',
+                                                    alignSelf: 'flex-end',
+                                                    marginTop: '3%',
+                                                    marginRight: '5%'
+                                                }}>
+                                                <Text
+                                                    style={{
+                                                        marginRight: '5%',
+                                                        alignSelf: 'center',
+                                                        fontSize: 11,
+                                                        lineHeight: 13,
+                                                        color: '#63697B',
+                                                        fontFamily: LS_FONTS.PoppinsRegular,
+                                                    }}>
+                                                    {moment(itemData.item.time).format('hh:mm A')}
+                                                </Text>
+                                            </View>
+                                        </View>
+
+                                    )
+                                }
+                                else {
+                                    return (
+                                        <View>
+                                            <TouchableOpacity onPress={() => {
+                                                showFile(itemData.item.message)
+                                            }}
+                                                style={{ marginTop: '3%', borderColor: "#ACF0F2", alignItems: 'center', borderWidth: 1, padding: 10, justifyContent: "space-between", flexDirection: 'row', width: '50%', alignSelf: 'flex-start', marginLeft: '5%', borderRadius: 5, overflow: 'hidden' }}>
+                                                <Image
+                                                    style={styles.file}
+                                                    source={require('../../../assets/document.png')}
+                                                />
+                                                <Text
+                                                    numberOfLines={1}
+                                                    style={{
+                                                        width: '90%',
+                                                        fontFamily: LS_FONTS.PoppinsRegular,
+                                                        fontSize: 10,
+                                                        marginLeft: 5
+                                                    }}>
+                                                    {itemData.item.message}
+                                                </Text>
+                                            </TouchableOpacity>
+                                            <View
+                                                style={{
+                                                    flexDirection: 'row',
+                                                    alignSelf: 'flex-start',
+                                                    marginTop: '3%',
+                                                    marginLeft: '5%'
+                                                }}>
+                                                <Text
+                                                    style={{
+                                                        left: 5,
+                                                        alignSelf: 'center',
+                                                        fontSize: 11,
+                                                        lineHeight: 13,
+                                                        color: '#63697B',
+                                                        fontFamily: LS_FONTS.PoppinsRegular,
+                                                    }}>
+                                                    {moment(itemData.item.time).format('hh:mm A')}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    )
+                                }
+
+                            }
+
                             else {
                                 if (user.id === itemData.item.sender.id) {
                                     return (
-                                        <>
+                                        <View>
                                             <View style={{ marginTop: '3%', alignSelf: 'flex-end', marginRight: '5%', borderRadius: 20, overflow: 'hidden' }}>
                                                 <FastImage
                                                     source={{ uri: itemData.item.message, priority: FastImage.priority.high, }}
@@ -290,7 +575,6 @@ const ChatScreen = (props) => {
                                                         alignSelf: 'flex-end',
                                                     }}
                                                 />
-
                                             </View>
                                             <View
                                                 style={{
@@ -301,26 +585,17 @@ const ChatScreen = (props) => {
                                                 }}>
                                                 <Text
                                                     style={{
-                                                        right: 5,
+                                                        marginRight: '5%',
                                                         alignSelf: 'center',
                                                         fontSize: 11,
                                                         lineHeight: 13,
                                                         color: '#63697B',
-                                                        fontFamily:LS_FONTS.PoppinsRegular,
+                                                        fontFamily: LS_FONTS.PoppinsRegular,
                                                     }}>
                                                     {moment(itemData.item.time).format('hh:mm A')}
                                                 </Text>
-                                                <Image
-                                                    source={{ uri: "http://122.160.70.200/projects/php/kalea_archer/public" + itemData.item.sender.profile_url }}
-                                                    style={{
-                                                        width: 20,
-                                                        height: 20,
-                                                        alignSelf: 'center',
-                                                        borderRadius: 10
-                                                    }}
-                                                />
                                             </View>
-                                        </>
+                                        </View>
 
                                     )
                                 }
@@ -343,17 +618,6 @@ const ChatScreen = (props) => {
                                                     marginTop: '3%',
                                                     marginRight: '5%'
                                                 }}>
-
-                                                <Image
-                                                    source={{ uri: BASE_URL+ itemData.item.sender.profile_url }}
-                                                    style={{
-                                                        width: 20,
-                                                        height: 20,
-                                                        alignSelf: 'center',
-                                                        borderRadius: 10,
-                                                        backgroundColor: 'red'
-                                                    }}
-                                                />
                                                 <Text
                                                     style={{
                                                         left: 5,
@@ -375,6 +639,9 @@ const ChatScreen = (props) => {
                     />
                     <View style={{ height: 40 }}></View>
                     <View style={styles.sendingContainer}>
+                        <TouchableOpacity onPress={() => setVisible(true)}>
+                            <Image style={{ height: 30, width: 30 }} source={require('../../../assets/addChat.png')} />
+                        </TouchableOpacity>
                         <TextInput
                             style={styles.inputStyle}
                             placeholder="Type your message"
@@ -399,7 +666,7 @@ const ChatScreen = (props) => {
                             <Image style={styles.send} source={require("../../../assets/send.png")} />
                         </TouchableOpacity>
                     </View>
-
+{loader && <Loader/>}
                 </View>
             </SafeAreaView>
         </>
@@ -422,7 +689,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         bottom: 15,
-        width: "95%",
+        width: "85%",
         alignSelf: "center"
     },
     systemMessageText: {
@@ -468,7 +735,12 @@ const styles = StyleSheet.create({
     add: {
         right: 10,
         bottom: 3
-    }
+    },
+    file: {
+        height: 20,
+        width: 20,
+        resizeMode: 'contain',
+    },
 })
 
 

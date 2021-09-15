@@ -32,21 +32,13 @@ const ChatUsers = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const [allChats, setAllChats] = useState([])
     const [data, setData] = useState([...allChats])
-
-    const filterthings = (search) => {
-        if (search !== '') {
-            const data = allChats.filter((data) =>
-                data.name.toLowerCase().includes(search.toLowerCase())
-            )
-            setData([...data])
-        } else {
-            setData([...allChats])
-        }
-    }
+    const [array, setArray] = useState([])
 
     useFocusEffect(useCallback(() => {
         get_user()
     }, []))
+
+
 
     async function get_user() {
         firestore()
@@ -81,10 +73,7 @@ const ChatUsers = (props) => {
         return () => unsubscribe();
     }
 
-
-
     const renderData = (itemData) => {
-        console.log(itemData.item._data.participants.user1.id == user.id)
         let otherUser = null
         let readcount = null
         let read11 = true
@@ -101,7 +90,6 @@ const ChatUsers = (props) => {
                 read11 = false
             }
         }
-        console.log(otherUser)
         return (
             <TouchableOpacity
                 style={{
@@ -116,11 +104,11 @@ const ChatUsers = (props) => {
                     width: "90%"
                 }}
                 activeOpacity={0.7}
-                onPress={() => { props.navigation.navigate("ChatScreen",{item: otherUser })}}
+                onPress={() => { props.navigation.navigate("ChatScreen", { item: otherUser }) }}
             >
                 <View style={{ flexDirection: 'row' }}>
                     <Image
-                        source={otherUser.profile_image !== "null" ? { uri: BASE_URL + otherUser.profile_image } : require("../../../assets/user.png")}
+                        source={otherUser.profile_image !== null ? { uri: BASE_URL + otherUser.profile_image } : require("../../../assets/user.png")}
                         style={{
                             width: 50,
                             height: 50,
@@ -133,7 +121,15 @@ const ChatUsers = (props) => {
                         <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>{itemData.item._data.lastMessage}</Text>
                     </View>
                     <View style={{ width: "20%", justifyContent: "flex-start", alignItems: "flex-end" }}>
+                        {readcount ?
+                            <View style={{ height: 25, width: 25, borderRadius: 30, justifyContent: 'center', alignItems: 'center', backgroundColor: LS_COLORS.global.green, alignSelf: "flex-end" }}>
+                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: 'white', alignSelf: 'center' }}>{readcount}</Text>
+                            </View>
+                            :
+                            null
+                        }
                         <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular }}>{moment(itemData.item._data.lastMessageTime).format('hh:mm A')}</Text>
+
                     </View>
                 </View>
             </TouchableOpacity>
@@ -172,7 +168,6 @@ const ChatUsers = (props) => {
                                 width: '90%',
                             }}
                             onChangeText={(text) => {
-                                filterthings(text)
                                 setSearch(text)
                             }}
                             placeholder="Search"
@@ -185,16 +180,24 @@ const ChatUsers = (props) => {
                             />
                         </View>
                     </View>
-                    {
-                        allChats?.length === 0 ?
-                            <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: "center", marginTop: 10 }}>
-                                <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No Chats Found</Text>
-                            </View>
-                            : <FlatList
-                                data={allChats}
-                                renderData={renderData}
-                                renderItem={(itemData) => renderData(itemData)}
-                            />
+                    {allChats?.length === 0 ?
+                        <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: "center", marginTop: 10 }}>
+                            <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No Chats Found</Text>
+                        </View>
+                        : <FlatList
+                            data={allChats
+                                .filter(data =>
+                                    data._data.participants.user1.first_name
+                                        .toLocaleLowerCase()
+                                        .includes(search.toLocaleLowerCase()) ||
+                                    data._data.participants.user2.first_name
+                                        .toLocaleLowerCase()
+                                        .includes(search.toLocaleLowerCase())
+                                )
+                            }
+                            renderData={renderData}
+                            renderItem={(itemData) => renderData(itemData)}
+                        />
                     }
                 </View>
             </SafeAreaView>
