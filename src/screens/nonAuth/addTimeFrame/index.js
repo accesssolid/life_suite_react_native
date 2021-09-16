@@ -96,9 +96,7 @@ const AddTimeFrame = (props) => {
             'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
         }
-
         let data = []
-
         customDatesStyles.map((item) => {
             if (item.from_time.trim() !== '' && item.to_time.trim() !== '') {
                 data.push({
@@ -108,7 +106,6 @@ const AddTimeFrame = (props) => {
                 })
             }
         })
-
         if (data.length == 0) {
             setLoading(false)
             return showToast("Invalid time frames data")

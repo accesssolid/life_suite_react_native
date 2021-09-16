@@ -19,12 +19,14 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 import Loader from "../../../components/loader"
 import { getApi } from "../../../api/api"
 import { loginReducer, setAuthToken, setUserRole } from '../../../redux/features/loginReducer';
+import messaging from '@react-native-firebase/messaging';
 
 /* Icons */
 import Entypo from 'react-native-vector-icons/Entypo'
 import { CommonActions } from '@react-navigation/native';
 
 const LoginScreen = (props) => {
+    const[fcmToken,setFcmToken] = useState("")
     const dispatch = useDispatch()
     const passRef = useRef(null)
     const role = useSelector(state => state.authenticate.user_role)
@@ -36,7 +38,21 @@ const LoginScreen = (props) => {
     const switchRole = () => {
         dispatch(setUserRole({ data: role == 1 ? 2 : 1 }))
     }
+    
+    useEffect(() => {
+        GetToken()
+     },[])
 
+    const GetToken = async() => {
+        const authorizationStatus = await messaging().requestPermission();
+        if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+            const token = await messaging().getToken()
+            console.log('TOKEN==>>>>',token)
+            setFcmToken(token)
+          } 
+    }
+
+console.log(fcmToken)
     function on_press_login() {
         setLoader(true)
         if (email.length == 0 || password.length == 0) {
@@ -51,7 +67,7 @@ const LoginScreen = (props) => {
         let user_data = {
             "email": email.toLowerCase(),
             "password": password,
-            "fcm_token": "fcm123",
+            "fcm_token": fcmToken,
             device_id: getUniqueId(),
             login_type: "biometric",
         }
@@ -64,6 +80,7 @@ const LoginScreen = (props) => {
 
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     setLoader(false)
                     showToast(response.message, 'success')

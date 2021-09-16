@@ -238,10 +238,10 @@ const MechanicLocation = (props) => {
                             />
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
-                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}
+                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1,  justifyContent: 'center' }}
                                 activeOpacity={0.7}>
                                 <Image
-                                    style={{ height: 15, width: 20, resizeMode: "contain", alignSelf: 'center' }}
+                                    style={{ height: 15, width: 20, resizeMode: "contain" }}
                                     source={require("../../../assets/location.png")}
                                 />
                             </TouchableOpacity>
@@ -260,10 +260,10 @@ const MechanicLocation = (props) => {
                             />
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
-                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}
+                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1,  justifyContent: 'center' }}
                                 activeOpacity={0.7}>
                                 <Image
-                                    style={{ height: 15, width: 20, resizeMode: "contain", alignSelf: 'center' }}
+                                    style={{ height: 15, width: 20, resizeMode: "contain",  }}
                                     source={require("../../../assets/location.png")}
                                 />
                             </TouchableOpacity>
@@ -282,10 +282,10 @@ const MechanicLocation = (props) => {
                                 onPress={() => {
                                     props.navigation.navigate("Calendar", { setDate: setDate.bind(this) })
                                 }}
-                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center' }}
+                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1,  justifyContent: 'center' }}
                                 activeOpacity={0.7}>
                                 <Image
-                                    style={{ height: 15, width: 20, resizeMode: "contain", alignSelf: 'center' }}
+                                    style={{ height: 15, width: 20, resizeMode: "contain"}}
                                     source={require("../../../assets/datePicker.png")}
                                 />
                             </TouchableOpacity>

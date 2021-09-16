@@ -117,14 +117,12 @@ const HomeScreen = (props) => {
         console.log(a)
         var formdata = new FormData();
         formdata.append("services_json", JSON.stringify(a));
-
         let config = {
             headers: headers,
             data: formdata,
             endPoint: '/api/customerServicesListingAdd',
             type: 'post'
         }
-        
         getApi(config)
             .then((response) => {
                 console.log(response)
@@ -169,9 +167,10 @@ const HomeScreen = (props) => {
                 setLoading(false)
             })
     }
+    
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
-            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+            props.navigation.navigate("ServicesProvided", {subService:item,items:[...item.itemsData]})
     }
 
     const getLocationPermission = async () => {

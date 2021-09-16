@@ -1,10 +1,13 @@
-import React from 'react';
-import { StatusBar } from 'react-native'
+import React,{useEffect} from 'react';
+import { Platform, StatusBar,LogBox } from 'react-native'
 
 /* Packages */
 import { Provider as StoreProvider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Root } from 'native-base';
+import PushNotificationIOS from "@react-native-community/push-notification-ios";
+import PushNotification from "react-native-push-notification";
+import messaging from '@react-native-firebase/messaging';
 
 /* Constants */
 import LS_COLORS from './src/constants/colors';
@@ -16,6 +19,43 @@ import store from './src/redux/store';
 import Router from './src/router';
 
 const App = () => {
+  LogBox.ignoreAllLogs();
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      if (Platform.OS == 'android') {
+        PushNotification.createChannel(
+          {
+            channelId: "channel-id", // (required)
+            channelName: "My channel", // (required)
+
+          },
+          (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+        );
+        PushNotification.localNotification({
+
+          channelId: "channel-id", // (required) channelId, if the channel doesn't exist, notification will not trigger.
+          title: remoteMessage.notification.title, // (optional)
+          message: remoteMessage.notification.body, // (required)
+
+        });
+      }
+
+    })
+
+    messaging().onMessage(async remoteMessage => {
+      if (Platform.OS == 'ios') {
+        PushNotificationIOS.addNotificationRequest({
+          id: 'test',
+          title: remoteMessage.notification.title,
+
+          body: remoteMessage.notification.body,
+
+        });
+      }
+
+    })
+  }, []);
+
   return (
     <Root>
       <StoreProvider store={store}>
