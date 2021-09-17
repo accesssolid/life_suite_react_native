@@ -32,8 +32,7 @@
         android:authorities="${applicationId}.provider"
         android:exported="false"
         android:grantUriPermissions="true">
-      
-      </provider>
+       </provider>   
       <meta-data
         android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyDY5JgaWK8EK2TC6Zm6460Qwo0G4NbWM-I"/>
