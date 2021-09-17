@@ -124,18 +124,15 @@ const Mechanics = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let user_data = {
             "provider_id": id,
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
             endPoint: user.user_role == 2 ? '/api/favouriteProviderAdd' : '/api/favouriteProviderAdd',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -163,7 +160,7 @@ const Mechanics = (props) => {
                         setOpen1(!open1);
                     }}
                 />
-                <FilterModal
+                {/* <FilterModal
                     title="Filter By Price"
                     save="Apply"
                     cancel="Cancel"
@@ -173,8 +170,7 @@ const Mechanics = (props) => {
                     visible={open1}
                     action={() => {
                         setOpen3(!open3);
-                    }}
-
+                    }
                 />
                 <FilterModal
                     title="Filter By Time"
@@ -187,7 +183,6 @@ const Mechanics = (props) => {
                     action={() => {
                         setOpen4(!open4);
                     }}
-
                 />
                 <FilterModal
                     title="Filter By Rating"
@@ -200,7 +195,6 @@ const Mechanics = (props) => {
                     action={() => {
                         setOpen5(!open5);
                     }}
-
                 />
                 <FilterType
                     title="Filter"
@@ -221,7 +215,7 @@ const Mechanics = (props) => {
                     action3={() => {
                         setOpen3(!open3)
                     }}
-                />
+                /> */}
                 <ImageBackground
                     resizeMode="cover"
                     source={{ uri: BASE_URL + subService.image }}
@@ -295,8 +289,7 @@ const Mechanics = (props) => {
                                                 </View>
                                             </View>
                                             <TouchableOpacity onPress={() => { like(item.id) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center', position: "absolute", right: 5 }}>
-                                                {
-                                                    item.is_favourite === 1
+                                                { item.is_favourite === 1
                                                         ?
                                                         <Image
                                                             style={{ height: 18, width: 21 }}

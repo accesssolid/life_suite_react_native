@@ -88,7 +88,7 @@ const ChatScreen = (props) => {
         try {
             const fileDetails = await DocumentPicker.pick({
                 // Provide which type of file you want user to pick
-                type: [DocumentPicker.types.allFiles],
+                type: [DocumentPicker.types.pdf,DocumentPicker.types.doc],
                 copyTo: "documentDirectory"
             });
             // Setting the state for selected File

@@ -20,11 +20,12 @@ import CustomInput from "../../../components/textInput"
 import DropDown from '../../../components/dropDown';
 import { showToast, storeItem } from '../../../components/validators';
 import { BASE_URL, getApi } from '../../../api/api';
-import { loadauthentication } from '../../../redux/features/loginReducer';
+import { loadauthentication, logout } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
 import SearchableDropDown from '../../../components/searchableDropDown';
 import { Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
 
 const getMessage = (name) => {
     switch (name) {
@@ -176,6 +177,37 @@ const Profile = (props) => {
     const [dropCityDataMasterWork, setDropCityMasterWork] = useState([])
     const [isSameAddress, setIsSameAddress] = useState(false)
     const [profilePic, setProfilePic] = useState(require("../../../assets/user.png"))
+
+    function logout() {
+        setLoader(true)
+        let headers = {
+            Accept: "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        var formdata = new FormData();
+        formdata.append("device_id", getUniqueId());
+
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: user.user_role == 2 ? '/api/customerLogout' : '/api/providerLogout',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                console.log("response",response)
+                if (response.status == true) {
+                    storeItem('user', null),
+                    props.navigation.navigate('WelcomeScreen')
+                }
+                else {
+                    setLoader(false)
+                    showToast(response.message, 'danger')
+                }
+            })
+            .catch(err => {
+            })
+    }
 
     useEffect(() => {
         setUserData({ ...user })
@@ -1292,7 +1324,7 @@ const Profile = (props) => {
                 <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('Settings')} style={{ height: 30, aspectRatio: 1 }}>
                     <Image source={require('../../../assets/gear.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => { storeItem('user', null), props.navigation.navigate('HomeScreen'), props.navigation.navigate('WelcomeScreen') }} style={{ height: 30, aspectRatio: 1 }}>
+                <TouchableOpacity activeOpacity={0.7} onPress={() =>  logout() } style={{ height: 30, aspectRatio: 1 }}>
                     <Image source={require('../../../assets/logout.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
                 </TouchableOpacity>
             </View>

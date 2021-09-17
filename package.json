@@ -51,7 +51,7 @@
     "react-native-image-crop-picker": "^0.36.2",
     "react-native-maps": "^0.28.0",
     "react-native-modal": "^13.0.0",
-    "react-native-modal-datetime-picker": "^10.2.0",
+    "react-native-modal-datetime-picker": "^9.2.0",
     "react-native-modal-dropdown": "^1.0.1",
     "react-native-month-year-picker": "^1.8.0",
     "react-native-paper": "^4.9.1",

@@ -16,7 +16,6 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Header from '../../../components/header';
 import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
-import { Row } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
 import { BASE_URL } from '../../../api/api';
 import { Dimensions } from 'react-native';
@@ -46,6 +45,7 @@ const MechanicLocation = (props) => {
         latitude: 37.78825,
         longitude: -122.4324,
     })
+
     const [toCoordinates, setToCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -123,7 +123,6 @@ const MechanicLocation = (props) => {
         }
     }
 
-
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
@@ -172,7 +171,6 @@ const MechanicLocation = (props) => {
         setEndTime(date)
         setDatePickerVisibility1(false);
     };
-
 
     const onLocation = (location, coords) => {
         setFromAddress(location)
@@ -255,15 +253,15 @@ const MechanicLocation = (props) => {
                                 onChangeText={setToAddress}
                                 placeholder="To Address"
                                 placeholderTextColor={LS_COLORS.global.placeholder}
-                                onChangeText={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
+                                onChangeText={() => props.navigation.navigate('MapScreen', {onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                                 ref={toInputRef}
                             />
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
-                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1,  justifyContent: 'center' }}
+                                style={{ alignSelf: "center", height: '100%',aspectRatio:1,justifyContent: 'center' }}
                                 activeOpacity={0.7}>
                                 <Image
-                                    style={{ height: 15, width: 20, resizeMode: "contain",  }}
+                                    style={{ height: 15, width: 20, resizeMode: "contain"}}
                                     source={require("../../../assets/location.png")}
                                 />
                             </TouchableOpacity>
@@ -283,7 +281,8 @@ const MechanicLocation = (props) => {
                                     props.navigation.navigate("Calendar", { setDate: setDate.bind(this) })
                                 }}
                                 style={{ alignSelf: "center", height: '100%', aspectRatio: 1,  justifyContent: 'center' }}
-                                activeOpacity={0.7}>
+                                activeOpacity={0.7}
+                                >
                                 <Image
                                     style={{ height: 15, width: 20, resizeMode: "contain"}}
                                     source={require("../../../assets/datePicker.png")}
@@ -297,7 +296,6 @@ const MechanicLocation = (props) => {
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility(true)} >
                                 <Text>{moment(startTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
-
                         </View>
                         <View style={{ flex: 1, alignItems: 'center' }} >
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>

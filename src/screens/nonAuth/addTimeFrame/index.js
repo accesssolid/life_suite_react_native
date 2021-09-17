@@ -40,6 +40,7 @@ const AddTimeFrame = (props) => {
     const [activeIndex, setActiveIndex] = useState(null)
     const [initialDate, setInitialDate] = useState(new Date())
     const [markedDates, setMarkedDates] = useState({})
+    console.log(markedDates)
 
     useEffect(() => {
         if (!isAddServiceMode)
@@ -54,25 +55,25 @@ const AddTimeFrame = (props) => {
     const onDateChange = (date) => {
         let marked = { ...markedDates }
         marked[date.dateString] = { selected: true, selectedColor: 'blue' }
-        setMarkedDates({ ...marked })
+        setMarkedDates({...marked})
         return
-        let dates = [...selectedDates]
-        let styles = [...customDatesStyles];
-        if (!dates.includes(moment(date).format("DD/MM/YYYY"))) {
-            dates.push(moment(date).format("DD/MM/YYYY"))
-            styles.push({
-                id: '',
-                date: moment(date).format("YYYY-MM-DD"),
-                style: { backgroundColor: LS_COLORS.global.green },
-                textStyle: { color: LS_COLORS.global.white },
-                containerStyle: [],
-                allowDisabled: true,
-                from_time: "",
-                to_time: ""
-            });
-        }
-        setSelectedDates([...dates])
-        setCustomDatesStyles([...styles])
+        // let dates = [...selectedDates]
+        // let styles = [...customDatesStyles];
+        // if (!dates.includes(moment(date).format("DD/MM/YYYY"))) {
+        //     dates.push(moment(date).format("DD/MM/YYYY"))
+        //     styles.push({
+        //         id: '',
+        //         date: moment(date).format("YYYY-MM-DD"),
+        //         style: { backgroundColor: LS_COLORS.global.green },
+        //         textStyle: { color: LS_COLORS.global.white },
+        //         containerStyle: [],
+        //         allowDisabled: true,
+        //         from_time: "",
+        //         to_time: ""
+        //     });
+        // }
+        // setSelectedDates([...dates])
+        // setCustomDatesStyles([...styles])
     }
 
     const removeTimeFrame = (frame) => {
@@ -100,24 +101,23 @@ const AddTimeFrame = (props) => {
         customDatesStyles.map((item) => {
             if (item.from_time.trim() !== '' && item.to_time.trim() !== '') {
                 data.push({
-                    "date": moment(item.date).format("YYYY-MM-DD"),
+                    "start_date": moment(item.date).format("YYYY-MM-DD"),
+                    "end_date": moment(item.date).format("YYYY-MM-DD"),
                     "from_time": item.from_time,
                     "to_time": item.to_time
                 })
             }
         })
+
         if (data.length == 0) {
             setLoading(false)
             return showToast("Invalid time frames data")
         }
 
         let { json_data, formdata } = serviceData
-
         json_data = JSON.parse(json_data)
         json_data['time_frame'] = data
-
         formdata.append("json_data", JSON.stringify(json_data));
-
         let config = {
             headers: headers,
             data: formdata,
@@ -150,25 +150,21 @@ const AddTimeFrame = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let user_data = {
             "user_id": user.id
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
             endPoint: '/api/timeFramesList',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     setLoading(false)
                     let styles = [];
                     let dates = [];
-
                     Object.keys(response.data).forEach((ele) => {
                         response.data[ele].forEach(element => {
                             dates.push(moment(element.date).format("DD/MM/YYYY"))
@@ -184,7 +180,6 @@ const AddTimeFrame = (props) => {
                             });
                         });
                     })
-
                     setSelectedDates([...dates])
                     setCustomDatesStyles([...styles])
                 }
@@ -204,18 +199,15 @@ const AddTimeFrame = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let user_data = {
             "user_id": user.id
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
             endPoint: '/api/providerAddedServicesList',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -249,7 +241,6 @@ const AddTimeFrame = (props) => {
         } else {
             styles[activeIndex].to_time = moment(date).format('hh:mm')
         }
-
         setCustomDatesStyles([...styles])
     };
 
@@ -271,18 +262,15 @@ const AddTimeFrame = (props) => {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${access_token}`
                         }
-
                         let data = {
                             "time_frame_id": frame.id
                         }
-
                         let config = {
                             headers: headers,
                             data: JSON.stringify({ ...data }),
                             endPoint: '/api/timeFramesDelete',
                             type: 'post'
                         }
-
                         getApi(config)
                             .then((response) => {
                                 if (response.status == true) {
@@ -294,7 +282,7 @@ const AddTimeFrame = (props) => {
                                     setCustomDatesStyles([...styles])
                                     calendarRef.current.resetSelections()
                                 } else {
-                                    showToast(response.message, 'success')
+                                    showToast(response.message,'success')
                                 }
                             }).catch(err => {
                             }).finally(() => {
@@ -347,23 +335,22 @@ const AddTimeFrame = (props) => {
                         hideArrows={false}
                         // renderArrow={(direction) => (<Arrow />)}
                         // Do not show days of other months in month page. Default = false
-                        hideExtraDays={true}
+                        hideExtraDays = {true}
                         disableMonthChange={false}
                         firstDay={1}
                         hideDayNames={false}
-                        showWeekNumbers={true}
+                        showWeekNumbers={false}
                         onPressArrowLeft={subtractMonth => subtractMonth()}
                         onPressArrowRight={addMonth => addMonth()}
                         disableArrowLeft={false}
                         disableArrowRight={false}
                         disableAllTouchEventsForDisabledDays={true}
-                        renderHeader={(date) => {
-                            return (
-                                <Text style={{}}>{moment(date).format('DD-MM-YYYY')}</Text>
-                            )
-                        }}
+                        // renderHeader={(date) => {
+                        //     return (
+                        //         <Text style={{}}>{moment(date).format('DD-MM-YYYY')}</Text>
+                        //     )
+                        // }}
                         enableSwipeMonths={false}
-
                         markedDates={{ ...markedDates }}
                     />
                 </View>
