@@ -40,7 +40,6 @@ const AddTimeFrame = (props) => {
     const [activeIndex, setActiveIndex] = useState(null)
     const [initialDate, setInitialDate] = useState(new Date())
     const [markedDates, setMarkedDates] = useState({})
-    console.log(markedDates)
 
     useEffect(() => {
         if (!isAddServiceMode)
@@ -53,27 +52,27 @@ const AddTimeFrame = (props) => {
     // "to_time" : "23:00"
 
     const onDateChange = (date) => {
-        let marked = { ...markedDates }
-        marked[date.dateString] = { selected: true, selectedColor: 'blue' }
-        setMarkedDates({...marked})
-        return
-        // let dates = [...selectedDates]
-        // let styles = [...customDatesStyles];
-        // if (!dates.includes(moment(date).format("DD/MM/YYYY"))) {
-        //     dates.push(moment(date).format("DD/MM/YYYY"))
-        //     styles.push({
-        //         id: '',
-        //         date: moment(date).format("YYYY-MM-DD"),
-        //         style: { backgroundColor: LS_COLORS.global.green },
-        //         textStyle: { color: LS_COLORS.global.white },
-        //         containerStyle: [],
-        //         allowDisabled: true,
-        //         from_time: "",
-        //         to_time: ""
-        //     });
-        // }
-        // setSelectedDates([...dates])
-        // setCustomDatesStyles([...styles])
+        // let marked = { ...markedDates }
+        // marked[date.dateString] = { selected: true, selectedColor: 'blue' }
+        // setMarkedDates({ ...marked })
+        // return
+        let dates = [...selectedDates]
+        let styles = [...customDatesStyles];
+        if (!dates.includes(moment(date).format("DD/MM/YYYY"))) {
+            dates.push(moment(date).format("DD/MM/YYYY"))
+            styles.push({
+                id: '',
+                date: moment(date).format("YYYY-MM-DD"),
+                style: { backgroundColor: LS_COLORS.global.green },
+                textStyle: { color: LS_COLORS.global.white },
+                containerStyle: [],
+                allowDisabled: true,
+                from_time: "",
+                to_time: ""
+            });
+        }
+        setSelectedDates([...dates])
+        setCustomDatesStyles([...styles])
     }
 
     const removeTimeFrame = (frame) => {
@@ -230,7 +229,7 @@ const AddTimeFrame = (props) => {
         setDateType(type)
         setActiveIndex(index)
         setDatePickerVisibility(true)
-        setInitialDate(new Date(moment(`${customDatesStyles[index].date} ${type == "from" ? customDatesStyles[index].from_time : customDatesStyles[index].to_time}`)))
+        // setInitialDate(new Date(moment(`${customDatesStyles[index].date} ${type == "from" ? customDatesStyles[index].from_time : customDatesStyles[index].to_time}`)))
     }
 
     const handleConfirm = (date) => {
@@ -282,7 +281,7 @@ const AddTimeFrame = (props) => {
                                     setCustomDatesStyles([...styles])
                                     calendarRef.current.resetSelections()
                                 } else {
-                                    showToast(response.message,'success')
+                                    showToast(response.message, 'success')
                                 }
                             }).catch(err => {
                             }).finally(() => {
@@ -329,13 +328,13 @@ const AddTimeFrame = (props) => {
                         // minDate={'2012-05-10'}
                         // maxDate={'2012-05-30'}
                         onDayPress={(day) => onDateChange(day)}
-                        // onDayLongPress={(day) => { console.log('selected day', day) }}
-                        // monthFormat={'yyyy MM'}                    
-                        // onMonthChange={(month) => { console.log('month changed', month) }}
+                        //onDayLongPress={(day) => { console.log('selected day', day) }}
+                        //monthFormat={'yyyy MM'}                    
+                        //onMonthChange={(month) => { console.log('month changed', month) }}
                         hideArrows={false}
                         // renderArrow={(direction) => (<Arrow />)}
                         // Do not show days of other months in month page. Default = false
-                        hideExtraDays = {true}
+                        hideExtraDays={true}
                         disableMonthChange={false}
                         firstDay={1}
                         hideDayNames={false}
@@ -349,7 +348,7 @@ const AddTimeFrame = (props) => {
                         //     return (
                         //         <Text style={{}}>{moment(date).format('DD-MM-YYYY')}</Text>
                         //     )
-                        // }}
+                        //}} 
                         enableSwipeMonths={false}
                         markedDates={{ ...markedDates }}
                     />
