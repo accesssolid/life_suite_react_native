@@ -370,7 +370,6 @@ const MechanicLocation = (props) => {
                             </View>
                         </SafeAreaView>
                     </View>
-
                 </ImageBackground>
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>

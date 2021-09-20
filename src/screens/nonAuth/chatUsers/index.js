@@ -205,8 +205,7 @@ const ChatUsers = (props) => {
     )
 }
 
-export default ChatUsers;
-
+export default ChatUsers
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
