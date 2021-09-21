@@ -48,7 +48,7 @@ const ChatScreen = (props) => {
         let roomname = temp.join('_');
         return roomname
     }
-    
+
     const getPermissons = async () => {
         let x = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
     }
@@ -88,7 +88,7 @@ const ChatScreen = (props) => {
         try {
             const fileDetails = await DocumentPicker.pick({
                 // Provide which type of file you want user to pick
-                type: [DocumentPicker.types.pdf,DocumentPicker.types.doc],
+                type: [DocumentPicker.types.pdf, DocumentPicker.types.doc],
                 copyTo: "documentDirectory"
             });
             // Setting the state for selected File
@@ -342,7 +342,7 @@ const ChatScreen = (props) => {
                     }}
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
-                   
+
                     <FlatList
                         contentContainerStyle={{ justifyContent: 'flex-end' }}
                         showsVerticalScrollIndicator={false}
@@ -666,7 +666,7 @@ const ChatScreen = (props) => {
                             <Image style={styles.send} source={require("../../../assets/send.png")} />
                         </TouchableOpacity>
                     </View>
-{loader && <Loader/>}
+                    {loader && <Loader />}
                 </View>
             </SafeAreaView>
         </>

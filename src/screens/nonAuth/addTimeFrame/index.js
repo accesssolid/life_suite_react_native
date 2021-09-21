@@ -39,7 +39,7 @@ const AddTimeFrame = (props) => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
     const [dateType, setDateType] = useState(null)
     const [activeIndex, setActiveIndex] = useState(null)
-    const [initialDate, setInitialDate] = useState(new Date())
+    const [initialDate, setInitialDate] = useState(moment(new Date()).unix())
     const [markedDates, setMarkedDates] = useState({})
 
     useEffect(() => {
@@ -53,50 +53,52 @@ const AddTimeFrame = (props) => {
     // "to_time" : "23:00"
 
     const onDateChange = (date) => {
-        let marked = markedDates 
+        let marked = markedDates
         if (marked[date.dateString]) {
             delete marked[date.dateString]
         }
         else {
-            marked[date.dateString] = { selected: true, selectedColor: LS_COLORS.global.green  }
+            const propOwn = Object.getOwnPropertyNames(marked);
+            if (propOwn.length == 2) {
+                delete marked[propOwn[1]]
+                marked[date.dateString] = { selected: true, selectedColor: LS_COLORS.global.green }
+            }
+            else {
+                marked[date.dateString] = { selected: true, selectedColor: LS_COLORS.global.green }
+            }
+        }
+        const propOwn = Object.getOwnPropertyNames(marked);
+        if (propOwn.length > 1 && moment(propOwn[0]).unix() > moment(propOwn[1]).unix()) {
+            marked = {}
         }
         setMarkedDates({ ...marked })
-        console.log(marked)
-        const propOwn = Object.getOwnPropertyNames(markedDates);
-        console.log(propOwn,markedDates); // 1
-        if(propOwn.length>2){
+        if (propOwn.length == 2) {
+            let dates = [...selectedDates]
+            let styles = [...customDatesStyles];
+            dates.push(moment(date.dateString).format("DD/MM/YYYY"))
+            styles.push({
+                id: '',
+                start_date: moment(propOwn[0]).format("YYYY-MM-DD"),
+                end_date: moment(propOwn[1]).format("YYYY-MM-DD"),
+                style: { backgroundColor: LS_COLORS.global.green },
+                textStyle: { color: LS_COLORS.global.white },
+                containerStyle: [],
+                allowDisabled: true,
+                from_time: "",
+                to_time: ""
+            });
 
-          alert('hhh')
-        
+            setSelectedDates([...dates])
+            setCustomDatesStyles([...styles])
         }
-
-        return
-    //     let dates = [...selectedDates]
-    //     let styles = [...customDatesStyles];
-    //     if (!dates.includes(moment(date).format("DD/MM/YYYY"))) {
-    //         dates.push(moment(date).format("DD/MM/YYYY"))
-    //         styles.push({
-    //             id: '',
-    //             date: moment(date).format("YYYY-MM-DD"),
-    //             style: { backgroundColor: LS_COLORS.global.green },
-    //             textStyle: { color: LS_COLORS.global.white },
-    //             containerStyle: [],
-    //             allowDisabled: true,
-    //             from_time: "",
-    //             to_time: ""
-    //         });
-    //     }
-    //     setSelectedDates([...dates])
-    //     setCustomDatesStyles([...styles])
-    // }
     }
 
     const removeTimeFrame = (frame) => {
         if (frame.id == '') {
             let dates = [...selectedDates]
             let styles = [...customDatesStyles]
-            dates = dates.filter(item => item !== moment(frame.date).format('DD/MM/YYYY'))
-            styles = styles.filter(item => item.date !== frame.date)
+            dates = dates.filter(item => item.start_date !== moment(frame.start_date).format('DD/MM/YYYY'))
+            styles = styles.filter(item => item.start_date !== frame.start_date  || item.end_date !== frame.end_date )
             setSelectedDates([...dates])
             setCustomDatesStyles([...styles])
             // calendarRef.current.resetSelections()
@@ -104,6 +106,7 @@ const AddTimeFrame = (props) => {
             deleteFrame(frame)
         }
     }
+
     const save = () => {
         setLoading(true)
         let headers = {
@@ -111,24 +114,23 @@ const AddTimeFrame = (props) => {
             'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
         }
-
         let data = []
         customDatesStyles.map((item) => {
             if (item.from_time.trim() !== '' && item.to_time.trim() !== '') {
+                var convertedFrom = moment(item.from_time, 'hh:mm A').format('HH:mm')
+                var convertedTo = moment(item.to_time, 'hh:mm A').format('HH:mm')
                 data.push({
-                    "start_date": moment(item.date).format("YYYY-MM-DD"),
-                    "end_date": moment(item.date).format("YYYY-MM-DD"),
-                    "from_time": item.from_time,
-                    "to_time": item.to_time
+                    "start_date": moment(item.start_date).format("YYYY-MM-DD"),
+                    "end_date": moment(item.end_date).format("YYYY-MM-DD"),
+                    "from_time": convertedFrom,
+                    "to_time": convertedTo
                 })
             }
         })
-
         if (data.length == 0) {
             setLoading(false)
-            return showToast("Invalid time frames data")
+            return showToast("Invalid time frame data")
         }
-
         let { json_data, formdata } = serviceData
         json_data = JSON.parse(json_data)
         json_data['time_frame'] = data
@@ -139,17 +141,17 @@ const AddTimeFrame = (props) => {
             endPoint: '/api/providerServicesAdd',
             type: 'post'
         }
-        console.log("CONFIG============================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",config)
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     setLoading(false)
                     showToast(response.message, 'success')
+                    data = []
                     getMyJobs(true)
                 }
                 else {
                     setLoading(false)
-                    showToast(response.message, 'danger') 
+                    showToast(response.message, 'danger')
                 }
             })
             .catch(err => {
@@ -178,16 +180,16 @@ const AddTimeFrame = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    console.log("response",response)
                     setLoading(false)
                     let styles = [];
                     let dates = [];
                     Object.keys(response.data).forEach((ele) => {
                         response.data[ele].forEach(element => {
-                            dates.push(moment(element.date).format("DD/MM/YYYY"))
+                            dates.push(moment(element.start_time).format("DD/MM/YYYY"))
                             styles.push({
                                 id: element.id,
-                                date: element.date,
+                                start_date: element.start_time,
+                                end_date: element.end_time,
                                 style: { backgroundColor: LS_COLORS.global.green },
                                 textStyle: { color: LS_COLORS.global.white },
                                 containerStyle: [],
@@ -234,33 +236,36 @@ const AddTimeFrame = (props) => {
                     if (shouldNavigate) {
                         props.navigation.navigate('HomeScreen')
                     }
-                } else {
+                }
+                else {
                     setLoading(false)
                     showToast(response.message, 'success')
                 }
             }).catch(err => {
                 setLoading(false)
-            })
+            }
+            )
     }
 
     const setTime = (type, index) => {
         setDateType(type)
         setActiveIndex(index)
         setDatePickerVisibility(true)
-        console.log(moment(customDatesStyles[index].date))
         // setInitialDate(new Date(moment(`${customDatesStyles[index].date} ${type == "from" ? customDatesStyles[index].from_time : customDatesStyles[index].to_time}`)))
     }
 
-    const handleConfirm = (date) => {0
+
+    const handleConfirm = (date) => {
         let styles = [...customDatesStyles];
         setDatePickerVisibility(false)
         if (dateType == "from") {
-            styles[activeIndex].from_time = moment(date).format('hh:mm')
+            styles[activeIndex].from_time = moment(date).format('hh:mm a')
         } else {
-            styles[activeIndex].to_time = moment(date).format('hh:mm')
+            styles[activeIndex].to_time = moment(date).format('hh:mm a')
         }
         setCustomDatesStyles([...styles])
     };
+
 
     const deleteFrame = (frame) => {
         Alert.alert(
@@ -325,7 +330,9 @@ const AddTimeFrame = (props) => {
                 <View style={styles.calendar}>
                     <Calendar
                         current={new Date()}
-                        onDayPress={(day) => onDateChange(day)}
+                        onDayPress={(day) => {
+                            onDateChange(day)
+                        }}
                         hideArrows={false}
                         hideExtraDays={true}
                         disableMonthChange={false}
@@ -340,22 +347,23 @@ const AddTimeFrame = (props) => {
                         enableSwipeMonths={false}
                         markedDates={{ ...markedDates }}
                         minDate={new Date()}
-                        // markingType={'period'}
+                    // markingType={'period'}
                     />
                 </View>
                 <ScrollView style={{ flex: 1 }}>
                     <View style={{ marginVertical: 5 }}>
                         {customDatesStyles.map((item, index) => {
-                            console.log("CUSTOMDATESSTYLE",item)
+                            const fromTime = moment(item.from_time, ["HH.mm"]).format("hh:mm");
+                            const toTime = moment(item.to_time, ["HH.mm"]).format("hh:mm");
                             return (
                                 <View key={index} style={{ paddingHorizontal: '5%', paddingVertical: 5 }}>
-                                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{moment(item.date).format("MM-DD-YYYY")}</Text>
+                                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{moment(item.start_date).format("MM-DD-YYYY") + " to " + moment(item.end_date).format("MM-DD-YYYY")}</Text>
                                     <View style={{ flexDirection: 'row', marginTop: 5, height: 60, alignItems: 'center' }}>
                                         <View style={{ flex: 1 }}>
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
                                                 <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} disabled={serviceData.formdata == undefined} activeOpacity={0.7} onPress={() => setTime("from", index)}>
-                                                    <Text>{item.from_time}</Text>
+                                                    <Text>{fromTime === "Invalid date" ? "" : fromTime}</Text>
                                                     <View style={{ height: 11, aspectRatio: 1 }}>
                                                         <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                     </View>
@@ -366,14 +374,14 @@ const AddTimeFrame = (props) => {
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                                                 <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} disabled={serviceData.formdata == undefined} activeOpacity={0.7} onPress={() => setTime("to", index)}>
-                                                    <Text>{item.to_time}</Text>
+                                                    <Text>{toTime === "Invalid date" ? "" : toTime}</Text>
                                                     <View style={{ height: 11, aspectRatio: 1 }}>
                                                         <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                     </View>
                                                 </TouchableOpacity>
                                             </View>
                                         </View>
-                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeTimeFrame(item)} style={{ height: '100%', aspectRatio: 1, padding: 20,marginTop:15 }}>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => removeTimeFrame(item)} style={{ height: '100%', aspectRatio: 1, padding: 20, marginTop: 15 }}>
                                             <Image source={require('../../../assets/delete.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                         </TouchableOpacity>
                                     </View>
