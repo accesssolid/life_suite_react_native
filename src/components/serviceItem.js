@@ -20,6 +20,11 @@ const ServiceItem = React.forwardRef((props, ref) => {
     const nameRef = useRef(null)
     const priceNewRef = useRef(null)
 
+    // from #liahs data check for the service item
+    useEffect(() => {
+        console.log(props.serviceItem, "Service Items")
+    }, [props.serviceItem])
+
     useEffect(() => {
         setInitialServiceData()
     }, [])
@@ -43,7 +48,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
             <View key={props.index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-start', overflow: 'hidden', width: props.showInputs ? '45%' : '90%' }}>
                     <CheckBox
-                        checked={props.isSelected}
+                        checked={props.isSelected ?? false}
                         onPress={props.onCheckPress}
                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../assets/unchecked.png")} />}

@@ -1,5 +1,5 @@
-import React,{useEffect} from 'react';
-import { Platform, StatusBar,LogBox } from 'react-native'
+import React, { useEffect } from 'react';
+import { Platform, StatusBar, LogBox } from 'react-native'
 
 /* Packages */
 import { Provider as StoreProvider } from 'react-redux';
@@ -20,7 +20,15 @@ import Router from './src/router';
 
 const App = () => {
   LogBox.ignoreAllLogs();
+
+  // function for getting noti token from #liahs
+  const getToken = async () => {
+    let gg = await messaging().getToken()
+    console.log(gg, "Token")
+  }
+
   useEffect(() => {
+    // getToken()
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       if (Platform.OS == 'android') {
         PushNotification.createChannel(

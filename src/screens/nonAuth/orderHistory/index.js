@@ -16,10 +16,51 @@ import DropDown from '../../../components/dropDown';
 import CustomTextInput from '../../../components/customTextInput';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { BASE_URL, getApi } from '../../../api/api';
+
+// order status types
+const order_types = [
+    { id: 1, title: "Pending" },
+    { id: 2, title: "Cancel" },
+    { id: 3, title: "Confirmed" },
+    { id: 4, title: "On the way" },
+    { id: 5, title: "Will be delayed" }
+]
 
 const OrderHistory = (props) => {
     const dispatch = useDispatch()
-    const [selected, setselected] = useState(null)
+    const [selected, setselected] = useState(order_types[0])
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const [loading, setLoading] = React.useState(false)
+
+    React.useEffect(() => {
+        getOrders(selected.id)
+    }, [selected])
+
+    const getOrders = async (order_status) => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ order_status }),
+            endPoint: '/api/providerOrderHistory',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+
+                }
+            }).catch(err => {
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -38,14 +79,14 @@ const OrderHistory = (props) => {
                 <Content
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}>
-                    {Platform.OS ==="ios" ?
-                         <DropDown
-                         item={["Declined", "Completed", "In progress"]}
-                         value={'Declined'}
-                         // onChangeValue={(index, value) => { setNotificationType(value), user.user_role == 2 ? cardNumberRef.current.focus() : null }}
-                         containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
-                         dropdownStyle={{ height: 120 }}
-                     />
+                    {Platform.OS === "ios" ?
+                        <DropDown
+                            item={order_types.map(x => x.title)}
+                            value={selected.title}
+                            onChangeValue={(index, value) => {setselected(order_types[index])}}
+                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
+                            dropdownStyle={{ height: 120 }}
+                        />
                         :
                         <DropDown
                             item={["Declined", "Completed", "In progress"]}

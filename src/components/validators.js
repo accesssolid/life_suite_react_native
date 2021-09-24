@@ -5,7 +5,7 @@ import Toast from 'react-native-simple-toast';
 
 export const showToast = async (text, type) => {
     if (Platform.OS == "ios") {
-        Toast.showWithGravity(text, Toast.LONG, Toast.BOTTOM);
+        Toast.showWithGravity(text, Toast.SHORT, Toast.BOTTOM);
     } else {
         ToastAndroid.show(text, ToastAndroid.LONG);
     }
