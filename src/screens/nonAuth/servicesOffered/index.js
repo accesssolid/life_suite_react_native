@@ -290,7 +290,7 @@ const ServicesProvided = (props) => {
             if (selectedItems.includes(itemm.item_id)) {
                 var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
                 var fieldArray = hoursDotMinutes.split(":");
-                var minutes = Number(fieldArray[0]) + 60 * Number(fieldArray[1]);
+                var minutes = Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
                 let obj = {
                     "item_id": itemm.item_id,
                     "price": Number(itemm.price.replace('$', '')),

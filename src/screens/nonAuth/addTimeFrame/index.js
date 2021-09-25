@@ -168,6 +168,7 @@ const AddTimeFrame = (props) => {
             endPoint: '/api/providerServicesAdd',
             type: 'post'
         }
+        console.log(json_data)
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -305,7 +306,6 @@ const AddTimeFrame = (props) => {
                     setTimeout(()=>{
                         showToast("End time can not be smaller than start time.", 'warn')
                     },500)
-                    
                 }
             }
 

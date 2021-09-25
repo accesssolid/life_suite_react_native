@@ -31,6 +31,9 @@ const MapScreen = (props) => {
     const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
     const [address, setAddress] = useState('')
     const [focused, setFocused] = useState(false)
+    // #liahs for permanent button clicked checked
+    const [isPermanentClicked, setIsPermanetClicked] = React.useState(false)
+
     const [coordinates, setCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -47,7 +50,6 @@ const MapScreen = (props) => {
                 ...coords
             })
         }
-
     }, [])
 
     const getLocationPermission = async () => {
@@ -113,6 +115,13 @@ const MapScreen = (props) => {
     }
 
     const reverseGeocode = (lat, lng) => {
+        // #liahs for name of adderess won't change if the permananet address is clicked
+        if (isPermanentClicked) {
+            setTimeout(() => {
+                setIsPermanetClicked(false)
+            }, 2000)
+            return
+        }
         try {
             let params = {
                 key: 'AIzaSyBoK4icaIuqCEWdbq-D4LdrsbK4X_Fa1Fg',
@@ -177,6 +186,7 @@ const MapScreen = (props) => {
                         textInputProps={{
                             onFocus: () => setFocused(true),
                             onblur: () => setFocused(false),
+
                             blurOnSubmit: true,
                             onSubmitEditing: () => setFocused(false),
                         }}
@@ -198,6 +208,8 @@ const MapScreen = (props) => {
                                     backgroundColor: LS_COLORS.global.green,
                                 }}
                                 action={() => {
+                                    // #liahs checked to permaned to true
+                                    setIsPermanetClicked(true)
                                     setAddress(`${user.address[0].address_line_1}`)
                                     placesRef.current.setAddressText(`${user.address[0].address_line_1}`)
                                     setCoordinates({

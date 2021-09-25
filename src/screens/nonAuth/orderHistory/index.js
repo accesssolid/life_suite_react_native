@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Platform } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Platform, ActivityIndicator, FlatList } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -17,14 +17,22 @@ import CustomTextInput from '../../../components/customTextInput';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { BASE_URL, getApi } from '../../../api/api';
-
+import moment from 'moment';
+// placeholder image
+const placeholder_image = require("../../../assets/user.png")
 // order status types
+// pending
+// future
+// inprogress
+// completed
+// rejected
+
 const order_types = [
     { id: 1, title: "Pending" },
-    { id: 2, title: "Cancel" },
-    { id: 3, title: "Confirmed" },
-    { id: 4, title: "On the way" },
-    { id: 5, title: "Will be delayed" }
+    { id: 3, title: "Future" },
+    { id: 7, title: "InProgress" },
+    { id: 8, title: "Completed" },
+    { id: 2, title: "Rejected" },
 ]
 
 const OrderHistory = (props) => {
@@ -32,12 +40,37 @@ const OrderHistory = (props) => {
     const [selected, setselected] = useState(order_types[0])
     const access_token = useSelector(state => state.authenticate.access_token)
     const [loading, setLoading] = React.useState(false)
+    const [data, setData] = React.useState([])
+
+    const [searchData, setSearchData] = React.useState({
+        text: "",
+        data: []
+    })
+
+    const [pageData, setPageData] = React.useState({
+        current_page: 1,
+        total: 0
+    })
 
     React.useEffect(() => {
         getOrders(selected.id)
     }, [selected])
 
-    const getOrders = async (order_status) => {
+    React.useEffect(() => {
+        if (searchData.text?.trim() !== "") {
+            let dataCopy = data.filter(x => `${x.customers_first_name} ${x.customers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase()))
+            setSearchData(state => ({ ...state, data: dataCopy }))
+        } else {
+            setSearchData(state => ({ ...state, data: data }))
+        }
+    }, [searchData.text])
+
+    React.useEffect(() => {
+        setSearchData(state => ({ ...state, data: data }))
+    }, [data])
+
+    const getOrders = async (order_status, page = 1) => {
+        setLoading(true)
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -45,7 +78,7 @@ const OrderHistory = (props) => {
         }
         let config = {
             headers: headers,
-            data: JSON.stringify({ order_status }),
+            data: JSON.stringify({ order_status, page }),
             endPoint: '/api/providerOrderHistory',
             type: 'post'
         }
@@ -54,7 +87,29 @@ const OrderHistory = (props) => {
             .then((response) => {
                 console.log(response)
                 if (response.status == true) {
-
+                    if (response.data?.data) {
+                        if (page == 1) {
+                            setData(response.data.data)
+                        } else {
+                            setData(state => ([...state, ...response.data.data]))
+                        }
+                        setPageData({
+                            current_page: response.data?.current_page,
+                            total: response?.data?.total
+                        })
+                    } else {
+                        setData([])
+                        setPageData({
+                            total: 0,
+                            current_page: 1
+                        })
+                    }
+                } else {
+                    setData([])
+                    setPageData({
+                        total: 0,
+                        current_page: 1
+                    })
                 }
             }).catch(err => {
             }).finally(() => {
@@ -83,15 +138,15 @@ const OrderHistory = (props) => {
                         <DropDown
                             item={order_types.map(x => x.title)}
                             value={selected.title}
-                            onChangeValue={(index, value) => {setselected(order_types[index])}}
+                            onChangeValue={(index, value) => { setselected(order_types[index]) }}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
                             dropdownStyle={{ height: 120 }}
                         />
                         :
                         <DropDown
-                            item={["Declined", "Completed", "In progress"]}
-                            value={'Declined'}
-                            // onChangeValue={(index, value) => { setNotificationType(value), user.user_role == 2 ? cardNumberRef.current.focus() : null }}
+                            item={order_types.map(x => x.title)}
+                            value={selected.title}
+                            onChangeValue={(index, value) => { setselected(order_types[index]) }}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
                             dropdownStyle={{ height: 120 }}
                         />
@@ -99,115 +154,131 @@ const OrderHistory = (props) => {
 
                     <CustomTextInput
                         placeholder="Search"
+                        value={searchData.text}
+                        onChangeText={t => { setSearchData(state => ({ ...state, text: t })) }}
                         customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 }}
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '10%', }}
                     />
                     <Text style={{ fontSize: 16, marginTop: 20, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
-                    {[1, 2, 3, 4, 5].map((item, index) => {
-                        if (selected !== index) {
-                            return (<TouchableOpacity key={index} activeOpacity={0.7} onPress={() => { setselected(index) /* props.navigation.navigate("InProgress") */ }} style={{ height: 72, width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
+                    <FlatList
+                        data={searchData.data}
+                        ListFooterComponent={loading && <ActivityIndicator color={LS_COLORS.global.green} />}
+                        keyExtractor={(item, index) => item.id + "" + index}
+                        onEndReached={e => {
+                            if (data.length < pageData.total) {
+                                getOrders(selected.id, pageData.current_page + 1)
+                            }
+                        }}
+                        renderItem={({ item, index }) => {
+                            return (<TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
+                                props.navigation.navigate("ProviderStack",{screen:"OrderDetail",params:{item}})
+                            }} style={{ height: 72, width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <View>
                                         <Image
                                             style={{ height: 50, width: 50, resizeMode: 'contain' }}
-                                            source={require("../../../assets/mecman.png")}
+                                            source={item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image}
                                         />
                                     </View>
                                     <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
-                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Alexi</Text>
-                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular }}>Mechanic</Text>
+                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{item.customers_first_name} {item.customers_last_name}</Text>
                                     </View>
                                     <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
                                         <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
-                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>April 20 at 10:10 am</Text>
+                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>)
-                        } else {
-                            return (
-                                <>
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => { setselected(null) /* props.navigation.navigate('UpcomingOrder') */ }}>
-                                        <Card style={styles.alexiContainer}>
-                                            <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => { setselected(null) /* props.navigation.navigate("InProgress") */ }} style={{ height: 72, width: "100%", padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
-                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                    <View>
-                                                        <Image
-                                                            style={{ height: 50, width: 50, resizeMode: 'contain' }}
-                                                            source={require("../../../assets/mecman.png")}
-                                                        />
-                                                    </View>
-                                                    <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
-                                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Alexi</Text>
-                                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular }}>Mechanic</Text>
-                                                    </View>
-                                                    <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
-                                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
-                                                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>April 20 at 10:10 am</Text>
-                                                    </View>
-                                                </View>
-                                            </TouchableOpacity>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Duration</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>2.5hrs</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Start Time</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>April 20 at 10:10 am</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>End Time</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>April 20 at 10:10 am</Text>
-                                            </View>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, alignItems: 'center', alignSelf: 'flex-start', paddingLeft: '3%' }}>
-                                                <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.darkBlack, }}>Rating </Text>
-                                                <View style={{ flexDirection: 'row' }}>
-                                                    {[1, 2, 3, 4].map((item, index) => {
-                                                        return (<FontAwesome key={index} name="star" size={12} color={LS_COLORS.global.textCyan} style={{ marginRight: 5 }} />)
-                                                    })}
-                                                </View>
-                                            </View>
-                                            <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 1</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 2</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 3</Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>$10</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'flex-end', flexDirection: 'row', marginTop: 10 }}>
-                                                <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.darkBlack }}>Total Price : </Text>
-                                                <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.darkBlack }}>$75</Text>
-                                            </View>
-                                        </Card>
-                                    </TouchableOpacity>
-                                    <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginBottom: 30 }}>
-                                        <TouchableOpacity
-                                            style={styles.save}
-                                            activeOpacity={0.7}
-                                            onPress={() => {
-                                            }}>
-                                            <Text style={styles.saveText}>
-                                                Block
-                                            </Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={styles.save}
-                                            activeOpacity={0.7}
-                                            onPress={() => {
-                                            }}>
-                                            <Text style={styles.saveText}>
-                                                Search Again
-                                            </Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </>
-                            )
-                        }
+                        }}
+                    />
+                    {data.map((item, index) => {
+                        // if (selected !== index) {
+
+                        // } else {
+                        //     return (
+                        //         <>
+                        //             <TouchableOpacity activeOpacity={0.7} onPress={() => { setselected(null) /* props.navigation.navigate('UpcomingOrder') */ }}>
+                        //                 <Card style={styles.alexiContainer}>
+                        //                     <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => { setselected(null) /* props.navigation.navigate("InProgress") */ }} style={{ height: 72, width: "100%", padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
+                        //                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        //                             <View>
+                        //                                 <Image
+                        //                                     style={{ height: 50, width: 50, resizeMode: 'contain' }}
+                        //                                     source={require("../../../assets/mecman.png")}
+                        //                                 />
+                        //                             </View>
+                        //                             <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
+                        //                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Alexi</Text>
+                        //                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular }}>Mechanic</Text>
+                        //                             </View>
+                        //                             <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
+                        //                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
+                        //                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>April 20 at 10:10 am</Text>
+                        //                             </View>
+                        //                         </View>
+                        //                     </TouchableOpacity>
+                        //                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                        //                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Duration</Text>
+                        //                         <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>2.5hrs</Text>
+                        //                     </View>
+                        //                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                        //                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Start Time</Text>
+                        //                         <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>April 20 at 10:10 am</Text>
+                        //                     </View>
+                        //                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                        //                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>End Time</Text>
+                        //                         <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>April 20 at 10:10 am</Text>
+                        //                     </View>
+                        //                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, alignItems: 'center', alignSelf: 'flex-start', paddingLeft: '3%' }}>
+                        //                         <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.darkBlack, }}>Rating </Text>
+                        //                         <View style={{ flexDirection: 'row' }}>
+                        //                             {[1, 2, 3, 4].map((item, index) => {
+                        //                                 return (<FontAwesome key={index} name="star" size={12} color={LS_COLORS.global.textCyan} style={{ marginRight: 5 }} />)
+                        //                             })}
+                        //                         </View>
+                        //                     </View>
+                        //                     <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
+                        //                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                        //                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 1</Text>
+                        //                         <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
+                        //                     </View>
+                        //                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                        //                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 2</Text>
+                        //                         <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$10</Text>
+                        //                     </View>
+                        //                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                        //                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>Task 3</Text>
+                        //                         <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>$10</Text>
+                        //                     </View>
+                        //                     <View style={{ justifyContent: 'flex-end', flexDirection: 'row', marginTop: 10 }}>
+                        //                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.darkBlack }}>Total Price : </Text>
+                        //                         <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.darkBlack }}>$75</Text>
+                        //                     </View>
+                        //                 </Card>
+                        //             </TouchableOpacity>
+                        //             <View style={{ justifyContent: 'space-evenly', flexDirection: 'row', marginBottom: 30 }}>
+                        //                 <TouchableOpacity
+                        //                     style={styles.save}
+                        //                     activeOpacity={0.7}
+                        //                     onPress={() => {
+                        //                     }}>
+                        //                     <Text style={styles.saveText}>
+                        //                         Block
+                        //                     </Text>
+                        //                 </TouchableOpacity>
+                        //                 <TouchableOpacity
+                        //                     style={styles.save}
+                        //                     activeOpacity={0.7}
+                        //                     onPress={() => {
+                        //                     }}>
+                        //                     <Text style={styles.saveText}>
+                        //                         Search Again
+                        //                     </Text>
+                        //                 </TouchableOpacity>
+                        //             </View>
+                        //         </>
+                        //     )
+                        // }
                     })}
                     <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
                     <View style={{ height: 30 }}></View>
