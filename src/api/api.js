@@ -1,4 +1,3 @@
-import { stringify } from "query-string";
 
 export const BASE_URL = "http://122.160.70.200/projects/php/lifeSuite/public"
 

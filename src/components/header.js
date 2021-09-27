@@ -22,13 +22,13 @@ const Header = (props) => {
                 />
             </TouchableOpacity>
             <View style={styles.middleView}>
-                <Text style={styles.title}>{props.title}</Text>
+                <Text style={[styles.title,props.titleStyle]}>{props.title}</Text>
             </View>
             <TouchableOpacity style={styles.rightView}
                 onPress={props.action1}
                 activeOpacity={0.7}>
                 <Image
-                    style={{ height: 25, width: 25, resizeMode: 'contain',tintColor:"black" }}
+                    style={[{ height: 25, width: 25, resizeMode: 'contain',tintColor:"black" },props.imageStyle1]}
                     source={props.imageUrl1}
                 />
             </TouchableOpacity>

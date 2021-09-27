@@ -1,0 +1,2 @@
+//dropdown error solved 
+add    onScrollToIndexFailed={info=>{console.log(info)}} in node_modules/react-native-modal-dropdown/components/ModelDropdown.js ==>FlatList
