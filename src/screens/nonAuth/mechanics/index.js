@@ -5,7 +5,6 @@ import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, To
 import LS_COLORS from '../../../constants/colors';
 import { globalStyles, showToast } from '../../../utils';
 import LS_FONTS from '../../../constants/fonts';
-import CustomDropDown from '../../../components/dropDown';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,17 +13,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 /* Components */;
 import Header from '../../../components/header';
-import DropDown from '../../../components/dropDown';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Card, Container, Content, Row, Toast, } from 'native-base'
 import Loader from '../../../components/loader';
 import { BASE_URL, getApi } from '../../../api/api';
-import { Rating, AirbnbRating } from 'react-native-ratings';
-var _ = require('lodash');
+import { Rating } from 'react-native-ratings';
 import SureModal from '../../../components/sureModal';
-import SureModal1 from '../../../components/sureModal1';
-import FilterModal from '../../../components/filterModal';
-import FilterType from '../../../components/filterType';
+import SureModal1 from '../../../components/sureModal1';;
 import TimeFrame from '../../../components/timeFrame';
 
 
@@ -45,18 +39,10 @@ const Mechanics = (props) => {
     const [selectedItemsWithProviders, setSelectedItemsWithProviders] = useState([])
     const [selectedProducts, setSelectedProducts] = useState([])
     const [apiData, setApiData] = useState([])
-    const [name, setName] = useState('')
-
-
-    // useEffect(() => {
-    //     const apple = [...providers]
-    //     apple.sort((a, b) => b.price - a.price)
-    // }, [providers])
 
     useEffect(() => {
         getProviders()
     }, [])
-
 
     const getProviders = () => {
         setLoading(true)
@@ -180,7 +166,6 @@ const Mechanics = (props) => {
     }
 
     const onSelecItems = (item) => {
-
         let Items = { providerId: item.user_id, itemId: item.service_item_id, service_name: item.service_items_name, price: item.productTotalPrice, name: item.name, duration: item.time_duration }
         let x={}
         let data = []
@@ -188,7 +173,7 @@ const Mechanics = (props) => {
         for (let index = 0; index < selectedItemsWithProviders.length; index++) {
             const items = selectedItemsWithProviders[index];
             if (items.itemId == item.service_item_id && items.providerId == item.user_id) {
-                x = { item: items, flag: false }
+                x = { item: items, flag: true }
                 data.push(x)
             }
             else if (items.itemId != item.service_item_id && items.providerId == item.user_id) {
