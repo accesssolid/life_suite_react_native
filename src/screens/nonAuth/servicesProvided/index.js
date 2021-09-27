@@ -106,6 +106,7 @@ const ServicesProvided = (props) => {
     const next = () => {
         let servicedata = []
         itemList.forEach(element => {
+            console.log("dkjndjk",element)
             if (selectedItems.includes(element.id)) {
                 servicedata.push({
                     "item_id": element.id,
@@ -242,7 +243,7 @@ const ServicesProvided = (props) => {
         setSelectedProducts([])
         setExtraDataa([])
     }
-
+    
     return (
         <>
             <StatusBar translucent={true} backgroundColor="transparent" barStyle="light-content" />

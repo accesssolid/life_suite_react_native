@@ -30,7 +30,6 @@ const ServicesProvided = (props) => {
     const [itemListMaster, setItemListMaster] = useState([])
     const [itemList, setItemList] = useState([])
     const [loading, setLoading] = useState(false)
-
     const [selectedItems, setSelectedItems] = useState([])
     const [servicesData, setServicesData] = useState([])
     const [productsData, setProductsData] = useState([])
@@ -38,7 +37,6 @@ const ServicesProvided = (props) => {
     const [selectedProducts, setSelectedProducts] = useState([])
     const [selectedNewProducts, setSelectedNewProducts] = useState([])
     const [isOtherSelected, setIsOtherSelected] = useState(false)
-
     const [variants, setVariants] = useState([])
     const [selectedVariant, setSelectedVariant] = useState(null)
     const access_token = useSelector(state => state.authenticate.access_token)

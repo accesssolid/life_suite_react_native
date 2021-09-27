@@ -132,11 +132,17 @@ const MechanicLocation = (props) => {
             .catch((error) => console.log(error.message));
     }
 
+ 
+
     const submit = () => {
+        let arr = []
+        servicedata.forEach(element => {
+            arr.push(element.item_id)
+        });
         let data = {
             "user_id": user.id,
             "json_data": JSON.stringify({
-                "items": [servicedata[0].item_id],
+                "items": arr,
                 "products": servicedata[0].products
             }),
             "order_placed_address": toAddress,
@@ -148,7 +154,6 @@ const MechanicLocation = (props) => {
             "order_from_long": fromCoordinates.longitude,
             "order_from_address": fromAddress
         }
-        console.log("data =>> ", data.json_data)
         if (subService.location_type == 2 && data.order_placed_address.trim() == "") {
             showToast("Please add to address")
         } else if (data.order_from_address.trim() == "") {
@@ -189,8 +194,6 @@ const MechanicLocation = (props) => {
             longitudeDelta: 0.012134,
         })
     }
-
-
 
     const renderView = () => {
         return (
@@ -303,21 +306,6 @@ const MechanicLocation = (props) => {
                                 <Text>{moment(endTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
                         </View>
-                        {
-                            /* <View style={{ flex: 1, alignItems: 'center' }}>
-                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>End Time</Text>
-                                <Row style={{ width: widthPercentageToDP(30), justifyContent: 'space-between', marginTop: 10 }}>
-                                    <DropDown
-                                        item={category_array}
-                                        value={endTime}
-                                        width={widthPercentageToDP(30)}
-                                        onChangeItem={(t) => setEndTime(t)}
-                                        placeholder="Car"
-                                        dropdownStyle={{ width: '30%', alignItems: 'center' }}
-                                    />
-                                </Row>
-                            </View> */
-                        }
                     </View>
                     <TouchableOpacity
                         style={styles.save}
