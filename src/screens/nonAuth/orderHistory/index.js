@@ -162,7 +162,7 @@ const OrderHistory = (props) => {
                         value={searchData.text}
                         onChangeText={t => { setSearchData(state => ({ ...state, text: t })) }}
                         customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 }}
-                        customInputStyle={{ borderRadius: 6, paddingHorizontal: '10%', }}
+                        customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
                     <Text style={{ fontSize: 16, marginTop: 20, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
                     <FlatList

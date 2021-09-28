@@ -28,6 +28,7 @@ import AddLicense from '../screens/nonAuth/addLicense';
 import SelectLocation from '../screens/nonAuth/selectLocation';
 import MapScreen from '../screens/nonAuth/map';
 import AddTimeFrame from '../screens/nonAuth/addTimeFrame';
+import OrderHistory1 from '../screens/nonAuth/orderHistory1';
 
 const Drawer = createDrawerNavigator();
 
@@ -71,8 +72,8 @@ const MainDrawer = (props) => {
                 />
                 <Drawer.Screen
                     name="Orders"
-                    // component={user.user_role == 2 ? OrderHistory : OrderHistory1}
-                    component={OrderHistory}
+                    component={user.user_role == 2 ? OrderHistory1 : OrderHistory}
+                    // component={OrderHistory}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/note.png')} style={{ height: 20, width: 20 }} />,
                     }}

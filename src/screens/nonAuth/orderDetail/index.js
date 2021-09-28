@@ -485,7 +485,6 @@ const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
     const user = useSelector(state => state.authenticate.user)
 
     return (
-        console.log(data),
         <Card containerStyle={{ borderRadius: 10 }}>
             <View style={{ flexDirection: "row" }}>
                 <View style={{ flex: 1, flexDirection: "row" }}>
@@ -504,8 +503,7 @@ const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
                     <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
                 </View>
             </View>
-            {
-                items?.map((i) => {
+            {items?.map((i) => {
                     return (
                         <>
                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>

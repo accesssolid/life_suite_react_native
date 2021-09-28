@@ -17,6 +17,7 @@ import store from './src/redux/store';
 
 /* Root Navigator */
 import Router from './src/router';
+import UpdateOrder from './src/screens/nonAuth/updateOrder';
 
 const App = () => {
   LogBox.ignoreAllLogs();
