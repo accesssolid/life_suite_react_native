@@ -234,6 +234,8 @@ const MapScreen = (props) => {
                                     backgroundColor: LS_COLORS.global.green,
                                 }}
                                 action={() => {
+                                         // #liahs checked to permaned to true
+                                         setIsPermanetClicked(true)
                                     setAddress(`${user.address[1].address_line_1}`)
                                     placesRef.current.setAddressText(`${user.address[1].address_line_1}`)
                                     setCoordinates({

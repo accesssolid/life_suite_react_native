@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         flex:1,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 100,
-        marginTop:10,
+        marginTop:"10%",
     },
     saveText: {
         textAlign: "center",

@@ -30,6 +30,7 @@ const ChatMembers = (props) => {
     const [loading, setLoading] = useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
+    console.log(user)
     const [member, setMembers] = useState("")
 
     useEffect(() => {

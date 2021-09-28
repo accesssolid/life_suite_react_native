@@ -377,8 +377,9 @@ const OrderClientDetail = (props) => {
                             <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>User Requested Time Frame </Text>
                             <Text style={styles.baseTextStyle}>{moment(data?.order_start_time).format("hh:mm a")} - {moment(data?.order_end_time).format("hh:mm a")}</Text>
                         </View>
+
                         {/* only show if order status is pending i.e 1 */}
-                        {data?.order_status == 1 && <><View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                        {(data?.order_status == 1 || data?.order_status == 3) && <><View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                             <View>
                                 <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Available Start Time</Text>
                                 <Text onPress={() => setBookedModal(true)} style={[styles.baseTextStyle, { color: "skyblue" }]}>(View Booked Slots)</Text>
@@ -402,7 +403,7 @@ const OrderClientDetail = (props) => {
                                 </View>
                                 <Text style={[styles.baseTextStyle]}>{estimated_time}</Text>
                             </View>
-                            <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
+                            {data?.order_status == 1 ? <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
                                 <TouchableOpacity
                                     style={styles.save}
                                     activeOpacity={0.7}
@@ -415,7 +416,31 @@ const OrderClientDetail = (props) => {
                                     onPress={() => setCancelModal(true)}>
                                     <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Decline</Text>
                                 </TouchableOpacity>
-                            </View>
+                            </View> :
+                                <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
+                                    <TouchableOpacity
+                                        style={styles.save}
+                                        activeOpacity={0.7}
+                                        onPress={() => {showToast("in progress.....")}}>
+                                        <Text style={styles.saveText}>Update Order</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+                                            props.navigation.navigate("ChatScreen",{item:{
+                                                id:data.customer_id,
+                                                email:data.customers_email,
+                                                first_name:data.customers_first_name,
+                                                last_name:data.customers_last_name,
+                                                phone_number:data.customers_phone_number,
+                                                profile_image:data.customers_profile_image
+                                            }})
+                                        }}>
+                                        <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Chat</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            }
                         </>}
                     </ScrollView>
                 </View>
@@ -504,32 +529,32 @@ const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
                 </View>
             </View>
             {items?.map((i) => {
-                    return (
-                        <>
-                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>{i.service_items_name + "  (Service Charge)"}</Text>
-                                <View style={{ height: 20, flexDirection: "row" }}>
-                                    <Text style={styles.baseTextStyle}>{"$" + i.price}</Text>
-                                </View>
+                return (
+                    <>
+                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                            <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>{i.service_items_name + "  (Service Charge)"}</Text>
+                            <View style={{ height: 20, flexDirection: "row" }}>
+                                <Text style={styles.baseTextStyle}>{"$" + i.price}</Text>
                             </View>
-                            {i.product.map((itemData, index) => {
-                                return (
-                                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                        <View style={{}} >
-                                            <Text style={{ marginLeft: 20 }}>
-                                                <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
-                                            </Text>
-                                        </View>
-                                        <View style={{ height: 20, flexDirection: "row" }}>
-                                            <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
-                                        </View>
+                        </View>
+                        {i.product.map((itemData, index) => {
+                            return (
+                                <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                                    <View style={{}} >
+                                        <Text style={{ marginLeft: 20 }}>
+                                            <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
+                                        </Text>
                                     </View>
-                                )
-                            })
-                            }
-                        </>
-                    )
-                })
+                                    <View style={{ height: 20, flexDirection: "row" }}>
+                                        <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
+                                    </View>
+                                </View>
+                            )
+                        })
+                        }
+                    </>
+                )
+            })
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>

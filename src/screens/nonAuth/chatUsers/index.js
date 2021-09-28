@@ -147,10 +147,7 @@ const ChatUsers = (props) => {
                     action={() => {
                         props.navigation.goBack()
                     }}
-                    imageUrl1={require("../../../assets/plus.png")}
-                    action1={() => {
-                        props.navigation.navigate("ChatMembers")
-                    }}
+                   
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
                     <View style={{

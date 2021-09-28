@@ -218,7 +218,7 @@ const OrderHistory1 = (props) => {
                         cancelOrder()
                     }
                 }}
-                action={() => {
+                action1={() => {
                     setOpen(!open)
                 }}
             />
@@ -237,7 +237,7 @@ const OrderHistory1 = (props) => {
                         blockUser()
                     }
                 }}
-                action={() => {
+                action1={() => {
                     setOpen1(!open1)
                 }}
             />
