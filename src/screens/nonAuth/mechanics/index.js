@@ -40,6 +40,8 @@ const Mechanics = (props) => {
     const [selectedProducts, setSelectedProducts] = useState([])
     const [apiData, setApiData] = useState([])
 
+    console.log("===>>>", selectedItemsWithProviders)
+
     useEffect(() => {
         getProviders()
     }, [])
@@ -97,10 +99,10 @@ const Mechanics = (props) => {
         { json_data.provider_id ? arr.push(json_data) : null }
         setApiData([...arr])
     }
+
     const placeOrder = () => {
         setLoading(true)
         var formdata = new FormData();
-
         apiData.forEach((item, index) => {
             formdata.append('items_data', JSON.stringify([{ ...item }]))
         })
@@ -129,7 +131,6 @@ const Mechanics = (props) => {
         formdata.append("order_from_address", data.order_from_address)
         formdata.append("order_from_lat", data.order_from_lat.toString())
         formdata.append("order_from_long", data.order_from_long.toString())
-
         setLoading(true)
         let headers = {
             "Content-Type": "multipart/form-data",
@@ -167,21 +168,52 @@ const Mechanics = (props) => {
 
     const onSelecItems = (item) => {
         let Items = { providerId: item.user_id, itemId: item.service_item_id, service_name: item.service_items_name, price: item.productTotalPrice, name: item.name, duration: item.time_duration }
-        let x={}
+        let x = {}
+        let z = {}
         let data = []
         let realData = []
         for (let index = 0; index < selectedItemsWithProviders.length; index++) {
             const items = selectedItemsWithProviders[index];
             if (items.itemId == item.service_item_id && items.providerId == item.user_id) {
-                x = { item: items, flag: true }
+                x = { item: items, flag: false }
                 data.push(x)
             }
             else if (items.itemId != item.service_item_id && items.providerId == item.user_id) {
-                x = { item: items, flag: true }
+                if (Items.providerId == items.providerId && Items.itemId == items.itemId) {
+                    x = { item: items, flag: false }
+                }
+                else {
+                    x = { item: items, flag: true }
+                }
                 data.push(x)
+                if (Items.providerId == items.providerId && Items.itemId == items.itemId) {
+                    z = { item: Items, flag: false }
+                }
+                else {
+                    let f = true
+                    for (let index = 0; index < data.length; index++) {
+                        const elements = data[index];
+                        if (elements.item.itemId == Items.itemId) {
+                            f = false
+                        }
+                    }
+                    if (f) {
+                        z = { item: Items, flag: true }
+                    }
+                    else {
+                        z = { item: Items, flag: false }
+                    }
+                }
+                data.push(z)
             }
             else if (items.itemId == item.service_item_id && items.providerId != item.user_id) {
                 x = { item: items, flag: false }
+                z = { item: Items, flag: true }
+                data.push(x)
+                data.push(z)
+            }
+            else if (items.itemId != item.service_item_id && items.providerId != item.user_id) {
+                x = { item: items, flag: true }
                 data.push(x)
             }
         }
@@ -193,11 +225,10 @@ const Mechanics = (props) => {
             if (element.flag) {
                 realData.push(element.item)
             }
-
         }
         setSelectedItemsWithProviders([...realData])
-        console.log(data)
         // add()
+        console.log("after", data)
     }
 
     const checkIncludes = (item) => {
@@ -417,13 +448,13 @@ const Mechanics = (props) => {
                                                 <>
                                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>{i.service_items_name + "(Service)"}</Text>
-                                                        <View style={{ height: 20, flexDirection: "row" }}>
+                                                        <View style={{ height: 25, flexDirection: "row", }}>
                                                             <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.productTotalPrice}</Text>
                                                             <CheckBox
                                                                 checked={checkIncludes(i)}
                                                                 onPress={() => onSelecItems({ ...i, name: name })}
-                                                                checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
-                                                                uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
+                                                                checkedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/checked.png")} />}
+                                                                uncheckedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
                                                             />
                                                         </View>
                                                     </View>
@@ -440,8 +471,8 @@ const Mechanics = (props) => {
                                                                     <CheckBox
                                                                         checked={checkIncludesProduct(itemData)}
                                                                         onPress={() => onSelectProducts(itemData)}
-                                                                        checkedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/checked.png")} />}
-                                                                        uncheckedIcon={<Image style={{ height: 17, width: 17, bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
+                                                                        checkedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/checked.png")} />}
+                                                                        uncheckedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/unchecked.png")} />}
                                                                     />
                                                                 </View>
                                                             </View>
