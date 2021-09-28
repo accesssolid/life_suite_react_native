@@ -1,6 +1,6 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, Dimensions, TextInput, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, Dimensions, TextInput, ScrollView, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -21,8 +21,28 @@ import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
+import BookedSlotsModal from './bookedSlotsModal';
+import Loader from '../../../components/loader'
+import CancelModal from '../../../components/cancelModal';
 // placeholder image
 const placeholder_image = require("../../../assets/user.png")
+
+
+
+function generate_series(step, start_time) {
+    const dt = new Date(1970, 0, 1);
+    const rc = [];
+    while (dt.getDate() === 1) {
+        const dated = new Date(start_time)
+        dated.setHours(dt.getHours())
+        dated.setMinutes(dt.getMinutes())
+        rc.push(dated);
+        dt.setMinutes(dt.getMinutes() + step);
+    }
+    return rc;
+}
+
+
 
 const OrderClientDetail = (props) => {
     const DATE = props.route.params.data
@@ -31,17 +51,30 @@ const OrderClientDetail = (props) => {
     const { servicedata, subService, item } = props.route.params
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
-    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
-    const category_array = ['01:00', '02:00', '03:00', '4:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00']
-    const [startTime, setStartTime] = useState(moment())
-    const [endTime, setEndTime] = useState(moment())
+    const [bookedModal, setBookedModal] = React.useState(false)
+    const [availableStartTimes, setAvailableStartTimes] = React.useState([])
+
     const [fromAddress, setFromAddress] = useState("")
-    const [toAddress, setToAddress] = useState("")
-    const [date, setDate] = useState("")
-    const [open, setOpen] = useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [loading, setLoading] = React.useState(false)
+    const [totalWorkingMinutes, setTotalWorkingMinutes] = React.useState(0)
+    const [selectedStartTime, setSelectedStartTime] = React.useState(null)
+    const [estimated_time, setEstimatedTime] = React.useState("1 hr")
+    const [reason, setReason] = React.useState("")
+    const [cancelModa, setCancelModal] = React.useState(false)
+    // books data from  modal
+    const [booked, setBooked] = React.useState([])
+
+    React.useEffect(() => {
+        if (data) {
+            let ds = generate_series(15, data.order_start_time)
+            let end_time = moment(data.order_end_time).subtract(totalWorkingMinutes, 'minutes').toDate()
+            console.log("dddddddddddd", data, totalWorkingMinutes, end_time, data.order_end_time)
+            let filteredDs = ds.filter(x => x >= new Date(data.order_start_time) && x <= new Date(end_time))
+            setSelectedStartTime(filteredDs[0])
+            setAvailableStartTimes(filteredDs)
+        }
+    }, [data, totalWorkingMinutes])
 
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
@@ -53,18 +86,65 @@ const OrderClientDetail = (props) => {
         longitude: -122.4324,
     })
 
-    const [activeCoordinates, setActiveCoordinates] = useState({
-        latitude: 37.78825,
-        longitude: -122.4324,
-    })
+    React.useEffect(() => {
+        if (data?.id) {
+            if (data.order_from_lat && data.order_from_long) {
+                setToCoordinates({
+                    latitude: data.order_from_lat,
+                    longitude: data.order_from_long,
+                })
+            } else if (data.order_to_lat && data.order_to_long) {
+                setToCoordinates({
+                    latitude: data.order_to_lat,
+                    longitude: data.order_to_long,
+                })
+            }
+        }
+        getBookedSlots()
+    }, [data])
 
-    useEffect(() => {
-        setActiveCoordinates(fromCoordinates)
-    }, [fromCoordinates])
+    const getBookedSlots = () => {
+        // setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ booking_date: moment().format("YYYY-MM-DD") }),
+            endPoint: '/api/providerBookedServices',
+            type: 'post'
+        }
+        console.log(config)
+        getApi(config)
+            .then((response) => {
+                console.log("Booked Slots", response)
+                if (response.status == true) {
+                    if (response.data) {
+                        setBooked(response.data)
+                    } else {
 
-    useEffect(() => {
-        setActiveCoordinates(toCoordinates)
-    }, [toCoordinates])
+                    }
+                } else {
+
+                }
+            }).catch(err => {
+            }).finally(() => {
+                // setLoading(false)
+            })
+    }
+
+    React.useEffect(() => {
+        fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyDY5JgaWK8EK2TC6Zm6460Qwo0G4NbWM-I`).then(res => {
+            console.log(res)
+            return res.json()
+        }).then(x => { console.log(x) }).catch(err => {
+            console.log(err)
+        })
+    }, [toCoordinates, fromCoordinates])
+
+
 
     useEffect(() => {
         // subService.location_type : 2 - Both , 1 - From only
@@ -113,6 +193,7 @@ const OrderClientDetail = (props) => {
         if (hasLocationPermission) {
             Geolocation.getCurrentPosition(
                 (position) => {
+                    console.log("Position", position)
                     getCurrentPlace()
                 },
                 (error) => {
@@ -130,6 +211,7 @@ const OrderClientDetail = (props) => {
             .then((results) => {
                 setFromAddress(results[0].address)
                 setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                console.log(results)
             })
             .catch((error) => console.log(error.message));
     }
@@ -166,13 +248,86 @@ const OrderClientDetail = (props) => {
             })
     }
 
+    const checkBookedInTime = () => {
+        let end_time = (moment(selectedStartTime).add(totalWorkingMinutes, "minutes").toDate())
+        let bookedInTime = booked.filter(x => {
+            if ((new Date(x.order_start_time) <= selectedStartTime && selectedStartTime <= new Date(x.order_end_time)) || (end_time <= new Date(x.order_end_time) && end_time >= new Date(x.order_end_time))) {
+                return true
+            } else {
+                return false
+            }
+        })
+        if (bookedInTime.length > 0) {
+            Alert.alert("Alert", "You have already booked in this time slot. Do you still want to accept?", [{
+                text: "Cancel",
+
+            },
+            {
+                text: "Ok",
+                onPress: () => submit(3)
+            }
+            ])
+        } else {
+            submit(3)
+        }
+
+    }
+
+    const submit = (order_status) => {
+        if (order_status == 3) {
+            if (!selectedStartTime) {
+                return
+            }
+        }
+
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({
+                order_id: data.id,
+                order_status: order_status,
+                reason: reason
+            }),
+            endPoint: "/api/providerOrderStatusUpdate",
+            type: 'post'
+        }
+        if (order_status == 3) {
+            config.data = JSON.stringify({
+                order_id: data.id,
+                order_status: order_status,
+                order_start_time: moment(selectedStartTime).format("YYYY-MM-DD HH:mm"),
+                order_end_time: moment(selectedStartTime).add(totalWorkingMinutes, "minutes").format("YYYY-MM-DD HH:mm"),
+            })
+        }
+        console.log(config)
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                    getOrderDetail(data.id)
+                } else {
+                    showToast(response.message)
+                }
+            }).catch(err => {
+
+            }).finally(() => {
+                setLoading(false)
+
+            })
+    }
+
     useEffect(() => {
         if (item.id) {
             getOrderDetail(item.id)
         }
     }, [item])
 
-    console.log(data)
+
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
             <StatusBar translucent backgroundColor={"transparent"} barStyle="light-content" />
@@ -210,7 +365,7 @@ const OrderClientDetail = (props) => {
                     {/* <RenderView /> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Client Info</Text>
-                        <CardClientInfo data={data} />
+                        <CardClientInfo data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         <RenderAddressFromTO addresses={{
                             from: data?.order_from_address, //from address
                             to: data?.order_placed_address, //to address
@@ -222,28 +377,78 @@ const OrderClientDetail = (props) => {
                             <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>User Requested Time Frame </Text>
                             <Text style={styles.baseTextStyle}>{moment(data?.order_start_time).format("hh:mm a")} - {moment(data?.order_end_time).format("hh:mm a")}</Text>
                         </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                        {/* only show if order status is pending i.e 1 */}
+                        {data?.order_status == 1 && <><View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                             <View>
                                 <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Available Start Time</Text>
-                                <Text style={[styles.baseTextStyle, { color: "skyblue" }]}>(View Booked Slots)</Text>
+                                <Text onPress={() => setBookedModal(true)} style={[styles.baseTextStyle, { color: "skyblue" }]}>(View Booked Slots)</Text>
                             </View>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                             <View>
-                                <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Estimated Drive Time</Text>
-                                <Text style={[styles.baseTextStyle]}>(From Current Location)</Text>
+                                <DropDown
+                                    item={availableStartTimes.map(x => moment(x).format("hh:mm a"))}
+                                    value={moment(selectedStartTime).format("hh:mm a")}
+                                    onChangeValue={(index, value) => {
+                                        setSelectedStartTime(availableStartTimes[index])
+                                    }}
+                                    containerStyle={{ width: 150, alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0, }}
+                                    dropdownStyle={{ height: 120, width: 150 }}
+                                />
                             </View>
                         </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                                <View>
+                                    <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Estimated Drive Time</Text>
+                                    <Text style={[styles.baseTextStyle]}>(From Current Location)</Text>
+                                </View>
+                                <Text style={[styles.baseTextStyle]}>{estimated_time}</Text>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
+                                <TouchableOpacity
+                                    style={styles.save}
+                                    activeOpacity={0.7}
+                                    onPress={() => checkBookedInTime()}>
+                                    <Text style={styles.saveText}>Accept</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
+                                    activeOpacity={0.7}
+                                    onPress={() => setCancelModal(true)}>
+                                    <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Decline</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </>}
                     </ScrollView>
                 </View>
             </SafeAreaView >
+            <BookedSlotsModal visible={bookedModal} setVisible={setBookedModal} />
+            <CancelModal
+                title="Kindly fill the reason for rejection."
+                visible={cancelModa}
+                value={reason}
+                // pressHandler={()=>setCancelModal(false)}
+                onChangeText={(t) => { setReason(t) }}
+                action1={() => {
+                    setCancelModal(false)
+                }}
+                action={() => {
+                    if (reason.trim() == "") {
+                        showToast("Reason cannot be empty!")
+                    }
+                    else {
+                        setCancelModal(false)
+                        setReason('')
+                        submit(2)
+                    }
+                }}
+            />
+            {loading && <Loader />}
         </View>
     )
 }
 
 export default OrderClientDetail;
 
-const CardClientInfo = ({ data }) => {
+const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [totalTime, setTotalTime] = React.useState(0)
@@ -253,6 +458,7 @@ const CardClientInfo = ({ data }) => {
             let t = items.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalTime(total)
+            setTotalWorkingMinutes(total)
         }
     }, [items])
 
@@ -286,10 +492,10 @@ const CardClientInfo = ({ data }) => {
                     <Avatar
                         size="large"
                         rounded
-                        source={ user.user_role === 3 ? data?.customers_profile_image ? { uri: BASE_URL + data?.customers_profile_image } : placeholder_image :  data?.providers_profile_image ? { uri: BASE_URL + data?.providers_profile_image } : placeholder_image  }
+                        source={user.user_role === 3 ? data?.customers_profile_image ? { uri: BASE_URL + data?.customers_profile_image } : placeholder_image : data?.providers_profile_image ? { uri: BASE_URL + data?.providers_profile_image } : placeholder_image}
                     />
                     <View style={{ marginLeft: 10, justifyContent: "center" }}>
-                        <Text style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ?data?.customers_first_name : data?.providers_first_name}</Text>
+                        <Text style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
                         <Text style={[styles.baseTextStyle]}>{country}</Text>
                     </View>
                 </View>
@@ -369,12 +575,7 @@ const RenderAddressFromTO = ({ addresses }) => {
                     />
                 </TouchableOpacity>
             </View>
-            {/* <TouchableOpacity
-                    style={styles.save}
-                    activeOpacity={0.7}
-                    onPress={() => submit()}>
-                    <Text style={styles.saveText}>Submit</Text>
-                </TouchableOpacity> */}
+
         </View>
     )
 }
@@ -397,7 +598,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: 'center',
         height: 45,
-        width: 174,
+        width: "40%",
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
