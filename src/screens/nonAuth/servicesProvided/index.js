@@ -273,7 +273,7 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    <Container style={{ marginTop: 0 }}>
+                   
                         {subService.id == 14 && <View style={{}}>
                             <DropDown
                                 title="Vehicle Type"
@@ -317,6 +317,7 @@ const ServicesProvided = (props) => {
                             </View>
                         </View>}
                         <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
+                        <ScrollView>
                         {
                             activeItem !== null
                                 ?
@@ -334,7 +335,8 @@ const ServicesProvided = (props) => {
                                 :
                                 itemListMaster.length > 0
                                     ?
-                                    <Content style={{ flex: 1 }}>
+                                    <>
+                                   {/* <Content removeClippedSubviews={true} style={{ flex: 1 }}> */}
                                         {itemList && itemList.length > 0
                                             ?
                                             itemList.map((item, index) => {
@@ -349,13 +351,15 @@ const ServicesProvided = (props) => {
                                             })
                                             :
                                             null}
-                                    </Content>
+                                    {/* </Content> */}
+                                    </>
                                     :
                                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                                         {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
                                     </View>
                         }
-                        <TouchableOpacity
+                    </ScrollView>
+                    <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={() => {
@@ -371,8 +375,8 @@ const ServicesProvided = (props) => {
                             }}>
                             <Text style={styles.saveText}>{activeItem !== null ? 'Save Request' : 'Next'}</Text>
                         </TouchableOpacity>
-                        <View style={{ height: 30 }}></View>
-                    </Container>
+                        <View style={{ height: 10 }}></View>
+
                 </View>
                 {loading && <Loader />}
             </SafeAreaView >
@@ -403,7 +407,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
-        marginTop: 20
+        marginTop: 5
     },
     saveText: {
         textAlign: "center",

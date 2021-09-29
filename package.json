@@ -54,6 +54,7 @@
     "react-native-modal-datetime-picker": "^9.2.0",
     "react-native-modal-dropdown": "^1.0.1",
     "react-native-month-year-picker": "^1.8.0",
+    "react-native-open-maps": "^0.4.0",
     "react-native-paper": "^4.9.1",
     "react-native-push-notification": "^8.1.0",
     "react-native-ratings": "^8.1.0",

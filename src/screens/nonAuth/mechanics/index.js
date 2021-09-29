@@ -20,13 +20,12 @@ import { Rating } from 'react-native-ratings';
 import SureModal from '../../../components/sureModal';
 import SureModal1 from '../../../components/sureModal1';;
 import TimeFrame from '../../../components/timeFrame';
-
-
+import _ from 'lodash'
+import moment from 'moment';
 const Mechanics = (props) => {
     const { data, subService, extraData } = props.route.params
     const [loading, setLoading] = useState(false)
     const [providers, setProviders] = useState([])
-    const [selectedProviders, setSelectedProviders] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
     const [price, setPrice] = useState(false)
@@ -38,9 +37,33 @@ const Mechanics = (props) => {
     const [selectedItems, setSelectedItems] = useState([])
     const [selectedItemsWithProviders, setSelectedItemsWithProviders] = useState([])
     const [selectedProducts, setSelectedProducts] = useState([])
+
     const [apiData, setApiData] = useState([])
 
-    console.log("===>>>", selectedItemsWithProviders)
+    //    #liahs
+    const [dupProviders, setDupProviders] = React.useState([])
+
+
+    React.useEffect(() => {
+        console.log("data===>", data)
+    }, [data])
+
+    React.useEffect(() => {
+        console.log(providers)
+        let z = []
+        for (let i of providers) {
+            let changedItems = _.cloneDeep(i.item_list).map(x => {
+                x.checked = false;
+                x.products = _.cloneDeep(x.products).map(y => { y.checked = false; return y })
+                return x
+            })
+            let d = _.cloneDeep(i)
+            d.item_list = changedItems
+            d.checked = false
+            z.push(d)
+        }
+        setDupProviders(z)
+    }, [providers])
 
     useEffect(() => {
         getProviders()
@@ -100,31 +123,11 @@ const Mechanics = (props) => {
         setApiData([...arr])
     }
 
-    const placeOrder = () => {
+    const placeOrder = (jsonData) => {
+        console.log(jsonData)
         setLoading(true)
         var formdata = new FormData();
-        apiData.forEach((item, index) => {
-            formdata.append('items_data', JSON.stringify([{ ...item }]))
-        })
-        // formdata.append("items_data", JSON.stringify([
-        //     {
-        //         "provider_id": "30",
-        //         "estimated_reached_time": "0",
-        //         "order_start_time": "2021-09-26 08:00:00",
-        //         "order_end_time": "2021-09-26 11:00:00",
-        //         "items": ["18"],
-        //         "products": ["1"],
-        //         "other_options": [
-        //             // {
-        //             //     "item_id": "",
-        //             //     "product_id": "",
-        //             //     "other": "",
-        //             //     "have_own": "",
-        //             //     "need_recommendation": ""
-        //             // }
-        //         ]
-        //     }
-        // ]))
+        formdata.append("items_data", JSON.stringify(jsonData))
         formdata.append("order_placed_address", data.order_placed_address)
         formdata.append("order_placed_lat", data.order_placed_lat.toString())
         formdata.append("order_placed_long", data.order_placed_long.toString())
@@ -142,12 +145,16 @@ const Mechanics = (props) => {
             endPoint: '/api/createOrder',
             type: 'post'
         }
+        console.log(config)
         getApi(config)
             .then((response) => {
+                console.log(response,"response")
                 if (response.status == true) {
                     setLoading(false)
+                    props.navigation.navigate("MainDrawer",{screen:"Orders"})
                 }
                 else {
+                    showToast(response.message)
                     setLoading(false)
                 }
             }).catch(err => {
@@ -156,124 +163,60 @@ const Mechanics = (props) => {
             })
     }
 
-    const onSelect = (item) => {
-        let temp = [...selectedProviders]
-        if (selectedProviders.includes(item.id)) {
-            temp.splice(temp.indexOf(item.id), 1)
+
+
+    //value boolean true or false and pIndex is provider index and iIndex is item index and prIndex is product Index
+    const onCheckBoxClicked = (value, pIndex, iIndex, prIndex) => {
+        let d = _.cloneDeep(dupProviders)
+        let provider = d[pIndex]
+        let item = provider.item_list[iIndex]
+
+        // checking for service id if it is already there
+        if (value) {
+            for (let z of d.filter(x => x.id != provider.id)) {
+                for (let s of z.item_list) {
+                    if (s.service_item_id == item.service_item_id && s.checked) {
+                        showToast("You can not have same service or products from different provider.")
+                        return
+                    }
+                }
+            }
+        }
+
+        // if prIndex is passed i.e product index
+        if (typeof prIndex === "number") {
+            let product = item.products[prIndex]
+            product.checked = value
+            if (item.products.filter(x => x.checked).length > 0) {
+                item.checked = true
+            } else {
+                item.checked = false
+            }
         } else {
-            temp.push(item.id)
+            item.checked = value
+            item.products = item.products.map(x => {
+                x.checked = value
+                return x
+            })
         }
-        setSelectedProviders(temp)
+        setDupProviders(d)
+    }
+    // onGlobal check box clicked
+    const onGlobCheckBoxClicked = (pIndex) => {
+        let d = _.cloneDeep(dupProviders)
+        let provider = d[pIndex]
+        let items = provider.item_list
+        let changedItems = _.cloneDeep(items).map(x => {
+            x.checked = false;
+            x.products = _.cloneDeep(x.products).map(y => { y.checked = false; return y })
+            return x
+        })
+        provider.item_list = changedItems
+        setDupProviders(d)
+
     }
 
-    const onSelecItems = (item) => {
-        let Items = { providerId: item.user_id, itemId: item.service_item_id, service_name: item.service_items_name, price: item.productTotalPrice, name: item.name, duration: item.time_duration }
-        let x = {}
-        let z = {}
-        let data = []
-        let realData = []
-        for (let index = 0; index < selectedItemsWithProviders.length; index++) {
-            const items = selectedItemsWithProviders[index];
-            if (items.itemId == item.service_item_id && items.providerId == item.user_id) {
-                x = { item: items, flag: false }
-                data.push(x)
-            }
-            else if (items.itemId != item.service_item_id && items.providerId == item.user_id) {
-                if (Items.providerId == items.providerId && Items.itemId == items.itemId) {
-                    x = { item: items, flag: false }
-                }
-                else {
-                    x = { item: items, flag: true }
-                }
-                data.push(x)
-                if (Items.providerId == items.providerId && Items.itemId == items.itemId) {
-                    z = { item: Items, flag: false }
-                }
-                else {
-                    let f = true
-                    for (let index = 0; index < data.length; index++) {
-                        const elements = data[index];
-                        if (elements.item.itemId == Items.itemId) {
-                            f = false
-                        }
-                    }
-                    if (f) {
-                        z = { item: Items, flag: true }
-                    }
-                    else {
-                        z = { item: Items, flag: false }
-                    }
-                }
-                data.push(z)
-            }
-            else if (items.itemId == item.service_item_id && items.providerId != item.user_id) {
-                x = { item: items, flag: false }
-                z = { item: Items, flag: true }
-                data.push(x)
-                data.push(z)
-            }
-            else if (items.itemId != item.service_item_id && items.providerId != item.user_id) {
-                x = { item: items, flag: true }
-                data.push(x)
-            }
-        }
-        if (selectedItemsWithProviders.length == 0) {
-            data.push({ item: Items, flag: true })
-        }
-        for (let index = 0; index < data.length; index++) {
-            const element = data[index];
-            if (element.flag) {
-                realData.push(element.item)
-            }
-        }
-        setSelectedItemsWithProviders([...realData])
-        // add()
-        console.log("after", data)
-    }
-
-    const checkIncludes = (item) => {
-        let flag = false;
-        for (let index = 0; index < selectedItemsWithProviders.length; index++) {
-            const element = selectedItemsWithProviders[index];
-            if (item.service_item_id == element.itemId && element.providerId == item.user_id) {
-                flag = true
-            }
-        }
-        if (flag) {
-            return true
-        }
-        else {
-            return false
-        }
-    }
-
-    const checkIncludesProduct = (item) => {
-        let flag = false;
-        for (let index = 0; index < selectedItems.length; index++) {
-            const element = selectedItems[index];
-            if (item.service_item_id == element.itemId && element.providerId == item.user_id) {
-                flag = true
-            }
-        }
-        if (flag) {
-            return true
-        }
-        else {
-            return false
-        }
-    }
-
-    const onSelectProducts = (item) => {
-        let temp = [...selectedProducts]
-        if (selectedProducts.includes(item.item_product_id)) {
-            temp.splice(temp.indexOf(item.item_product_id), 1)
-        } else {
-            temp.push(item.item_product_id)
-        }
-        setSelectedProducts(temp)
-    }
-
-    const like = (id) => {
+    const like = (id, value) => {
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -291,7 +234,10 @@ const Mechanics = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    getProviders()
+                    let d = _.cloneDeep(dupProviders)
+                    let providerIndex = d.findIndex(x => x.id == id)
+                    d[providerIndex].is_favourite = value == 1 ? 0 : 1
+                    setDupProviders(d)
                     showToast(response.message)
                 }
                 else {
@@ -318,7 +264,10 @@ const Mechanics = (props) => {
                 />
                 <TimeFrame
                     visible={open2}
-                    action={() => {
+                    data={dupProviders}
+                    orderPreviousData={data}
+                    action={(jsonData) => {
+                        placeOrder(jsonData)
                         setOpen2(!open2);
                     }}
                     pressHandler={() => {
@@ -359,21 +308,51 @@ const Mechanics = (props) => {
                                 {/* <TouchableOpacity onPress={() => { setOpen2(!open2) }} style={{ justifyContent: "center", alignItems: "center" }}>
                                     <Image style={{ height: 30, width: 30, alignSelf: "center" }} source={require("../../../assets/filter.png")} />
                                 </TouchableOpacity> */}
-                                <TouchableOpacity onPress={() => { setPrice(!price), price ? providers.sort((a, b) => a.totalPrice - b.totalPrice) : providers.sort((a, b) => b.totalPrice - a.totalPrice) }} style={styles.upper} >
+                                <TouchableOpacity onPress={() => {
+                                    setPrice(!price)
+                                    let data = _.cloneDeep(dupProviders)
+                                    if (price) {
+                                        data.sort((a, b) => a.totalPrice - b.totalPrice)
+                                    }
+                                    else {
+                                        data.sort((a, b) => b.totalPrice - a.totalPrice)
+                                    }
+                                    setDupProviders(data)
+                                }} style={styles.upper} >
                                     <Text style={styles.upperText}>Price</Text>
                                     <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => { setTime(!time), time ? providers.sort((a, b) => a.timeDuration - b.timeDuration) : providers.sort((a, b) => b.timeDuration - a.timeDuration) }} style={styles.upper} >
+                                <TouchableOpacity onPress={() => {
+                                    setTime(!time)
+                                    let data = _.cloneDeep(dupProviders)
+                                    if (time) {
+                                        data.sort((a, b) => a.timeDuration - b.timeDuration)
+                                    } else {
+                                        data.sort((a, b) => b.timeDuration - a.timeDuration)
+                                    }
+                                    setDupProviders(data)
+                                }} style={styles.upper} >
                                     <Text style={styles.upperText}>Time</Text>
                                     <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => { setRating(!rating), rating ? providers.sort((a, b) => a.rating - b.rating) : providers.sort((a, b) => b.rating - a.rating) }} style={styles.upper} >
+                                <TouchableOpacity onPress={() => {
+                                    setRating(!rating)
+                                    let data = _.cloneDeep(dupProviders)
+                                    if (rating) {
+                                        data.sort((a, b) => a.rating - b.rating)
+                                    } else {
+                                        data.sort((a, b) => b.rating - a.rating)
+                                    }
+                                    setDupProviders(data)
+                                }} style={styles.upper} >
                                     <Text style={styles.upperText}>Rating</Text>
                                     <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
                                 </TouchableOpacity>
                             </View>
-                            {providers.length > 0 ?
-                                providers.map((item, index) => {
+                            {/* providers changed to dupProviders */}
+                            {dupProviders.length > 0 ?
+                                dupProviders.map((item, index) => {
+                                    console.log(item)
                                     let country = item?.current_address?.split(",")
                                     let countryName = country[country?.length - 1]
                                     let x = item.timeDuration / 60
@@ -384,6 +363,17 @@ const Mechanics = (props) => {
                                         time_format = item.timeDuration + " min"
                                     }
                                     let name = item.first_name
+                                    // price calculation
+                                    let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
+                                    let totalProductPrice = 0
+                                    for (let z of item.item_list) {
+                                        for (let p of z.products) {
+                                            if (p.checked) {
+                                                totalProductPrice += Number(p.price)
+                                            }
+                                        }
+                                    }
+                                    let totalPrice = totalServicePrice + totalProductPrice
                                     // setName(name)
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -400,7 +390,7 @@ const Mechanics = (props) => {
                                                     <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>{countryName.trim()}</Text>
                                                 </View>
                                             </View>
-                                            <TouchableOpacity onPress={() => { like(item.id) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center', position: "absolute", right: 5 }}>
+                                            <TouchableOpacity onPress={() => { like(item.id, item.is_favourite) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center', position: "absolute", right: 5 }}>
                                                 {item.is_favourite === 1
                                                     ?
                                                     <Image style={{ height: 18, width: 21 }} source={require('../../../assets/heartGreen.png')} resizeMode="cover" />
@@ -408,15 +398,17 @@ const Mechanics = (props) => {
                                                     <Image style={{ height: 18, width: 21 }} source={require('../../../assets/whiteHeart.png')} resizeMode="cover" />
                                                 }
                                             </TouchableOpacity>
-                                            {/* <View style={{ flexDirection: "row", marginTop: 20 }}>
+                                            {totalPrice > 0 && <View style={{ flexDirection: "row", marginTop: 20 }}>
                                                 <CheckBox
-                                                    checked={selectedProviders.includes(item.id)}
-                                                    onPress={() => onSelect(item)}
+                                                    checked={totalPrice > 0}
+                                                    onPress={() => {
+                                                        onGlobCheckBoxClicked(index)
+                                                    }}
                                                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                                                 />
-                                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15, right: 15 }}>{"$" + item.itemTotalPrice}</Text>
-                                            </View> */}
+                                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15, right: 15 }}>$ {totalPrice}</Text>
+                                            </View>}
                                         </View>
                                         {!open ?
                                             <Text numberOfLines={1} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.about}</Text>
@@ -436,7 +428,7 @@ const Mechanics = (props) => {
                                             />
                                         </View>
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
-                                        {item.item_list.map((i) => {
+                                        {item.item_list.map((i, iIndex) => {
                                             let x = i.time_duration / 60
                                             let time_format = ""
                                             if (x > 1) {
@@ -449,16 +441,18 @@ const Mechanics = (props) => {
                                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                                         <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>{i.service_items_name + "(Service)"}</Text>
                                                         <View style={{ height: 25, flexDirection: "row", }}>
-                                                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.productTotalPrice}</Text>
+                                                            <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.price}</Text>
                                                             <CheckBox
-                                                                checked={checkIncludes(i)}
-                                                                onPress={() => onSelecItems({ ...i, name: name })}
+                                                                // checked={checkIncludes(i)}
+                                                                // onPress={() => onSelecItems({ ...i, name: name })}
+                                                                checked={i.checked}
+                                                                onPress={() => onCheckBoxClicked(!i.checked, index, iIndex, null)}
                                                                 checkedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/checked.png")} />}
                                                                 uncheckedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
                                                             />
                                                         </View>
                                                     </View>
-                                                    {i.products.map((itemData) => {
+                                                    {i.products.map((itemData, prIndex) => {
                                                         return (
                                                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
                                                                 <View style={{}} >
@@ -469,8 +463,10 @@ const Mechanics = (props) => {
                                                                 <View style={{ height: 20, flexDirection: "row" }}>
                                                                     <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + itemData.price}</Text>
                                                                     <CheckBox
-                                                                        checked={checkIncludesProduct(itemData)}
-                                                                        onPress={() => onSelectProducts(itemData)}
+                                                                        // checked={checkIncludesProduct(itemData)}
+                                                                        // onPress={() => onSelectProducts(itemData)}
+                                                                        checked={itemData.checked}
+                                                                        onPress={() => onCheckBoxClicked(!itemData.checked, index, iIndex, prIndex)}
                                                                         checkedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/checked.png")} />}
                                                                         uncheckedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/unchecked.png")} />}
                                                                     />
@@ -497,7 +493,22 @@ const Mechanics = (props) => {
                                 style={styles.save}
                                 activeOpacity={0.7}
                                 onPress={() => {
-                                    setOpen2(!open2)
+                                    // props.navigation.navigate("MainDrawer",{screen:"Orders"})
+                                    let requiredSevices=JSON.parse(data.json_data)?.items
+                                    let z=[]
+                                    for(let p of dupProviders){
+                                        for(let item of p.item_list){
+                                            if(item.checked){
+                                                z.push(item.service_item_id)
+                                            }
+                                        }
+                                    }
+                                    console.log("data===>",requiredSevices,z)
+                                    if(_.isEqual(requiredSevices.sort((a,b)=>a-b),z.sort((a,b)=>a-b))){
+                                        setOpen2(!open2)
+                                    }else{
+                                        showToast("Please select service provider for all the service listed.")
+                                    }
                                 }}>
                                 <Text style={styles.saveText}>Request</Text>
                             </TouchableOpacity>

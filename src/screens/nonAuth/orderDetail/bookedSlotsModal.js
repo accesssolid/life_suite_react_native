@@ -9,47 +9,8 @@ import { BASE_URL, getApi } from '../../../api/api';
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
 
-export default function BookedSlotsModal({ visible, setVisible }) {
-    const [data, setData] = React.useState([])
-    const access_token = useSelector(state => state.authenticate.access_token)
-    const [loading, setLoading] = React.useState(false)
-    React.useEffect(() => {
-        if (access_token) {
-            getBookedSlots()
-        }
-    }, [access_token])
-
-    const getBookedSlots = () => {
-        setLoading(true)
-        let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${access_token}`
-        }
-        let config = {
-            headers: headers,
-            data: JSON.stringify({ booking_date: moment().format("YYYY-MM-DD") }),
-            endPoint: '/api/providerBookedServices',
-            type: 'post'
-        }
-        console.log(config)
-        getApi(config)
-            .then((response) => {
-                console.log("Booked Slots", response)
-                if (response.status == true) {
-                    if (response.data) {
-                        setData(response.data)
-                    } else {
-
-                    }
-                } else {
-
-                }
-            }).catch(err => {
-            }).finally(() => {
-                setLoading(false)
-            })
-    }
+export default function BookedSlotsModal({ visible,booked, setVisible }) {
+  
     return (
         <Modal
             visible={visible}
@@ -64,7 +25,7 @@ export default function BookedSlotsModal({ visible, setVisible }) {
                     <Card containerStyle={{ maxHeight: 300,borderRadius:5}}>
                         <Card.Title style={{ fontFamily: LS_FONTS.PoppinsBold }}>Booked Slots</Card.Title>
                         <ScrollView>
-                            {data.map(x => {
+                            {booked.map(x => {
                                 return (
                                     <>
                                     <Card.Divider />

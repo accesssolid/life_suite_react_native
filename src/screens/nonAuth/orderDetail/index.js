@@ -1,6 +1,6 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, Dimensions, TextInput, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, Dimensions, Linking, ScrollView, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -26,16 +26,19 @@ import Loader from '../../../components/loader'
 import CancelModal from '../../../components/cancelModal';
 // placeholder image
 const placeholder_image = require("../../../assets/user.png")
+import _ from 'lodash'
+import openMap from 'react-native-open-maps';
 
 
 
 function generate_series(step, start_time) {
-    const dt = new Date(1970, 0, 1);
+    const dt = moment(start_time, 'YYYY-MM-DD HH:mm').toDate()
+    const dt_another = moment(start_time, 'YYYY-MM-DD').add(1, "day").toDate()
     const rc = [];
-    while (dt.getDate() === 1) {
-        const dated = new Date(start_time)
-        dated.setHours(dt.getHours())
-        dated.setMinutes(dt.getMinutes())
+    while (dt < dt_another) {
+        const dated = moment(start_time, 'YYYY-MM-DD HH:mm')
+        dated.hour(dt.getHours())
+        dated.minute(dt.getMinutes())
         rc.push(dated);
         dt.setMinutes(dt.getMinutes() + step);
     }
@@ -58,7 +61,7 @@ const OrderClientDetail = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const [loading, setLoading] = React.useState(false)
     const [totalWorkingMinutes, setTotalWorkingMinutes] = React.useState(0)
-    const [selectedStartTime, setSelectedStartTime] = React.useState(null)
+    const [selectedStartTime, setSelectedStartTime] = React.useState(moment())
     const [estimated_time, setEstimatedTime] = React.useState("1 hr")
     const [reason, setReason] = React.useState("")
     const [cancelModa, setCancelModal] = React.useState(false)
@@ -68,10 +71,14 @@ const OrderClientDetail = (props) => {
     React.useEffect(() => {
         if (data) {
             let ds = generate_series(15, data.order_start_time)
-            let end_time = moment(data.order_end_time).subtract(totalWorkingMinutes, 'minutes').toDate()
-            console.log("dddddddddddd", data, totalWorkingMinutes, end_time, data.order_end_time)
-            let filteredDs = ds.filter(x => x >= new Date(data.order_start_time) && x <= new Date(end_time))
-            setSelectedStartTime(filteredDs[0])
+            let end_time = moment(data.order_end_time, "YYYY-MM-DD HH:mm").subtract(totalWorkingMinutes, 'minutes')
+            let filteredDs = ds.filter(x => x.toDate() >= moment(data.order_start_time, "YYYY-MM-DD HH:mm").toDate() && x.toDate() <= end_time.toDate())
+            console.log(filteredDs.map(x => x.format("HH:mm")), "dddddddd", ds.map(x => x.format("HH:mm")))
+            if (filteredDs[0]) {
+                setSelectedStartTime(filteredDs[0])
+            } else {
+                setSelectedStartTime(moment(data.order_start_time, "YYYY-MM-DD HH:mm"))
+            }
             setAvailableStartTimes(filteredDs)
         }
     }, [data, totalWorkingMinutes])
@@ -99,8 +106,8 @@ const OrderClientDetail = (props) => {
                     longitude: data.order_to_long,
                 })
             }
+            getBookedSlots()
         }
-        getBookedSlots()
     }, [data])
 
     const getBookedSlots = () => {
@@ -112,14 +119,12 @@ const OrderClientDetail = (props) => {
         }
         let config = {
             headers: headers,
-            data: JSON.stringify({ booking_date: moment().format("YYYY-MM-DD") }),
+            data: JSON.stringify({ booking_date: moment(data?.order_start_time, "YYYY-MM-DD HH:mm").format("YYYY-MM-DD") }),
             endPoint: '/api/providerBookedServices',
             type: 'post'
         }
-        console.log(config)
         getApi(config)
             .then((response) => {
-                console.log("Booked Slots", response)
                 if (response.status == true) {
                     if (response.data) {
                         setBooked(response.data)
@@ -136,10 +141,18 @@ const OrderClientDetail = (props) => {
     }
 
     React.useEffect(() => {
-        fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyDY5JgaWK8EK2TC6Zm6460Qwo0G4NbWM-I`).then(res => {
-            console.log(res)
+        fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyBtDBhUzqiZRbcFQezVwgfB9I6Wr4TkJkE`).then(res => {
+
             return res.json()
-        }).then(x => { console.log(x) }).catch(err => {
+        }).then(res => {
+            if (res?.rows[0]) {
+                let element = res.rows[0].elements[0]
+                let duration = element?.duration?.text
+                if (duration) {
+                    setEstimatedTime(duration)
+                }
+            }
+        }).catch(err => {
             console.log(err)
         })
     }, [toCoordinates, fromCoordinates])
@@ -211,7 +224,7 @@ const OrderClientDetail = (props) => {
             .then((results) => {
                 setFromAddress(results[0].address)
                 setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
-                console.log(results)
+
             })
             .catch((error) => console.log(error.message));
     }
@@ -232,7 +245,6 @@ const OrderClientDetail = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
@@ -240,7 +252,7 @@ const OrderClientDetail = (props) => {
 
                     }
                 } else {
-
+                    showToast(response.message)
                 }
             }).catch(err => {
             }).finally(() => {
@@ -249,9 +261,9 @@ const OrderClientDetail = (props) => {
     }
 
     const checkBookedInTime = () => {
-        let end_time = (moment(selectedStartTime).add(totalWorkingMinutes, "minutes").toDate())
+        let end_time = _.cloneDeep(selectedStartTime)?.add(totalWorkingMinutes, "minutes").toDate()
         let bookedInTime = booked.filter(x => {
-            if ((new Date(x.order_start_time) <= selectedStartTime && selectedStartTime <= new Date(x.order_end_time)) || (end_time <= new Date(x.order_end_time) && end_time >= new Date(x.order_end_time))) {
+            if ((moment(x.order_start_time, "YYYY-MM-DD HH:mm").toDate() <= selectedStartTime?.toDate() && selectedStartTime?.toDate() <= moment(x.order_end_time, "YYYY-MM-DD HH:mm").toDate()) || (end_time <= moment(x.order_end_time, "YYYY-MM-DD HH:mm").toDate() && end_time >= moment(x.order_end_time, "YYYY-MM-DD HH:mm").toDate())) {
                 return true
             } else {
                 return false
@@ -274,8 +286,11 @@ const OrderClientDetail = (props) => {
     }
 
     const submit = (order_status) => {
+        // console.log(selectedStartTime)
+        // return 
         if (order_status == 3) {
             if (!selectedStartTime) {
+                showToast("Select available start time to accept the order.")
                 return
             }
         }
@@ -300,16 +315,15 @@ const OrderClientDetail = (props) => {
             config.data = JSON.stringify({
                 order_id: data.id,
                 order_status: order_status,
-                order_start_time: moment(selectedStartTime).format("YYYY-MM-DD HH:mm"),
-                order_end_time: moment(selectedStartTime).add(totalWorkingMinutes, "minutes").format("YYYY-MM-DD HH:mm"),
+                order_start_time: _.cloneDeep(selectedStartTime)?.format("YYYY-MM-DD HH:mm"),
+                order_end_time: _.cloneDeep(selectedStartTime)?.add(totalWorkingMinutes, "minutes").format("YYYY-MM-DD HH:mm"),
             })
         }
         console.log(config)
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
-                    getOrderDetail(data.id)
+                    setData(response.data)
                 } else {
                     showToast(response.message)
                 }
@@ -348,7 +362,7 @@ const OrderClientDetail = (props) => {
                                     titleStyle={{ color: "white" }}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
-                                        props.navigation.navigate("HomeScreen")
+                                        props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})
                                     }}
                                     imageStyle1={{ tintColor: "white" }}
                                 />
@@ -366,11 +380,11 @@ const OrderClientDetail = (props) => {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Client Info</Text>
                         <CardClientInfo data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        <RenderAddressFromTO addresses={{
+                        <RenderAddressFromTO currentAddress={fromCoordinates} addresses={{
                             from: data?.order_from_address, //from address
                             to: data?.order_placed_address, //to address
-                            fromCoordinates: { latitude: data?.order_from_lat, longitude: data?.order_from_long }, //from in lat && long
-                            toCoordinates: { latitude: data?.order_placed_lat, longitude: data?.order_placed_long } //to in lat && long
+                            fromCoordinates: { latitude: Number(data?.order_from_lat), longitude: Number(data?.order_from_long) }, //from in lat && long
+                            toCoordinates: { latitude: Number(data?.order_placed_lat), longitude: Number(data?.order_placed_long) } //to in lat && long
                         }}
                         />
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
@@ -386,8 +400,8 @@ const OrderClientDetail = (props) => {
                             </View>
                             <View>
                                 <DropDown
-                                    item={availableStartTimes.map(x => moment(x).format("hh:mm a"))}
-                                    value={moment(selectedStartTime).format("hh:mm a")}
+                                    item={availableStartTimes.map(x => x.format("hh:mm a"))}
+                                    value={selectedStartTime?.format("hh:mm a")}
                                     onChangeValue={(index, value) => {
                                         setSelectedStartTime(availableStartTimes[index])
                                     }}
@@ -421,21 +435,23 @@ const OrderClientDetail = (props) => {
                                     <TouchableOpacity
                                         style={styles.save}
                                         activeOpacity={0.7}
-                                        onPress={() => {showToast("in progress.....")}}>
+                                        onPress={() => { showToast("in progress.....") }}>
                                         <Text style={styles.saveText}>Update Order</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
                                         activeOpacity={0.7}
                                         onPress={() => {
-                                            props.navigation.navigate("ChatScreen",{item:{
-                                                id:data.customer_id,
-                                                email:data.customers_email,
-                                                first_name:data.customers_first_name,
-                                                last_name:data.customers_last_name,
-                                                phone_number:data.customers_phone_number,
-                                                profile_image:data.customers_profile_image
-                                            }})
+                                            props.navigation.navigate("ChatScreen", {
+                                                item: {
+                                                    id: data.customer_id,
+                                                    email: data.customers_email,
+                                                    first_name: data.customers_first_name,
+                                                    last_name: data.customers_last_name,
+                                                    phone_number: data.customers_phone_number,
+                                                    profile_image: data.customers_profile_image
+                                                }
+                                            })
                                         }}>
                                         <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Chat</Text>
                                     </TouchableOpacity>
@@ -445,7 +461,7 @@ const OrderClientDetail = (props) => {
                     </ScrollView>
                 </View>
             </SafeAreaView >
-            <BookedSlotsModal visible={bookedModal} setVisible={setBookedModal} />
+            <BookedSlotsModal visible={bookedModal} booked={booked} setVisible={setBookedModal} />
             <CancelModal
                 title="Kindly fill the reason for rejection."
                 visible={cancelModa}
@@ -568,7 +584,7 @@ const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
     )
 }
 
-const RenderAddressFromTO = ({ addresses }) => {
+const RenderAddressFromTO = ({ addresses, currentAddress }) => {
     const navigation = useNavigation()
     return (
         <View style={{ marginHorizontal: 20, marginTop: 20 }}>
@@ -576,7 +592,17 @@ const RenderAddressFromTO = ({ addresses }) => {
             <View style={styles.fromContainer}>
                 <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.from}</Text>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })}
+                    onPress={() => {
+                        // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
+                        if (addresses.fromCoordinates?.latitude && addresses.fromCoordinates?.longitude) {
+                            if (Platform.OS == "android") {
+                                Linking.openURL(`google.navigation:q=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                            } else {
+                                Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                            }
+
+                        }
+                    }}
                     style={{ height: 20, width: 40 }}
                     activeOpacity={0.7}>
                     <Image
@@ -589,7 +615,16 @@ const RenderAddressFromTO = ({ addresses }) => {
             <View style={styles.fromContainer}>
                 <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.to}</Text>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.toCoordinates })}
+                    onPress={() => {
+                        if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {
+                            if (Platform.OS == "android") {
+                                Linking.openURL(`google.navigation:q=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                            } else {
+                                Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                            }
+                        }
+                        // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.toCoordinates })
+                    }}
                     style={{ height: 20, width: 40 }}
                     activeOpacity={0.7}>
                     <Image

@@ -136,7 +136,7 @@ const OrderHistory1 = (props) => {
         }
         let user_data = {
             "order_id": orderId,
-            "order_status": 2,
+            "order_status": 1,
             "reason": reason
         }
 
@@ -386,7 +386,7 @@ const OrderHistory1 = (props) => {
                                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}></Text>
                                                 <Text style={styles.baseTextStyle}>{"Total Price :  $" + item?.order_total_price}</Text>
                                             </View>
-                                            {item.order_status == 1 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
+                                            {item.order_status !== 1 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
                                                 <TouchableOpacity
                                                     style={styles.save}
                                                     activeOpacity={0.7}

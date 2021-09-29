@@ -48,7 +48,7 @@ const ServiceItemUser = (props) => {
                 <Text style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{props.item.name}</Text>
             </View>
             {props.activeMode && <View style={{ flex: 1 }}>
-                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+                <ScrollView removeClippedSubviews={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                     {props.item.products.map((product, indexx) => {
                         return (
                             <View key={indexx} style={{ flexDirection: "row", paddingLeft: '10%' }}>

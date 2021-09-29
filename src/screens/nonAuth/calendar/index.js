@@ -20,7 +20,7 @@ import CustomInput from "../../../components/textInput"
 import CustomButton from "../../../components/customButton"
 
 const Calendar = (props) => {
-    const { setDate } = props.route.params
+    const { setDate,service } = props.route.params
     const [date, setDatee] = useState(moment(new Date().getTime()).format("DD MMM YYYY"))
 
     const onDateChange = (date) => {
@@ -58,6 +58,7 @@ const Calendar = (props) => {
                         monthYearHeaderWrapperStyle={{
                             fontSize: 18
                         }}
+                        minDate={new Date()}
                         selectedDayColor={LS_COLORS.global.green}
                         selectedDayTextColor={LS_COLORS.global.white}
                         textStyle={{
@@ -71,7 +72,7 @@ const Calendar = (props) => {
                             <View style={{ height: 60, width: 60, backgroundColor: LS_COLORS.global.green, borderRadius: 100, marginLeft: 20, justifyContent: 'center', alignItems: 'center' }}>
                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsBold, color: LS_COLORS.global.white, textAlign: 'center' }}>{date}</Text>
                             </View>
-                            <Text style={{ alignSelf: 'center', fontSize: 14, fontFamily: LS_FONTS.PoppinsLight, marginLeft: 10 }}>Need a Mechanic</Text>
+                            <Text style={{ alignSelf: 'center', fontSize: 14, fontFamily: LS_FONTS.PoppinsLight, marginLeft: 10 }}>Need a {service}</Text>
                         </View>
                         <TouchableOpacity
                             style={styles.save}

@@ -7,7 +7,7 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -105,8 +105,10 @@ const MapScreen = (props) => {
             .then((results) => {
                 setAddress(results[0].address)
                 placesRef.current.setAddressText(results[0].address)
-                setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
-                mapRef.current.animateToRegion({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                if(results[0].location.latitude){
+                    setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                    mapRef.current.animateToRegion({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                }
             })
             .catch((error) => console.log("results error => ", error.message))
             .finally(() => {
@@ -167,18 +169,21 @@ const MapScreen = (props) => {
                         placeholder='Search'
                         fetchDetails={true}
                         onPress={(data, details) => {
-                            setCoordinates({
-                                ...coordinates,
-                                latitude: details?.geometry?.location?.lat,
-                                longitude: details.geometry?.location?.lng
-                            })
-                            setAddress(data?.description)
-                            placesRef.current.blur()
-                            mapRef.current.animateToRegion({
-                                ...coordinates,
-                                latitude: details?.geometry?.location?.lat,
-                                longitude: details.geometry?.location?.lng
-                            })
+                            if(details?.geometry?.location?.lat){
+                                setCoordinates({
+                                    ...coordinates,
+                                    latitude: details?.geometry?.location?.lat,
+                                    longitude: details.geometry?.location?.lng
+                                })
+                                setAddress(data?.description)
+                                placesRef.current.blur()
+                                mapRef.current.animateToRegion({
+                                    ...coordinates,
+                                    latitude: details?.geometry?.location?.lat,
+                                    longitude: details.geometry?.location?.lng
+                                })
+                            }
+                         
                             if (Platform.OS == "ios") {
                                 setFocused(false)
                             }
@@ -209,7 +214,7 @@ const MapScreen = (props) => {
                                 }}
                                 action={() => {
                                     // #liahs checked to permaned to true
-                                    setIsPermanetClicked(true)
+                                    // setIsPermanetClicked(true)
                                     setAddress(`${user.address[0].address_line_1}`)
                                     placesRef.current.setAddressText(`${user.address[0].address_line_1}`)
                                     setCoordinates({
@@ -234,8 +239,8 @@ const MapScreen = (props) => {
                                     backgroundColor: LS_COLORS.global.green,
                                 }}
                                 action={() => {
-                                         // #liahs checked to permaned to true
-                                         setIsPermanetClicked(true)
+                                    // #liahs checked to permaned to true
+                                    // setIsPermanetClicked(true)
                                     setAddress(`${user.address[1].address_line_1}`)
                                     placesRef.current.setAddressText(`${user.address[1].address_line_1}`)
                                     setCoordinates({
@@ -253,16 +258,35 @@ const MapScreen = (props) => {
                         </View>
                         <MapView
                             ref={mapRef}
-                            // initialRegion={{ ...coordinates }}
-                            // camera={{ ...coordinates }}
+                            initialRegion={{...coordinates,
+                                latitudeDelta: 0.0922,
+                                longitudeDelta: 0.0421,
+                            }}
+                            // camera={{ ...coordinates,
+                            //     latitudeDelta: 0.0922,
+                            //     longitudeDelta: 0.0421,
+                            //  }}
                             style={styles.map}
-                            onRegionChange={(reg) => { setCoordinates({ ...reg, }) }}
-                            onRegionChangeComplete={(reg) => reverseGeocode(reg.latitude, reg.longitude)}>
+                            region={{
+                                ...coordinates,
+                                latitudeDelta: 0.0922,
+                                longitudeDelta: 0.0421,
+                            }}
+                        >
+                            <Marker
+                                // icon={require('../../../assets/pin.png')}
+                                pinColor={"black"}
+                                coordinate={coordinates}
+                            />
                         </MapView>
-                        <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}>
+
+                        {/* <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}>
                             <Image pointerEvents="none" style={{ height: 40, aspectRatio: 1 }} source={require('../../../assets/pin.png')} />
-                        </View>
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => getLocationPermission()} style={{ position: 'absolute', height: 30, aspectRatio: 1, bottom: '15%', right: '10%' }}>
+                        </View> */}
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                            // setIsPermanetClicked(true)
+                            getLocationPermission()
+                        }} style={{ position: 'absolute', height: 30, aspectRatio: 1, bottom: '15%', right: '10%' }}>
                             <Image style={{ height: '100%', aspectRatio: 1, tintColor: LS_COLORS.global.green }} source={require('../../../assets/gps.png')} resizeMode="contain" />
                         </TouchableOpacity>
                         <View style={{ paddingBottom: '5%', position: 'absolute', bottom: 0, width: '100%' }}>

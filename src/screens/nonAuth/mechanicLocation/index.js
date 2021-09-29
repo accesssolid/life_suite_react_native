@@ -173,8 +173,13 @@ const MechanicLocation = (props) => {
     };
 
     const handleConfirm1 = (date) => {
-        setEndTime(date)
+        if(moment(date).toDate()>moment(startTime).toDate()){
+            setEndTime(date)
+        }else{
+            showToast("End time must be greater than start time.")
+        }
         setDatePickerVisibility1(false);
+
     };
 
     const onLocation = (location, coords) => {
@@ -226,50 +231,38 @@ const MechanicLocation = (props) => {
                     </View> */}
                     <View style={{ marginTop: 20 }}>
                         <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>
-                        <View style={styles.fromContainer}>
-                            <TextInput
-                                style={styles.inputStyle}
-                                color="black"
-                                value={fromAddress}
-                                onChangeText={setFromAddress}
-                                placeholder="From Address"
-                                placeholderTextColor={LS_COLORS.global.placeholder}
-                                onChangeText={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
-                                ref={fromInputRef}
-                            />
+                        <TouchableOpacity
+                            onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
+                            style={styles.fromContainer}>
+                            <Text style={{ flex: 1, }} numberOfLines={1}>
+                                {fromAddress}
+                            </Text>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
-                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1, justifyContent: 'center' }}
+                                style={{ height: '100%', aspectRatio: 1, justifyContent: 'center', alignItems: "flex-end", paddingHorizontal: 10 }}
                                 activeOpacity={0.7}>
                                 <Image
                                     style={{ height: 15, width: 20, resizeMode: "contain" }}
                                     source={require("../../../assets/location.png")}
                                 />
                             </TouchableOpacity>
-                        </View>
+                        </TouchableOpacity>
                         {console.log(subService)}
                         {subService.location_type == 2 ? <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text> : null}
-                        {subService.location_type == 2 && <View style={styles.fromContainer}>
-                            <TextInput
-                                style={styles.inputStyle}
-                                color="black"
-                                value={toAddress}
-                                onChangeText={setToAddress}
-                                placeholder="To Address"
-                                placeholderTextColor={LS_COLORS.global.placeholder}
-                                onChangeText={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
-                                ref={toInputRef}
-                            />
+                        {subService.location_type == 2 && <TouchableOpacity
+                            onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
+                            style={styles.fromContainer}>
+                            <Text style={{ flex: 1, }} numberOfLines={1}>{toAddress}</Text>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
-                                style={{ alignSelf: "center", height: '100%', aspectRatio: 1, justifyContent: 'center' }}
+                                style={{ height: '100%', aspectRatio: 1, justifyContent: 'center', alignItems: "flex-end", paddingHorizontal: 10 }}
                                 activeOpacity={0.7}>
                                 <Image
                                     style={{ height: 15, width: 20, resizeMode: "contain" }}
                                     source={require("../../../assets/location.png")}
                                 />
                             </TouchableOpacity>
-                        </View>}
+                        </TouchableOpacity>}
                         <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>Add Date</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
@@ -282,7 +275,7 @@ const MechanicLocation = (props) => {
                             />
                             <TouchableOpacity
                                 onPress={() => {
-                                    props.navigation.navigate("Calendar", { setDate: setDate.bind(this) })
+                                    props.navigation.navigate("Calendar", { setDate: setDate.bind(this), service: subService.name })
                                 }}
                                 style={{ alignSelf: "center", height: '100%', aspectRatio: 1, justifyContent: 'center' }}
                                 activeOpacity={0.7}
@@ -318,12 +311,14 @@ const MechanicLocation = (props) => {
                     <DateTimePickerModal
                         isVisible={isDatePickerVisible}
                         mode="time"
+                        date={moment(startTime).toDate()}
                         onConfirm={handleConfirm}
                         onCancel={() => setDatePickerVisibility(false)}
                     />
                     <DateTimePickerModal
                         isVisible={isDatePickerVisible1}
                         mode="time"
+                        date={moment(endTime).toDate()}
                         onConfirm={handleConfirm1}
                         onCancel={() => setDatePickerVisibility1(false)}
                     />
@@ -424,6 +419,7 @@ const styles = StyleSheet.create({
         height: 50,
         width: "88%",
         alignSelf: 'center',
+        alignItems: "center",
         borderColor: LS_COLORS.global.lightTextColor,
         borderRadius: 3,
         flexDirection: 'row',
