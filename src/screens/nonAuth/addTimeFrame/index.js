@@ -135,7 +135,7 @@ const AddTimeFrame = (props) => {
     }
 
     const save = () => {
-        setLoading(true)
+        // setLoading(true)
         let headers = {
             Accept: "application/json",
             'Content-Type': 'multipart/form-data',
@@ -159,6 +159,7 @@ const AddTimeFrame = (props) => {
             return showToast("Invalid time frame data")
         }
         let { json_data, formdata } = serviceData
+        console.log(JSON.parse(json_data))
         json_data = JSON.parse(json_data)
         json_data['time_frame'] = data
         formdata.append("json_data", JSON.stringify(json_data));

@@ -139,24 +139,7 @@ const OrderHistory = (props) => {
                 <Content
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}>
-                    {Platform.OS === "ios" ?
-                        <DropDown
-                            item={order_types.map(x => x.title)}
-                            value={selected.title}
-                            onChangeValue={(index, value) => { setselected(order_types[index]) }}
-                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
-                            dropdownStyle={{ height: 120 }}
-                        />
-                        :
-                        <DropDown
-                            item={order_types.map(x => x.title)}
-                            value={selected.title}
-                            onChangeValue={(index, value) => { setselected(order_types[index]) }}
-                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
-                            dropdownStyle={{ height: 120 }}
-                        />
-                    }
-
+                    <View style={{ marginTop: 10 }}></View>
                     <CustomTextInput
                         placeholder="Search"
                         value={searchData.text}
@@ -164,7 +147,28 @@ const OrderHistory = (props) => {
                         customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 }}
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
-                    <Text style={{ fontSize: 16, marginTop: 20, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", marginTop: 20 }}>
+                        <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
+                        <View style={{ flex: 1, marginRight: 20, alignItems: "flex-end" }}>
+                            {Platform.OS === "ios" ?
+                                <DropDown
+                                    item={order_types.map(x => x.title)}
+                                    value={selected.title}
+                                    onChangeValue={(index, value) => { setselected(order_types[index]) }}
+                                    containerStyle={{ width: "60%", borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0 }}
+                                    dropdownStyle={{ height: 120, width: "35%" }}
+                                />
+                                :
+                                <DropDown
+                                    item={order_types.map(x => x.title)}
+                                    value={selected.title}
+                                    onChangeValue={(index, value) => { setselected(order_types[index]) }}
+                                    containerStyle={{ width: "60%", borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0 }}
+                                    dropdownStyle={{ height: 120, width: "35%" }}
+                                />
+                            }
+                        </View>
+                    </View>
                     <FlatList
                         data={searchData.data}
                         ListFooterComponent={loading && <ActivityIndicator color={LS_COLORS.global.green} />}

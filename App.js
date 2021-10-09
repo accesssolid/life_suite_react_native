@@ -24,8 +24,13 @@ const App = () => {
 
   // function for getting noti token from #liahs
   const getToken = async () => {
-    let gg = await messaging().getToken()
-    console.log(gg, "Token")
+    try{
+      let gg = await messaging().getToken()
+      console.log(gg, "Token")
+    }catch(err){
+      
+    }
+    
   }
 
   useEffect(() => {

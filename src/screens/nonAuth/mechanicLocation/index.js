@@ -29,7 +29,7 @@ const MechanicLocation = (props) => {
     const DATE = props.route.params.data
     const fromInputRef = useRef(null)
     const toInputRef = useRef(null)
-    const { servicedata, subService } = props.route.params
+    const { servicedata, subService, extraData } = props.route.params
     const user = useSelector(state => state.authenticate.user)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
@@ -40,6 +40,10 @@ const MechanicLocation = (props) => {
     const [toAddress, setToAddress] = useState("")
     const [date, setDate] = useState("")
     const [open, setOpen] = useState(false)
+
+    React.useEffect(() => {
+        console.log("Params", props.route.params)
+    }, [props.route.params])
 
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
@@ -163,7 +167,7 @@ const MechanicLocation = (props) => {
         } else if (startTime.toString() === endTime.toString()) {
             showToast("Start Time and End Time Cannot Be Same")
         } else {
-            props.navigation.navigate("Mechanics", { data: data, subService: subService })
+            props.navigation.navigate("Mechanics", { data: data, subService: subService,extraData})
         }
     }
 
@@ -173,9 +177,9 @@ const MechanicLocation = (props) => {
     };
 
     const handleConfirm1 = (date) => {
-        if(moment(date).toDate()>moment(startTime).toDate()){
+        if (moment(date).toDate() > moment(startTime).toDate()) {
             setEndTime(date)
-        }else{
+        } else {
             showToast("End time must be greater than start time.")
         }
         setDatePickerVisibility1(false);
@@ -301,12 +305,7 @@ const MechanicLocation = (props) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <TouchableOpacity
-                        style={styles.save}
-                        activeOpacity={0.7}
-                        onPress={() => submit()}>
-                        <Text style={styles.saveText}>Submit</Text>
-                    </TouchableOpacity>
+
                     <View style={{ height: 30 }}></View>
                     <DateTimePickerModal
                         isVisible={isDatePickerVisible}
@@ -323,6 +322,12 @@ const MechanicLocation = (props) => {
                         onCancel={() => setDatePickerVisibility1(false)}
                     />
                 </ScrollView>
+                <TouchableOpacity
+                    style={styles.save}
+                    activeOpacity={0.7}
+                    onPress={() => submit()}>
+                    <Text style={styles.saveText}>Submit</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -389,7 +394,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
-        marginTop: 40
+        marginTop: 10
     },
     saveText: {
         textAlign: "center",

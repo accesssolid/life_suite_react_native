@@ -158,8 +158,8 @@ const ServicesProvided = (props) => {
                             arr.push({
                                 "item_id": item.id,
                                 "price": "$" + ele.price,
-                                "time_duration_h": String(minutes),
-                                "time_duration_m": String(hours),
+                                "time_duration_h": String(hours),
+                                "time_duration_m": String(minutes),
                                 "variant_data": item.variant_data
                             })
                             selected.push(ele.id)
@@ -187,8 +187,8 @@ const ServicesProvided = (props) => {
                             arr.push({
                                 "item_id": item.id,
                                 "price": "$" + ele.price,
-                                "time_duration_h": String(minutes),
-                                "time_duration_m": String(hours),
+                                "time_duration_h": String(hours),
+                                "time_duration_m": String(minutes),
                             })
                             selected.push(ele.id)
                         }

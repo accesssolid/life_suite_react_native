@@ -15,7 +15,7 @@ const store = configureStore({
 })
 
 store.subscribe(() => {
-    // console.log("Store ==>>> ", store.getState())
+    console.log("Store ==>>> ", store.getState())
 })
 
 export default store

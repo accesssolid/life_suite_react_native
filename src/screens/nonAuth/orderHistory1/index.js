@@ -67,7 +67,7 @@ const OrderHistory1 = (props) => {
 
     useEffect(() => {
         if (searchData.text?.trim() !== "") {
-            let dataCopy = data.filter(x => `${x.customers_first_name} ${x.customers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase()))
+            let dataCopy = data.filter(x => `${x.providers_first_name} ${x.providers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase()))
             setSearchData(state => ({ ...state, data: dataCopy }))
         } else {
             setSearchData(state => ({ ...state, data: data }))
@@ -136,7 +136,7 @@ const OrderHistory1 = (props) => {
         }
         let user_data = {
             "order_id": orderId,
-            "order_status": 1,
+            "order_status": 2,
             "reason": reason
         }
 
@@ -182,7 +182,6 @@ const OrderHistory1 = (props) => {
             endPoint: "/api/blockProvider",
             type: 'post'
         }
-        console.log(config)
         getApi(config)
             .then((response) => {
                 console.log(response)
@@ -256,32 +255,35 @@ const OrderHistory1 = (props) => {
                 <Content
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}>
-                    {Platform.OS === "ios" ?
-                        <DropDown
-                            item={order_types.map(x => x.title)}
-                            value={selected.title}
-                            onChangeValue={(index, value) => { setselected(order_types[index]) }}
-                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
-                            dropdownStyle={{ height: 120 }}
-                        />
-                        :
-                        <DropDown
-                            item={order_types.map(x => x.title)}
-                            value={selected.title}
-                            onChangeValue={(index, value) => { setselected(order_types[index]) }}
-                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0, marginTop: 14 }}
-                            dropdownStyle={{ height: 120 }}
-                        />
-                    }
-
                     <CustomTextInput
                         placeholder="Search"
                         value={searchData.text}
                         onChangeText={t => { setSearchData(state => ({ ...state, text: t })) }}
-                        customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 }}
+                        customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 ,marginTop:20}}
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
-                    <Text style={{ fontSize: 16, marginTop: 20, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
+                       <View style={{ flexDirection: "row", alignItems: "center", marginTop: 20 }}>
+                        <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
+                        <View style={{ flex: 1, marginRight: 20, alignItems: "flex-end" }}>
+                            {Platform.OS === "ios" ?
+                                <DropDown
+                                    item={order_types.map(x => x.title)}
+                                    value={selected.title}
+                                    onChangeValue={(index, value) => { setselected(order_types[index]) }}
+                                    containerStyle={{ width: "60%", borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0 }}
+                                    dropdownStyle={{ height: 120, width: "35%" }}
+                                />
+                                :
+                                <DropDown
+                                    item={order_types.map(x => x.title)}
+                                    value={selected.title}
+                                    onChangeValue={(index, value) => { setselected(order_types[index]) }}
+                                    containerStyle={{ width: "60%", borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, paddingHorizontal: '5%', borderWidth: 0 }}
+                                    dropdownStyle={{ height: 120, width: "35%" }}
+                                />
+                            }
+                        </View>
+                    </View>
                     <FlatList
                         data={searchData.data}
                         ListFooterComponent={loading && <ActivityIndicator color={LS_COLORS.global.green} />}
@@ -386,7 +388,7 @@ const OrderHistory1 = (props) => {
                                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}></Text>
                                                 <Text style={styles.baseTextStyle}>{"Total Price :  $" + item?.order_total_price}</Text>
                                             </View>
-                                            {item.order_status !== 1 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
+                                            {item.order_status == 1 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
                                                 <TouchableOpacity
                                                     style={styles.save}
                                                     activeOpacity={0.7}

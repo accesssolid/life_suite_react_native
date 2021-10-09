@@ -26,15 +26,36 @@ const ServiceItemUser = (props) => {
     const [isNeedRecommendationSelected, setIsNeedRecommendationSelected] = useState(false)
 
     useEffect(() => {
-        let extraData = {
-            isOtherSelected: isOtherSelected,
-            other: otherText,
-            isHaveOwnSelected: isHaveOwnSelected,
-            have_own: haveOwnText,
-            need_recommendation: isNeedRecommendationSelected
+        if(isOtherSelected||isHaveOwnSelected||isNeedRecommendationSelected){
+            let extraData = {
+                isOtherSelected: isOtherSelected,
+                other: otherText,
+                isHaveOwnSelected: isHaveOwnSelected,
+                have_own: haveOwnText,
+                need_recommendation: isNeedRecommendationSelected
+            }
+            props.setExtraData(extraData, props.item)
         }
-        props.setExtraData(extraData, props.item)
     }, [otherText, haveOwnText, isNeedRecommendationSelected, isOtherSelected, isHaveOwnSelected])
+
+    React.useEffect(()=>{
+        if(props.item&&props.extraData){
+            let data=props.extraData.find(x=>x.parent_id==props.item.id)
+            if(data){
+                if(data.other&&data.other.trim()!=""){
+                    setIsOtherSelected(true)
+                    setOtherText(data.other)
+                }
+                if(data.have_own&&data.have_own.trim()!=""){
+                    setIsHaveOwnSelected(true)
+                    setHaveOwnText(data.have_own)
+                }
+                if(data.need_recommendation){
+                    setIsNeedRecommendationSelected(true)
+                }
+            }
+        }
+    },[props.item])
 
     return (
         <>

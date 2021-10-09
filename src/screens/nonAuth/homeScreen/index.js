@@ -156,6 +156,7 @@ const HomeScreen = (props) => {
         }
         getApi(config)
             .then((response) => {
+                console.log("/api/providerAddedServicesList",response)
                 if (response.status == true) {
                     dispatch(setMyJobs({ data: [...response.data] }))
                     setLoading(false)

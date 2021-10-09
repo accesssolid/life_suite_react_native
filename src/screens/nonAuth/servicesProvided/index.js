@@ -19,6 +19,7 @@ import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
 import ServiceItemUser from '../../../components/serviceItemUser';
 
+import _ from 'lodash'
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -31,6 +32,12 @@ const ServicesProvided = (props) => {
     const [activeItem, setActiveItem] = useState(null)
     const [extraData, setExtraDataa] = useState([])
     const [vehicleType, setVehicleType] = useState('Car')
+
+    useEffect(() => {
+        console.log("SelectedItems", selectedItems)
+        console.log("SelectedProducts", selectedProducts)
+        console.log("ExtraData", extraData)
+    }, [selectedItems, selectedProducts, extraData])
 
     useEffect(() => {
         if (subService.id == 14) {
@@ -106,7 +113,7 @@ const ServicesProvided = (props) => {
     const next = () => {
         let servicedata = []
         itemList.forEach(element => {
-            console.log("dkjndjk",element)
+            console.log("dkjndjk", element)
             if (selectedItems.includes(element.id)) {
                 servicedata.push({
                     "item_id": element.id,
@@ -158,7 +165,7 @@ const ServicesProvided = (props) => {
             }
         });
 
-        if(activeItem.products.length == 0){
+        if (activeItem.products.length == 0) {
             isSelected = true
         }
 
@@ -170,6 +177,8 @@ const ServicesProvided = (props) => {
     }
 
     const setExtraData = (data, item) => {
+        console.log("Data", data, item)
+
         let obj = {
             parent_id: item.id,
         }
@@ -185,18 +194,24 @@ const ServicesProvided = (props) => {
             obj['have_own'] = ''
         }
         obj['need_recommendation'] = data.need_recommendation
-
-        let temp = [...extraData]
+        console.log("Object", obj)
+        let temp = _.cloneDeep(extraData)
         if (temp.length == 0) {
             temp.push(obj)
         } else {
-            extraData.forEach((element, index) => {
-                if (element.id == item.id) {
-                    temp[index] = obj
-                }
-            });
+            let index = temp.findIndex(x => x.parent_id == item.id)
+            if (index >= 0) {
+                temp[index] = obj
+            }else{
+                temp.push(obj)
+            }
+            // extraData.forEach((element, index) => {
+            //     if (element.id == item.id) {
+            //         temp[index] = obj
+            //     }
+            // });
         }
-
+        console.log(extraData)
         setExtraDataa([...temp])
     }
 
@@ -243,7 +258,7 @@ const ServicesProvided = (props) => {
         setSelectedProducts([])
         setExtraDataa([])
     }
-    
+
     return (
         <>
             <StatusBar translucent={true} backgroundColor="transparent" barStyle="light-content" />
@@ -273,51 +288,51 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                   
-                        {subService.id == 14 && <View style={{}}>
-                            <DropDown
-                                title="Vehicle Type"
-                                item={['Car', 'Truck', 'Suv', 'Van']}
-                                value={vehicleType}
-                                onChangeValue={(index, value) => onChangeVehicleType(value)}
-                                containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                dropdownStyle={{ maxHeight: 300 }}
-                            />
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: '3.5%' }}>
-                                <View style={{ flex: 1 }}>
-                                    <DropDown
-                                        title="Make"
-                                        item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
-                                        value={'1990'}
-                                        onChangeValue={(index, value) => { }}
-                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
-                                        dropdownStyle={{ maxHeight: 300 }}
-                                    />
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <DropDown
-                                        title="Model"
-                                        item={['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']}
-                                        value={'A1'}
-                                        onChangeValue={(index, value) => { }}
-                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                        dropdownStyle={{ maxHeight: 300 }}
-                                    />
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <DropDown
-                                        title="Year"
-                                        item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
-                                        value={'2001'}
-                                        onChangeValue={(index, value) => { }}
-                                        containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                        dropdownStyle={{ maxHeight: 300 }}
-                                    />
-                                </View>
+
+                    {subService.id == 14 && <View style={{}}>
+                        <DropDown
+                            title="Vehicle Type"
+                            item={['Car', 'Truck', 'Suv', 'Van']}
+                            value={vehicleType}
+                            onChangeValue={(index, value) => onChangeVehicleType(value)}
+                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
+                            dropdownStyle={{ maxHeight: 300 }}
+                        />
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: '3.5%' }}>
+                            <View style={{ flex: 1 }}>
+                                <DropDown
+                                    title="Make"
+                                    item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
+                                    value={'1990'}
+                                    onChangeValue={(index, value) => { }}
+                                    containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
+                                    dropdownStyle={{ maxHeight: 300 }}
+                                />
                             </View>
-                        </View>}
-                        <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
-                        <ScrollView>
+                            <View style={{ flex: 1 }}>
+                                <DropDown
+                                    title="Model"
+                                    item={['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']}
+                                    value={'A1'}
+                                    onChangeValue={(index, value) => { }}
+                                    containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
+                                    dropdownStyle={{ maxHeight: 300 }}
+                                />
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <DropDown
+                                    title="Year"
+                                    item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
+                                    value={'2001'}
+                                    onChangeValue={(index, value) => { }}
+                                    containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
+                                    dropdownStyle={{ maxHeight: 300 }}
+                                />
+                            </View>
+                        </View>
+                    </View>}
+                    <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
+                    <ScrollView>
                         {
                             activeItem !== null
                                 ?
@@ -329,6 +344,7 @@ const ServicesProvided = (props) => {
                                         selectedProducts={selectedProducts}
                                         onSelectProduct={(product) => setCheckedDataProducts(product)}
                                         activeMode
+                                        extraData={extraData}
                                         setExtraData={setExtraData}
                                     />
                                 </>
@@ -336,7 +352,7 @@ const ServicesProvided = (props) => {
                                 itemListMaster.length > 0
                                     ?
                                     <>
-                                   {/* <Content removeClippedSubviews={true} style={{ flex: 1 }}> */}
+                                        {/* <Content removeClippedSubviews={true} style={{ flex: 1 }}> */}
                                         {itemList && itemList.length > 0
                                             ?
                                             itemList.map((item, index) => {
@@ -351,7 +367,7 @@ const ServicesProvided = (props) => {
                                             })
                                             :
                                             null}
-                                    {/* </Content> */}
+                                        {/* </Content> */}
                                     </>
                                     :
                                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -360,22 +376,22 @@ const ServicesProvided = (props) => {
                         }
                     </ScrollView>
                     <TouchableOpacity
-                            style={styles.save}
-                            activeOpacity={0.7}
-                            onPress={() => {
-                                activeItem !== null
+                        style={styles.save}
+                        activeOpacity={0.7}
+                        onPress={() => {
+                            activeItem !== null
+                                ?
+                                saveRequest()
+                                :
+                                selectedItems.length > 0
                                     ?
-                                    saveRequest()
+                                    next()
                                     :
-                                    selectedItems.length > 0
-                                        ?
-                                        next()
-                                        :
-                                        showToast("Select service first")
-                            }}>
-                            <Text style={styles.saveText}>{activeItem !== null ? 'Save Request' : 'Next'}</Text>
-                        </TouchableOpacity>
-                        <View style={{ height: 10 }}></View>
+                                    showToast("Select service first")
+                        }}>
+                        <Text style={styles.saveText}>{activeItem !== null ? 'Save Request' : 'Next'}</Text>
+                    </TouchableOpacity>
+                    <View style={{ height: 10 }}></View>
 
                 </View>
                 {loading && <Loader />}
