@@ -6,7 +6,8 @@ import {
     View,
     TouchableOpacity,
     Text,
-    Image
+    Image,
+    TextInput
 } from 'react-native';
 import { Card } from 'native-base';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -15,6 +16,9 @@ import LS_COLORS from '../constants/colors';
 import moment from 'moment';
 import _ from 'lodash'
 import { showToast } from '../utils';
+import { Rating } from 'react-native-ratings';
+
+
 const TimeFrame = props => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
     const [data, setData] = React.useState([])
@@ -24,6 +28,7 @@ const TimeFrame = props => {
     const [selectedDate, setSelectedDate] = React.useState(new Date())
     const [type, setType] = React.useState("start")
     const [selectedIndex, setSelectedIndex] = React.useState(null)
+
     // const 
     const handleConfirm = (date) => {
         console.log(date, selectedIndex, type)
@@ -61,19 +66,39 @@ const TimeFrame = props => {
                 let selectedServices = []
                 let selectedProducts = []
                 let selectedServicesName = []
+                let otherOptions = []
                 let duration = 0
 
                 for (let i of p.item_list) {
+                    let data = {
+                        "item_id": i.service_item_id,
+                        "product_id": "",
+                        "other": "",
+                        "have_own": "",
+                        "need_recommendation": ""
+                    }
                     if (i.checked) {
                         selectedServices.push(i.service_item_id)
                         selectedServicesName.push(i.service_items_name)
                         duration += Number(i.time_duration)
                     }
                     for (let pr of i.products) {
-                        if (pr.checked) {
+                        if (pr.checked && !pr.type) {
                             selectedProducts.push(pr.item_product_id)
                         }
+                        if (pr.type&&pr.checked) {
+                            if (pr.type == "other") {
+                                data.other = pr.other
+                            }
+                            if (pr.type == "have_own") {
+                                data.have_own = pr.have_own
+                            }
+                            if (pr.type == "need_recommendation") {
+                                data.need_recommendation = "true"
+                            }
+                        }
                     }
+                    otherOptions.push(data)
                 }
                 if (selectedServices.length == 0) {
 
@@ -88,12 +113,12 @@ const TimeFrame = props => {
                         "items": [...new Set(selectedServices)],
                         "itemsName": [...selectedServicesName], //need to removed when order hited
                         "products": [...new Set(selectedProducts)],
-                        "other_options": []
+                        "other_options": otherOptions
                     })
                 }
             }
             setJsonData(_.cloneDeep(z))
-
+            console.log("Check Data", z)
         }
     }, [data])
 
@@ -199,6 +224,98 @@ const TimeFrame = props => {
         </Modal>
     );
 };
+
+export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
+    const [rating, setRating] = React.useState({
+        "range_start_rating": "",
+        "range_end_rating": ""
+    })
+    const [price, setPrice] = React.useState({
+        "range_start_price": "",
+        "range_end_price": ""
+    })
+
+    const handleSave = () => {
+        getFilteredData({ ...rating, ...price })
+        setVisible(false)
+    }
+    return (
+        <Modal
+            visible={visible}
+            animationType="fade"
+            transparent={true}
+        >
+            <Pressable onPress={() => setVisible(false)} style={styles.modalScreen}>
+                <Card style={{
+                    backgroundColor: 'white',
+                    width: "95%",
+                    borderRadius: 10,
+                    padding: 10,
+                }}>
+                    <Pressable>
+                        <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Filter</Text>
+                        <View style={{ marginTop: "10%" }}>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            </View>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>Rating: ({rating.range_start_rating})</Text>
+                            {[4, 3, 2, 1].map(x => <TouchableOpacity onPress={() => {
+                                setRating({
+                                    range_start_rating: "" + x,
+                                    range_end_rating: ""
+                                })
+                            }} ><View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
+                                    <Rating
+                                        type='custom'
+                                        ratingColor='gold'
+                                        ratingBackgroundColor='white'
+                                        ratingCount={5}
+                                        imageSize={20}
+                                        startingValue={x}
+                                        readonly={true}
+
+                                    />
+                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black }}> & Up</Text>
+                                </View></TouchableOpacity>)}
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10 }}>Price : </Text>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
+                                    <Text>$</Text>
+                                    <TextInput value={price.range_start_price} onChangeText={t => {
+                                        setPrice({
+                                            range_start_price: t,
+                                            range_end_price: price.range_end_price
+                                        })
+                                    }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
+                                </View>
+                                <Text>  -  </Text>
+                                <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
+                                    <Text>$</Text>
+                                    <TextInput value={price.range_end_price} onChangeText={t => {
+                                        setPrice({
+                                            range_start_price: price.range_start_price,
+                                            range_end_price: t
+                                        })
+                                    }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
+                                </View>
+                            </View>
+                        </View>
+
+                        <View style={{ marginTop: '10%' }}>
+                            <TouchableOpacity
+                                style={styles.save}
+                                activeOpacity={0.7}
+                                onPress={() => {
+                                    handleSave()
+                                }}>
+                                <Text style={styles.saveText}>Save</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Pressable>
+                </Card>
+            </Pressable>
+        </Modal>
+    )
+}
 
 const styles = StyleSheet.create({
     modalScreen: {

@@ -19,9 +19,12 @@ import { BASE_URL, getApi } from '../../../api/api';
 import { Rating } from 'react-native-ratings';
 import SureModal from '../../../components/sureModal';
 import SureModal1 from '../../../components/sureModal1';;
-import TimeFrame from '../../../components/timeFrame';
+import TimeFrame, { FilterModal } from '../../../components/timeFrame';
 import _ from 'lodash'
 import moment from 'moment';
+
+// #liahs_provider_list
+
 const Mechanics = (props) => {
     const { data, subService, extraData } = props.route.params
     const [loading, setLoading] = useState(false)
@@ -42,19 +45,85 @@ const Mechanics = (props) => {
 
     //    #liahs
     const [dupProviders, setDupProviders] = React.useState([])
-
+    const [filterModal, setFilterModal] = React.useState(false)
 
     React.useEffect(() => {
         console.log("data===>", data)
     }, [data])
 
     React.useEffect(() => {
-        console.log(providers)
+        console.log(providers, "Providers")
         let z = []
         for (let i of providers) {
             let changedItems = _.cloneDeep(i.item_list).map(x => {
+                let service_id = x.service_item_id
+                let other_options = extraData.find(e => e.parent_id == service_id)
+                let other = null
+                let have_own = null
+                let need_recommendation = null
+                if (other_options) {
+                    if (other_options.other?.trim() != "") {
+                        other = {
+                            created_at: "2021-10-11T07:46:35.000000Z",
+                            id: service_id+111111111111,
+                            item_product_id:service_id+111111111111,
+                            item_products_name:other_options.other,
+                            item_id:service_id,
+                            type:"other",
+                            product_id:"",
+                            other:other_options.other,
+                            price: 0,
+                            updated_at: null,
+                            user_id: x.user_id,
+                            checked:false
+                        }
+                    }
+                    if (other_options.have_own?.trim() != "") {
+                         have_own = {
+                            created_at: "2021-10-11T07:46:35.000000Z",
+                            id: service_id+1111111111111,
+                            item_product_id:service_id+1111111111111,
+                            item_products_name:other_options.have_own,
+                            item_id:service_id,
+                            type:"have_own",
+                            product_id:"",
+                            have_own:other_options.have_own,
+                            price: 0,
+                            updated_at: null,
+                            user_id: x.user_id,
+                            checked:false
+                        }
+                    }
+                    if (other_options.need_recommendation) {
+                        need_recommendation = {
+                            created_at: "2021-10-11T07:46:35.000000Z",
+                            id: service_id+11111111111111,
+                            item_product_id:service_id+11111111111111,
+                            item_products_name:"Need recommendation",
+                            item_id:service_id,
+                            type:"need_recommendation",
+                            product_id:"",
+                            need_recommendation:true,
+                            price: 0,
+                            updated_at: null,
+                            user_id: x.user_id,
+                            checked:false
+                        }
+                    }
+                }
                 x.checked = false;
                 x.products = _.cloneDeep(x.products).map(y => { y.checked = false; return y })
+                if(other){
+                    x.products.push(other)
+                }
+                if(have_own){
+                    x.products.push(have_own)
+                }
+               if(need_recommendation){
+                x.products.push(need_recommendation)
+               }
+            
+              
                 return x
             })
             let d = _.cloneDeep(i)
@@ -63,27 +132,29 @@ const Mechanics = (props) => {
             z.push(d)
         }
         setDupProviders(z)
-    }, [providers])
+    }, [providers, extraData])
 
     useEffect(() => {
         getProviders()
     }, [])
 
-    const getProviders = () => {
+    const getProviders = (rangeData = {}) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
+
         let config = {
             headers: headers,
-            data: JSON.stringify({ ...data }),
+            data: JSON.stringify({ ...data, ...rangeData }),
             endPoint: '/api/providerListOrder',
             type: 'post'
         }
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -100,28 +171,30 @@ const Mechanics = (props) => {
             })
     }
 
-    const add = () => {
-        let json_data = {
-            "provider_id": selectedItemsWithProviders[0]?.providerId,
-            "estimated_reached_time": "0",
-            "order_start_time": "2021-09-26 08:00:00",
-            "order_end_time": "2021-09-26 11:00:00",
-            "items": selectedItemsWithProviders.map((i) => { return String(i.itemId) }),
-            "products": ["1"],
-            "other_options": [
-                // {
-                //     "item_id": "",
-                //     "product_id": "",
-                //     "other": "",
-                //     "have_own": "",
-                //     "need_recommendation": ""
-                // }
-            ]
-        }
-        let arr = [...apiData]
-        { json_data.provider_id ? arr.push(json_data) : null }
-        setApiData([...arr])
-    }
+    // const add = () => {
+    //     let json_data = {
+    //         "provider_id": selectedItemsWithProviders[0]?.providerId,
+    //         "estimated_reached_time": "0",
+    //         "order_start_time": "2021-09-26 08:00:00",
+    //         "order_end_time": "2021-09-26 11:00:00",
+    //         "items": selectedItemsWithProviders.map((i) => { return String(i.itemId) }),
+    //         "products": ["1"],
+    //         "other_options": [
+    //             // {
+    //             //     "item_id": "",
+    //             //     "product_id": "",
+    //             //     "other": "",
+    //             //     "have_own": "",
+    //             //     "need_recommendation": ""
+    //             // }
+    //         ]
+    //     }
+    //     let arr = [...apiData]
+    //     { json_data.provider_id ? arr.push(json_data) : null }
+    //     setApiData([...arr])
+    // }
+
+    console.log(extraData, "ExtraData")
 
     const placeOrder = (jsonData) => {
         console.log(jsonData)
@@ -148,10 +221,10 @@ const Mechanics = (props) => {
         console.log(config)
         getApi(config)
             .then((response) => {
-                console.log(response,"response")
+                console.log(response, "response")
                 if (response.status == true) {
                     setLoading(false)
-                    props.navigation.navigate("MainDrawer",{screen:"Orders"})
+                    props.navigation.navigate("MainDrawer", { screen: "Orders" })
                 }
                 else {
                     showToast(response.message)
@@ -275,6 +348,7 @@ const Mechanics = (props) => {
                     }}
                     serviceData={selectedItemsWithProviders}
                 />
+
                 <ImageBackground
                     resizeMode="cover"
                     source={{ uri: BASE_URL + subService.image }}
@@ -305,9 +379,9 @@ const Mechanics = (props) => {
                     <Container style={{ marginTop: 26 }}>
                         <Content showsVerticalScrollIndicator={false} bounces={false} >
                             <View style={{ height: 40, width: '90%', alignSelf: "center", justifyContent: 'space-between', flexDirection: 'row' }}>
-                                {/* <TouchableOpacity onPress={() => { setOpen2(!open2) }} style={{ justifyContent: "center", alignItems: "center" }}>
+                                <TouchableOpacity onPress={() => { setFilterModal(true) }} style={{ justifyContent: "center", alignItems: "center", marginRight: 5 }}>
                                     <Image style={{ height: 30, width: 30, alignSelf: "center" }} source={require("../../../assets/filter.png")} />
-                                </TouchableOpacity> */}
+                                </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
                                     setPrice(!price)
                                     let data = _.cloneDeep(dupProviders)
@@ -331,7 +405,7 @@ const Mechanics = (props) => {
                                         data.sort((a, b) => b.timeDuration - a.timeDuration)
                                     }
                                     setDupProviders(data)
-                                }} style={styles.upper} >
+                                }} style={[styles.upper, { marginHorizontal: 5 }]} >
                                     <Text style={styles.upperText}>Time</Text>
                                     <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
                                 </TouchableOpacity>
@@ -436,6 +510,10 @@ const Mechanics = (props) => {
                                             } else {
                                                 time_format = i.time_duration + " min"
                                             }
+                                            // extra data
+                                            let service_id = i.service_item_id
+                                            let extra = extraData.find(x => x.parent_id == service_id)
+                                            console.log("Extra Fuck", extra)
                                             return (
                                                 <>
                                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
@@ -443,8 +521,6 @@ const Mechanics = (props) => {
                                                         <View style={{ height: 25, flexDirection: "row", }}>
                                                             <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.price}</Text>
                                                             <CheckBox
-                                                                // checked={checkIncludes(i)}
-                                                                // onPress={() => onSelecItems({ ...i, name: name })}
                                                                 checked={i.checked}
                                                                 onPress={() => onCheckBoxClicked(!i.checked, index, iIndex, null)}
                                                                 checkedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/checked.png")} />}
@@ -453,18 +529,29 @@ const Mechanics = (props) => {
                                                         </View>
                                                     </View>
                                                     {i.products.map((itemData, prIndex) => {
+                                                        let productTitle="(Product)"
+                                                        let type=itemData.type
+                                                        let isPriced=true
+                                                        if(type=="other"){
+                                                            productTitle="(Other Product)"
+                                                            isPriced=false
+                                                        }else if(type=="have_own"){
+                                                            productTitle="(Have Own Product)"
+                                                            isPriced=false
+                                                        }else if(type=="need_recommendation"){
+                                                            productTitle=""
+                                                            isPriced=false
+                                                        }
                                                         return (
                                                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
                                                                 <View style={{}} >
                                                                     <Text style={{ marginLeft: 20 }}>
-                                                                        <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>{itemData.item_products_name + "(Product)"}</Text>
+                                                                        <Text style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>{itemData.item_products_name + productTitle}</Text>
                                                                     </Text>
                                                                 </View>
                                                                 <View style={{ height: 20, flexDirection: "row" }}>
-                                                                    <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + itemData.price}</Text>
+                                                                {isPriced&&<Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + itemData.price}</Text>}
                                                                     <CheckBox
-                                                                        // checked={checkIncludesProduct(itemData)}
-                                                                        // onPress={() => onSelectProducts(itemData)}
                                                                         checked={itemData.checked}
                                                                         onPress={() => onCheckBoxClicked(!itemData.checked, index, iIndex, prIndex)}
                                                                         checkedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/checked.png")} />}
@@ -474,6 +561,7 @@ const Mechanics = (props) => {
                                                             </View>
                                                         )
                                                     })}
+                                                    {/* extra data */}
                                                 </>
                                             )
                                         })
@@ -489,40 +577,49 @@ const Mechanics = (props) => {
                                     {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16 }}>No Providers Found</Text>}
                                 </View>
                             }
-                            <TouchableOpacity
-                                style={styles.save}
-                                activeOpacity={0.7}
-                                onPress={() => {
-                                    // props.navigation.navigate("MainDrawer",{screen:"Orders"})
-                                    let requiredSevices=JSON.parse(data.json_data)?.items
-                                    let z=[]
-                                    for(let p of dupProviders){
-                                        for(let item of p.item_list){
-                                            if(item.checked){
-                                                z.push(item.service_item_id)
-                                            }
+                        </Content>
+                        <TouchableOpacity
+                            style={styles.save}
+                            activeOpacity={0.7}
+                            onPress={() => {
+                                // props.navigation.navigate("MainDrawer",{screen:"Orders"})
+                                let requiredSevices = JSON.parse(data.json_data)?.items
+                                let z = []
+                                for (let p of dupProviders) {
+                                    for (let item of p.item_list) {
+                                        if (item.checked) {
+                                            z.push(item.service_item_id)
                                         }
                                     }
-                                    console.log("data===>",requiredSevices,z)
-                                    if(_.isEqual(requiredSevices.sort((a,b)=>a-b),z.sort((a,b)=>a-b))){
-                                        setOpen2(!open2)
-                                    }else{
-                                        showToast("Please select service provider for all the service listed.")
-                                    }
-                                }}>
-                                <Text style={styles.saveText}>Request</Text>
-                            </TouchableOpacity>
-                            <View style={{ height: 30 }}></View>
-                        </Content>
+                                }
+                                console.log("data===>", requiredSevices, z)
+                                if (_.isEqual(requiredSevices.sort((a, b) => a - b), z.sort((a, b) => a - b))) {
+                                    setOpen2(!open2)
+                                } else {
+                                    showToast("Please select service provider for all the service listed.")
+                                }
+                            }}>
+                            <Text style={styles.saveText}>Request</Text>
+                        </TouchableOpacity>
+                        <View style={{ height: 10 }}></View>
                     </Container>
                 </View>
                 {loading && <Loader />}
             </SafeAreaView>
+            <FilterModal
+                visible={filterModal}
+                setVisible={setFilterModal}
+                getFilteredData={getProviders}
+            />
         </>
     )
 }
 
 export default Mechanics;
+
+
+
+
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -567,7 +664,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: 'center',
         height: 30,
-        width: 100,
+        width: 85,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 100,
         alignSelf: 'center',

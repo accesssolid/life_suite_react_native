@@ -25,11 +25,14 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import SureModal from '../../../components/sureModal';
 
+// #liahs_before_providers
+
 const MechanicLocation = (props) => {
     const DATE = props.route.params.data
     const fromInputRef = useRef(null)
     const toInputRef = useRef(null)
     const { servicedata, subService, extraData } = props.route.params
+    console.log("SubService==>", subService)
     const user = useSelector(state => state.authenticate.user)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
@@ -167,7 +170,7 @@ const MechanicLocation = (props) => {
         } else if (startTime.toString() === endTime.toString()) {
             showToast("Start Time and End Time Cannot Be Same")
         } else {
-            props.navigation.navigate("Mechanics", { data: data, subService: subService,extraData})
+            props.navigation.navigate("Mechanics", { data: data, subService: subService, extraData })
         }
     }
 
@@ -234,8 +237,8 @@ const MechanicLocation = (props) => {
                         <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Other Location</Text>
                     </View> */}
                     <View style={{ marginTop: 20 }}>
-                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>
-                        <TouchableOpacity
+                        {subService.location_type == 2 && <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>}
+                        {subService.location_type == 2 && <TouchableOpacity
                             onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
                             style={styles.fromContainer}>
                             <Text style={{ flex: 1, }} numberOfLines={1}>
@@ -250,10 +253,9 @@ const MechanicLocation = (props) => {
                                     source={require("../../../assets/location.png")}
                                 />
                             </TouchableOpacity>
-                        </TouchableOpacity>
-                        {console.log(subService)}
-                        {subService.location_type == 2 ? <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text> : null}
-                        {subService.location_type == 2 && <TouchableOpacity
+                        </TouchableOpacity>}
+                        {(subService.location_type == 1||subService.location_type == 2) && <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>}
+                        {(subService.location_type == 1||subService.location_type == 2 ) && <TouchableOpacity
                             onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                             style={styles.fromContainer}>
                             <Text style={{ flex: 1, }} numberOfLines={1}>{toAddress}</Text>
