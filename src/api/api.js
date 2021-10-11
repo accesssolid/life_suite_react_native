@@ -10,6 +10,7 @@ export const getApi = (config) => {
             headers: config.headers,
             method: config.type
         }).then(async (response) => {
+            // console.log("Response",await response.text())
             let json = await response.json()
             // console.log("Response Data =>", '/*', config.endPoint, '*/', "==>", JSON.stringify(json))
             resolve(json);

@@ -27,6 +27,8 @@ import { Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { getUniqueId, getManufacturer } from 'react-native-device-info';
 
+
+
 const getMessage = (name) => {
     switch (name) {
         case "first_name":
@@ -178,6 +180,9 @@ const Profile = (props) => {
     const [isSameAddress, setIsSameAddress] = useState(false)
     const [profilePic, setProfilePic] = useState(require("../../../assets/user.png"))
 
+    // 
+    const [isConnectedToAccount,setIsConnectedToAccount]=React.useState(false)
+    
     function logout() {
         setLoader(true)
         let headers = {
@@ -229,7 +234,14 @@ const Profile = (props) => {
             setNotificationType(getNotificationType(user.notification_prefrence))
         }, [])
     );
-
+  useFocusEffect(
+        React.useCallback(() => {
+            if(user.user_role==3){
+                getCheckAccountFromServer()
+                getConnectAccountDetail()
+            }
+        }, [user])
+    );
     useEffect(() => {
         const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValue)
         if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
@@ -461,6 +473,73 @@ const Profile = (props) => {
         save(address)
     }
 
+    const getConnectAccountDetail=()=>{
+        try{
+            let headers = {
+                'Content-Type': 'multipart/form-data',
+                "Authorization": `Bearer ${access_token}`
+            }
+            let config = {
+                headers: headers,
+                data: JSON.stringify({}),
+                endPoint: '/api/isAccountSetupDetail',
+                type: 'post'
+            }
+            getApi(config).then(response=>{
+                console.log(response)
+                if (response.status == true) {
+                    if(response.data){
+                        if(response.data.email&&response.data.details_submitted){
+                            setIsConnectedToAccount(true)
+                        }
+                    }
+                }
+                else {
+                    showToast(response.message, 'danger')
+                }
+            })
+            .catch(err => {
+
+            })
+        }catch(err){
+
+        }
+    }
+    const getAccountLink=()=>{
+        try{
+            let headers = {
+                'Content-Type': 'multipart/form-data',
+                "Authorization": `Bearer ${access_token}`
+            }
+            let config = {
+                headers: headers,
+                data: JSON.stringify({}),
+                endPoint: '/api/addConnectAccountLink',
+                type: 'post'
+            }
+            getApi(config).then(response=>{
+                console.log(response)
+                if (response.status == true) {
+                    if(response.data){
+                        props.navigation.navigate("UserStack",{screen:"CustomWebView",params:{uri:response.data.url}})
+                    }
+                }
+                else {
+                    showToast(response.message, 'danger')
+                }
+            })
+            .catch(err => {
+
+            })
+        }catch(err){
+
+        }
+    }
+    useEffect(()=>{
+        if(user.user_role==3){
+            getConnectAccountDetail()
+        }
+    },[  user])
     const save = (addr) => {
         let notifType = getNotificationTypeNumber(notificationType)
 
@@ -511,6 +590,34 @@ const Profile = (props) => {
             console.log("error ==>> ", error)
         }
     }
+
+    const getCheckAccountFromServer= () => {
+        let headers = {
+            Accept: "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+     
+        let config = {
+            headers: headers,
+            data: JSON.stringify({}),
+            endPoint: '/api/isAccountSetup',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                
+                }
+                else {
+                  
+                }
+            })
+            .catch(err => {
+                setLoader(false)
+            })
+    }
+
 
     const getStates = () => {
         setLoader(true)
@@ -1136,8 +1243,13 @@ const Profile = (props) => {
                             user.user_role == 2
                                 ?
                                 <View style={{ ...styles.personalContainer, marginTop: 20, zIndex: -1000 }}>
-                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION</Text>
-                                    <View style={{
+                                    <Text style={{ ...styles.text2, alignSelf: "flex-start",fontSize:14, marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION </Text>
+                                    <TouchableOpacity onPress={()=>{
+                                        props.navigation.navigate("UserStack",{screen:"CardList"})
+                                    }}>
+                                        <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>Manage Cards</Text>
+                                    </TouchableOpacity>
+                                    {/* <View style={{
                                         borderRadius: 7,
                                         borderColor: LS_COLORS.global.textInutBorderColor,
                                         paddingLeft: 16,
@@ -1267,22 +1379,22 @@ const Profile = (props) => {
                                         keyboardType="numeric"
                                         ref={cardDateRef}
                                         returnKeyType="done"
-                                    />
+                                    /> */}
                                     <View style={{ height: 50 }} />
                                 </View>
                                 :
                                 <View style={{ ...styles.personalContainer, paddingVertical: 20, marginTop: 10, zIndex: -1000 }}>
-                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Bank Information</Text>
+                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Account Information</Text>
                                     <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
                                         activeOpacity={0.7}
-                                        onPress={() => alert('under development')}>
-                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Add Accounts</Text>
-                                        <View style={{ height: 21, aspectRatio: 1 }}>
-                                            <Image
-                                                style={{ height: '100%', width: '100%', resizeMode: "contain" }}
-                                                source={require("../../../assets/plus.png")}
-                                            />
-                                        </View>
+                                        onPress={() => {
+                                            if(isConnectedToAccount){
+
+                                            }else{
+                                                getAccountLink()
+                                            }
+                                        }}>
+                                        {isConnectedToAccount?<Text>Connect Account Linked</Text>:<Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
                                     </TouchableOpacity>
                                 </View>
                         }

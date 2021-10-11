@@ -117,8 +117,8 @@ const TimeFrame = props => {
                     })
                 }
             }
+            console.log("JSONData", z)
             setJsonData(_.cloneDeep(z))
-            console.log("Check Data", z)
         }
     }, [data])
 
@@ -204,7 +204,7 @@ const TimeFrame = props => {
                                             "order_end_time": x.order_end_time,
                                             "items": x.items.map(String),
                                             "products": x.products.map(String),
-                                            "other_options": []
+                                            "other_options": x.other_options
                                         })
                                     }))
                                 }}>

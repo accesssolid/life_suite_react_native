@@ -259,10 +259,10 @@ const OrderHistory1 = (props) => {
                         placeholder="Search"
                         value={searchData.text}
                         onChangeText={t => { setSearchData(state => ({ ...state, text: t })) }}
-                        customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 ,marginTop:20}}
+                        customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0, marginTop: 20 }}
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
-                       <View style={{ flexDirection: "row", alignItems: "center", marginTop: 20 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", marginTop: 20 }}>
                         <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>ORDERS</Text>
                         <View style={{ flex: 1, marginRight: 20, alignItems: "flex-end" }}>
                             {Platform.OS === "ios" ?
@@ -376,6 +376,39 @@ const OrderHistory1 = (props) => {
                                                                         <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
                                                                     </View>
                                                                 </View>
+                                                            )
+                                                        })
+                                                        }
+                                                        {i.other_data.map((itemData, index) => {
+                                                            let other = itemData.other
+                                                            let have_own = itemData.have_own
+                                                            let need_recommendation = itemData.need_recommendation
+
+                                                            return (
+                                                                <>
+                                                                    {other && other.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                                                                        <View style={{}} >
+                                                                            <Text style={{ marginLeft: 20 }}>
+                                                                                <Text style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
+                                                                            </Text>
+                                                                        </View>
+                                                                    </View>
+                                                                    }
+                                                                    {have_own && have_own.trim() != ""&&<View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                                                                        <View style={{}} >
+                                                                            <Text style={{ marginLeft: 20 }}>
+                                                                                <Text style={styles.baseTextStyle}>{have_own+ "(Have Own Product)"}</Text>
+                                                                            </Text>
+                                                                        </View>
+                                                                    </View>}
+                                                                    {need_recommendation&&need_recommendation=="true"&&<View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                                                                        <View style={{}} >
+                                                                            <Text style={{ marginLeft: 20 }}>
+                                                                                <Text style={styles.baseTextStyle}>Need Recommendation</Text>
+                                                                            </Text>
+                                                                        </View>
+                                                                    </View>}
+                                                                </>
                                                             )
                                                         })
                                                         }

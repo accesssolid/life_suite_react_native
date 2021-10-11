@@ -194,10 +194,11 @@ const Mechanics = (props) => {
     //     setApiData([...arr])
     // }
 
-    console.log(extraData, "ExtraData")
+   
 
     const placeOrder = (jsonData) => {
-        console.log(jsonData)
+        console.log(jsonData,"JSONData")
+        console.log(JSON.stringify(jsonData),"JSONData")
         setLoading(true)
         var formdata = new FormData();
         formdata.append("items_data", JSON.stringify(jsonData))
@@ -218,7 +219,7 @@ const Mechanics = (props) => {
             endPoint: '/api/createOrder',
             type: 'post'
         }
-        console.log(config)
+
         getApi(config)
             .then((response) => {
                 console.log(response, "response")

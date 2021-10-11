@@ -362,7 +362,7 @@ const OrderClientDetail = (props) => {
                                     titleStyle={{ color: "white" }}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
-                                        props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})
+                                        props.navigation.navigate("MainDrawer", { screen: "HomeScreen" })
                                     }}
                                     imageStyle1={{ tintColor: "white" }}
                                 />
@@ -565,6 +565,39 @@ const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
                                         <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
                                     </View>
                                 </View>
+                            )
+                        })
+                        }
+                        {i.other_data.map((itemData, index) => {
+                            let other = itemData.other
+                            let have_own = itemData.have_own
+                            let need_recommendation = itemData.need_recommendation
+
+                            return (
+                                <>
+                                    {other && other.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                                        <View style={{}} >
+                                            <Text style={{ marginLeft: 20 }}>
+                                                <Text style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
+                                            </Text>
+                                        </View>
+                                    </View>
+                                    }
+                                    {have_own && have_own.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                                        <View style={{}} >
+                                            <Text style={{ marginLeft: 20 }}>
+                                                <Text style={styles.baseTextStyle}>{have_own + "(Have Own Product)"}</Text>
+                                            </Text>
+                                        </View>
+                                    </View>}
+                                    {need_recommendation && need_recommendation == "true" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                                        <View style={{}} >
+                                            <Text style={{ marginLeft: 20 }}>
+                                                <Text style={styles.baseTextStyle}>Need Recommendation</Text>
+                                            </Text>
+                                        </View>
+                                    </View>}
+                                </>
                             )
                         })
                         }
