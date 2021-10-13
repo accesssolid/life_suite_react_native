@@ -11,8 +11,9 @@ import { useSelector } from 'react-redux'
 import Loader from '../../components/loader'
 import LS_COLORS from '../../constants/colors'
 import LS_FONTS from '../../constants/fonts'
-
-export default function CardList({navigation,route}) {
+import { ActivityIndicator } from 'react-native-paper'
+import { showToast, storeItem } from '../../components/validators';
+export default function CardList({ navigation, route }) {
     const [loader, setLoader] = useState(false)
     const [cards, setCards] = React.useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -34,15 +35,47 @@ export default function CardList({navigation,route}) {
 
         getApi(config)
             .then((response) => {
-                console.log(response)
-                if (response.status == true && response.data?.data) {
-                    setCards(response.data?.data)
+                console.log("Card List", response)
+                if (response.status == true && response.data) {
+                    setCards(response.data)
                 }
                 else {
 
                 }
             })
             .catch(err => {
+                setLoader(false)
+            }).finally(() => {
+                setLoader(false)
+            })
+    }
+    const deleteCard = (id) => {
+        setLoader(true)
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+        const formdata = new FormData()
+        formdata.append("card_id", id)
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: '/api/customerCardRemove',
+            type: 'post'
+        }
+        console.log(config)
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    showToast("Card removed.", 'danger')
+                    getCards()
+                }
+                else {
+                    showToast(response.message, 'danger')
+                }
+            })
+            .catch(err => {
+
+            }).finally(() => {
                 setLoader(false)
             })
     }
@@ -67,23 +100,48 @@ export default function CardList({navigation,route}) {
                 <FlatList
                     style={{ flex: 1 }}
                     data={cards}
+                    ListHeaderComponent={loader && <ActivityIndicator color={LS_COLORS.global.green} />}
                     ListEmptyComponent={<View style={[styles.saveText, { justifyContent: "center", alignItems: "center", marginTop: 20 }]}><Text style={[styles.saveText, { color: "gray" }]}>No Cards</Text></View>}
                     renderItem={({ item }) => {
                         return (
-                            <TouchableOpacity key={item.id} onPress={() => handleModal(item)}>
+                            <Pressable key={item.id} onLongPress={() => {
+                                Alert.alert("Delete", "Do you really want to remove this card ?", [
+                                    {
+                                        text: "No"
+                                    },
+                                    {
+                                        text: "Yes",
+                                        onPress: () => {
+                                            deleteCard(item.id)
+                                        }
+                                    }
+                                ])
+                            }}>
                                 <ImageBackground
                                     source={require('../../assets/card.png')}
-                                    style={{ width: widthPercentageToDP(90), justifyContent: "flex-end", aspectRatio: 1.6, alignSelf: 'center', borderRadius: 20, marginTop: 40 }}
+                                    style={{
+                                        width: widthPercentageToDP(90),
+                                        justifyContent: "flex-end",
+                                        height: 200,
+                                        alignSelf: 'center',
+                                        overflow: "hidden",
+                                        borderRadius: 20,
+                                        marginTop: 40
+                                    }}
+                                    resizeMode="cover"
                                 >
-                                    <View style={{ marginHorizontal: 40, flexDirection: "row", marginBottom: 20, justifyContent: "space-between" }}>
+                                    <View style={{ marginHorizontal: 15, flexDirection: "row", marginBottom: 20, justifyContent: "space-between" }}>
                                         <View>
                                             <Text style={[styles.saveText, { color: "white" }]}>{item.brand}</Text>
-                                            <Text style={[styles.saveText, { color: "white" }]}>{item.last4}</Text>
+                                            <Text style={[styles.saveText, { color: "white" }]}>********{item.last4}</Text>
                                         </View>
-                                        <Text style={[styles.saveText, { color: "white", marginRight: 10 }]}>0{item.exp_month}/{item.exp_year}</Text>
+                                        <View>
+                                            <Text style={[styles.saveText, { color: "white" }]}>Expires :</Text>
+                                            <Text style={[styles.saveText, { color: "white" }]}>0{item.exp_month}/{item.exp_year}</Text>
+                                        </View>
                                     </View>
                                 </ImageBackground>
-                            </TouchableOpacity>)
+                            </Pressable>)
                     }
                     }
                 />

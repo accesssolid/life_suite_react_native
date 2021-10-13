@@ -25,6 +25,7 @@ import MapScreen from '../screens/nonAuth/map';
 import ChatScreen from '../screens/nonAuth/chatScreen';
 import OrderClientDetail from '../screens/nonAuth/orderDetail';
 import CustomWebView from '../screens/nonAuth/CustomWebView';
+import UpdateOrderItems from '../screens/nonAuth/updateOrderItem';
 const Stack = createStackNavigator();
 
 const ProviderStack = () => {
@@ -49,6 +50,7 @@ const ProviderStack = () => {
             <Stack.Screen name="MapScreen" component={MapScreen} />
             <Stack.Screen name="OrderDetail" component={OrderClientDetail} />
             <Stack.Screen name="CustomWebView" component={CustomWebView} />
+            <Stack.Screen name="UpdateOrderItems" component={UpdateOrderItems} />
         </Stack.Navigator>
     )
 }

@@ -245,6 +245,7 @@ const OrderClientDetail = (props) => {
 
         getApi(config)
             .then((response) => {
+                console.log("Response",response)
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
@@ -435,7 +436,9 @@ const OrderClientDetail = (props) => {
                                     <TouchableOpacity
                                         style={styles.save}
                                         activeOpacity={0.7}
-                                        onPress={() => { showToast("in progress.....") }}>
+                                        onPress={() => { props.navigation.navigate("UpdateOrderItems",{
+                                            servicedata, subService, item 
+                                        })}}>
                                         <Text style={styles.saveText}>Update Order</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
