@@ -547,13 +547,14 @@ const Profile = (props) => {
             'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
         }
-
+        console.log(userData)
+        // alert()
         var formdata = new FormData();
         formdata.append("user_id", userData.id);
         formdata.append("email", userData.email);
         formdata.append("first_name", userData.first_name);
         formdata.append("last_name", userData.last_name);
-        formdata.append("phone_number", userData.phone_number);
+        formdata.append("phone_number", userData.phone_number.replace(/-/g,""));
         if (user.user_role == 3) {
             formdata.append("about", userData.about);
         }

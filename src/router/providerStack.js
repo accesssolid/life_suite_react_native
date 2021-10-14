@@ -26,6 +26,7 @@ import ChatScreen from '../screens/nonAuth/chatScreen';
 import OrderClientDetail from '../screens/nonAuth/orderDetail';
 import CustomWebView from '../screens/nonAuth/CustomWebView';
 import UpdateOrderItems from '../screens/nonAuth/updateOrderItem';
+import AddDiscount from '../screens/nonAuth/addDiscount';
 const Stack = createStackNavigator();
 
 const ProviderStack = () => {
@@ -51,6 +52,7 @@ const ProviderStack = () => {
             <Stack.Screen name="OrderDetail" component={OrderClientDetail} />
             <Stack.Screen name="CustomWebView" component={CustomWebView} />
             <Stack.Screen name="UpdateOrderItems" component={UpdateOrderItems} />
+            <Stack.Screen name="AddDiscount" component={AddDiscount} />
         </Stack.Navigator>
     )
 }

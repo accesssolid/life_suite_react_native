@@ -34,6 +34,7 @@ const order_types = [
     { id: 7, title: "InProgress" },
     { id: 8, title: "Completed" },
     { id: 2, title: "Rejected" },
+    {id:9,title:"Updation"}
 ]
 
 const OrderHistory = (props) => {
