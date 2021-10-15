@@ -181,8 +181,8 @@ const Profile = (props) => {
     const [profilePic, setProfilePic] = useState(require("../../../assets/user.png"))
 
     // 
-    const [isConnectedToAccount,setIsConnectedToAccount]=React.useState(false)
-    
+    const [isConnectedToAccount, setIsConnectedToAccount] = React.useState(false)
+
     function logout() {
         setLoader(true)
         let headers = {
@@ -200,10 +200,10 @@ const Profile = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log("response",response)
+                console.log("response", response)
                 if (response.status == true) {
                     storeItem('user', null),
-                    props.navigation.navigate('WelcomeScreen')
+                        props.navigation.navigate('WelcomeScreen')
                 }
                 else {
                     setLoader(false)
@@ -234,9 +234,9 @@ const Profile = (props) => {
             setNotificationType(getNotificationType(user.notification_prefrence))
         }, [])
     );
-  useFocusEffect(
+    useFocusEffect(
         React.useCallback(() => {
-            if(user.user_role==3){
+            if (user.user_role == 3) {
                 getCheckAccountFromServer()
                 getConnectAccountDetail()
             }
@@ -473,8 +473,8 @@ const Profile = (props) => {
         save(address)
     }
 
-    const getConnectAccountDetail=()=>{
-        try{
+    const getConnectAccountDetail = () => {
+        try {
             let headers = {
                 'Content-Type': 'multipart/form-data',
                 "Authorization": `Bearer ${access_token}`
@@ -485,11 +485,11 @@ const Profile = (props) => {
                 endPoint: '/api/isAccountSetupDetail',
                 type: 'post'
             }
-            getApi(config).then(response=>{
+            getApi(config).then(response => {
                 console.log(response)
                 if (response.status == true) {
-                    if(response.data){
-                        if(response.data.email&&response.data.details_submitted){
+                    if (response.data) {
+                        if (response.data.email && response.data.details_submitted) {
                             setIsConnectedToAccount(true)
                         }
                     }
@@ -498,15 +498,15 @@ const Profile = (props) => {
                     showToast(response.message, 'danger')
                 }
             })
-            .catch(err => {
+                .catch(err => {
 
-            })
-        }catch(err){
+                })
+        } catch (err) {
 
         }
     }
-    const getAccountLink=()=>{
-        try{
+    const getAccountLink = () => {
+        try {
             let headers = {
                 'Content-Type': 'multipart/form-data',
                 "Authorization": `Bearer ${access_token}`
@@ -517,29 +517,29 @@ const Profile = (props) => {
                 endPoint: '/api/addConnectAccountLink',
                 type: 'post'
             }
-            getApi(config).then(response=>{
+            getApi(config).then(response => {
                 console.log(response)
                 if (response.status == true) {
-                    if(response.data){
-                        props.navigation.navigate("UserStack",{screen:"CustomWebView",params:{uri:response.data.url}})
+                    if (response.data) {
+                        props.navigation.navigate("UserStack", { screen: "CustomWebView", params: { uri: response.data.url } })
                     }
                 }
                 else {
                     showToast(response.message, 'danger')
                 }
             })
-            .catch(err => {
+                .catch(err => {
 
-            })
-        }catch(err){
+                })
+        } catch (err) {
 
         }
     }
-    useEffect(()=>{
-        if(user.user_role==3){
+    useEffect(() => {
+        if (user.user_role == 3) {
             getConnectAccountDetail()
         }
-    },[  user])
+    }, [user])
     const save = (addr) => {
         let notifType = getNotificationTypeNumber(notificationType)
 
@@ -554,7 +554,7 @@ const Profile = (props) => {
         formdata.append("email", userData.email);
         formdata.append("first_name", userData.first_name);
         formdata.append("last_name", userData.last_name);
-        formdata.append("phone_number", userData.phone_number.replace(/-/g,""));
+        formdata.append("phone_number", userData.phone_number.replace(/-/g, ""));
         if (user.user_role == 3) {
             formdata.append("about", userData.about);
         }
@@ -592,12 +592,12 @@ const Profile = (props) => {
         }
     }
 
-    const getCheckAccountFromServer= () => {
+    const getCheckAccountFromServer = () => {
         let headers = {
             Accept: "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-     
+
         let config = {
             headers: headers,
             data: JSON.stringify({}),
@@ -608,10 +608,10 @@ const Profile = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                
+
                 }
                 else {
-                  
+
                 }
             })
             .catch(err => {
@@ -811,18 +811,19 @@ const Profile = (props) => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : null}
                 style={styles.container}>
+                     <View style={{ marginTop: '15%',}}>
+                            <Text style={styles.text}>MY INFORMATION</Text>
+                            <Text style={styles.text1}>{userData.first_name}</Text>
+                            <Text style={styles.text2}>Profile ID : {userData.id}</Text>
+                        </View>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
                     bounces={false}
                     keyboardShouldPersistTaps='handled'
                     style={styles.container}>
-                    <View style={{ marginTop: '15%', marginBottom: '5%' }}>
-                        <View style={{}}>
-                            <Text style={styles.text}>MY INFORMATION</Text>
-                            <Text style={styles.text1}>{userData.first_name}</Text>
-                            <Text style={styles.text2}>Profile ID : {userData.id}</Text>
-                        </View>
+                    <View style={{marginBottom: '5%' }}>
+                       
                         <View style={styles.personalContainer}>
                             <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>PERSONAL INFORMATION</Text>
                             <CustomInput
@@ -855,7 +856,14 @@ const Profile = (props) => {
                                 }}
                                 inpuRef={prefNameRef}
                                 returnKeyType="next"
-                                onSubmitEditing={() => bioRef.current._root.focus()}
+                                onSubmitEditing={() => {
+                                    if(user.user_role==3){
+                                        bioRef.current._root.focus()
+                                    }else{
+                                        emailRef.current._root.focus()
+                                    }
+                                    
+                                }}
                             />
 
                             {user.user_role == 3 && <CustomInput
@@ -896,9 +904,9 @@ const Profile = (props) => {
                                 returnKeyType={Platform.OS == "ios" ? "done" : "next"}
                                 maxLength={12}
                                 onSubmitEditing={() => {
-                                    setAddHomeAddressActive(true), setTimeout(() => {
-                                        homeAddressLine1Ref.current._root.focus()
-                                    }, 250)
+                                    // setAddHomeAddressActive(true), setTimeout(() => {
+                                    //     homeAddressLine1Ref?.current?._root?.focus()
+                                    // }, 350)
                                 }}
                                 required={true}
                             />
@@ -952,86 +960,7 @@ const Profile = (props) => {
                                         language: 'en',
                                     }}
                                 />
-                                {/* {
-                                    !addHomeAddressActive
-                                        ?
-                                        <TouchableOpacity
-                                            activeOpacity={0.7}
-                                            onPress={() => { setAddHomeAddressActive(!addHomeAddressActive) }}
-                                            style={{ flexDirection: "row", marginLeft: '5%', marginTop: 20, alignItems: 'center' }}>
-                                            <Image
-                                                style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                source={require("../../../assets/plus.png")}
-                                            />
-                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {user.user_role == 2 ? 'HOME' : 'PERMANENT'} ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
-                                        </TouchableOpacity>
-                                        :
-                                        <>
-                                            <TouchableOpacity
-                                                activeOpacity={0.7}
-                                                onPress={() => { setAddHomeAddressActive(!addHomeAddressActive) }}
-                                                style={{ flexDirection: "row", marginLeft: '5%', marginTop: 20, alignItems: 'center' }}>
-                                                <Image
-                                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                    source={require("../../../assets/plus.png")}
-                                                />
-                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {user.user_role == 2 ? 'HOME' : 'PERMANENT'} ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
-                                            </TouchableOpacity>
-                                            <View style={{}}>
-                                                <CustomInput
-                                                    text="ADDRESS LINE 1"
-                                                    value={homeAddressData.address_line_1}
-                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_1: text }) }}
-                                                    inpuRef={homeAddressLine1Ref}
-                                                    returnKeyType={"next"}
-                                                    onSubmitEditing={() => homeAddressLine2Ref.current._root.focus()}
-                                                />
-                                                <CustomInput
-                                                    text="ADDRESS LINE 2"
-                                                    value={homeAddressData.address_line_2}
-                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_2: text }) }}
-                                                    inpuRef={homeAddressLine2Ref}
-                                                    returnKeyType={"next"}
-                                                    onSubmitEditing={() => homeAddressStateDropRef.current.show()}
-                                                />
-                                                <View style={{ marginTop: 25 }} />
-                                                <DropDown
-                                                    dropRef={homeAddressStateDropRef}
-                                                    item={dropStateData}
-                                                    value={dropStateValue}
-                                                    onChangeValue={(index, value) => { setDropStateValue(value), startGetCities(value, "home") }}
-                                                    containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                                    dropdownStyle={{ maxHeight: 300 }}
-                                                />
 
-                                                <SearchableDropDown
-                                                    dropRef={homeAddressCityDropRef}
-                                                    onItemSelect={(item) => {
-                                                        setDropCityValue(item.name)
-                                                        homeAddressZipRef.current._root.focus()
-                                                    }}
-                                                    items={dropCityDataMaster}
-                                                    onTextChange={(text) => setDropCityValue(text)}
-                                                    value={dropCityValue}
-                                                />
-
-                                                <CustomInput
-                                                    text="Zip code"
-                                                    value={homeAddressData.zip}
-                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
-                                                    keyboardType="numeric"
-                                                    keyboardType="numeric"
-                                                    returnKeyType={Platform.OS == "ios" ? "done" : "next"}
-                                                    inpuRef={homeAddressZipRef}
-                                                    onSubmitEditing={() => {
-                                                        setAddWorkAddressActive(true), setTimeout(() => {
-                                                            workAddressLine1Ref.current._root.focus()
-                                                        }, 250)
-                                                    }}
-                                                />
-                                            </View>
-                                        </>
-                                } */}
                             </View>
                             <View style={{ marginTop: 10 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%' }}>
@@ -1094,110 +1023,7 @@ const Profile = (props) => {
                                         language: 'en',
                                     }}
                                 />
-                                {/* {
-                                    !addWorkAddressActive
-                                        ?
-                                        <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '5%', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <TouchableOpacity
-                                                activeOpacity={0.7}
-                                                onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
-                                                style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <Image
-                                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                    source={require("../../../assets/plus.png")}
-                                                />
-                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {user.user_role == 2 ? 'WORK' : 'MAILING'} ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
-                                            </TouchableOpacity>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <CheckBox
-                                                    style={{}}
-                                                    containerStyle={{ width: 25 }}
-                                                    wrapperStyle={{}}
-                                                    checked={isSameAddress}
-                                                    onPress={() => setIsSameAddress(!isSameAddress)}
-                                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
-                                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
-                                                />
-                                                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 5 }}>Same address</Text>
-                                            </View>
-                                        </View>
-                                        :
-                                        <>
-                                            <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '5%', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                <TouchableOpacity
-                                                    activeOpacity={0.7}
-                                                    onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
-                                                    style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Image
-                                                        style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                        source={require("../../../assets/plus.png")}
-                                                    />
-                                                    <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {user.user_role == 2 ? 'WORK' : 'MAILING'} ADDRESS{user.user_role == 1 ? '' : "*"}</Text>
-                                                </TouchableOpacity>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <CheckBox
-                                                        style={{}}
-                                                        containerStyle={{ width: 25 }}
-                                                        wrapperStyle={{}}
-                                                        checked={isSameAddress}
-                                                        onPress={() => setIsSameAddress(!isSameAddress)}
-                                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
-                                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
-                                                    />
-                                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 5 }}>Same address</Text>
-                                                </View>
-                                            </View>
-                                            <CustomInput
-                                                text="ADDRESS LINE 1"
-                                                value={workAddressData.address_line_1}
-                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_1: text }) }}
-                                                inpuRef={workAddressLine1Ref}
-                                                returnKeyType={"next"}
-                                                onSubmitEditing={() => workAddressLine2Ref.current._root.focus()}
-                                                editable={!isSameAddress}
-                                            />
-                                            <CustomInput
-                                                text="ADDRESS LINE 2"
-                                                value={workAddressData.address_line_2}
-                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_2: text }) }}
-                                                inpuRef={workAddressLine2Ref}
-                                                returnKeyType={"next"}
-                                                onSubmitEditing={() => workAddressStateDropRef.current.show()}
-                                                editable={!isSameAddress}
-                                            />
-                                            <View style={{ marginTop: 25 }} />
-                                            <DropDown
-                                                dropRef={workAddressStateDropRef}
-                                                item={dropStateData}
-                                                value={dropStateValueWork}
-                                                onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
-                                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                                dropdownStyle={{ maxHeight: 300 }}
-                                                disabled={isSameAddress}
-                                            />
-                                            <SearchableDropDown
-                                                dropRef={workAddressCityDropRef}
-                                                onItemSelect={(item) => {
-                                                    setDropCityValueWork(item.name)
-                                                    workAddressZipRef.current._root.focus()
-                                                }}
-                                                items={dropCityDataMasterWork}
-                                                onTextChange={(text) => setDropCityValueWork(text)}
-                                                value={dropCityValueWork}
-                                                editable={!isSameAddress}
-                                            />
-                                            <CustomInput
-                                                text="Zip code"
-                                                value={workAddressData.zip}
-                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, zip: text }) }}
-                                                keyboardType="numeric"
-                                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
-                                                returnKeyType='done'
-                                                inpuRef={workAddressZipRef}
-                                                editable={!isSameAddress}
-                                            />
-                                        </>
-                                } */}
+
                             </View>
                             <View style={{ height: 20 }}></View>
                             <View style={{}}>
@@ -1232,7 +1058,7 @@ const Profile = (props) => {
                                             title="Notification type"
                                             item={["Email", "Push Notification", "Text", "All"]}
                                             value={notificationType}
-                                            onChangeValue={(index, value) => { setNotificationType(value), user.user_role == 2 ? cardNumberRef.current.focus() : null }}
+                                            onChangeValue={(index, value) => { setNotificationType(value) }}
                                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
                                             dropdownStyle={{ height: 120 }}
                                         />
@@ -1244,13 +1070,13 @@ const Profile = (props) => {
                             user.user_role == 2
                                 ?
                                 <View style={{ ...styles.personalContainer, marginTop: 20, zIndex: -1000 }}>
-                                    <Text style={{ ...styles.text2, alignSelf: "flex-start",fontSize:14, marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION </Text>
-                                    <TouchableOpacity onPress={()=>{
-                                        props.navigation.navigate("UserStack",{screen:"CardList"})
+                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", fontSize: 14, marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION </Text>
+                                    <TouchableOpacity onPress={() => {
+                                        props.navigation.navigate("UserStack", { screen: "CardList" })
                                     }}>
                                         <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>Manage Cards</Text>
                                     </TouchableOpacity>
-                               
+
                                     <View style={{ height: 50 }} />
                                 </View>
                                 :
@@ -1259,13 +1085,13 @@ const Profile = (props) => {
                                     <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
                                         activeOpacity={0.7}
                                         onPress={() => {
-                                            if(isConnectedToAccount){
+                                            if (isConnectedToAccount) {
 
-                                            }else{
+                                            } else {
                                                 getAccountLink()
                                             }
                                         }}>
-                                        {isConnectedToAccount?<Text>Connect Account Linked</Text>:<Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
+                                        {isConnectedToAccount ? <Text>Connect Account Linked</Text> : <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
                                     </TouchableOpacity>
                                 </View>
                         }
@@ -1301,14 +1127,17 @@ const Profile = (props) => {
                 </ScrollView>
             </KeyboardAvoidingView>
             <View style={{ flexDirection: 'row', backgroundColor: LS_COLORS.global.transparent, height: Dimensions.get('screen').height / 12, justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: '5%' }}>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => saveUser()} style={{ height: 30, aspectRatio: 1 }}>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => saveUser()} style={{ height: 30, }}>
                     <Image source={require('../../../assets/save.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                    <Text>Save</Text>
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('Settings')} style={{ height: 30, aspectRatio: 1 }}>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('Settings')} style={{ height: 30, }}>
                     <Image source={require('../../../assets/gear.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                    <Text>Settings</Text>
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.7} onPress={() =>  logout() } style={{ height: 30, aspectRatio: 1 }}>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => logout()} style={{ height: 30, }}>
                     <Image source={require('../../../assets/logout.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                    <Text>Logout</Text>
                 </TouchableOpacity>
             </View>
             {loader && <Loader />}

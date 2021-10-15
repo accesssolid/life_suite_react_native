@@ -39,7 +39,7 @@ const DropDown = (props) => {
                     showsVerticalScrollIndicator={false}
                     disabled={props.disabled}
                     renderRow={(item) => {
-                        return (<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 40, paddingHorizontal: '5%', backgroundColor: LS_COLORS.global.white }}>
+                        return (<View style={{ flexDirection: 'row',width:"100%", justifyContent: 'space-between', alignItems: 'center', height: 40, paddingHorizontal: '5%', backgroundColor: LS_COLORS.global.white }}>
                             <Text style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12 }}>{item}</Text>
                             {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}
                         </View>)

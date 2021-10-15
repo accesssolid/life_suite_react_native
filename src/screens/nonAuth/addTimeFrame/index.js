@@ -30,6 +30,7 @@ import { indexOf } from 'lodash';
 const AddTimeFrame = (props) => {
     const dispatch = useDispatch()
     const { serviceData } = props.route.params
+    console.log("Service Data", JSON.stringify(serviceData))
     const calendarRef = useRef(null)
     const [selectedDates, setSelectedDates] = useState([])
     const user = useSelector(state => state.authenticate.user)
@@ -47,6 +48,7 @@ const AddTimeFrame = (props) => {
         if (!isAddServiceMode)
             getTimeFrames()
     }, [])
+
 
     // "start_date" : "2021-07-16",  
     // "end_date" : "2021-07-16", 
@@ -106,9 +108,6 @@ const AddTimeFrame = (props) => {
     }
 
 
-    React.useEffect(() => {
-        console.log("=======zzzzzzz", selectedDates, "\n", customDatesStyles)
-    }, [selectedDates, customDatesStyles])
 
 
 
@@ -159,7 +158,6 @@ const AddTimeFrame = (props) => {
             return showToast("Invalid time frame data")
         }
         let { json_data, formdata } = serviceData
-        console.log(JSON.parse(json_data))
         json_data = JSON.parse(json_data)
         json_data['time_frame'] = data
         formdata.append("json_data", JSON.stringify(json_data));
@@ -169,7 +167,6 @@ const AddTimeFrame = (props) => {
             endPoint: '/api/providerServicesAdd',
             type: 'post'
         }
-        console.log(json_data)
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -198,11 +195,12 @@ const AddTimeFrame = (props) => {
             "Authorization": `Bearer ${access_token}`
         }
         let user_data = {
-            "user_id": user.id
+            "user_id": user.id,
+            "service_id": serviceData?.subService?.id
         }
         let config = {
             headers: headers,
-            data: JSON.stringify({ ...user_data }),
+            data: JSON.stringify(user_data),
             endPoint: '/api/timeFramesList',
             type: 'post'
         }
@@ -228,14 +226,14 @@ const AddTimeFrame = (props) => {
                             });
                         });
                     })
+                    console.log("Styles==>", styles)
                     setSelectedDates([...dates])
-                    setCustomDatesStyles([...styles])
+                    setCustomDatesStyles(styles)
                 }
                 else {
                     setLoading(false)
                 }
             }).catch(err => {
-                console.log("err =>. ", err)
                 setLoading(false)
             })
     }
@@ -293,20 +291,20 @@ const AddTimeFrame = (props) => {
             let styleDate = styles[activeIndex]
             const start_date = moment(styleDate.start_date).format("MM-DD-YYYY")
             const end_date = moment(styleDate.end_date).format("MM-DD-YYYY")
-            const toTime=moment(date).format('hh:mm a')
+            const toTime = moment(date).format('hh:mm a')
             if (start_date !== end_date) {
                 setMarkedDates({})
                 styles[activeIndex].to_time = toTime
             } else {
-                const fromTime = moment(styleDate.from_time,'hh:mm a');
-                const toTime1=moment(toTime,'hh:mm a');
-                if(fromTime<toTime1){
+                const fromTime = moment(styleDate.from_time, 'hh:mm a');
+                const toTime1 = moment(toTime, 'hh:mm a');
+                if (fromTime < toTime1) {
                     setMarkedDates({})
                     styles[activeIndex].to_time = toTime
-                }else{
-                    setTimeout(()=>{
+                } else {
+                    setTimeout(() => {
                         showToast("End time can not be smaller than start time.", 'warn')
-                    },500)
+                    }, 500)
                 }
             }
 
@@ -366,6 +364,9 @@ const AddTimeFrame = (props) => {
         );
     }
 
+    const [markedDates1, setMarkedDates1] = React.useState({})
+
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -382,6 +383,7 @@ const AddTimeFrame = (props) => {
                         onDayPress={(day) => {
                             onDateChange(day)
                         }}
+                        markingType={'period'}
                         hideArrows={false}
                         hideExtraDays={true}
                         disableMonthChange={false}
@@ -394,9 +396,8 @@ const AddTimeFrame = (props) => {
                         disableArrowRight={false}
                         disableAllTouchEventsForDisabledDays={true}
                         enableSwipeMonths={false}
-                        markedDates={{ ...markedDates }}
+                        markedDates={markedDates}
                         minDate={new Date()}
-                    // markingType={'period'}
                     />
                 </View>
                 <ScrollView style={{ flex: 1 }}>

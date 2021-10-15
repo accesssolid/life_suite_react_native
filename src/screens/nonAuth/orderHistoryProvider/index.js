@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Platform, ActivityIndicator, FlatList ,Dimensions} from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, Platform, ActivityIndicator, FlatList, Dimensions } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -8,6 +8,7 @@ import { globalStyles, showToast } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /* Components */
 import Header from '../../../components/header';
@@ -28,7 +29,7 @@ const placeholder_image = require("../../../assets/user.png")
 // completed
 // rejected
 
-const {height,width}=Dimensions.get("window")
+const { height, width } = Dimensions.get("window")
 
 const order_types = [
     { id: 1, title: "Pending" },
@@ -43,6 +44,7 @@ const order_types = [
 
 const OrderHistory = (props) => {
     const dispatch = useDispatch()
+    const { user1 } = props.route.params
     const [selected, setselected] = useState(order_types[0])
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
@@ -86,8 +88,8 @@ const OrderHistory = (props) => {
         }
         let config = {
             headers: headers,
-            data: JSON.stringify({ order_status, page }),
-            endPoint: user.user_role == 3 ? '/api/providerOrderHistory' : "/api/customerOrderHistory",
+            data: JSON.stringify({ order_status, page, customer_id: user1 }),
+            endPoint: '/api/ordersWithCustomer',
             type: 'post'
         }
 
@@ -152,15 +154,15 @@ const OrderHistory = (props) => {
                         customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 }}
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
-                  <View style={{ flexDirection: "row", alignItems: "center",justifyContent:"space-between", marginTop: 20 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
                         <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>List of orders</Text>
-                        <View style={{ flex: 0.8,alignSelf:"flex-end", marginRight: 20, alignItems: "flex-end" }}>
-                           <DropDown
-                               item={order_types.map(x => x.title)}
-                               value={selected.title}
-                               onChangeValue={(index, value) => { setselected(order_types[index]) }}
-                               containerStyle={{ marginLeft:20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10,borderWidth: 0 }}
-                           />
+                        <View style={{ flex: 0.8, alignSelf: "flex-end", marginRight: 20, alignItems: "flex-end" }}>
+                            <DropDown
+                                item={order_types.map(x => x.title)}
+                                value={selected.title}
+                                onChangeValue={(index, value) => { setselected(order_types[index]) }}
+                                containerStyle={{ marginLeft: 20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
+                            />
                         </View>
                     </View>
                     <FlatList
@@ -173,7 +175,7 @@ const OrderHistory = (props) => {
                             }
                         }}
                         renderItem={({ item, index }) => {
-                            let serviceNames=[...new Set(item.order_items?.map(x=>x.services_name))]
+                            let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
 
 
                             return (<TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {

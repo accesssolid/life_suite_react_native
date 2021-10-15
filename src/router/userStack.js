@@ -31,6 +31,7 @@ import ChatScreen from '../screens/nonAuth/chatScreen';
 import CustomWebView from '../screens/nonAuth/CustomWebView'
 import CardList from '../screens/nonAuth/cardlist';
 import AddCard from '../screens/nonAuth/addCard'
+import OrderDetailCustomer from '../screens/nonAuth/orderDetailCustomer';
 
 const Stack = createStackNavigator();
 
@@ -59,6 +60,7 @@ const UserStack = () => {
             <Stack.Screen name="CustomWebView" component={CustomWebView} />
             <Stack.Screen name="CardList" component={CardList} />
             <Stack.Screen name="AddCard" component={AddCard} />
+            <Stack.Screen name="OrderDetailCustomer" component={OrderDetailCustomer} />
         </Stack.Navigator>
     )
 }

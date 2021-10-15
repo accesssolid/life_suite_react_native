@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, TextInput, StatusBar, Modal, Image, TouchableOpacity, FlatList, Platform } from 'react-native'
+import { View, StyleSheet, Text, TextInput, StatusBar, Modal, Image, TouchableOpacity, FlatList, Platform, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -39,6 +39,7 @@ const ChatScreen = (props) => {
     const [messages, setMessages] = useState("");
     const flatlistRef = useRef();
     const [visible, setVisible] = useState(false)
+    const [visible1, setVisible1] = useState(false)
     const [arr, setArr] = useState([])
     const [read, setRead] = useState(0)
     const [loader, setLoader] = useState(false)
@@ -243,6 +244,8 @@ const ChatScreen = (props) => {
         )
     }
 
+
+
     const showFile = (fileUrl) => {
         const ext = fileUrl.split(/[#?]/)[0].split('.').pop().trim();
         return new Promise((resolve, reject) => {
@@ -339,6 +342,10 @@ const ChatScreen = (props) => {
                     imageUrl={require("../../../assets/back.png")}
                     action={() => {
                         props.navigation.goBack()
+                    }}
+                    imageUrl1={require("../../../assets/3dot.png")}
+                    action1={() => {
+                        setVisible1(true)
                     }}
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -669,11 +676,37 @@ const ChatScreen = (props) => {
                     {loader && <Loader />}
                 </View>
             </SafeAreaView>
+            <MenuModal visible={visible1} role={user.user_role} user1={data.id.toString()} setVisible={setVisible1} navigation={props.navigation} />
         </>
     )
 }
 
 export default ChatScreen;
+
+const MenuModal = ({ visible, setVisible, role, navigation, user1 }) => {
+    return (
+        <Modal
+            visible={visible}
+            transparent={true}
+            style={{ flex: 1 }}
+        >
+            <Pressable onPress={() => setVisible(false)} style={{ flex: 1, alignItems: "flex-end", paddingTop: "8%" }}>
+                <Pressable
+                    onPress={() => {
+                        setVisible(false)
+                        if (role == 3) {
+                            navigation.navigate("OrderHistoryProvider", { user1: user1 })
+                        } else {
+                            navigation.navigate("OrderHistoryCustomer", { user1: user1 })
+                        }
+                    }}
+                    style={{ height: 30, justifyContent: "center", borderColor: LS_COLORS.global.green, alignItems: "center", width: 100, backgroundColor: "white", borderRadius: 2, borderWidth: 1, marginRight: 5 }}>
+                    <Text style={[styles.msgText, { color: "black", fontSize: 14 }]}>Order History</Text>
+                </Pressable>
+            </Pressable>
+        </Modal>
+    )
+}
 
 const styles = StyleSheet.create({
     safeArea: {

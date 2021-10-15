@@ -102,7 +102,7 @@ const OrderClientDetail = (props) => {
                 items_data: JSON.stringify({
                     estimated_reached_time: data.estimated_reached_time,
                     order_start_time: data.order_start_time,
-                    order_end_time: moment(data.order_start_time).add(newTimeNeeded, "minute").toDate(),
+                    order_end_time: moment(data.order_start_time).add(newTimeNeeded, "minutes").format("YYYY-MM-DD HH:mm:[00]"),
                     items: selectedItems,
                     products: selectedProducts,
                     other_options: [],
@@ -122,7 +122,7 @@ const OrderClientDetail = (props) => {
         }
 
 
-
+        console.log(config.data)
         getApi(config)
             .then((response) => {
                 console.log("/api/providerOrderUpdate", response)

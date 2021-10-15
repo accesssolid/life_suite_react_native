@@ -18,53 +18,55 @@ import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Card, Row } from 'native-base'
 import { TextInput } from 'react-native-gesture-handler';
-import { BASE_URL } from '../../../api/api';
+import { BASE_URL, getApi } from '../../../api/api';
 import { Dimensions } from 'react-native';
 import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector ,useDispatch} from 'react-redux';
 import moment from 'moment';
-
+import {useFocusEffect} from '@react-navigation/native'
 const Notification = (props) => {
-    const [notifications, setNotifications] = useState([
-        {
-            name: "hlloftuuctjjfcgcghcfgcjfgcgfcfgcfhcfcfgcfcfgcfcxfgcgffgcfcfgcgffcgfcgfcfcfgcfcfgcfcgffgfcfcfgfccfgcfgcfgcfcfgfgccfgfcgcfcfgcfgfgfcgcfgcfcfcfgcfgfcgcfgcfgcfgfcgfcgfcgcfgcf",
-            text: "Good One",
-            time: "11.31",
-            color:'#ACF0F2'
-        },
-        {
-            name: "hllogkjsvdfvsdkvfvdsfjdfs",
-            text: "Good One",
-            time: "11.31",
-            color:'lightgrey'
-        },
-        {
-            name: "hllokjbajsvdf",
-            text: "Good One",
-            time: "11.31",
-            color:'#ACF0F2'
-        },
-        {
-            name: "hlloftuuctjjfcgcghcfgcjfgcgfcfgcfhcfcfgcfcfgcfcxfgcgffgcfcfgcfcfcfgfccfgcfgcfgcfcfgfgccfgfcgcfcfgcfgfgfcgcfgcfcfcfgcfgfcgcfgcfgcfgfcgfcgfcgcfgcf",
-            text: "Good One",
-            time: "11.31",
-            color:'#ACF0F2'
-        },
-        {
-            name: "hllogkjsvdfvsdkvfvdsfjdfs",
-            text: "Good One",
-            time: "11.31",
-            color:'lightgrey'
-        },
-        {
-            name: "hllokjbajsvdf",
-            text: "Good One",
-            time: "11.31",
-            color:'#ACF0F2'
+    const [loading, setLoading] = React.useState(false)
+    const dispatch = useDispatch()
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const user = useSelector(state => state.authenticate.user)
+
+    const [notifications, setNotifications] = useState([])
+
+
+    const getNotifications = async () => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
         }
-    ])
-    const renderData = (itemData) => {
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ notification_type:"all" }),
+            endPoint: user.user_role == 3 ? '/api/providerNotificationList' : "/api/customerNotificationList",
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                    setNotifications(response.data)
+                }
+                else {
+                    showToast(response.message)
+                }
+            }).catch(err => {
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
+
+    useFocusEffect(React.useCallback(()=>{
+        getNotifications()
+    },[]))
+
+    const renderData = ({item}) => {
         return (
             <Card
                 style={{
@@ -76,18 +78,18 @@ const Notification = (props) => {
                     borderRadius: 10,
                     borderColor: '#4141411A',
                     width: "90%",
-                    overflow:"hidden",
-                    height:50
+                    overflow: "hidden",
+                    height: 50
                 }}
                 activeOpacity={0.7}
             >
                 <View style={{ flexDirection: 'row' }}>
-                <View style={{ backgroundColor:itemData.item.color , width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center",right:10 }}></View>
+                    <View style={{  width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center", right: 10 }}></View>
                     <View style={{ marginLeft: '5%', alignSelf: 'center', width: "65%" }}>
-                        <Text numberOfLines={4} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>{itemData.item.name}</Text>
+                        <Text numberOfLines={4} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>{item.description}</Text>
                     </View>
                     <View style={{ width: "20%", justifyContent: "flex-start", alignItems: "flex-end" }}>
-                        <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular }}>{itemData.item.time}</Text>
+                        <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular }}>{moment(item.created_at).format("HH:mm")}</Text>
                     </View>
                 </View>
             </Card>

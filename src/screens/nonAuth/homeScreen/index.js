@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -156,7 +156,7 @@ const HomeScreen = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log("/api/providerAddedServicesList",response)
+                console.log("/api/providerAddedServicesList", response)
                 if (response.status == true) {
                     dispatch(setMyJobs({ data: [...response.data] }))
                     setLoading(false)
@@ -168,10 +168,10 @@ const HomeScreen = (props) => {
                 setLoading(false)
             })
     }
-    
+
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
-            props.navigation.navigate("ServicesProvided", {subService:item,items:[...item.itemsData]})
+            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
     }
 
     const getLocationPermission = async () => {
@@ -278,19 +278,19 @@ const HomeScreen = (props) => {
                     </TouchableOpacity>
                     <View style={{ flex: 1, paddingHorizontal: '5%' }}>
                     </View>
-                    {   user.user_role == 2
-                            ?
-                            <TouchableOpacity style={styles.search}
-                                activeOpacity={0.7}
-                                onPress={() => { props.navigation.navigate('Search') }}>
-                                <Image
-                                    style={styles.searchImage}
-                                    source={require("../../../assets/search.png")}
-                                />
-                            </TouchableOpacity>
-                            :
-                            null
-                    }                    
+                    {user.user_role == 2
+                        ?
+                        <TouchableOpacity style={styles.search}
+                            activeOpacity={0.7}
+                            onPress={() => { props.navigation.navigate('Search') }}>
+                            <Image
+                                style={styles.searchImage}
+                                source={require("../../../assets/search.png")}
+                            />
+                        </TouchableOpacity>
+                        :
+                        null
+                    }
                 </View>
                 {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7} onPress={() => setIsAddJobActive(!isAddJobActive)}>
                     <View style={{ height: 30, aspectRatio: 1 }}>
@@ -353,10 +353,10 @@ const HomeScreen = (props) => {
                     :
                     <View style={{ flex: 1, paddingTop: '5%' }}>
                         <SortableGrid
-                            blockTransitionDuration={200}
-                            activeBlockCenteringDuration={200}
+                            blockTransitionDuration={400}
+                            activeBlockCenteringDuration={500}
                             itemsPerRow={2}
-                            dragActivationTreshold={200}
+                            dragActivationTreshold={300}
                             onDragRelease={(itemOrder) => {
                                 let arr = []
                                 itemOrder.itemOrder.map((itemData,) => {
@@ -376,7 +376,8 @@ const HomeScreen = (props) => {
                                             props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
                                             :
                                             props.navigation.navigate("SubServices", { service: item })
-                                    }}>
+                                    }}
+                                    >
                                     <UserCards
                                         title1={item.name}
                                         title2="SERVICES"

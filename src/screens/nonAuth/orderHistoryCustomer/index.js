@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Platform, ActivityIndicator, FlatList } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, Platform, ActivityIndicator, FlatList } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -8,7 +8,7 @@ import { globalStyles, showToast } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 /* Components */
 import Header from '../../../components/header';
 import { Card, Container, Content } from 'native-base';
@@ -43,6 +43,7 @@ const order_types = [
 
 const OrderHistory1 = (props) => {
     const [reason, setReason] = useState("")
+    const {user1}=props.route.params
     const [open, setOpen] = useState(false)
     const [reason1, setReason1] = useState("")
     const [open1, setOpen1] = useState(false)
@@ -90,8 +91,8 @@ const OrderHistory1 = (props) => {
         }
         let config = {
             headers: headers,
-            data: JSON.stringify({ order_status, page }),
-            endPoint: user.user_role == 3 ? '/api/providerOrderHistory' : "/api/customerOrderHistory",
+            data: JSON.stringify({ order_status, page,provider_id:user1}),
+            endPoint: '/api/ordersWithProvider',
             type: 'post'
         }
         getApi(config)
@@ -265,15 +266,15 @@ const OrderHistory1 = (props) => {
                         customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0, marginTop: 20 }}
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
+                   <View style={{ flexDirection: "row", alignItems: "center",justifyContent:"space-between", marginTop: 20 }}>
                         <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>List of orders</Text>
-                        <View style={{ flex: 0.8, alignSelf: "flex-end", marginRight: 20, alignItems: "flex-end" }}>
-                            <DropDown
-                                item={order_types.map(x => x.title)}
-                                value={selected.title}
-                                onChangeValue={(index, value) => { setselected(order_types[index]) }}
-                                containerStyle={{ marginLeft: 20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
-                            />
+                        <View style={{ flex: 0.8,alignSelf:"flex-end", marginRight: 20, alignItems: "flex-end" }}>
+                           <DropDown
+                               item={order_types.map(x => x.title)}
+                               value={selected.title}
+                               onChangeValue={(index, value) => { setselected(order_types[index]) }}
+                               containerStyle={{ marginLeft:20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10,borderWidth: 0 }}
+                           />
                         </View>
                     </View>
                     <FlatList
@@ -287,14 +288,10 @@ const OrderHistory1 = (props) => {
                         }}
                         renderItem={({ item, index }) => {
                             console.log(item)
-                            let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
-                            let order_status = item.order_status
+                            let serviceNames=[...new Set(item.order_items?.map(x=>x.services_name))]
+
                             return (
                                 <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
-                                    if (order_status == 9) {
-                                        props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item } })
-                                        return
-                                    }
                                     if (done === index) {
                                         setDone("")
                                     }
@@ -441,7 +438,7 @@ const OrderHistory1 = (props) => {
                                                     style={styles.save}
                                                     activeOpacity={0.7}
                                                     onPress={() => {
-
+                                                      
                                                         props.navigation.navigate("ChatScreen", {
                                                             item: {
                                                                 id: item.provider_id,
@@ -468,7 +465,7 @@ const OrderHistory1 = (props) => {
                                                 :
                                                 null
                                             }
-                                             {item.order_status == 8 || item.order_status == 2 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
+                                               {item.order_status == 8 || item.order_status == 2 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
                                                 <TouchableOpacity
                                                     style={styles.save}
                                                     activeOpacity={0.7}
@@ -489,7 +486,6 @@ const OrderHistory1 = (props) => {
                                                 :
                                                 null
                                             }
-                                               
                                         </>
                                         : <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <View>

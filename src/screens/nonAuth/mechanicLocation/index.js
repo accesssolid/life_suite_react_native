@@ -242,7 +242,7 @@ const MechanicLocation = (props) => {
                             onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
                             style={styles.fromContainer}>
                             <Text style={{ flex: 1, }} numberOfLines={1}>
-                                {fromAddress}
+                                {fromAddress==""?"Select Address":toAddress}
                             </Text>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
@@ -258,7 +258,7 @@ const MechanicLocation = (props) => {
                         {(subService.location_type == 1||subService.location_type == 2 ) && <TouchableOpacity
                             onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                             style={styles.fromContainer}>
-                            <Text style={{ flex: 1, }} numberOfLines={1}>{toAddress}</Text>
+                            <Text style={{ flex: 1, }} numberOfLines={1}>{toAddress==""?"Select Address":toAddress}</Text>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                                 style={{ height: '100%', aspectRatio: 1, justifyContent: 'center', alignItems: "flex-end", paddingHorizontal: 10 }}
@@ -274,7 +274,7 @@ const MechanicLocation = (props) => {
                             <TextInput
                                 style={styles.inputStyle}
                                 color="black"
-                                value={moment(DATE).format("MM-DD-YYYY")}
+                                value={date!=""?moment(date).format("MM-DD-YYYY"):"Select Date"}
                                 editable={false}
                                 placeholder="Select date"
                                 placeholderTextColor={LS_COLORS.global.placeholder}

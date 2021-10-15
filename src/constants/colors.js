@@ -14,7 +14,8 @@ const LS_COLORS = {
         divider: '#CFCFCF',
         darkGray: '#5A5A5A',
         placeholder: '#8f8f8f',
-        frameBg: '#ECECEC'
+        frameBg: '#ECECEC',
+        danger:"#F92525"
     },
 }
 
