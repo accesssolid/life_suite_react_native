@@ -339,6 +339,8 @@ const Mechanics = (props) => {
                 <TimeFrame
                     visible={open2}
                     data={dupProviders}
+                    starting_time={data.order_start_time}
+                    ending_time={data.order_end_time}
                     orderPreviousData={data}
                     action={(jsonData) => {
                         placeOrder(jsonData)
@@ -437,8 +439,6 @@ const Mechanics = (props) => {
                                     } else {
                                         time_format = item.timeDuration + " min"
                                     }
-                                    let name = item.first_name
-                                    // price calculation
                                     let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
                                     let totalProductPrice = 0
                                     for (let z of item.item_list) {
@@ -449,7 +449,7 @@ const Mechanics = (props) => {
                                         }
                                     }
                                     let totalPrice = totalServicePrice + totalProductPrice
-                                    // setName(name)
+
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <View style={{ width: "75%", flexDirection: 'row' }}>
@@ -499,7 +499,7 @@ const Mechanics = (props) => {
                                                 ratingBackgroundColor="white"
                                                 ratingColor="#04BFBF"
                                                 tintColor="white"
-                                                startingValue={parseInt(item.rating)}
+                                                startingValue={parseInt(item.rating??0)}
                                             />
                                         </View>
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
@@ -511,7 +511,6 @@ const Mechanics = (props) => {
                                             } else {
                                                 time_format = i.time_duration + " min"
                                             }
-                                            // extra data
                                             let service_id = i.service_item_id
                                             let extra = extraData.find(x => x.parent_id == service_id)
                                             console.log("Extra Fuck", extra)
@@ -562,11 +561,9 @@ const Mechanics = (props) => {
                                                             </View>
                                                         )
                                                     })}
-                                                    {/* extra data */}
                                                 </>
                                             )
-                                        })
-                                        }
+                                        })  }
                                         <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                             <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Estimated Time</Text>
                                             <Text style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{time_format}</Text>
@@ -653,13 +650,11 @@ const styles = StyleSheet.create({
         color: LS_COLORS.global.white
     },
     alexiContainer: {
-        maxHeight: '100%',
         width: "90%",
         alignSelf: 'center',
         borderRadius: 6,
         padding: 10,
         marginTop: 10,
-        overflow: 'hidden'
     },
     upper: {
         justifyContent: "center",

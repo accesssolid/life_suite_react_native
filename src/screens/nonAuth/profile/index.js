@@ -218,6 +218,8 @@ const Profile = (props) => {
         setUserData({ ...user })
         setNotificationType(getNotificationType(user.notification_prefrence))
         homeAddressRef.current.setAddressText(homeAddressData.address_line_1)
+        workAddressRef.current.setAddressText()
+
     }, [user])
 
     useEffect(() => {
@@ -292,11 +294,29 @@ const Profile = (props) => {
                 lat: homeAddressData.lat,
                 lon: homeAddressData.lon
             })
-            workAddressRef.current.setAddressText(homeAddressData.address_line_1)
+            // workAddressRef.current.setAddressText(homeAddressData.address_line_1)
             // setDropStateValueWork(dropStateValue)
             // setDropCityValueWork(dropCityValue)
+        } else {
+            if( userData.address[1]){
+                setWorkAddressData({
+                    address_line_1: userData.address[1]?.address_line_1,
+                    address_line_2: userData.address[1]?.address_line_2,
+                    city: userData.address[1]?.city,
+                    state: userData.address[1]?.state,
+                    zip: userData.address[1]?.zip_code,
+                    lat: userData.address[1]?.lat,
+                    lon: userData.address[1]?.long
+                })
+            }
+          
+            // workAddressRef.current.setAddressText(homeAddressData.address_line_1)
         }
     }, [isSameAddress, homeAddressData])
+
+    React.useEffect(() => {
+        workAddressRef.current.setAddressText(workAddressData.address_line_1)
+    }, [workAddressData])
 
     useEffect(() => {
         if (isSameAddress) {
@@ -313,6 +333,8 @@ const Profile = (props) => {
             workAddressRef.current.setAddressText(homeAddressData.address_line_1)
             // setDropStateValueWork(dropStateValue)
             // setDropCityValueWork(dropCityValue)
+        } else {
+
         }
     }, [homeAddressData])
 
@@ -811,19 +833,19 @@ const Profile = (props) => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : null}
                 style={styles.container}>
-                     <View style={{ marginTop: '15%',}}>
-                            <Text style={styles.text}>MY INFORMATION</Text>
-                            <Text style={styles.text1}>{userData.first_name}</Text>
-                            <Text style={styles.text2}>Profile ID : {userData.id}</Text>
-                        </View>
+                <View style={{ marginTop: '15%', }}>
+                    <Text style={styles.text}>MY INFORMATION</Text>
+                    <Text style={styles.text1}>{userData.first_name}</Text>
+                    <Text style={styles.text2}>Profile ID : {userData.id}</Text>
+                </View>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
                     bounces={false}
                     keyboardShouldPersistTaps='handled'
                     style={styles.container}>
-                    <View style={{marginBottom: '5%' }}>
-                       
+                    <View style={{ marginBottom: '5%' }}>
+
                         <View style={styles.personalContainer}>
                             <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>PERSONAL INFORMATION</Text>
                             <CustomInput
@@ -833,8 +855,10 @@ const Profile = (props) => {
                                     setUserData({ ...userData, first_name: text })
                                 }}
                                 inpuRef={fnameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => { lnameRef.current._root.focus() }}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+
+                                // returnKeyType="next"
+                                // onSubmitEditing={() => { lnameRef.current._root.focus() }}
                                 required={true}
                             />
                             <CustomInput
@@ -844,26 +868,30 @@ const Profile = (props) => {
                                     setUserData({ ...userData, last_name: text })
                                 }}
                                 inpuRef={lnameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => prefNameRef.current._root.focus()}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+
+                                // returnKeyType="next"
+                                // onSubmitEditing={() => prefNameRef.current._root.focus()}
                                 required={true}
                             />
                             <CustomInput
-                                text="Preffered Name"
+                                text="Preferred Name"
                                 value={userData?.prefer_name === "null" ? "" : userData.prefer_name}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, prefer_name: text })
                                 }}
                                 inpuRef={prefNameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => {
-                                    if(user.user_role==3){
-                                        bioRef.current._root.focus()
-                                    }else{
-                                        emailRef.current._root.focus()
-                                    }
-                                    
-                                }}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => {
+                            //     if(user.user_role==3){
+                            //         bioRef.current._root.focus()
+                            //     }else{
+                            //         emailRef.current._root.focus()
+                            //     }
+
+                            // }}
                             />
 
                             {user.user_role == 3 && <CustomInput
@@ -880,6 +908,11 @@ const Profile = (props) => {
                                 multiline
                                 maxLength={255}
                                 numberOfLines={3}
+                                onSubmitEditing={() => {
+                                    console.log(bioRef.current.blur)
+                                }}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+
                                 bottomText={userData?.about?.length + "/255"}
                             />}
 
@@ -890,8 +923,9 @@ const Profile = (props) => {
                                     setUserData({ ...userData, email: text })
                                 }}
                                 inpuRef={emailRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => phoneRef.current._root.focus()}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+                                // returnKeyType="next"
+                                // onSubmitEditing={() => phoneRef.current._root.focus()}
                                 required={true}
                             />
                             <CustomInput
@@ -901,7 +935,7 @@ const Profile = (props) => {
                                     setUserData({ ...userData, phone_number: text })
                                 }}
                                 inpuRef={phoneRef}
-                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                 maxLength={12}
                                 onSubmitEditing={() => {
                                     // setAddHomeAddressActive(true), setTimeout(() => {
@@ -1027,7 +1061,7 @@ const Profile = (props) => {
                             </View>
                             <View style={{ height: 20 }}></View>
                             <View style={{}}>
-                                {
+                                {/* {
                                     Platform.OS == "ios"
                                         ?
                                         <DropDownPicker
@@ -1053,16 +1087,16 @@ const Profile = (props) => {
                                             dropDownContainerStyle={{ borderWidth: 0.3, borderColor: LS_COLORS.global.grey, borderRadius: 0, zIndex: 9999999999 }}
                                             listItemContainerStyle={{ zIndex: 999999999 }}
                                         />
-                                        :
-                                        <DropDown
-                                            title="Notification type"
-                                            item={["Email", "Push Notification", "Text", "All"]}
-                                            value={notificationType}
-                                            onChangeValue={(index, value) => { setNotificationType(value) }}
-                                            containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                            dropdownStyle={{ height: 120 }}
-                                        />
-                                }
+                                        : */}
+                                <DropDown
+                                    title="Notification type"
+                                    item={["Email", "Push Notification", "Text", "All"]}
+                                    value={notificationType}
+                                    onChangeValue={(index, value) => { setNotificationType(value) }}
+                                    containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                    dropdownStyle={{ height: 120 }}
+                                />
+                                {/* } */}
                                 <View style={{ height: 40 }}></View>
                             </View>
                         </View>
@@ -1126,17 +1160,17 @@ const Profile = (props) => {
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-            <View style={{ flexDirection: 'row', backgroundColor: LS_COLORS.global.transparent, height: Dimensions.get('screen').height / 12, justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: '5%' }}>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => saveUser()} style={{ height: 30, }}>
-                    <Image source={require('../../../assets/save.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+            <View style={{ flexDirection: 'row', backgroundColor: LS_COLORS.global.transparent, paddingVertical: 5, justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: '5%' }}>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => saveUser()} style={{ alignItems: "center" }}>
+                    <Image source={require('../../../assets/save.png')} style={{ height: 30, aspectRatio: 1 }} resizeMode="contain" />
                     <Text>Save</Text>
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('Settings')} style={{ height: 30, }}>
-                    <Image source={require('../../../assets/gear.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('Settings')} style={{ alignItems: "center" }}>
+                    <Image source={require('../../../assets/gear.png')} style={{ height: 30, aspectRatio: 1 }} resizeMode="contain" />
                     <Text>Settings</Text>
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => logout()} style={{ height: 30, }}>
-                    <Image source={require('../../../assets/logout.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                <TouchableOpacity activeOpacity={0.7} onPress={() => logout()} style={{ alignItems: "center" }}>
+                    <Image source={require('../../../assets/logout.png')} style={{ height: 30, aspectRatio: 1 }} resizeMode="contain" />
                     <Text>Logout</Text>
                 </TouchableOpacity>
             </View>

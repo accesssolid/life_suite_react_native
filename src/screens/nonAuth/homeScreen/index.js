@@ -74,6 +74,16 @@ const HomeScreen = (props) => {
         }, [])
     );
 
+    useFocusEffect(
+        useCallback(() => {
+            if(props.route?.params){
+                if(props.route?.params.addJobClear){
+                    setIsAddJobActive(false)
+                }
+            }
+        }, [props.route])
+    );
+
     const getServices = () => {
         setLoading(true)
         let headers = {
@@ -108,34 +118,40 @@ const HomeScreen = (props) => {
     }
 
     const getList = (a) => {
-        setLoading(true)
-        let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${access_token}`
-        }
-        console.log(a)
-        var formdata = new FormData();
-        formdata.append("services_json", JSON.stringify(a));
-        let config = {
-            headers: headers,
-            data: formdata,
-            endPoint: '/api/customerServicesListingAdd',
-            type: 'post'
-        }
-        getApi(config)
-            .then((response) => {
-                console.log(response)
-                if (response.status == true) {
+        try{
+            console.log("a",a)
+            setLoading(true)
+            let headers = {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${access_token}`
+            }
+            var formdata = new FormData();
+            formdata.append("services_json", JSON.stringify(a));
+            let config = {
+                headers: headers,
+                data: formdata,
+                endPoint: '/api/customerServicesListingAdd',
+                type: 'post'
+            }
+            console.log("config",config)
+            getApi(config)
+                .then((response) => {
+                    console.log(response)
+                    if (response.status == true) {
+                        setLoading(false)
+                    }
+                    else {
+                        showToast(response.message, 'danger')
+                        setLoading(false)
+                    }
+                }).catch(err => {
+                    console.log("error",err)
                     setLoading(false)
-                }
-                else {
-                    showToast(response.message, 'danger')
-                    setLoading(false)
-                }
-            }).catch(err => {
-                setLoading(false)
-            })
+                })
+        }catch(err){
+            console.log("Error",err)
+        }
+      
     }
 
     const getMyJobs = () => {
@@ -171,7 +187,7 @@ const HomeScreen = (props) => {
 
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
-            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+        props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
     }
 
     const getLocationPermission = async () => {
@@ -212,6 +228,10 @@ const HomeScreen = (props) => {
             }
         }
     }
+
+    React.useEffect(()=>{
+        console.log("#liahs","items",items,"mysJobs",myJobs)
+    },[items,myJobs])
 
     const getCurrentLocation = (hasLocationPermission) => {
         if (hasLocationPermission) {
@@ -363,6 +383,7 @@ const HomeScreen = (props) => {
                                     arr.push(items[itemData.key].id)
                                     setOrder(arr)
                                 })
+                                console.log("arr",arr)
                                 getList(arr)
                                 console.log("Drag was released, the blocks are in the following order: ", arr)
                             }}
@@ -391,7 +412,7 @@ const HomeScreen = (props) => {
                     <View style={styles.orderContainer}>
                         <TouchableOpacity
                             activeOpacity={0.7}
-                            onPress={() => user.user_role == 3 ? props.navigation.navigate("OrderHistory1") : props.navigation.navigate("OrderHistory")}>
+                            onPress={() =>props.navigation.navigate("Orders")}>
                             <Text style={styles.order}>
                                 ORDER
                             </Text>

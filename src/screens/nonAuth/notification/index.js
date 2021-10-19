@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, FlatList, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, FlatList, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -22,9 +22,10 @@ import { BASE_URL, getApi } from '../../../api/api';
 import { Dimensions } from 'react-native';
 import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
-import { useSelector ,useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
-import {useFocusEffect} from '@react-navigation/native'
+import { useFocusEffect } from '@react-navigation/native'
+
 const Notification = (props) => {
     const [loading, setLoading] = React.useState(false)
     const dispatch = useDispatch()
@@ -42,7 +43,7 @@ const Notification = (props) => {
         }
         let config = {
             headers: headers,
-            data: JSON.stringify({ notification_type:"all" }),
+            data: JSON.stringify({ notification_type: "all" }),
             endPoint: user.user_role == 3 ? '/api/providerNotificationList' : "/api/customerNotificationList",
             type: 'post'
         }
@@ -62,37 +63,43 @@ const Notification = (props) => {
             })
     }
 
-    useFocusEffect(React.useCallback(()=>{
+    useFocusEffect(React.useCallback(() => {
         getNotifications()
-    },[]))
+    }, []))
 
-    const renderData = ({item}) => {
+    const renderData = ({ item }) => {
         return (
-            <Card
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    marginTop: 15,
-                    alignSelf: 'center',
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    borderColor: '#4141411A',
-                    width: "90%",
-                    overflow: "hidden",
-                    height: 50
+            <Pressable
+                onPress={() => {
+
                 }}
-                activeOpacity={0.7}
             >
-                <View style={{ flexDirection: 'row' }}>
-                    <View style={{  width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center", right: 10 }}></View>
-                    <View style={{ marginLeft: '5%', alignSelf: 'center', width: "65%" }}>
-                        <Text numberOfLines={4} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>{item.description}</Text>
+                <Card
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 15,
+                        alignSelf: 'center',
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        borderColor: '#4141411A',
+                        width: "90%",
+                        overflow: "hidden",
+                        height: 50
+                    }}
+                    activeOpacity={0.7}
+                >
+                    <View style={{ flexDirection: 'row' }}>
+                        <View style={{ width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center", right: 10, backgroundColor: item.is_read == "0" ? "#5CBFBF" : "gray" }}></View>
+                        <View style={{ marginLeft: '5%', alignSelf: 'center', width: "65%" }}>
+                            <Text numberOfLines={4} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: '#707070' }}>Order #{item.order_id} {item.description}</Text>
+                        </View>
+                        <View style={{ width: "20%", justifyContent: "center", alignItems: "flex-end" }}>
+                            <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>
+                        </View>
                     </View>
-                    <View style={{ width: "20%", justifyContent: "flex-start", alignItems: "flex-end" }}>
-                        <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular }}>{moment(item.created_at).format("HH:mm")}</Text>
-                    </View>
-                </View>
-            </Card>
+                </Card>
+            </Pressable>
         )
     }
     return (
@@ -110,7 +117,7 @@ const Notification = (props) => {
                     {
                         notifications?.length === 0 ?
                             <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: "center", marginTop: 10 }}>
-                                <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No Chats Found</Text>
+                                <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No notification found</Text>
                             </View>
                             : <FlatList
                                 data={notifications}

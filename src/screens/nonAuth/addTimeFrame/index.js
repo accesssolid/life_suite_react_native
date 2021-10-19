@@ -9,7 +9,8 @@ import { globalStyles } from '../../../utils';
 /* Packages */
 import CalendarPicker from 'react-native-calendar-picker';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import moment from "moment";
+
+
 import TextInputMask from 'react-native-text-input-mask';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -22,10 +23,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getApi } from '../../../api/api';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
-import { setAddServiceMode } from '../../../redux/features/services';
+import { setAddServiceMode,clearCleanData } from '../../../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
 import { CheckBox, Toast } from 'native-base'
 import { indexOf } from 'lodash';
+const Moment = require("moment")
+const MomentRange = require("moment-range")
+const moment = MomentRange.extendMoment(Moment)
 
 const AddTimeFrame = (props) => {
     const dispatch = useDispatch()
@@ -89,7 +93,6 @@ const AddTimeFrame = (props) => {
             let dates = [...selectedDates]
             let styles = customDatesStyles.filter(x => x.from_time !== "" || x.to_time !== "")
             dates.push(moment(date.dateString).format("DD/MM/YYYY"))
-
             styles.push({
                 id: '',
                 start_date: moment(propOwn[0]).format("YYYY-MM-DD"),
@@ -259,9 +262,10 @@ const AddTimeFrame = (props) => {
                 if (response.status == true) {
                     dispatch(setMyJobs({ data: [...response.data] }))
                     dispatch(setAddServiceMode({ data: false }))
+                    dispatch(clearCleanData())
                     setLoading(false)
                     if (shouldNavigate) {
-                        props.navigation.navigate('HomeScreen')
+                        props.navigation.navigate('HomeScreen',{addJobClear:true})
                     }
                 }
                 else {
@@ -273,6 +277,8 @@ const AddTimeFrame = (props) => {
             }
             )
     }
+
+
 
     const setTime = (type, index) => {
         setDateType(type)
@@ -293,11 +299,20 @@ const AddTimeFrame = (props) => {
             const end_date = moment(styleDate.end_date).format("MM-DD-YYYY")
             const toTime = moment(date).format('hh:mm a')
             if (start_date !== end_date) {
-                setMarkedDates({})
-                styles[activeIndex].to_time = toTime
+                const fromTime = moment(styleDate.from_time, 'hh:mm a').toDate();
+                const toTime1 = moment(toTime, 'hh:mm a').toDate();
+                if (fromTime < toTime1) {
+                    setMarkedDates({})
+                    styles[activeIndex].to_time = toTime
+                } else {
+                    setTimeout(() => {
+                        showToast("End time can not be smaller than start time.", 'warn')
+                    }, 500)
+                }
             } else {
-                const fromTime = moment(styleDate.from_time, 'hh:mm a');
-                const toTime1 = moment(toTime, 'hh:mm a');
+                const fromTime = moment(styleDate.from_time, 'hh:mm a').toDate();
+                const toTime1 = moment(toTime, 'hh:mm a').toDate();
+                console.log("orders",fromTime,toTime)
                 if (fromTime < toTime1) {
                     setMarkedDates({})
                     styles[activeIndex].to_time = toTime
@@ -364,8 +379,33 @@ const AddTimeFrame = (props) => {
         );
     }
 
-    const [markedDates1, setMarkedDates1] = React.useState({})
 
+
+    const getAllMarkedDates = (markedObject) => {
+        console.log(markedObject)
+        let keys = Object.keys(markedObject)
+        if (keys.length == 2) {
+            let range = moment().range(keys[0], keys[1])
+            let array = Array.from(range.by("days")).map((x, i) => ({ date: moment(x).format("YYYY-MM-DD"), index: i }))
+            // {"selected": true, "selectedColor": "#1AB8AA"}
+            let data = array.reduce((a, b) => ({ ...a, [b.date]: { "selected": true, "color": "#1AB8AA", startingDay: b.index == 0 ? true : false, endingDay: b.index == array.length - 1 ? true : false } }), {})
+            return data
+        } else {
+            let data = keys.reduce((a, b) => ({
+                ...a, [b]: {
+                    customStyles: {
+                        container: {
+                            backgroundColor: '#1AB8AA'
+                        },
+                        text: {
+                            color: 'white'
+                        }
+                    }
+                }
+            }), {})
+            return data
+        }
+    }
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -383,7 +423,7 @@ const AddTimeFrame = (props) => {
                         onDayPress={(day) => {
                             onDateChange(day)
                         }}
-                        markingType={'period'}
+                        markingType={Object.keys(markedDates).length == 2 ? "period" : 'custom'}
                         hideArrows={false}
                         hideExtraDays={true}
                         disableMonthChange={false}
@@ -396,7 +436,7 @@ const AddTimeFrame = (props) => {
                         disableArrowRight={false}
                         disableAllTouchEventsForDisabledDays={true}
                         enableSwipeMonths={false}
-                        markedDates={markedDates}
+                        markedDates={getAllMarkedDates(markedDates)}
                         minDate={new Date()}
                     />
                 </View>

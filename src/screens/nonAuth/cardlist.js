@@ -3,16 +3,16 @@ import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageB
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Header from '../../components/header'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
 import { useFocusEffect } from '@react-navigation/native'
-
 import { getApi } from '../../api/api'
 import { useSelector } from 'react-redux'
 import Loader from '../../components/loader'
 import LS_COLORS from '../../constants/colors'
 import LS_FONTS from '../../constants/fonts'
 import { ActivityIndicator } from 'react-native-paper'
-import { showToast, storeItem } from '../../components/validators';
+import { showToast } from '../../components/validators';
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import { CheckBox } from 'react-native-elements'
 export default function CardList({ navigation, route }) {
     const [loader, setLoader] = useState(false)
     const [cards, setCards] = React.useState([])
@@ -49,17 +49,19 @@ export default function CardList({ navigation, route }) {
                 setLoader(false)
             })
     }
-    const deleteCard = (id) => {
+
+
+    const selectCard = (id) => {
         setLoader(true)
         let headers = {
             "Authorization": `Bearer ${access_token}`
         }
         const formdata = new FormData()
-        formdata.append("card_id", id)
+        formdata.append("source", id)
         let config = {
             headers: headers,
             data: formdata,
-            endPoint: '/api/customerCardRemove',
+            endPoint: '/api/customerDefaultCardUpdate',
             type: 'post'
         }
         console.log(config)
@@ -80,6 +82,37 @@ export default function CardList({ navigation, route }) {
             })
     }
 
+    const deleteCard = (id) => {
+        setLoader(true)
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+        const formdata = new FormData()
+        formdata.append("card_id", id)
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: '/api/customerCardRemove',
+            type: 'post'
+        }
+        console.log(config)
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    showToast("Card updated.", 'danger')
+                    getCards()
+                }
+                else {
+                    showToast(response.message, 'danger')
+                }
+            })
+            .catch(err => {
+
+            }).finally(() => {
+                setLoader(false)
+            })
+    }
+
     useFocusEffect(React.useCallback(() => {
         getCards()
     }, []))
@@ -87,6 +120,36 @@ export default function CardList({ navigation, route }) {
     useEffect(() => {
         getCards()
     }, [])
+    const Type = type => {
+        switch (type.toLowerCase()) {
+            case 'visa':
+                return require('../../assets/Images1/visa.png');
+            case 'mastercard':
+                return require('../../assets/Images1/master.png');
+            case 'american-express':
+                return require('../../assets/Images1/american.png');
+            case 'discover':
+                return require('../../assets/Images1/discover.png');
+            case 'jcb':
+                return require('../../assets/Images1/jcb.png');
+            case 'unionpay':
+                return require('../../assets/Images1/unionpay.png');
+            case 'diners_club':
+                return require('../../assets/Images1/dinner_club.png');
+            case 'mir':
+                return require('../../assets/Images1/mir.png');
+            case 'elo':
+                return require('../../assets/Images1/elo.png');
+            case 'hiper':
+                return require('../../assets/Images1/hiper.png');
+            case 'hipercards':
+                return require('../../assets/Images1/hipercard.png');
+            case 'maestro':
+                return require('../../assets/Images1/maestro.png');
+            default:
+                return require('../../assets/Images1/invalid.png');
+        }
+    }
 
 
     return (
@@ -105,17 +168,7 @@ export default function CardList({ navigation, route }) {
                     renderItem={({ item }) => {
                         return (
                             <Pressable key={item.id} onLongPress={() => {
-                                Alert.alert("Delete", "Do you really want to remove this card ?", [
-                                    {
-                                        text: "No"
-                                    },
-                                    {
-                                        text: "Yes",
-                                        onPress: () => {
-                                            deleteCard(item.id)
-                                        }
-                                    }
-                                ])
+
                             }}>
                                 <ImageBackground
                                     source={require('../../assets/card.png')}
@@ -126,20 +179,61 @@ export default function CardList({ navigation, route }) {
                                         alignSelf: 'center',
                                         overflow: "hidden",
                                         borderRadius: 20,
-                                        marginTop: 40
+                                        marginTop: 40,
+                                        position: "relative"
                                     }}
                                     resizeMode="cover"
                                 >
                                     <View style={{ marginHorizontal: 15, flexDirection: "row", marginBottom: 20, justifyContent: "space-between" }}>
                                         <View>
-                                            <Text style={[styles.saveText, { color: "white" }]}>{item.brand}</Text>
-                                            <Text style={[styles.saveText, { color: "white" }]}>********{item.last4}</Text>
+                                            <Text style={[styles.saveText, { color: "black" }]}>{item.brand}</Text>
+                                            <Text style={[styles.saveText, { color: "black" }]}>********{item.last4}</Text>
                                         </View>
                                         <View>
-                                            <Text style={[styles.saveText, { color: "white" }]}>Expires :</Text>
-                                            <Text style={[styles.saveText, { color: "white" }]}>0{item.exp_month}/{item.exp_year}</Text>
+                                            <Text style={[styles.saveText, { color: "black" }]}>Expiry Date :</Text>
+                                            <Text style={[styles.saveText, { color: "black" }]}>0{item.exp_month}/{item.exp_year}</Text>
                                         </View>
                                     </View>
+                                    <Image style={{ height: 60, width: 60, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type(item.brand)} />
+                                    <AntDesign
+                                        name="delete"
+                                        size={20}
+                                        onPress={() => {
+                                            Alert.alert("Delete", "Do you really want to remove this card ?", [
+                                                {
+                                                    text: "No"
+                                                },
+                                                {
+                                                    text: "Yes",
+                                                    onPress: () => {
+                                                        deleteCard(item.id)
+                                                    }
+                                                }
+                                            ])
+                                        }}
+                                        color="red"
+                                        style={{ position: "absolute", top: 10, right: 10 }}
+                                    />
+                                      <CheckBox
+                                            containerStyle={{ width: 25,position: "absolute", top: 30, right: 5 }}
+                                            wrapperStyle={{}}
+                                            checked={item.default_type}
+                                            onPress={() =>{
+                                                Alert.alert("Delete", "Do you really want to make default this card?", [
+                                                    {
+                                                        text: "No"
+                                                    },
+                                                    {
+                                                        text: "Yes",
+                                                        onPress: () => {
+                                                            selectCard(item.id)
+                                                        }
+                                                    }
+                                                ])
+                                            }}
+                                            checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/checked.png")} />}
+                                            uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
+                                        />
                                 </ImageBackground>
                             </Pressable>)
                     }

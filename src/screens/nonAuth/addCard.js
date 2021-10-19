@@ -15,11 +15,11 @@ import LS_COLORS from '../../constants/colors'
 import LS_FONTS from '../../constants/fonts'
 import { Container, Content } from 'native-base'
 import { showToast } from '../../components/validators';
+import creditCardType from 'credit-card-type';
 
 
 export default function CardList({ navigation, route }) {
     const [loader, setLoader] = useState(false)
-    const [cards, setCards] = React.useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
     const [cardDetails, setCardDetails] = useState({
         number: '',
@@ -27,20 +27,66 @@ export default function CardList({ navigation, route }) {
         expiry: '',
         cvv: ''
     })
+
+    const [address, setAddress] = React.useState({
+        address_line1: "",
+        address_line2: "",
+        address_city: "",
+        address_state: "",
+        address_zip: "",
+        address_country: ""
+    })
+
     const cardNameRef = useRef(null)
     const cardNumberRef = useRef(null)
     const cardDateRef = useRef(null)
+    var cards = creditCardType(cardDetails.number);
+
+    const Type = type => {
+        if (cards) {
+            switch (cards[0]?.type) {
+                case 'visa':
+                    return require('../../assets/Images1/visa.png');
+                case 'mastercard':
+                    return require('../../assets/Images1/master.png');
+                case 'american-express':
+                    return require('../../assets/Images1/american.png');
+                case 'discover':
+                    return require('../../assets/Images1/discover.png');
+                case 'jcb':
+                    return require('../../assets/Images1/jcb.png');
+                case 'unionpay':
+                    return require('../../assets/Images1/unionpay.png');
+                case 'diners_club':
+                    return require('../../assets/Images1/dinner_club.png');
+                case 'mir':
+                    return require('../../assets/Images1/mir.png');
+                case 'elo':
+                    return require('../../assets/Images1/elo.png');
+                case 'hiper':
+                    return require('../../assets/Images1/hiper.png');
+                case 'hipercards':
+                    return require('../../assets/Images1/hipercard.png');
+                case 'maestro':
+                    return require('../../assets/Images1/maestro.png');
+                default:
+                    return require('../../assets/Images1/invalid.png');
+            }
+        } else {
+            return require('../../assets/Images1/invalid.png');
+        }
+    };
 
     const generateCardToken = async () => {
         try {
             setLoader(true)
-            const card = `card[number]=${cardDetails.number.replace(/ /g, "")}&card[exp_month]=${cardDetails.expiry.split("/")[0]}&card[exp_year]=${cardDetails.expiry.split("/")[1]}&card[cvc]=${cardDetails.cvv}`
+            const card = `card[number]=${cardDetails.number.replace(/ /g, "")}&card[exp_month]=${cardDetails.expiry.split("/")[0]}&card[exp_year]=${cardDetails.expiry.split("/")[1]}&card[cvc]=${cardDetails.cvv}&card[address_line1]=${address.address_line1}&card[address_line2]=${address.address_line2}&card[address_city]=${address.address_city}&card[address_zip]=${address.address_zip}&card[address_state]=${address.address_state}&card[address_country]=${address.address_country}`
             let response = await fetch('https://api.stripe.com/v1/tokens', {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded',
                     // Use the Stripe publishable key as Bearer
-                    Authorization: `Bearer pk_test_51JIxOXLzLw3RerP6aLxvmA85BjPUVOLswXh80XXVuL537C24461xc0QZQBXC7fy0fqcvgHiOPdtfGHm0nW7qXI6E00NnkpKI5w`
+                    Authorization: `Bearer pk_test_51JKvYmBlfwj1B9UxRZugpwJP7OSpAw22SqDhkvjaIR5Lz78NAwAiOU8SirA3Z3AGUJC8P5Uy0fqeETeWBxRgGyyr00ySqSSS3c`
                 },
                 method: 'post',
                 body: card
@@ -76,7 +122,7 @@ export default function CardList({ navigation, route }) {
 
         let config = {
             headers: headers,
-            data:formdata,
+            data: formdata,
             endPoint: '/api/customerSaveCard',
             type: 'post'
         }
@@ -110,23 +156,43 @@ export default function CardList({ navigation, route }) {
                 <Container>
                     <Content>
                         <View style={{ alignItems: "center" }}>
-                            <CardView number={cardDetails.number} name={cardDetails.name} expiry={cardDetails.expiry} imageFront={require("../../assets/card.png")} onChange={(e => { })} />
+                            <View style={{ position: "relative" }}>
+                                <CardView
+                                    number={cardDetails.number}
+                                    name={cardDetails.name}
+                                    expiry={cardDetails.expiry}
+                                    imageFront={require("../../assets/card.png")}
+
+                                    onChange={(e => { })} />
+                                {cardDetails.number.length == 0 ? null : (
+                                    <Image style={{ height: 40, width: 40, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type()} />
+                                )}
+                            </View>
+
                             <View style={{ marginTop: 20 }} />
-                            <TextInputMask
-                                style={styles.inputMaskStyle}
-                                placeholder={'Credit Card Number'}
-                                onChangeText={(formatted, extracted) => {
-                                    setCardDetails({ ...cardDetails, number: formatted })
-                                }}
-                                mask={"[0000] [0000] [0000] [0000]"}
-                                keyboardType="numeric"
-                                ref={cardNumberRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => cardNameRef.current.focus()}
-                            />
+                            <View style={{ flexDirection: "row" }}>
+                                <TextInputMask
+                                    style={styles.inputMaskStyle}
+                                    placeholder={'Credit Card Number'}
+                                    placeholderTextColor={"gray"}
+                                    onChangeText={(formatted, extracted) => {
+                                        setCardDetails({ ...cardDetails, number: formatted })
+                                    }}
+                                    mask={"[0000] [0000] [0000] [0000]"}
+                                    keyboardType="numeric"
+                                    ref={cardNumberRef}
+                                    returnKeyType="next"
+
+                                    onSubmitEditing={() => cardNameRef.current.focus()}
+                                />
+                                {cardDetails.number.length == 0 ? null : (
+                                    <Image style={{ height: 40, width: 40, position: "absolute", right: 10, top: 15 }} resizeMode="contain" source={Type()} />
+                                )}
+                            </View>
                             <TextInputMask
                                 style={styles.inputMaskStyle}
                                 placeholder={'Credit Card Holder Name'}
+                                placeholderTextColor={"gray"}
                                 onChangeText={(formatted, extracted) => {
                                     setCardDetails({ ...cardDetails, name: formatted })
                                 }}
@@ -137,6 +203,7 @@ export default function CardList({ navigation, route }) {
                             <TextInputMask
                                 style={styles.inputMaskStyle}
                                 placeholder={'Expiry Date(MM/YY)'}
+                                placeholderTextColor={"gray"}
                                 onChangeText={(formatted, extracted) => {
                                     setCardDetails({ ...cardDetails, expiry: formatted })
                                 }}
@@ -149,6 +216,7 @@ export default function CardList({ navigation, route }) {
                             <TextInputMask
                                 style={styles.inputMaskStyle}
                                 placeholder={'CVV'}
+                                placeholderTextColor={"gray"}
                                 onChangeText={(formatted, extracted) => {
                                     setCardDetails({ ...cardDetails, cvv: extracted })
                                 }}
@@ -156,6 +224,61 @@ export default function CardList({ navigation, route }) {
                                 keyboardType="numeric"
                                 ref={cardDateRef}
                                 returnKeyType="done"
+                            />
+                            <Text style={[styles.saveText, { color: "gray", fontSize: 16, textAlign: "left", width: "80%", marginTop: 10 }]}>Address : (Optional)</Text>
+                            <TextInputMask
+                                style={styles.inputMaskStyle}
+                                placeholder={'Address 1'}
+                                placeholderTextColor={"gray"}
+                                keyboardType="default"
+                                onChangeText={(formatted, extracted) => {
+                                    setAddress({ ...address, address_line1: formatted })
+                                }}
+                            />
+                            <TextInputMask
+                                style={styles.inputMaskStyle}
+                                placeholder={'Address 2'}
+                                placeholderTextColor={"gray"}
+                                keyboardType="default"
+                                onChangeText={(formatted, extracted) => {
+                                    setAddress({ ...address, address_line2: formatted })
+                                }}
+                            />
+                            <TextInputMask
+                                style={styles.inputMaskStyle}
+                                placeholder={'City'}
+                                placeholderTextColor={"gray"}
+                                keyboardType="default"
+                                onChangeText={(formatted, extracted) => {
+                                    setAddress({ ...address, address_city: formatted })
+                                }}
+                            />
+                            <TextInputMask
+                                style={styles.inputMaskStyle}
+                                placeholder={'State'}
+                                placeholderTextColor={"gray"}
+                                keyboardType="default"
+                                onChangeText={(formatted, extracted) => {
+                                    setAddress({ ...address, address_state: formatted })
+                                }}
+                            />
+                            <TextInputMask
+                                style={styles.inputMaskStyle}
+                                placeholder={'ZipCode'}
+                                placeholderTextColor={"gray"}
+                                keyboardType="numeric"
+                                onChangeText={(formatted, extracted) => {
+                                    setAddress({ ...address, address_zip: formatted })
+                                }}
+                            />
+                              <TextInputMask
+                                style={styles.inputMaskStyle}
+                                placeholder={'Country'}
+                                placeholderTextColor={"gray"}
+                                keyboardType="default"
+                                onChangeText={(formatted, extracted) => {
+                                    setAddress({ ...address, address_country: formatted })
+                                }}
                             />
                         </View>
                     </Content>
@@ -170,7 +293,7 @@ export default function CardList({ navigation, route }) {
                     <Text style={styles.saveText}>Save</Text>
                 </TouchableOpacity>
             </SafeAreaView>
-            {loader&&<Loader />}
+            {loader && <Loader />}
         </>
     )
 }

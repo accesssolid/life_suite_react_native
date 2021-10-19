@@ -342,7 +342,7 @@ const OrderHistory1 = (props) => {
                                                         ratingBackgroundColor="white"
                                                         ratingColor="#04BFBF"
                                                         tintColor="white"
-                                                        startingValue={parseInt(item.providers_rating)}
+                                                        startingValue={parseInt(item.providers_rating??0)}
                                                     />
                                                 </View>
                                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green, textAlign: 'right' }}></Text>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, KeyboardAvoidingView, TouchableOpacity, ScrollView, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -32,6 +32,125 @@ const ServicesProvided = (props) => {
     const [activeItem, setActiveItem] = useState(null)
     const [extraData, setExtraDataa] = useState([])
     const [vehicleType, setVehicleType] = useState('Car')
+    // vehicle
+    const [makeList, setMakeList] = React.useState([])
+    const [modelList, setModelList] = React.useState([])
+    const [yearList, setYearList] = React.useState([])
+    // 
+    const [selectedMake, setSelectedMake] = React.useState("")
+    const [selectedModel, setSelectedModel] = React.useState("")
+    const [selectedYear, setSelectedYear] = React.useState("")
+
+
+
+    const getMakeList = () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({}),
+            endPoint: '/api/makeList',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setMakeList(response.data)
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            }).finally(()=>{
+                setLoading(false)
+
+            })
+    }
+
+    React.useEffect(() => {
+        getMakeList()
+    }, [])
+
+    React.useEffect(() => {
+        if (selectedMake && selectedMake != "") {
+            getModelsList(selectedMake)
+        }
+    }, [selectedMake])
+
+    const getModelsList = async (selectedMake) => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ make_id: selectedMake }),
+            endPoint: '/api/modelList',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setModelList(response.data)
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            }).finally(()=>{
+                setLoading(false)
+
+            })
+    }
+
+    React.useEffect(() => {
+        if (selectedModel && selectedModel != "") {
+            getYear(selectedModel)
+        }
+    }, [selectedModel])
+
+    const getYear=async(id)=>{
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ model_id: id }),
+            endPoint: '/api/yearList',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setYearList(response.data)
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            }).finally(()=>{
+                setLoading(false)
+
+            })
+    }
 
     useEffect(() => {
         console.log("SelectedItems", selectedItems)
@@ -202,7 +321,7 @@ const ServicesProvided = (props) => {
             let index = temp.findIndex(x => x.parent_id == item.id)
             if (index >= 0) {
                 temp[index] = obj
-            }else{
+            } else {
                 temp.push(obj)
             }
             // extraData.forEach((element, index) => {
@@ -272,7 +391,12 @@ const ServicesProvided = (props) => {
                             <Header
                                 imageUrl={require("../../../assets/backWhite.png")}
                                 action={() => {
-                                    props.navigation.goBack()
+                                    if(activeItem!==null){
+                                        onPressItem(activeItem)
+                                    }else{
+                                        props.navigation.goBack()
+                                    }
+                                  
                                 }}
                                 imageUrl1={require("../../../assets/homeWhite.png")}
                                 action1={() => {
@@ -288,8 +412,7 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-
-                    {subService.id == 14 && <View style={{}}>
+                    {subService.id == 14&& activeItem == null && <View style={{}}>
                         <DropDown
                             title="Vehicle Type"
                             item={['Car', 'Truck', 'Suv', 'Van']}
@@ -298,13 +421,15 @@ const ServicesProvided = (props) => {
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                             dropdownStyle={{ maxHeight: 300 }}
                         />
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: '3.5%' }}>
+                        <View style={{ flexDirection: 'row', paddingHorizontal: '3.5%' }}>
                             <View style={{ flex: 1 }}>
                                 <DropDown
                                     title="Make"
-                                    item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
-                                    value={'1990'}
-                                    onChangeValue={(index, value) => { }}
+                                    item={makeList.map(x => x.title)}
+                                    onChangeValue={(index, value) => {
+                                        setSelectedMake(makeList[index].id)
+                                    }}
+                                    value={"Make"}
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
                                     dropdownStyle={{ maxHeight: 300 }}
                                 />
@@ -312,9 +437,11 @@ const ServicesProvided = (props) => {
                             <View style={{ flex: 1 }}>
                                 <DropDown
                                     title="Model"
-                                    item={['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']}
-                                    value={'A1'}
-                                    onChangeValue={(index, value) => { }}
+                                    item={modelList.map(x => x.title)}
+                                    value={'Model'}
+                                    onChangeValue={(index, value) => {
+                                        setSelectedModel(modelList[index].id)
+                                    }}
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                                     dropdownStyle={{ maxHeight: 300 }}
                                 />
@@ -322,9 +449,11 @@ const ServicesProvided = (props) => {
                             <View style={{ flex: 1 }}>
                                 <DropDown
                                     title="Year"
-                                    item={['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']}
-                                    value={'2001'}
-                                    onChangeValue={(index, value) => { }}
+                                    item={yearList.map(x => "\t"+x.title+"\t")}
+                                    value={'Year'}
+                                    onChangeValue={(index, value) => {
+                                        setSelectedYear(yearList[index].id)
+                                    }}
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                                     dropdownStyle={{ maxHeight: 300 }}
                                 />
@@ -332,7 +461,8 @@ const ServicesProvided = (props) => {
                         </View>
                     </View>}
                     <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
-                    <ScrollView>
+                    <Container>
+                        <Content>
                         {
                             activeItem !== null
                                 ?
@@ -374,7 +504,9 @@ const ServicesProvided = (props) => {
                                         {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
                                     </View>
                         }
-                    </ScrollView>
+                        </Content>
+                    </Container>
+                    {/* <KeyboardAvoidingView behavior={Platform.OS=="ios"?"padding":undefined}  /> */}
                     <TouchableOpacity
                         style={styles.save}
                         activeOpacity={0.7}

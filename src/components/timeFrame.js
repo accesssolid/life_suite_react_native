@@ -17,6 +17,7 @@ import moment from 'moment';
 import _ from 'lodash'
 import { showToast } from '../utils';
 import { Rating } from 'react-native-ratings';
+import { CheckBox } from 'react-native-elements';
 
 
 const TimeFrame = props => {
@@ -40,7 +41,9 @@ const TimeFrame = props => {
                 if (moment(d[selectedIndex].order_start_time).toDate() < moment(date).toDate()) {
                     d[selectedIndex].order_end_time = moment(date).format("YYYY-MM-DD HH:mm:[00]")
                 } else {
-                    showToast("order end time must be greater than start time")
+                    setTimeout(()=>{
+                        showToast("order end time must be greater than start time")
+                    },500)
                 }
             }
             setDatePickerVisibility(false)
@@ -86,7 +89,7 @@ const TimeFrame = props => {
                         if (pr.checked && !pr.type) {
                             selectedProducts.push(pr.item_product_id)
                         }
-                        if (pr.type&&pr.checked) {
+                        if (pr.type && pr.checked) {
                             if (pr.type == "other") {
                                 data.other = pr.other
                             }
@@ -117,7 +120,6 @@ const TimeFrame = props => {
                     })
                 }
             }
-            console.log("JSONData", z)
             setJsonData(_.cloneDeep(z))
         }
     }, [data])
@@ -234,7 +236,10 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
         "range_start_price": "",
         "range_end_price": ""
     })
-
+    const [time, setTime] = React.useState({
+        "range_start_time": "",
+        "range_end_time": ""
+    })
     const handleSave = () => {
         getFilteredData({ ...rating, ...price })
         setVisible(false)
@@ -257,25 +262,38 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                         <View style={{ marginTop: "10%" }}>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                             </View>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>Rating: ({rating.range_start_rating})</Text>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>Rating:</Text>
                             {[4, 3, 2, 1].map(x => <TouchableOpacity onPress={() => {
                                 setRating({
                                     range_start_rating: "" + x,
                                     range_end_rating: ""
                                 })
-                            }} ><View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
+                            }} style={{flexDirection:"row",justifyContent:"space-between"}} ><View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
                                     <Rating
                                         type='custom'
                                         ratingColor='gold'
                                         ratingBackgroundColor='white'
                                         ratingCount={5}
                                         imageSize={20}
-                                        startingValue={x}
+                                        startingValue={x ?? 0}
                                         readonly={true}
-
                                     />
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black }}> & Up</Text>
-                                </View></TouchableOpacity>)}
+                                </View>
+                                <CheckBox
+                                    checked={x==Number(rating.range_start_rating)}
+                                    onPress={() => {
+                                        setRating({
+                                            range_start_rating: "" + x,
+                                            range_end_rating: ""
+                                        })
+                                    }}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                                    // checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
+                                    // uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
+                                />
+                            </TouchableOpacity>)}
                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10 }}>Price : </Text>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
@@ -298,9 +316,50 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                     }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
                                 </View>
                             </View>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10 ,marginBottom:5}}>Time (minute): </Text>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
+                                    <TextInput value={time.range_start_time} onChangeText={t => {
+                                        setTime({
+                                            range_start_time: t,
+                                            range_end_time: time.range_end_time
+                                        })
+                                    }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
+                                </View>
+                                <Text>  -  </Text>
+                                <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
+                                    <TextInput value={time.range_end_time} onChangeText={t => {
+                                        setTime({
+                                            range_start_time: time.range_start_time,
+                                            range_end_time: t
+                                        })
+                                    }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
+                                   
+                                </View>
+                                
+                            </View>
                         </View>
 
-                        <View style={{ marginTop: '10%' }}>
+                        <View style={{ marginTop: '10%' ,flexDirection:"row",justifyContent:"space-between"}}>
+                        <TouchableOpacity
+                                style={styles.save}
+                                activeOpacity={0.7}
+                                onPress={() => {
+                                    setRating({
+                                        "range_start_rating": "",
+                                        "range_end_rating": ""
+                                    })
+                                    setPrice({
+                                        "range_start_price": "",
+                                        "range_end_price": ""
+                                    })
+                                    setTime({
+                                        "range_start_time": "",
+                                        "range_end_time": ""
+                                    })
+                                }}>
+                                <Text style={styles.saveText}>Clear</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.save}
                                 activeOpacity={0.7}

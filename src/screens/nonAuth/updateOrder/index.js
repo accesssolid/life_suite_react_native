@@ -105,7 +105,7 @@ const UpdateOrder = (props) => {
                                                 ratingBackgroundColor="white"
                                                 ratingColor="#04BFBF"
                                                 tintColor="white"
-                                                startingValue={parseInt(item.rating)}
+                                                startingValue={parseInt(item.rating??0)}
                                             />
                                         </View>
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
