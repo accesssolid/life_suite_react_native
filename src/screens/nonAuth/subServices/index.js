@@ -124,6 +124,7 @@ const SubServices = (props) => {
                                             if (user.user_role == 3) {
                                                 dispatch(setAddServiceMode({ data: true }))
                                             }
+                                            console.log("Items",item)
                                             props.navigation.navigate("ServicesProvided", { subService: item, items: [] })
                                         }}
                                         favorite = {() => {like(item.id)}}

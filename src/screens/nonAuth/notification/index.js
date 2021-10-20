@@ -92,7 +92,7 @@ const Notification = (props) => {
                     <View style={{ flexDirection: 'row' }}>
                         <View style={{ width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center", right: 10, backgroundColor: item.is_read == "0" ? "#5CBFBF" : "gray" }}></View>
                         <View style={{ marginLeft: '5%', alignSelf: 'center', width: "65%" }}>
-                            <Text numberOfLines={4} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: '#707070' }}>Order #{item.order_id} {item.description}</Text>
+                            <Text numberOfLines={4} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: '#707070' }}>{item.description}</Text>
                         </View>
                         <View style={{ width: "20%", justifyContent: "center", alignItems: "flex-end" }}>
                             <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>

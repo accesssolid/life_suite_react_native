@@ -36,9 +36,6 @@ const order_types = [
     { id: 7, title: "InProgress" },
     { id: 8, title: "Completed" },
     { id: 2, title: "Cancelled" },
-    { id: 9, title: "Updation" },
-    { id: 10, title: "Updation Accepted" },
-    { id: 11, title: "Updation Rejected" }
 ]
 
 const OrderHistory = (props) => {

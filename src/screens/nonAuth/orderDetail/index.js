@@ -245,7 +245,7 @@ const OrderClientDetail = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log("Response",response)
+                console.log("Response", response)
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
@@ -394,7 +394,7 @@ const OrderClientDetail = (props) => {
                         </View>
 
                         {/* only show if order status is pending i.e 1 */}
-                        {(data?.order_status == 1 || data?.order_status == 3) && <><View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                        {(data?.order_status == 1 || data?.order_status == 3 || data?.order_status == 4 || data?.order_status == 6 || data?.order_status == 5 || data?.order_status == 12 || data?.order_status == 9 || data?.order_status == 10 || data?.order_status == 11) && <><View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                             <View>
                                 <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Available Start Time</Text>
                                 <Text onPress={() => setBookedModal(true)} style={[styles.baseTextStyle, { color: "skyblue" }]}>(View Booked Slots)</Text>
@@ -418,7 +418,7 @@ const OrderClientDetail = (props) => {
                                 </View>
                                 <Text style={[styles.baseTextStyle]}>{estimated_time}</Text>
                             </View>
-                            {data?.order_status == 1 ? <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
+                            {data?.order_status == 1 && <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
                                 <TouchableOpacity
                                     style={styles.save}
                                     activeOpacity={0.7}
@@ -431,17 +431,84 @@ const OrderClientDetail = (props) => {
                                     onPress={() => setCancelModal(true)}>
                                     <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Decline</Text>
                                 </TouchableOpacity>
-                            </View> :
+                            </View>}
+                            {data?.order_status != 1 &&
+                                <>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
+                                        <TouchableOpacity
+                                            style={styles.save}
+                                            activeOpacity={0.7}
+                                            onPress={() => {
+                                                submit(7)
+                                            }}>
+                                            <Text style={styles.saveText}>Start Order</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
+                                            activeOpacity={0.7}
+                                            onPress={() => {
+
+                                            }}>
+                                            <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Delay Order</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
+                                        <TouchableOpacity
+                                            style={styles.save}
+                                            activeOpacity={0.7}
+                                            onPress={() => {
+                                                props.navigation.navigate("UpdateOrderItems", {
+                                                    servicedata, subService, item
+                                                })
+                                            }}>
+                                            <Text style={styles.saveText}>Update Order</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
+                                            activeOpacity={0.7}
+                                            onPress={() => {
+                                                props.navigation.navigate("ChatScreen", {
+                                                    item: {
+                                                        id: data.customer_id,
+                                                        email: data.customers_email,
+                                                        first_name: data.customers_first_name,
+                                                        last_name: data.customers_last_name,
+                                                        phone_number: data.customers_phone_number,
+                                                        profile_image: data.customers_profile_image
+                                                    }
+                                                })
+                                            }}>
+                                            <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Chat</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                            }
+                        </>}
+                        {data?.order_status == 7 &&
+                            <>
                                 <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
                                     <TouchableOpacity
                                         style={styles.save}
                                         activeOpacity={0.7}
-                                        onPress={() => { props.navigation.navigate("UpdateOrderItems",{
-                                            servicedata, subService, item 
-                                        })}}>
+                                        onPress={() => {
+                                            props.navigation.navigate("UpdateOrderItems", {
+                                                servicedata, subService, item
+                                            })
+                                           
+                                        }}>
                                         <Text style={styles.saveText}>Update Order</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity
+                                    {/* <TouchableOpacity
+                                        style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+
+                                        }}>
+                                        <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Delay Order</Text>
+                                    </TouchableOpacity> */}
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20 }}>
+                                <TouchableOpacity
                                         style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
                                         activeOpacity={0.7}
                                         onPress={() => {
@@ -458,9 +525,17 @@ const OrderClientDetail = (props) => {
                                         }}>
                                         <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Chat</Text>
                                     </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.save}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+                                            submit(15)
+                                        }}>
+                                        <Text style={styles.saveText}>Finish Order</Text>
+                                    </TouchableOpacity>
                                 </View>
-                            }
-                        </>}
+                            </>
+                        }
                     </ScrollView>
                 </View>
             </SafeAreaView >

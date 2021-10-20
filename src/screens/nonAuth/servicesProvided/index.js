@@ -200,6 +200,7 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
+                console.log("Response",response)
                 if (response.status == true) {
                     setLoading(false)
                     setItemList([...response.data])

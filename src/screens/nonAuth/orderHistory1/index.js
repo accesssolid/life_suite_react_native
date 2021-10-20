@@ -36,9 +36,6 @@ const order_types = [
     { id: 7, title: "InProgress" },
     { id: 8, title: "Completed" },
     { id: 2, title: "Cancelled" },
-    { id: 9, title: "Updation" },
-    { id: 10, title: "Updation Accepted" },
-    { id: 11, title: "Updation Rejected" }
 ]
 
 const OrderHistory1 = (props) => {
@@ -342,7 +339,7 @@ const OrderHistory1 = (props) => {
                                                         ratingBackgroundColor="white"
                                                         ratingColor="#04BFBF"
                                                         tintColor="white"
-                                                        startingValue={parseInt(item.providers_rating??0)}
+                                                        startingValue={parseInt(item.providers_rating ?? 0)}
                                                     />
                                                 </View>
                                                 <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green, textAlign: 'right' }}></Text>
@@ -436,6 +433,37 @@ const OrderHistory1 = (props) => {
                                                 :
                                                 null
                                             }
+                                            {item.order_status == 7 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
+                                                <TouchableOpacity
+                                                    style={styles.save}
+                                                    activeOpacity={0.7}
+                                                    onPress={() => {
+                                                        props.navigation.navigate("ChatScreen", {
+                                                            item: {
+                                                                id: item.provider_id,
+                                                                email: item.providers_email,
+                                                                first_name: item.providers_first_name,
+                                                                last_name: item.providers_last_name,
+                                                                phone_number: item.providers_phone_number,
+                                                                profile_image: item.providers_profile_image
+                                                            }
+                                                        })
+                                                    }}>
+                                                    <Text style={styles.saveText}>Chat</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    style={styles.save}
+                                                    activeOpacity={0.7}
+                                                    onPress={() => {
+                                                        setOrderId(item.id)
+                                                        setOpen(!open)
+                                                    }}>
+                                                    <Text style={styles.saveText}>Cancel Order</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                                :
+                                                null
+                                            }
                                             {item.order_status == 3 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
                                                 <TouchableOpacity
                                                     style={styles.save}
@@ -468,7 +496,7 @@ const OrderHistory1 = (props) => {
                                                 :
                                                 null
                                             }
-                                             {item.order_status == 8 || item.order_status == 2 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
+                                            {item.order_status == 8 || item.order_status == 2 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
                                                 <TouchableOpacity
                                                     style={styles.save}
                                                     activeOpacity={0.7}
@@ -481,7 +509,7 @@ const OrderHistory1 = (props) => {
                                                     style={styles.save}
                                                     activeOpacity={0.7}
                                                     onPress={() => {
-                                                        
+
                                                     }}>
                                                     <Text style={styles.saveText}>Block</Text>
                                                 </TouchableOpacity>
@@ -489,7 +517,7 @@ const OrderHistory1 = (props) => {
                                                 :
                                                 null
                                             }
-                                               
+
                                         </>
                                         : <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <View>
