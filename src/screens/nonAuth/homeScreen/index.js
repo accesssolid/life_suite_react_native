@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView,ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -35,7 +35,7 @@ const HomeScreen = (props) => {
     const [items, setItems] = useState([...services])
     const [order, setOrder] = useState([])
     const [orders, setOrders] = useState()
-
+    const [scrollEnabled,setScrollEnabled]=React.useState(true)
     useEffect(() => {
         const backAction = () => {
             return true;
@@ -76,8 +76,8 @@ const HomeScreen = (props) => {
 
     useFocusEffect(
         useCallback(() => {
-            if(props.route?.params){
-                if(props.route?.params.addJobClear){
+            if (props.route?.params) {
+                if (props.route?.params.addJobClear) {
                     setIsAddJobActive(false)
                 }
             }
@@ -118,8 +118,8 @@ const HomeScreen = (props) => {
     }
 
     const getList = (a) => {
-        try{
-            console.log("a",a)
+        try {
+            console.log("a", a)
             setLoading(true)
             let headers = {
                 "Content-Type": "multipart/form-data",
@@ -133,10 +133,9 @@ const HomeScreen = (props) => {
                 endPoint: '/api/customerServicesListingAdd',
                 type: 'post'
             }
-            console.log("config",config)
             getApi(config)
                 .then((response) => {
-                    console.log(response)
+                    console.log("Response===>>>", response)
                     if (response.status == true) {
                         setLoading(false)
                     }
@@ -145,13 +144,13 @@ const HomeScreen = (props) => {
                         setLoading(false)
                     }
                 }).catch(err => {
-                    console.log("error",err)
+                    console.log("error", err)
                     setLoading(false)
                 })
-        }catch(err){
-            console.log("Error",err)
+        } catch (err) {
+            console.log("Error", err)
         }
-      
+
     }
 
     const getMyJobs = () => {
@@ -187,7 +186,7 @@ const HomeScreen = (props) => {
 
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
-        props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
     }
 
     const getLocationPermission = async () => {
@@ -229,9 +228,9 @@ const HomeScreen = (props) => {
         }
     }
 
-    React.useEffect(()=>{
-        console.log("#liahs","items",items,"mysJobs",myJobs)
-    },[items,myJobs])
+    React.useEffect(() => {
+        console.log("#liahs", "items", items, "mysJobs", myJobs)
+    }, [items, myJobs])
 
     const getCurrentLocation = (hasLocationPermission) => {
         if (hasLocationPermission) {
@@ -371,48 +370,54 @@ const HomeScreen = (props) => {
                                 {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>}
                             </View>
                     :
-                    <View style={{ flex: 1, paddingTop: '5%' }}>
-                        <SortableGrid
-                            blockTransitionDuration={400}
-                            activeBlockCenteringDuration={500}
-                            itemsPerRow={2}
-                            dragActivationTreshold={300}
-                            onDragRelease={(itemOrder) => {
-                                let arr = []
-                                itemOrder.itemOrder.map((itemData,) => {
-                                    arr.push(items[itemData.key].id)
-                                    setOrder(arr)
-                                })
-                                console.log("arr",arr)
-                                getList(arr)
-                                console.log("Drag was released, the blocks are in the following order: ", arr)
-                            }}
-                            onDragStart={() => console.log("Some block is being dragged now!")}>
-                            {items.map((item, index) =>
-                                <View key={index}
-                                    style={{ alignItems: 'center', justifyContent: 'center' }}
-                                    onTap={() => {
-                                        item.itemsData.length > 0
-                                            ?
-                                            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
-                                            :
-                                            props.navigation.navigate("SubServices", { service: item })
-                                    }}
+                    <ScrollView scrollEnabled={scrollEnabled} showsVerticalScrollIndicator={false}>
+                        <View style={{ flex: 1, paddingTop: '5%' }}>
+                            <SortableGrid
+                                blockTransitionDuration={400}
+                                activeBlockCenteringDuration={500}
+                                itemsPerRow={2}
+                                dragActivationTreshold={300}
+                                onDragRelease={(itemOrder) => {
+                                    setScrollEnabled(true)
+                                    let arr = []
+                                    itemOrder.itemOrder.map((itemData,) => {
+                                        arr.push(items[itemData.key].id)
+                                        setOrder(arr)
+                                    })
+                                    console.log("arr", arr)
+                                    getList(arr)
+                                    console.log("Drag was released, the blocks are in the following order: ", arr)
+                                }}
+                                onDragStart={() => {
+                                        setScrollEnabled(false)
+                                }}>
+                                {items.map((item, index) =>
+                                    <View key={index}
+                                        style={{ alignItems: 'center', justifyContent: 'center' }}
+                                        onTap={() => {
+                                            item.itemsData.length > 0
+                                                ?
+                                                props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+                                                :
+                                                props.navigation.navigate("SubServices", { service: item })
+                                        }}
                                     >
-                                    <UserCards
-                                        title1={item.name}
-                                        title2="SERVICES"
-                                        imageUrl={{ uri: BASE_URL + item.image }}
-                                    />
-                                </View>
-                            )}
-                        </SortableGrid>
-                    </View>}
+                                        <UserCards
+                                            title1={item.name}
+                                            title2="SERVICES"
+                                            imageUrl={{ uri: BASE_URL + item.image }}
+                                        />
+                                    </View>
+                                )}
+                            </SortableGrid>
+                        </View>
+                    </ScrollView>
+                }
                 {!loading && <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                     <View style={styles.orderContainer}>
                         <TouchableOpacity
                             activeOpacity={0.7}
-                            onPress={() =>props.navigation.navigate("Orders")}>
+                            onPress={() => props.navigation.navigate("Orders")}>
                             <Text style={styles.order}>
                                 ORDER
                             </Text>

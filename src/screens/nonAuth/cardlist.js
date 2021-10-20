@@ -20,22 +20,21 @@ export default function CardList({ navigation, route }) {
 
 
     const getCards = () => {
+      
         setLoader(true)
         let headers = {
-            Accept: "application/json",
             "Authorization": `Bearer ${access_token}`
         }
 
         let config = {
             headers: headers,
-            data: JSON.stringify({}),
             endPoint: '/api/customerSaveCardList',
-            type: 'post'
+            type: 'get'
         }
 
         getApi(config)
             .then((response) => {
-                console.log("Card List", response)
+                console.log(response)
                 if (response.status == true && response.data) {
                     setCards(response.data)
                 }
@@ -44,6 +43,7 @@ export default function CardList({ navigation, route }) {
                 }
             })
             .catch(err => {
+                console.log(err)
                 setLoader(false)
             }).finally(() => {
                 setLoader(false)
@@ -68,7 +68,7 @@ export default function CardList({ navigation, route }) {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    showToast("Card removed.", 'danger')
+                    showToast("Card updated.", 'danger')
                     getCards()
                 }
                 else {
@@ -99,7 +99,7 @@ export default function CardList({ navigation, route }) {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    showToast("Card updated.", 'danger')
+                    showToast("Card removed.", 'danger')
                     getCards()
                 }
                 else {
@@ -117,9 +117,9 @@ export default function CardList({ navigation, route }) {
         getCards()
     }, []))
 
-    useEffect(() => {
-        getCards()
-    }, [])
+    // useEffect(() => {
+    //     getCards()
+    // }, [])
     const Type = type => {
         switch (type.toLowerCase()) {
             case 'visa':
@@ -214,26 +214,26 @@ export default function CardList({ navigation, route }) {
                                         color="red"
                                         style={{ position: "absolute", top: 10, right: 10 }}
                                     />
-                                      <CheckBox
-                                            containerStyle={{ width: 25,position: "absolute", top: 30, right: 5 }}
-                                            wrapperStyle={{}}
-                                            checked={item.default_type}
-                                            onPress={() =>{
-                                                Alert.alert("Delete", "Do you really want to make default this card?", [
-                                                    {
-                                                        text: "No"
-                                                    },
-                                                    {
-                                                        text: "Yes",
-                                                        onPress: () => {
-                                                            selectCard(item.id)
-                                                        }
+                                    <CheckBox
+                                        containerStyle={{ width: 25, position: "absolute", top: 30, right: 5 }}
+                                        wrapperStyle={{}}
+                                        checked={item.default_type}
+                                        onPress={() => {
+                                            Alert.alert("Message", "Do you really want to make default this card?", [
+                                                {
+                                                    text: "No"
+                                                },
+                                                {
+                                                    text: "Yes",
+                                                    onPress: () => {
+                                                        selectCard(item.id)
                                                     }
-                                                ])
-                                            }}
-                                            checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
-                                        />
+                                                }
+                                            ])
+                                        }}
+                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/checked.png")} />}
+                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
+                                    />
                                 </ImageBackground>
                             </Pressable>)
                     }

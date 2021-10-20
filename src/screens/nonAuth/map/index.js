@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid } from 'react-native'
+import { View, StyleSheet, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid ,Text} from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -105,7 +105,7 @@ const MapScreen = (props) => {
             .then((results) => {
                 setAddress(results[0].address)
                 placesRef.current.setAddressText(results[0].address)
-                if(results[0].location.latitude){
+                if (results[0].location.latitude) {
                     setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
                     mapRef.current.animateToRegion({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
                 }
@@ -147,7 +147,13 @@ const MapScreen = (props) => {
             console.log("reverseGeocode err => ", error)
         }
     }
-
+    const onZoomInPress = () => {
+        mapRef?.current?.getCamera().then((cam: Camera) => {
+            cam.zoom += 1;
+            map?.current?.animateCamera(cam);
+        });
+    };
+    
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -169,7 +175,7 @@ const MapScreen = (props) => {
                         placeholder='Search'
                         fetchDetails={true}
                         onPress={(data, details) => {
-                            if(details?.geometry?.location?.lat){
+                            if (details?.geometry?.location?.lat) {
                                 setCoordinates({
                                     ...coordinates,
                                     latitude: details?.geometry?.location?.lat,
@@ -183,7 +189,7 @@ const MapScreen = (props) => {
                                     longitude: details.geometry?.location?.lng
                                 })
                             }
-                         
+
                             if (Platform.OS == "ios") {
                                 setFocused(false)
                             }
@@ -258,7 +264,8 @@ const MapScreen = (props) => {
                         </View>
                         <MapView
                             ref={mapRef}
-                            initialRegion={{...coordinates,
+                            initialRegion={{
+                                ...coordinates,
                                 latitudeDelta: 0.0922,
                                 longitudeDelta: 0.0421,
                             }}
@@ -266,6 +273,13 @@ const MapScreen = (props) => {
                             //     latitudeDelta: 0.0922,
                             //     longitudeDelta: 0.0421,
                             //  }}
+                            onRegionChange={(reg) => {
+                             
+                            }}
+                            onRegionChangeComplete={(reg) => {
+                                setCoordinates({ ...reg })
+                                reverseGeocode(reg.latitude, reg.longitude)
+                            }}
                             style={styles.map}
                             region={{
                                 ...coordinates,
@@ -273,16 +287,20 @@ const MapScreen = (props) => {
                                 longitudeDelta: 0.0421,
                             }}
                         >
-                            <Marker
-                                // icon={require('../../../assets/pin.png')}
+                            {/* <Marker
                                 pinColor={"black"}
                                 coordinate={coordinates}
-                            />
+                            /> */}
                         </MapView>
 
-                        {/* <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}>
+                        <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}>
                             <Image pointerEvents="none" style={{ height: 40, aspectRatio: 1 }} source={require('../../../assets/pin.png')} />
-                        </View> */}
+                        </View>
+                        <TouchableOpacity onPress={()=>{
+                            onZoomInPress()
+                        }}>
+                            <Text>+</Text>
+                            </TouchableOpacity>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => {
                             // setIsPermanetClicked(true)
                             getLocationPermission()

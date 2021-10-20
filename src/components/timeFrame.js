@@ -241,7 +241,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
         "range_end_time": ""
     })
     const handleSave = () => {
-        getFilteredData({ ...rating, ...price })
+        getFilteredData({ ...rating,...time})
         setVisible(false)
     }
     return (

@@ -68,7 +68,7 @@ const ServicesProvided = (props) => {
                 }
             }).catch(err => {
                 setLoading(false)
-            }).finally(()=>{
+            }).finally(() => {
                 setLoading(false)
 
             })
@@ -81,6 +81,9 @@ const ServicesProvided = (props) => {
     React.useEffect(() => {
         if (selectedMake && selectedMake != "") {
             getModelsList(selectedMake)
+            setSelectedModel("")
+            setSelectedYear("")
+            setYearList([])
         }
     }, [selectedMake])
 
@@ -101,15 +104,19 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
+                console.log(response, "Response")
                 if (response.status == true) {
                     setModelList(response.data)
+                    // setSelectedModel(response.data)
                 }
                 else {
+                    setModelList([])
+
                     setLoading(false)
                 }
             }).catch(err => {
                 setLoading(false)
-            }).finally(()=>{
+            }).finally(() => {
                 setLoading(false)
 
             })
@@ -118,10 +125,11 @@ const ServicesProvided = (props) => {
     React.useEffect(() => {
         if (selectedModel && selectedModel != "") {
             getYear(selectedModel)
+            setSelectedYear("")
         }
     }, [selectedModel])
 
-    const getYear=async(id)=>{
+    const getYear = async (id) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -142,13 +150,13 @@ const ServicesProvided = (props) => {
                     setYearList(response.data)
                 }
                 else {
+                    setYearList([])
                     setLoading(false)
                 }
             }).catch(err => {
                 setLoading(false)
-            }).finally(()=>{
+            }).finally(() => {
                 setLoading(false)
-
             })
     }
 
@@ -391,12 +399,12 @@ const ServicesProvided = (props) => {
                             <Header
                                 imageUrl={require("../../../assets/backWhite.png")}
                                 action={() => {
-                                    if(activeItem!==null){
+                                    if (activeItem !== null) {
                                         onPressItem(activeItem)
-                                    }else{
+                                    } else {
                                         props.navigation.goBack()
                                     }
-                                  
+
                                 }}
                                 imageUrl1={require("../../../assets/homeWhite.png")}
                                 action1={() => {
@@ -412,7 +420,7 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    {subService.id == 14&& activeItem == null && <View style={{}}>
+                    {subService.id == 14 && activeItem == null && <View style={{}}>
                         <DropDown
                             title="Vehicle Type"
                             item={['Car', 'Truck', 'Suv', 'Van']}
@@ -425,20 +433,22 @@ const ServicesProvided = (props) => {
                             <View style={{ flex: 1 }}>
                                 <DropDown
                                     title="Make"
-                                    item={makeList.map(x => x.title)}
+                                    handleTextValue={true}
+                                    item={makeList.map(x => x.title) ?? []}
                                     onChangeValue={(index, value) => {
                                         setSelectedMake(makeList[index].id)
                                     }}
-                                    value={"Make"}
+                                    value={makeList.find(x => x.id == selectedMake)?.title ?? "Make"}
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
                                     dropdownStyle={{ maxHeight: 300 }}
                                 />
                             </View>
                             <View style={{ flex: 1 }}>
                                 <DropDown
+                                    handleTextValue={true}
                                     title="Model"
-                                    item={modelList.map(x => x.title)}
-                                    value={'Model'}
+                                    item={modelList.map(x => x.title) ?? []}
+                                    value={modelList.find(x => x.id == selectedModel)?.title ?? "Model"}
                                     onChangeValue={(index, value) => {
                                         setSelectedModel(modelList[index].id)
                                     }}
@@ -449,8 +459,9 @@ const ServicesProvided = (props) => {
                             <View style={{ flex: 1 }}>
                                 <DropDown
                                     title="Year"
-                                    item={yearList.map(x => "\t"+x.title+"\t")}
-                                    value={'Year'}
+                                    handleTextValue={true}
+                                    item={yearList.map(x => "\t" + x.title + "\t") ?? []}
+                                    value={yearList.find(x => x.id == selectedYear)?.title ?? "Year"}
                                     onChangeValue={(index, value) => {
                                         setSelectedYear(yearList[index].id)
                                     }}
@@ -463,47 +474,47 @@ const ServicesProvided = (props) => {
                     <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
                     <Container>
                         <Content>
-                        {
-                            activeItem !== null
-                                ?
-                                <>
-                                    <ServiceItemUser
-                                        item={activeItem}
-                                        onCheckPress={() => onPressItem(activeItem)}
-                                        isSelected={selectedItems.includes(activeItem.id)}
-                                        selectedProducts={selectedProducts}
-                                        onSelectProduct={(product) => setCheckedDataProducts(product)}
-                                        activeMode
-                                        extraData={extraData}
-                                        setExtraData={setExtraData}
-                                    />
-                                </>
-                                :
-                                itemListMaster.length > 0
+                            {
+                                activeItem !== null
                                     ?
                                     <>
-                                        {/* <Content removeClippedSubviews={true} style={{ flex: 1 }}> */}
-                                        {itemList && itemList.length > 0
-                                            ?
-                                            itemList.map((item, index) => {
-                                                return (<ServiceItemUser
-                                                    key={index}
-                                                    item={item}
-                                                    index={index}
-                                                    onCheckPress={() => onPressItem(item, index)}
-                                                    isSelected={selectedItems.includes(item.id)}
-                                                    setExtraData={setExtraData}
-                                                />)
-                                            })
-                                            :
-                                            null}
-                                        {/* </Content> */}
+                                        <ServiceItemUser
+                                            item={activeItem}
+                                            onCheckPress={() => onPressItem(activeItem)}
+                                            isSelected={selectedItems.includes(activeItem.id)}
+                                            selectedProducts={selectedProducts}
+                                            onSelectProduct={(product) => setCheckedDataProducts(product)}
+                                            activeMode
+                                            extraData={extraData}
+                                            setExtraData={setExtraData}
+                                        />
                                     </>
                                     :
-                                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                        {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
-                                    </View>
-                        }
+                                    itemListMaster.length > 0
+                                        ?
+                                        <>
+                                            {/* <Content removeClippedSubviews={true} style={{ flex: 1 }}> */}
+                                            {itemList && itemList.length > 0
+                                                ?
+                                                itemList.map((item, index) => {
+                                                    return (<ServiceItemUser
+                                                        key={index}
+                                                        item={item}
+                                                        index={index}
+                                                        onCheckPress={() => onPressItem(item, index)}
+                                                        isSelected={selectedItems.includes(item.id)}
+                                                        setExtraData={setExtraData}
+                                                    />)
+                                                })
+                                                :
+                                                null}
+                                            {/* </Content> */}
+                                        </>
+                                        :
+                                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                            {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
+                                        </View>
+                            }
                         </Content>
                     </Container>
                     {/* <KeyboardAvoidingView behavior={Platform.OS=="ios"?"padding":undefined}  /> */}

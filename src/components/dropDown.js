@@ -27,20 +27,52 @@ const DropDown = (props) => {
                 <View style={styles.arrow}>
                     <AntDesign name="down" color={LS_COLORS.global.green} />
                 </View>
+                {props.handleTextValue && <Text style={{
+                    fontSize: 14,
+                    height: 50,
+                    width: "100%",
+                    fontFamily: LS_FONTS.PoppinsRegular,
+                    paddingLeft: 20,
+                    textAlignVertical: "center",
+                    lineHeight: 50,
+                    left:"0%",
+                    position:"absolute",
+                }}>{props.value}</Text>}
                 <ModalDropdown
                     ref={props.dropRef}
                     defaultValue={props.value}
                     isFullWidth={true}
                     options={props.item}
-                    textStyle={{ fontSize: 14, height: 50, width: "100%", fontFamily: LS_FONTS.PoppinsRegular, paddingLeft: 20, textAlignVertical: "center", lineHeight: 50 }}
-                    dropdownTextStyle={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.black }}
+                    textStyle={{
+                        fontSize: props.handleTextValue ? 0 : 14,
+                        height: 50,
+                        width: "100%",
+                        opacity: props.handleTextValue ? 0 :1,
+                        fontFamily: LS_FONTS.PoppinsRegular,
+                        paddingLeft: 20,
+                        textAlignVertical: "center",
+                        lineHeight: 50
+                    }}
+                    dropdownTextStyle={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 12,
+                        color: LS_COLORS.global.black
+                    }}
                     dropdownStyle={[{ borderWidth: 1 }, props.dropdownStyle]}
                     onSelect={props.onChangeValue}
                     showsVerticalScrollIndicator={false}
                     disabled={props.disabled}
                     renderRow={(item) => {
-                        return (<View style={{ flexDirection: 'row',width:"100%", justifyContent: 'space-between', alignItems: 'center', height: 40, paddingHorizontal: '2%', backgroundColor: LS_COLORS.global.white }}>
-                            <Text style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12,textAlign:"left" }}>{item}</Text>
+                        return (<View style={{
+                            flexDirection: 'row',
+                            width: "100%",
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            height: 40,
+                            paddingHorizontal: '2%',
+                            backgroundColor: LS_COLORS.global.white
+                        }}>
+                            <Text style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
                             {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}
                         </View>)
                     }}

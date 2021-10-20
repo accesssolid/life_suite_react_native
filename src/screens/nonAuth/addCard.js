@@ -225,17 +225,17 @@ export default function CardList({ navigation, route }) {
                                 ref={cardDateRef}
                                 returnKeyType="done"
                             />
-                            <Text style={[styles.saveText, { color: "gray", fontSize: 16, textAlign: "left", width: "80%", marginTop: 10 }]}>Address : (Optional)</Text>
+                            {/* <Text style={[styles.saveText, { color: "gray", fontSize: 16, textAlign: "left", width: "80%", marginTop: 10 }]}>Address : (Optional)</Text> */}
                             <TextInputMask
                                 style={styles.inputMaskStyle}
-                                placeholder={'Address 1'}
+                                placeholder={'Address'}
                                 placeholderTextColor={"gray"}
                                 keyboardType="default"
                                 onChangeText={(formatted, extracted) => {
                                     setAddress({ ...address, address_line1: formatted })
                                 }}
                             />
-                            <TextInputMask
+                            {/* <TextInputMask
                                 style={styles.inputMaskStyle}
                                 placeholder={'Address 2'}
                                 placeholderTextColor={"gray"}
@@ -279,7 +279,7 @@ export default function CardList({ navigation, route }) {
                                 onChangeText={(formatted, extracted) => {
                                     setAddress({ ...address, address_country: formatted })
                                 }}
-                            />
+                            /> */}
                         </View>
                     </Content>
                 </Container>

@@ -138,8 +138,9 @@ const Mechanics = (props) => {
         getProviders()
     }, [])
 
-    const getProviders = (rangeData = {}) => {
+    const getProviders = (rangeData = {},showRangeResult=false) => {
         setLoading(true)
+        console.log("RangeData",JSON.stringify(rangeData))
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -154,7 +155,7 @@ const Mechanics = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
+                console.log(response,"response")
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -163,7 +164,11 @@ const Mechanics = (props) => {
                     setLoading(false)
                 }
                 else {
-                    setOpen1(!open)
+                    if(!showRangeResult){
+                        setOpen1(!open)
+                    }else{
+                        setProviders([])
+                    }
                     setLoading(false)
                 }
             }).catch(err => {
@@ -572,7 +577,7 @@ const Mechanics = (props) => {
                                 })
                                 :
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                    {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16 }}>No Providers Found</Text>}
+                                    {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16 ,marginTop:10}}>No Providers Found</Text>}
                                 </View>
                             }
                         </Content>
@@ -607,7 +612,7 @@ const Mechanics = (props) => {
             <FilterModal
                 visible={filterModal}
                 setVisible={setFilterModal}
-                getFilteredData={getProviders}
+                getFilteredData={(data)=>getProviders(data,true)}
             />
         </>
     )

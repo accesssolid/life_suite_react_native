@@ -1,7 +1,13 @@
 //dropdown error solved 
-add    onScrollToIndexFailed={info=>{console.log(info)}} in node_modules/react-native-modal-dropdown/components/ModelDropdown.js ==>FlatList
+node_modules/react-native-modal-dropdown/components/ModelDropdown.js ==>FlatList
+onScrollToIndexFailed={info=>{console.log(info)}}
 
 //
 #liahs_provider_list search to goto provider list 
 
 #liahs_before_providers before list screen 
+
+#liahs GooglePlacesLibrary
+node_modules/react-native-google-places-autocomplete/GooglePlacesAutocomplete.js
+line number: 765
+nestedScrollEnabled={true}

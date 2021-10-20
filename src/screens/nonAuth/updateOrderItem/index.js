@@ -431,9 +431,9 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
         <View key={"S"} style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-evenly', alignItems: 'center' }}>
             <View style={{ marginRight: '2.5%' }}>
                 <TextInput
-                    style={[styles.inputStyle, , { width: 120 }]}
+                    style={[styles.inputStyle, , { width: 120 ,height:40}]}
                     color="black"
-                    placeholder="Product name"
+                    placeholder="Product Name"
                     // editable={props.selectedNewProducts.includes(item.temp_id)}
                     onChangeText={(text) => {
                         setOtherProducts(state => {
@@ -449,7 +449,7 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
             </View>
             <View style={{ marginRight: '2%' }}>
                 <TextInput
-                    style={[styles.inputStyle, { width: 60 }]}
+                    style={[styles.inputStyle, { width: 60,height:40 }]}
                     color="black"
                     placeholder="$000"
                     // editable={props.selectedNewProducts.includes(item.temp_id)}

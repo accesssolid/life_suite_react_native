@@ -239,10 +239,12 @@ const MechanicLocation = (props) => {
                     <View style={{ marginTop: 20 }}>
                         {subService.location_type == 2 && <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>}
                         {subService.location_type == 2 && <TouchableOpacity
-                            onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
+                            onPress={() => {
+                                props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })
+                            }}
                             style={styles.fromContainer}>
                             <Text style={{ flex: 1, }} numberOfLines={1}>
-                                {fromAddress==""?"Select Address":toAddress}
+                                {fromAddress == ""? "Select Address" : fromAddress}
                             </Text>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}
@@ -254,11 +256,11 @@ const MechanicLocation = (props) => {
                                 />
                             </TouchableOpacity>
                         </TouchableOpacity>}
-                        {(subService.location_type == 1||subService.location_type == 2) && <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>}
-                        {(subService.location_type == 1||subService.location_type == 2 ) && <TouchableOpacity
+                        {(subService.location_type == 1 || subService.location_type == 2) && <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>}
+                        {(subService.location_type == 1 || subService.location_type == 2) && <TouchableOpacity
                             onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                             style={styles.fromContainer}>
-                            <Text style={{ flex: 1, }} numberOfLines={1}>{toAddress==""?"Select Address":toAddress}</Text>
+                            <Text style={{ flex: 1, }} numberOfLines={1}>{toAddress == "" ? "Select Address" : toAddress}</Text>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                                 style={{ height: '100%', aspectRatio: 1, justifyContent: 'center', alignItems: "flex-end", paddingHorizontal: 10 }}
@@ -274,7 +276,7 @@ const MechanicLocation = (props) => {
                             <TextInput
                                 style={styles.inputStyle}
                                 color="black"
-                                value={date!=""?moment(date).format("MM-DD-YYYY"):"Select Date"}
+                                value={date != "" ? moment(date).format("MM-DD-YYYY") : "Select Date"}
                                 editable={false}
                                 placeholder="Select date"
                                 placeholderTextColor={LS_COLORS.global.placeholder}
