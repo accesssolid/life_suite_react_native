@@ -5,7 +5,7 @@ import { View, StyleSheet, Image, Text, Platform, SafeAreaView, Alert, Touchable
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
 import { getCardImage, globalStyles } from '../../../utils';
-
+import { role } from '../../../constants/globals';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -182,6 +182,8 @@ const Profile = (props) => {
 
     // 
     const [isConnectedToAccount, setIsConnectedToAccount] = React.useState(false)
+    // 
+    const [selection, setSelection] = React.useState({ start: 0 })
 
     function logout() {
         setLoader(true)
@@ -195,7 +197,7 @@ const Profile = (props) => {
         let config = {
             headers: headers,
             data: formdata,
-            endPoint: user.user_role == 2 ? '/api/customerLogout' : '/api/providerLogout',
+            endPoint: user.user_role == role.customer ? '/api/customerLogout' : '/api/providerLogout',
             type: 'post'
         }
         getApi(config)
@@ -238,7 +240,7 @@ const Profile = (props) => {
     );
     useFocusEffect(
         React.useCallback(() => {
-            if (user.user_role == 3) {
+            if (user.user_role == role.provider) {
                 getCheckAccountFromServer()
                 getConnectAccountDetail()
             }
@@ -298,7 +300,7 @@ const Profile = (props) => {
             // setDropStateValueWork(dropStateValue)
             // setDropCityValueWork(dropCityValue)
         } else {
-            if( userData.address[1]){
+            if (userData.address[1]) {
                 setWorkAddressData({
                     address_line_1: userData.address[1]?.address_line_1,
                     address_line_2: userData.address[1]?.address_line_2,
@@ -309,7 +311,7 @@ const Profile = (props) => {
                     lon: userData.address[1]?.long
                 })
             }
-          
+
             // workAddressRef.current.setAddressText(homeAddressData.address_line_1)
         }
     }, [isSameAddress, homeAddressData])
@@ -356,7 +358,7 @@ const Profile = (props) => {
         let config = {
             headers: headers,
             data: formdata,
-            endPoint: user.user_role == 2 ? '/api/customer_profile_update' : '/api/provider_profile_update',
+            endPoint: user.user_role == role.customer ? '/api/customer_profile_update' : '/api/provider_profile_update',
             type: 'post'
         }
 
@@ -428,7 +430,7 @@ const Profile = (props) => {
             }
         }
 
-        if (user.user_role == 3 && userData.about.trim() == "") {
+        if (user.user_role == role.provider && userData.about.trim() == "") {
             showToast("Bio is required", 'danger')
             setLoader(false)
             return false
@@ -472,7 +474,7 @@ const Profile = (props) => {
             }
         ]
 
-        if (userData.user_role == 3) {
+        if (userData.user_role == role.provider) {
             let homekeys = Object.keys(address[0])
             for (let index = 0; index < homekeys.length; index++) {
                 if (homekeys[index] !== 'state' && homekeys[index] !== 'city' && String(address[0][homekeys[index]]).trim() == '' && homekeys[index] !== 'zip_code' && homekeys[index] !== 'address_line_2' && homekeys[index] !== 'lat' && homekeys[index] !== 'long') {
@@ -558,7 +560,7 @@ const Profile = (props) => {
         }
     }
     useEffect(() => {
-        if (user.user_role == 3) {
+        if (user.user_role == role.provider) {
             getConnectAccountDetail()
         }
     }, [user])
@@ -577,7 +579,7 @@ const Profile = (props) => {
         formdata.append("first_name", userData.first_name);
         formdata.append("last_name", userData.last_name);
         formdata.append("phone_number", userData.phone_number.replace(/-/g, ""));
-        if (user.user_role == 3) {
+        if (user.user_role == role.provider) {
             formdata.append("about", userData.about);
         }
         formdata.append("prefer_name", userData.prefer_name);
@@ -588,7 +590,7 @@ const Profile = (props) => {
         let config = {
             headers: headers,
             data: formdata,
-            endPoint: user.user_role == 2 ? '/api/customer_detail_update' : '/api/provider_detail_update',
+            endPoint: user.user_role == role.customer ? '/api/customer_detail_update' : '/api/provider_detail_update',
             type: 'post'
         }
 
@@ -834,7 +836,7 @@ const Profile = (props) => {
                 behavior={Platform.OS === "ios" ? "padding" : null}
                 style={styles.container}>
                 <View style={{ marginTop: '15%', }}>
-                    <Text style={styles.text}>MY INFORMATION</Text>
+                    <Text style={styles.text}>{user.user_role == role.provider ? "Service Provider Profile" : "Customer Profile"}</Text>
                     <Text style={styles.text1}>{userData.first_name}</Text>
                     <Text style={styles.text2}>Profile ID : {userData.id}</Text>
                 </View>
@@ -894,7 +896,7 @@ const Profile = (props) => {
                             // }}
                             />
 
-                            {user.user_role == 3 && <CustomInput
+                            {user.user_role == role.provider && <CustomInput
                                 required
                                 text="Bio"
                                 value={userData?.about}
@@ -951,7 +953,7 @@ const Profile = (props) => {
                                         marginHorizontal: '10%',
                                         color: LS_COLORS.global.black
                                     }}>
-                                        {user.user_role == 2 ? 'Home' : 'Permanent'} Address{user.user_role == 2 ? '' : "*"}
+                                        {user.user_role == role.customer ? 'Home' : 'Permanent'} Address{user.user_role == role.customer ? '' : "*"}
                                     </Text>
                                 </View>
                                 <GooglePlacesAutocomplete
@@ -970,12 +972,12 @@ const Profile = (props) => {
                                         },
                                         textInput: {
                                             backgroundColor: LS_COLORS.global.lightGrey,
-
+                                            color: LS_COLORS.global.black,
                                         },
                                         listView: { paddingVertical: 5 },
                                         separator: {}
                                     }}
-                                    placeholder={`${user.user_role == 2 ? 'Home' : 'Permanent'} address${user.user_role == 2 ? '' : "*"}`}
+                                    placeholder={`${user.user_role == role.customer ? 'Home' : 'Permanent'} address${user.user_role == role.customer ? '' : "*"}`}
                                     fetchDetails={true}
                                     onPress={(data, details) => {
                                         setHomeAddressData({
@@ -987,7 +989,10 @@ const Profile = (props) => {
                                     }}
                                     textInputProps={{
                                         onSubmitEditing: () => workAddressRef.current.focus(),
-                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                        placeholderTextColor: LS_COLORS.global.placeholder,
+                                        selection:selection,
+                                        onBlur:()=>{setSelection({start:0})},
+                                        onFocus:()=>{setSelection(null)}
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -1003,7 +1008,7 @@ const Profile = (props) => {
                                         marginHorizontal: '10%',
                                         color: LS_COLORS.global.black
                                     }}>
-                                        {user.user_role == 2 ? 'Work' : 'Mailing'} Address{user.user_role == 2 ? '' : "*"}
+                                        {user.user_role == role.customer ? 'Work' : 'Mailing'} Address{user.user_role == role.customer ? '' : "*"}
                                     </Text>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <CheckBox
@@ -1034,11 +1039,13 @@ const Profile = (props) => {
                                         },
                                         textInput: {
                                             backgroundColor: LS_COLORS.global.lightGrey,
+                                            color: LS_COLORS.global.black,
+
                                         },
                                         listView: { paddingVertical: 5 },
                                         separator: {}
                                     }}
-                                    placeholder={`${user.user_role == 2 ? 'Work' : 'Mailing'} Address${user.user_role == 2 ? '' : "*"}`}
+                                    placeholder={`${user.user_role == role.customer ? 'Work' : 'Mailing'} Address${user.user_role == role.customer ? '' : "*"}`}
                                     fetchDetails={true}
                                     onPress={(data, details) => {
                                         setWorkAddressData({
@@ -1050,7 +1057,10 @@ const Profile = (props) => {
                                     }}
                                     textInputProps={{
                                         editable: !isSameAddress,
-                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                        placeholderTextColor: LS_COLORS.global.placeholder,
+                                        selection:selection,
+                                        onBlur:()=>{setSelection({start:0})},
+                                        onFocus:()=>{setSelection(null)}
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -1094,14 +1104,14 @@ const Profile = (props) => {
                                     value={notificationType}
                                     onChangeValue={(index, value) => { setNotificationType(value) }}
                                     containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                    dropdownStyle={{ height: 120 }}
+                                    // dropdownStyle={{ height: 120 }}
                                 />
                                 {/* } */}
                                 <View style={{ height: 40 }}></View>
                             </View>
                         </View>
                         {
-                            user.user_role == 2
+                            user.user_role == role.customer
                                 ?
                                 <View style={{ ...styles.personalContainer, marginTop: 20, zIndex: -1000 }}>
                                     <Text style={{ ...styles.text2, alignSelf: "flex-start", fontSize: 14, marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION </Text>

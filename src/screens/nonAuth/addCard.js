@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useFocusEffect } from '@react-navigation/native'
 import { CreditCardInput, CardView } from "react-native-credit-card-input";
 import TextInputMask from 'react-native-text-input-mask';
+import { CheckBox } from 'react-native-elements'
 
 import { getApi } from '../../api/api'
 import { useSelector } from 'react-redux'
@@ -16,9 +17,11 @@ import LS_FONTS from '../../constants/fonts'
 import { Container, Content } from 'native-base'
 import { showToast } from '../../components/validators';
 import creditCardType from 'credit-card-type';
-
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
 export default function CardList({ navigation, route }) {
+    const { type, item } = route.params ?? { type: "add" }
+    const user = useSelector(state => state.authenticate.user)
     const [loader, setLoader] = useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [cardDetails, setCardDetails] = useState({
@@ -27,7 +30,7 @@ export default function CardList({ navigation, route }) {
         expiry: '',
         cvv: ''
     })
-
+    const [selection,setShowSelection]=React.useState({start:0})
     const [address, setAddress] = React.useState({
         address_line1: "",
         address_line2: "",
@@ -40,11 +43,38 @@ export default function CardList({ navigation, route }) {
     const cardNameRef = useRef(null)
     const cardNumberRef = useRef(null)
     const cardDateRef = useRef(null)
+    const [isSameAddress, setIsSameAddress] = React.useState(false)
+
     var cards = creditCardType(cardDetails.number);
 
-    const Type = type => {
-        if (cards) {
-            switch (cards[0]?.type) {
+    React.useEffect(() => {
+        if (item) {
+            if (item.address_line1) {
+                setAddress({ ...address, address_line1: item.address_line1 })
+            }
+            setCardDetails({ ...cardDetails, name: item.name, expiry: item.exp_month + "/" + item.exp_year ,number:"**** **** **** "+item.last4})
+        }
+    }, [item])
+
+    React.useEffect(() => {
+        if (isSameAddress) {
+            if (user?.address) {
+                let homeAddress = user.address?.find(x => x.address_type == "home")
+                console.log(homeAddress)
+                if (homeAddress) {
+                    setAddress({ ...address, address_line1: homeAddress.address_line_1 })
+                }
+            }
+        } else {
+            // setAddress({ ...address, address_line1: "" })
+        }
+    }, [isSameAddress])
+
+
+    const Type =()=> {
+        if (cards||type=="edit") {
+            let switchValue=type=="edit"?item?.brand?.toLowerCase():cards[0]?.type
+            switch (switchValue) {
                 case 'visa':
                     return require('../../assets/Images1/visa.png');
                 case 'mastercard':
@@ -80,7 +110,7 @@ export default function CardList({ navigation, route }) {
     const generateCardToken = async () => {
         try {
             setLoader(true)
-            const card = `card[number]=${cardDetails.number.replace(/ /g, "")}&card[exp_month]=${cardDetails.expiry.split("/")[0]}&card[exp_year]=${cardDetails.expiry.split("/")[1]}&card[cvc]=${cardDetails.cvv}&card[address_line1]=${address.address_line1}&card[address_line2]=${address.address_line2}&card[address_city]=${address.address_city}&card[address_zip]=${address.address_zip}&card[address_state]=${address.address_state}&card[address_country]=${address.address_country}`
+            const card = `card[name]=${cardDetails.name}&card[number]=${cardDetails.number.replace(/ /g, "")}&card[exp_month]=${cardDetails.expiry.split("/")[0]}&card[exp_year]=${cardDetails.expiry.split("/")[1]}&card[cvc]=${cardDetails.cvv}&card[address_line1]=${address.address_line1}&card[address_line2]=${address.address_line2}&card[address_city]=${address.address_city}&card[address_zip]=${address.address_zip}&card[address_state]=${address.address_state}&card[address_country]=${address.address_country}`
             let response = await fetch('https://api.stripe.com/v1/tokens', {
                 headers: {
                     Accept: 'application/json',
@@ -145,6 +175,43 @@ export default function CardList({ navigation, route }) {
             })
     }
 
+    const cardUpdate = async () => {
+        setLoader(true)
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+        const formdata = new FormData()
+        formdata.append("card_id", item.id)
+        formdata.append("name", cardDetails.name)
+        formdata.append("exp_month", cardDetails.expiry.split("/")[0])
+        formdata.append("exp_year", cardDetails.expiry.split("/")[1])
+        formdata.append("address_line1", address.address_line1)
+
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: '/api/customerCardUpdate',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                console.log("Card Save", response)
+                if (response.status == true) {
+                    showToast("Successfully, card updated.")
+                    navigation.pop()
+                }
+                else {
+                    showToast(response?.message)
+                }
+            })
+            .catch(err => {
+                setLoader(false)
+            }).finally(() => {
+                setLoader(false)
+            })
+    }
+
     return (
         <>
             <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -152,7 +219,7 @@ export default function CardList({ navigation, route }) {
                     action={() => navigation.goBack()}
                     // imageUrl1={require("../../assets/home.png")}
                     // action1={() => props.navigation.navigate("HomeScreen")}
-                    title={'Add Card'} />
+                    title={type=="edit"?"Edit Card":'Add Card'} />
                 <Container>
                     <Content>
                         <View style={{ alignItems: "center" }}>
@@ -162,7 +229,6 @@ export default function CardList({ navigation, route }) {
                                     name={cardDetails.name}
                                     expiry={cardDetails.expiry}
                                     imageFront={require("../../assets/card.png")}
-
                                     onChange={(e => { })} />
                                 {cardDetails.number.length == 0 ? null : (
                                     <Image style={{ height: 40, width: 40, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type()} />
@@ -170,7 +236,7 @@ export default function CardList({ navigation, route }) {
                             </View>
 
                             <View style={{ marginTop: 20 }} />
-                            <View style={{ flexDirection: "row" }}>
+                            {type == "add" && <View style={{ flexDirection: "row" }}>
                                 <TextInputMask
                                     style={styles.inputMaskStyle}
                                     placeholder={'Credit Card Number'}
@@ -188,7 +254,7 @@ export default function CardList({ navigation, route }) {
                                 {cardDetails.number.length == 0 ? null : (
                                     <Image style={{ height: 40, width: 40, position: "absolute", right: 10, top: 15 }} resizeMode="contain" source={Type()} />
                                 )}
-                            </View>
+                            </View>}
                             <TextInputMask
                                 style={styles.inputMaskStyle}
                                 placeholder={'Credit Card Holder Name'}
@@ -196,24 +262,26 @@ export default function CardList({ navigation, route }) {
                                 onChangeText={(formatted, extracted) => {
                                     setCardDetails({ ...cardDetails, name: formatted })
                                 }}
+                                value={cardDetails.name}
                                 ref={cardNameRef}
                                 returnKeyType="next"
                                 onSubmitEditing={() => cardDateRef.current.focus()}
                             />
                             <TextInputMask
                                 style={styles.inputMaskStyle}
-                                placeholder={'Expiry Date(MM/YY)'}
+                                placeholder={'Expiry Date(MM/YYYY)'}
                                 placeholderTextColor={"gray"}
                                 onChangeText={(formatted, extracted) => {
                                     setCardDetails({ ...cardDetails, expiry: formatted })
                                 }}
-                                mask={"[00]/[00]"}
+                                value={cardDetails.expiry}
+                                mask={"[00]/[0000]"}
                                 keyboardType="numeric"
                                 ref={cardDateRef}
                                 returnKeyType="done"
                             />
 
-                            <TextInputMask
+                            {type == "add" && <TextInputMask
                                 style={styles.inputMaskStyle}
                                 placeholder={'CVV'}
                                 placeholderTextColor={"gray"}
@@ -224,15 +292,75 @@ export default function CardList({ navigation, route }) {
                                 keyboardType="numeric"
                                 ref={cardDateRef}
                                 returnKeyType="done"
-                            />
+                            />}
                             {/* <Text style={[styles.saveText, { color: "gray", fontSize: 16, textAlign: "left", width: "80%", marginTop: 10 }]}>Address : (Optional)</Text> */}
-                            <TextInputMask
+                            {/* <TextInputMask
                                 style={styles.inputMaskStyle}
                                 placeholder={'Address'}
                                 placeholderTextColor={"gray"}
                                 keyboardType="default"
                                 onChangeText={(formatted, extracted) => {
                                     setAddress({ ...address, address_line1: formatted })
+                                }}
+                            /> */}
+                            <View style={{ flexDirection: 'row', width: "80%", alignItems: 'center', alignSelf: "center" }}>
+                                <CheckBox
+                                    containerStyle={{ marginHorizontal: 0, paddingHorizontal: 0 }}
+                                    checked={isSameAddress}
+                                    onPress={() => {
+                                        if (isSameAddress) {
+                                            setAddress({ ...address, address_line1: "" })
+                                        }
+                                        setIsSameAddress(!isSameAddress)
+                                    }}
+                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/checked.png")} />}
+                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
+                                />
+                                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same as home address</Text>
+                            </View>
+                            <GooglePlacesAutocomplete
+                                styles={{
+                                    container: {
+                                        width: '100%',
+                                        borderRadius: 28,
+                                        alignSelf: 'center',
+                                        paddingTop: 5,
+                                        paddingHorizontal: '10%',
+                                        maxHeight: 200
+                                    },
+                                    textInput: {
+                                        color: LS_COLORS.global.black,
+                                        borderWidth: 1,
+                                        borderRadius: 7,
+                                        borderColor: LS_COLORS.global.textInutBorderColor,
+                                        fontFamily: LS_FONTS.PoppinsMedium,
+                                        fontSize: 16,
+                                        paddingLeft: 16,
+                                        
+                                    },
+                                    listView: { paddingVertical: 5 },
+                                    separator: {}
+                                }}
+                                placeholder={`Address`}
+                                onPress={(data, details) => {
+                                    setAddress({ ...address, address_line1: data.description })
+                                }}
+                                textInputProps={{
+                                    placeholderTextColor: "gray",
+                                    value: address.address_line1,
+                                    selection:selection,
+                                    onBlur:()=>{setShowSelection({start:0})},
+                                    onFocus:()=>{setShowSelection(null)},
+                                    onChangeText: (t) => {
+                                        if (isSameAddress) {
+                                            return
+                                        }
+                                        setAddress({ ...address, address_line1: t })
+                                    }
+                                }}
+                                query={{
+                                    key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                    language: 'en',
                                 }}
                             />
                             {/* <TextInputMask
@@ -287,7 +415,12 @@ export default function CardList({ navigation, route }) {
                     style={styles.save}
                     activeOpacity={0.7}
                     onPress={() => {
-                        generateCardToken()
+                        if (type == "add") {
+                            generateCardToken()
+                        } else if (type == "edit") {
+                            cardUpdate()
+                        }
+
                     }}
                 >
                     <Text style={styles.saveText}>Save</Text>

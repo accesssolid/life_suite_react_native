@@ -65,65 +65,65 @@ const Mechanics = (props) => {
                     if (other_options.other?.trim() != "") {
                         other = {
                             created_at: "2021-10-11T07:46:35.000000Z",
-                            id: service_id+111111111111,
-                            item_product_id:service_id+111111111111,
-                            item_products_name:other_options.other,
-                            item_id:service_id,
-                            type:"other",
-                            product_id:"",
-                            other:other_options.other,
+                            id: service_id + 111111111111,
+                            item_product_id: service_id + 111111111111,
+                            item_products_name: other_options.other,
+                            item_id: service_id,
+                            type: "other",
+                            product_id: "",
+                            other: other_options.other,
                             price: 0,
                             updated_at: null,
                             user_id: x.user_id,
-                            checked:false
+                            checked: false
                         }
                     }
                     if (other_options.have_own?.trim() != "") {
-                         have_own = {
+                        have_own = {
                             created_at: "2021-10-11T07:46:35.000000Z",
-                            id: service_id+1111111111111,
-                            item_product_id:service_id+1111111111111,
-                            item_products_name:other_options.have_own,
-                            item_id:service_id,
-                            type:"have_own",
-                            product_id:"",
-                            have_own:other_options.have_own,
+                            id: service_id + 1111111111111,
+                            item_product_id: service_id + 1111111111111,
+                            item_products_name: other_options.have_own,
+                            item_id: service_id,
+                            type: "have_own",
+                            product_id: "",
+                            have_own: other_options.have_own,
                             price: 0,
                             updated_at: null,
                             user_id: x.user_id,
-                            checked:false
+                            checked: false
                         }
                     }
                     if (other_options.need_recommendation) {
                         need_recommendation = {
                             created_at: "2021-10-11T07:46:35.000000Z",
-                            id: service_id+11111111111111,
-                            item_product_id:service_id+11111111111111,
-                            item_products_name:"Need recommendation",
-                            item_id:service_id,
-                            type:"need_recommendation",
-                            product_id:"",
-                            need_recommendation:true,
+                            id: service_id + 11111111111111,
+                            item_product_id: service_id + 11111111111111,
+                            item_products_name: "Need recommendation",
+                            item_id: service_id,
+                            type: "need_recommendation",
+                            product_id: "",
+                            need_recommendation: true,
                             price: 0,
                             updated_at: null,
                             user_id: x.user_id,
-                            checked:false
+                            checked: false
                         }
                     }
                 }
                 x.checked = false;
                 x.products = _.cloneDeep(x.products).map(y => { y.checked = false; return y })
-                if(other){
+                if (other) {
                     x.products.push(other)
                 }
-                if(have_own){
+                if (have_own) {
                     x.products.push(have_own)
                 }
-               if(need_recommendation){
-                x.products.push(need_recommendation)
-               }
-            
-              
+                if (need_recommendation) {
+                    x.products.push(need_recommendation)
+                }
+
+
                 return x
             })
             let d = _.cloneDeep(i)
@@ -138,9 +138,9 @@ const Mechanics = (props) => {
         getProviders()
     }, [])
 
-    const getProviders = (rangeData = {},showRangeResult=false) => {
+    const getProviders = (rangeData = {}, showRangeResult = false) => {
         setLoading(true)
-        console.log("RangeData",JSON.stringify(rangeData))
+        console.log("RangeData", JSON.stringify(rangeData))
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -155,7 +155,7 @@ const Mechanics = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response,"response")
+                console.log(response, "response")
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -164,9 +164,9 @@ const Mechanics = (props) => {
                     setLoading(false)
                 }
                 else {
-                    if(!showRangeResult){
+                    if (!showRangeResult) {
                         setOpen1(!open)
-                    }else{
+                    } else {
                         setProviders([])
                     }
                     setLoading(false)
@@ -199,11 +199,11 @@ const Mechanics = (props) => {
     //     setApiData([...arr])
     // }
 
-   
+
 
     const placeOrder = (jsonData) => {
-        console.log(jsonData,"JSONData")
-        console.log(JSON.stringify(jsonData),"JSONData")
+        console.log(jsonData, "JSONData")
+        console.log(JSON.stringify(jsonData), "JSONData")
         setLoading(true)
         var formdata = new FormData();
         formdata.append("items_data", JSON.stringify(jsonData))
@@ -434,9 +434,8 @@ const Mechanics = (props) => {
                             {/* providers changed to dupProviders */}
                             {dupProviders.length > 0 ?
                                 dupProviders.map((item, index) => {
-                                    console.log(item)
                                     let country = item?.current_address?.split(",")
-                                    let countryName = country[country?.length - 1]
+                                    let countryName = country && country.length > 0 ? country[country.length - 1] : ""
                                     let x = item.timeDuration / 60
                                     let time_format = ""
                                     if (x > 1) {
@@ -504,7 +503,7 @@ const Mechanics = (props) => {
                                                 ratingBackgroundColor="white"
                                                 ratingColor="#04BFBF"
                                                 tintColor="white"
-                                                startingValue={parseInt(item.rating??0)}
+                                                startingValue={parseInt(item.rating ?? 0)}
                                             />
                                         </View>
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
@@ -534,18 +533,18 @@ const Mechanics = (props) => {
                                                         </View>
                                                     </View>
                                                     {i.products.map((itemData, prIndex) => {
-                                                        let productTitle="(Product)"
-                                                        let type=itemData.type
-                                                        let isPriced=true
-                                                        if(type=="other"){
-                                                            productTitle="(Other Product)"
-                                                            isPriced=false
-                                                        }else if(type=="have_own"){
-                                                            productTitle="(Have Own Product)"
-                                                            isPriced=false
-                                                        }else if(type=="need_recommendation"){
-                                                            productTitle=""
-                                                            isPriced=false
+                                                        let productTitle = "(Product)"
+                                                        let type = itemData.type
+                                                        let isPriced = true
+                                                        if (type == "other") {
+                                                            productTitle = "(Other Product)"
+                                                            isPriced = false
+                                                        } else if (type == "have_own") {
+                                                            productTitle = "(Have Own Product)"
+                                                            isPriced = false
+                                                        } else if (type == "need_recommendation") {
+                                                            productTitle = ""
+                                                            isPriced = false
                                                         }
                                                         return (
                                                             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
@@ -555,7 +554,7 @@ const Mechanics = (props) => {
                                                                     </Text>
                                                                 </View>
                                                                 <View style={{ height: 20, flexDirection: "row" }}>
-                                                                {isPriced&&<Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + itemData.price}</Text>}
+                                                                    {isPriced && <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + itemData.price}</Text>}
                                                                     <CheckBox
                                                                         checked={itemData.checked}
                                                                         onPress={() => onCheckBoxClicked(!itemData.checked, index, iIndex, prIndex)}
@@ -568,7 +567,7 @@ const Mechanics = (props) => {
                                                     })}
                                                 </>
                                             )
-                                        })  }
+                                        })}
                                         <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                             <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Estimated Time</Text>
                                             <Text style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{time_format}</Text>
@@ -577,7 +576,7 @@ const Mechanics = (props) => {
                                 })
                                 :
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                    {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16 ,marginTop:10}}>No Providers Found</Text>}
+                                    {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginTop: 10 }}>No Providers Found</Text>}
                                 </View>
                             }
                         </Content>
@@ -612,7 +611,7 @@ const Mechanics = (props) => {
             <FilterModal
                 visible={filterModal}
                 setVisible={setFilterModal}
-                getFilteredData={(data)=>getProviders(data,true)}
+                getFilteredData={(data) => getProviders(data, true)}
             />
         </>
     )

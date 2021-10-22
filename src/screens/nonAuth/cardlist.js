@@ -20,7 +20,7 @@ export default function CardList({ navigation, route }) {
 
 
     const getCards = () => {
-      
+
         setLoader(true)
         let headers = {
             "Authorization": `Bearer ${access_token}`
@@ -167,8 +167,8 @@ export default function CardList({ navigation, route }) {
                     ListEmptyComponent={<View style={[styles.saveText, { justifyContent: "center", alignItems: "center", marginTop: 20 }]}><Text style={[styles.saveText, { color: "gray" }]}>No Cards</Text></View>}
                     renderItem={({ item }) => {
                         return (
-                            <Pressable key={item.id} onLongPress={() => {
-
+                            <TouchableOpacity activeOpacity={0.5} key={item.id} style={{ height: 200, marginTop: 20, position: "relative" }} onPress={() => {
+                                navigation.navigate("AddCard", { type: "edit", item })
                             }}>
                                 <ImageBackground
                                     source={require('../../assets/card.png')}
@@ -179,19 +179,22 @@ export default function CardList({ navigation, route }) {
                                         alignSelf: 'center',
                                         overflow: "hidden",
                                         borderRadius: 20,
-                                        marginTop: 40,
                                         position: "relative"
                                     }}
                                     resizeMode="cover"
                                 >
+                                    <View>
+                                        <Text style={[styles.saveText, { color: "black",textAlign:"center" ,fontSize:18,letterSpacing:3}]}>**** **** **** {item.last4}</Text>
+                                    </View>
                                     <View style={{ marginHorizontal: 15, flexDirection: "row", marginBottom: 20, justifyContent: "space-between" }}>
-                                        <View>
-                                            <Text style={[styles.saveText, { color: "black" }]}>{item.brand}</Text>
-                                            <Text style={[styles.saveText, { color: "black" }]}>********{item.last4}</Text>
+                                        <View style={{ justifyContent: "flex-end" }}>
+                                            {/* <Text style={[styles.saveText, { color: "black" }]}>{item.brand}</Text> */}
+
+                                            <Text style={[styles.saveText, { color: "black", fontSize: 15,textTransform:"uppercase" }]}>{item.name}</Text>
                                         </View>
                                         <View>
-                                            <Text style={[styles.saveText, { color: "black" }]}>Expiry Date :</Text>
-                                            <Text style={[styles.saveText, { color: "black" }]}>0{item.exp_month}/{item.exp_year}</Text>
+                                            <Text style={[styles.saveText, { color: "black" }]}>Expiry Date</Text>
+                                            <Text style={[styles.saveText, { color: "black" }]}>{item.exp_month}/{item.exp_year}</Text>
                                         </View>
                                     </View>
                                     <Image style={{ height: 60, width: 60, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type(item.brand)} />
@@ -235,7 +238,7 @@ export default function CardList({ navigation, route }) {
                                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
                                     />
                                 </ImageBackground>
-                            </Pressable>)
+                            </TouchableOpacity>)
                     }
                     }
                 />
@@ -243,7 +246,7 @@ export default function CardList({ navigation, route }) {
                     style={styles.save}
                     activeOpacity={0.7}
                     onPress={() => {
-                        navigation.navigate("AddCard")
+                        navigation.navigate("AddCard", { type: "add" })
                     }}
                 >
                     <Text style={styles.saveText}>Add Card</Text>

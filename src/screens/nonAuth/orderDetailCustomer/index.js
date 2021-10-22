@@ -30,19 +30,6 @@ import _ from 'lodash'
 
 
 
-function generate_series(step, start_time) {
-    const dt = moment(start_time, 'YYYY-MM-DD HH:mm').toDate()
-    const dt_another = moment(start_time, 'YYYY-MM-DD').add(1, "day").toDate()
-    const rc = [];
-    while (dt < dt_another) {
-        const dated = moment(start_time, 'YYYY-MM-DD HH:mm')
-        dated.hour(dt.getHours())
-        dated.minute(dt.getMinutes())
-        rc.push(dated);
-        dt.setMinutes(dt.getMinutes() + step);
-    }
-    return rc;
-}
 
 
 
@@ -171,32 +158,14 @@ export default function OrderDetailUpdateCustomer(props) {
                 <View style={styles.container}>
                     {/* <RenderView /> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
-                        <Text style={[styles.client_info_text]}>Order Update</Text>
+                        <Text style={[styles.client_info_text]}>Order Detail</Text>
                         <CardClientInfo virtual_data={virtualdata} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
+                        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
                             <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>User Requested Time Frame </Text>
                             <Text style={styles.baseTextStyle}>{moment(virtualdata?.order_start_time).format("hh:mm a")} - {moment(virtualdata?.order_end_time).format("hh:mm a")}</Text>
-                        </View>
-                        <Text style={{ color: LS_COLORS.global.danger, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, textAlign: "center", marginTop: 20 }}>Adding new service requires 1 hour extra</Text>
+                        </View> */}
+                        {/* <Text style={{ color: LS_COLORS.global.danger, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, textAlign: "center", marginTop: 20 }}>Adding new service requires 1 hour extra</Text> */}
                     </ScrollView>
-                    {/* only show if order status is pending i.e 1 */}
-                    {data?.order_status == 9 ? <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20 }}>
-                        <TouchableOpacity
-                            style={[styles.save, { marginTop: 5 }]}
-                            activeOpacity={0.7}
-                            onPress={() => {
-                                submit(10)
-                            }}>
-                            <Text style={styles.saveText}>Accept</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.save, { backgroundColor: LS_COLORS.global.white, marginTop: 5, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
-                            activeOpacity={0.7}
-                            onPress={() => setCancelModal(true)}>
-                            <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Decline</Text>
-                        </TouchableOpacity>
-                    </View> : null
-                    }
                 </View>
             </SafeAreaView >
             <CancelModal
@@ -288,87 +257,28 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes }) => {
                     <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
                 </View>
             </View>
+            {/* request data */}
+            {items?.map((i) => {
+                return (<OrderItemsDetail i={i} />)
+            })}
             {/* New Request products and Service */}
-            <View style={{ marginVertical: 20 }}>
-                <Text style={[styles.client_info_text, { textAlign: "left", fontSize: 14 }]}>New requested service/product</Text>
+            {virtualOrders.length > 0 && <View style={{ marginVertical: 20 }}>
+                <Text style={[styles.client_info_text, { textAlign: "left", fontSize: 14 }]}>Updated Order Items</Text>
                 {virtualOrders?.order_items?.map((i) => {
-                    return (
-                        <>
-                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} numberOfLines={1}>{i.service_items_name + "  (Service Charge)"}</Text>
-                                <View style={{ height: 20, flexDirection: "row" }}>
-                                    <Text style={styles.baseTextStyle}>{"$" + i.price}</Text>
-                                </View>
-                            </View>
-                            {i.product.map((itemData, index) => {
-                                return (
-                                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                        <View style={{}} >
-                                            <Text style={{ marginLeft: 20 }}>
-                                                <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
-                                            </Text>
-                                        </View>
-                                        <View style={{ height: 20, flexDirection: "row" }}>
-                                            <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
-                                        </View>
-                                    </View>
-                                )
-                            })
-                            }
-                            {i.extra_product.map((itemData, index) => {
-                                return (
-                                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                        <View style={{}} >
-                                            <Text style={{ marginLeft: 20 }}>
-                                                <Text style={styles.baseTextStyle}>{itemData.product_name + "(Other Product)"}</Text>
-                                            </Text>
-                                        </View>
-                                        <View style={{ height: 20, flexDirection: "row" }}>
-                                            <Text style={styles.baseTextStyle}>{"$" + itemData.product_price}</Text>
-                                        </View>
-                                    </View>
-                                )
-                            })
-                            }
-                            {i.other_data.map((itemData, index) => {
-                                let other = itemData.other
-                                let have_own = itemData.have_own
-                                let need_recommendation = itemData.need_recommendation
-                                return (
-                                    <>
-                                        {other && other.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                            <View style={{}} >
-                                                <Text style={{ marginLeft: 20 }}>
-                                                    <Text style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
-                                                </Text>
-                                            </View>
-                                        </View>
-                                        }
-                                        {have_own && have_own.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                            <View style={{}} >
-                                                <Text style={{ marginLeft: 20 }}>
-                                                    <Text style={styles.baseTextStyle}>{have_own + "(Have Own Product)"}</Text>
-                                                </Text>
-                                            </View>
-                                        </View>}
-                                        {need_recommendation && need_recommendation == "true" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                            <View style={{}} >
-                                                <Text style={{ marginLeft: 20 }}>
-                                                    <Text style={styles.baseTextStyle}>Need Recommendation</Text>
-                                                </Text>
-                                            </View>
-                                        </View>}
-                                    </>
-                                )
-                            })
-                            }
-                        </>
-                    )
+                    return (<OrderItemsDetail i={i} />)
                 })}
-            </View>
+            </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>
                 <Text style={styles.greenTextStyle}>${virtualOrders?.order_total_price}</Text>
+            </View>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text style={styles.greenTextStyle}>Order Start Time</Text>
+                <Text style={styles.greenTextStyle}>{moment(data.order_start_time).format("hh:mm a")}</Text>
+            </View>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text style={styles.greenTextStyle}>Order End Time</Text>
+                <Text style={styles.greenTextStyle}>{moment(data.order_end_time).format("hh:mm a")}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Time</Text>
@@ -378,6 +288,81 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes }) => {
     )
 }
 
+
+const OrderItemsDetail = ({ i }) => {
+    return (
+        <>
+            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} numberOfLines={1}>{i.service_items_name + "  (Service Charge)"}</Text>
+                <View style={{ height: 20, flexDirection: "row" }}>
+                    <Text style={styles.baseTextStyle}>{"$" + i.price}</Text>
+                </View>
+            </View>
+            {i.product.map((itemData, index) => {
+                return (
+                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                        <View style={{}} >
+                            <Text style={{ marginLeft: 20 }}>
+                                <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
+                            </Text>
+                        </View>
+                        <View style={{ height: 20, flexDirection: "row" }}>
+                            <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
+                        </View>
+                    </View>
+                )
+            })
+            }
+            {i.extra_product.map((itemData, index) => {
+                return (
+                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                        <View style={{}} >
+                            <Text style={{ marginLeft: 20 }}>
+                                <Text style={styles.baseTextStyle}>{itemData.product_name + "(Other Product)"}</Text>
+                            </Text>
+                        </View>
+                        <View style={{ height: 20, flexDirection: "row" }}>
+                            <Text style={styles.baseTextStyle}>{"$" + itemData.product_price}</Text>
+                        </View>
+                    </View>
+                )
+            })
+            }
+            {i.other_data.map((itemData, index) => {
+                let other = itemData.other
+                let have_own = itemData.have_own
+                let need_recommendation = itemData.need_recommendation
+                return (
+                    <>
+                        {other && other.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                            <View style={{}} >
+                                <Text style={{ marginLeft: 20 }}>
+                                    <Text style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
+                                </Text>
+                            </View>
+                        </View>
+                        }
+                        {have_own && have_own.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                            <View style={{}} >
+                                <Text style={{ marginLeft: 20 }}>
+                                    <Text style={styles.baseTextStyle}>{have_own + "(Have Own Product)"}</Text>
+                                </Text>
+                            </View>
+                        </View>}
+                        {need_recommendation && need_recommendation == "true" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                            <View style={{}} >
+                                <Text style={{ marginLeft: 20 }}>
+                                    <Text style={styles.baseTextStyle}>Need Recommendation</Text>
+                                </Text>
+                            </View>
+                        </View>}
+                    </>
+                )
+            })
+            }
+        </>
+    )
+}
 
 const styles = StyleSheet.create({
     safeArea: {

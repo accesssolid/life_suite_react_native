@@ -270,7 +270,9 @@ const OrderHistory1 = (props) => {
                                 value={selected.title}
                                 onChangeValue={(index, value) => { setselected(order_types[index]) }}
                                 containerStyle={{ marginLeft: 20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
-                            />
+                                dropdownStyle={{height:order_types.length*40}}
+
+                           />
                         </View>
                     </View>
                     <FlatList
@@ -288,16 +290,16 @@ const OrderHistory1 = (props) => {
                             let order_status = item.order_status
                             return (
                                 <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
-                                    if (order_status == 9) {
+                                    // if (order_status == 9) {
                                         props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item } })
-                                        return
-                                    }
-                                    if (done === index) {
-                                        setDone("")
-                                    }
-                                    else {
-                                        setDone(index)
-                                    }
+                                    //     return
+                                    // }
+                                    // if (done === index) {
+                                    //     setDone("")
+                                    // }
+                                    // else {
+                                    //     setDone(index)
+                                    // }
                                 }} style={{ width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
                                     {done === index ?
                                         <>

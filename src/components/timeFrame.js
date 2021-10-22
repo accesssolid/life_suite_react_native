@@ -140,7 +140,7 @@ const TimeFrame = props => {
                 }}>
                     <Pressable>
                         <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Select Time Frame</Text>
-                        {jsonData.map((i, index) => {
+                        {jsonData&&jsonData.map((i, index) => {
                             console.log(i)
                             let x = i.duration / 60
                             let time_format = ""
@@ -159,7 +159,7 @@ const TimeFrame = props => {
                                     <View style={{ width: "50%", height: 50, }} >
                                         <Text>From</Text>
                                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
-                                            <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
+                                            <TouchableOpacity disabled={jsonData.length<=1} style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
                                                 onPress={() => {
                                                     setType("start")
                                                     setSelectedDate(moment(i.order_start_time).toDate())
@@ -176,7 +176,7 @@ const TimeFrame = props => {
                                     <View style={{ width: "50%", height: 50, justifyContent: 'center' }}>
                                         <Text>To</Text>
                                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
-                                            <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
+                                            <TouchableOpacity disabled={jsonData.length<=1} style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
                                                 onPress={() => {
                                                     setType("end")
                                                     setSelectedDate(moment(i.order_end_time).toDate())

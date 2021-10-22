@@ -60,7 +60,7 @@ const DropDown = (props) => {
                     }}
                     dropdownStyle={[{ borderWidth: 1 }, props.dropdownStyle]}
                     onSelect={props.onChangeValue}
-                    showsVerticalScrollIndicator={false}
+                    showsVerticalScrollIndicator={true}
                     disabled={props.disabled}
                     renderRow={(item) => {
                         return (<View style={{

@@ -15,7 +15,8 @@ const LS_COLORS = {
         darkGray: '#5A5A5A',
         placeholder: '#8f8f8f',
         frameBg: '#ECECEC',
-        danger:"#F92525"
+        danger:"#F92525",
+        "drawer_name":"#baedf1"
     },
 }
 

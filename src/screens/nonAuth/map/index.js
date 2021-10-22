@@ -169,6 +169,9 @@ const MapScreen = (props) => {
                         ref={placesRef}
                         styles={{
                             container: { borderColor: "green", borderWidth: 1, position: 'absolute', width: '75%', zIndex: 500, alignSelf: 'flex-end', right: '5%', top: '2.5%', backgroundColor: LS_COLORS.global.white, borderRadius: 6 },
+                            textInput: {
+                                color: LS_COLORS.global.black,
+                            },
                             listView: { paddingVertical: 5 },
                             separator: {}
                         }}

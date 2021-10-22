@@ -157,6 +157,7 @@ const OrderHistory = (props) => {
                                value={selected.title}
                                onChangeValue={(index, value) => { setselected(order_types[index]) }}
                                containerStyle={{ marginLeft:20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10,borderWidth: 0 }}
+                               dropdownStyle={{height:order_types.length*40}}
                            />
                         </View>
                     </View>

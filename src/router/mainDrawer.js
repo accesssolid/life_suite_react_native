@@ -30,6 +30,7 @@ import MapScreen from '../screens/nonAuth/map';
 import AddTimeFrame from '../screens/nonAuth/addTimeFrame';
 import OrderHistory1 from '../screens/nonAuth/orderHistory1';
 
+import { role } from '../constants/globals';
 const Drawer = createDrawerNavigator();
 
 const MainDrawer = (props) => {
@@ -72,7 +73,7 @@ const MainDrawer = (props) => {
                 />
                 <Drawer.Screen
                     name="Orders"
-                    component={user.user_role == 2 ? OrderHistory1 : OrderHistory}
+                    component={user.user_role == role.customer ? OrderHistory1 : OrderHistory}
                     // component={OrderHistory}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/note.png')} style={{ height: 20, width: 20 }} />,
@@ -115,7 +116,7 @@ const MainDrawer = (props) => {
                 />
                 <Drawer.Screen
                     name="HomeScreen"
-                    component={user.user_role == 2 ? UserStack : ProviderStack}
+                    component={user.user_role == role.customer ? UserStack : ProviderStack}
                     options={{
                         drawerIcon: ({ focused, color }) => null,
                         drawerLabel: ({ focused, color }) => null,
@@ -185,11 +186,16 @@ const MainDrawer = (props) => {
 export default MainDrawer;
 
 const CustomDrawerContent = (props) => {
+    const user = useSelector(state => state.authenticate.user)
     const navigation = useNavigation()
     return (
         <DrawerContentScrollView {...props}>
-            <View style={{ height: Dimensions.get('screen').height / 7, padding: '7%' }}>
-                <Image source={require('../assets/splash/logo.png')} resizeMode={"contain"} style={{ height: '100%', width: '100%' }} />
+            <View >
+                <Image source={require('../assets/splash/logo.png')}  resizeMode="contain" style={{ height: 100, width: '80%',marginLeft:10 ,}} />
+                <Text style={{fontFamily:LS_FONTS.PoppinsSemiBold,fontSize:15,marginLeft:10}}>{user?.user_role==role.customer?"Customer":"Service Provider"}</Text>
+            </View>
+            <View style={{flexDirection:"row",alignItems:"center",justifyContent:"center",marginVertical:10,backgroundColor:LS_COLORS.global.drawer_name,paddingVertical:5}}>
+                <Text style={{fontFamily:LS_FONTS.PoppinsSemiBold,fontSize:15,marginLeft:10}}>{user?.first_name} {user?.last_name}</Text>
             </View>
             <DrawerItemList {...props} />
             <DrawerItem

@@ -631,6 +631,7 @@ const SignUpScreen = (props) => {
                                         },
                                         textInput: {
                                             backgroundColor: LS_COLORS.global.lightGrey,
+                                            color: LS_COLORS.global.black,
 
                                         },
                                         listView: { paddingVertical: 5 },
@@ -773,6 +774,7 @@ const SignUpScreen = (props) => {
                                         },
                                         textInput: {
                                             backgroundColor: LS_COLORS.global.lightGrey,
+                                            color: LS_COLORS.global.black,
                                         },
                                         listView: { paddingVertical: 5 },
                                         separator: {}
