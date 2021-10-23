@@ -323,6 +323,7 @@ const OrderClientDetail = (props) => {
         console.log(config)
         getApi(config)
             .then((response) => {
+                console.log("Response",response)
                 if (response.status == true) {
                     setData(response.data)
                 } else {

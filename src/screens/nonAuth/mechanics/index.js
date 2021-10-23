@@ -227,7 +227,7 @@ const Mechanics = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response, "response")
+                console.log(JSON.stringify(response), "Create ORder")
                 if (response.status == true) {
                     setLoading(false)
                     props.navigation.navigate("MainDrawer", { screen: "Orders" })

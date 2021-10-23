@@ -25,7 +25,7 @@ import { PermissionsAndroid } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native'
-
+import { role } from '../../../constants/globals';
 const Notification = (props) => {
     const [loading, setLoading] = React.useState(false)
     const dispatch = useDispatch()
@@ -33,6 +33,52 @@ const Notification = (props) => {
     const user = useSelector(state => state.authenticate.user)
 
     const [notifications, setNotifications] = useState([])
+
+    const seenNotification = async (data) => {
+        if (data.is_read == "0") {
+            setLoading(true)
+            let headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${access_token}`
+            }
+            let config = {
+                headers: headers,
+                data: JSON.stringify({ notification_id: data.id }),
+                endPoint: user.user_role == role.provider ? '/api/providerReadNotification' : "/api/customerReadNotification",
+                type: 'post'
+            }
+
+            getApi(config)
+                .then((response) => {
+                    if (response.status == true) {
+
+                    }
+                    else {
+                        showToast(response.message)
+                    }
+                }).catch(err => {
+                }).finally(() => {
+                    setLoading(false)
+                    if (data?.type == "order") {
+                        if (user?.user_role == role.customer) {
+                            props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item: { id: data.order_id } } })
+                        } else {
+                            props.navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: data.order_id } } })
+                        }
+                    }
+                })
+        } else {
+            if (data?.type == "order") {
+                if (user?.user_role == role.customer) {
+                    props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item: { id: data.order_id } } })
+                } else {
+                    props.navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: data.order_id } } })
+                }
+            }
+        }
+
+    }
 
 
     const getNotifications = async () => {
@@ -44,7 +90,7 @@ const Notification = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ notification_type: "all" }),
-            endPoint: user.user_role == 3 ? '/api/providerNotificationList' : "/api/customerNotificationList",
+            endPoint: user.user_role == role.provider ? '/api/providerNotificationList' : "/api/customerNotificationList",
             type: 'post'
         }
 
@@ -71,7 +117,7 @@ const Notification = (props) => {
         return (
             <Pressable
                 onPress={() => {
-
+                    seenNotification(item)
                 }}
             >
                 <Card

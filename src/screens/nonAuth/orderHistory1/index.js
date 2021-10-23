@@ -285,9 +285,11 @@ const OrderHistory1 = (props) => {
                             }
                         }}
                         renderItem={({ item, index }) => {
-                            console.log(item)
                             let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
                             let order_status = item.order_status
+                            if(item?.hide_order>0){
+                                return null
+                            }
                             return (
                                 <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
                                     // if (order_status == 9) {
@@ -301,7 +303,100 @@ const OrderHistory1 = (props) => {
                                     //     setDone(index)
                                     // }
                                 }} style={{ width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
-                                    {done === index ?
+                                 
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <View>
+                                                <Image
+                                                    style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 100 }}
+                                                    source={user.user_role === 3 ? item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image : item?.providers_profile_image ? { uri: BASE_URL + item?.providers_profile_image } : placeholder_image}
+                                                />
+                                            </View>
+                                            <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
+                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
+                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
+                                            </View>
+                                            <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
+                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
+                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
+                                            </View>
+                                        </View>
+                                   
+                                </TouchableOpacity>
+                            )
+                        }}
+                    />
+                    <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
+                    <View style={{ height: 30 }}></View>
+                </Content>
+                {loader && <Loader />}
+            </Container>
+        </SafeAreaView>
+    )
+}
+
+export default OrderHistory1;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: LS_COLORS.global.white,
+        paddingHorizontal: 10,
+        paddingBottom: 10
+    },
+    alexiContainer: {
+        maxHeight: '100%',
+        width: "95%",
+        alignSelf: 'center',
+        borderRadius: 6,
+        padding: 10
+    },
+    save: {
+        justifyContent: "center",
+        alignItems: 'center',
+        height: 32,
+        width: 111,
+        backgroundColor: LS_COLORS.global.green,
+        borderRadius: 28,
+        alignSelf: 'center',
+        marginTop: 20
+    },
+    saveText: {
+        textAlign: "center",
+        fontSize: 12,
+        fontFamily: LS_FONTS.PoppinsMedium,
+        color: LS_COLORS.global.white
+    },
+    greenTextStyle: {
+        fontSize: 12,
+        fontFamily: LS_FONTS.PoppinsMedium,
+        color: LS_COLORS.global.green
+    },
+    baseTextStyle: {
+        fontSize: 12,
+        fontFamily: LS_FONTS.PoppinsMedium,
+        color: "black"
+    },
+    save: {
+        justifyContent: "center",
+        alignItems: 'center',
+        height: 45,
+        width: 122,
+        backgroundColor: LS_COLORS.global.green,
+        borderRadius: 6,
+        alignSelf: 'center',
+        marginTop: 20,
+        borderRadius: 33
+    },
+    saveText: {
+        textAlign: "center",
+        fontSize: 12,
+        fontFamily: LS_FONTS.PoppinsMedium,
+        color: 'white'
+    }
+})
+
+/*
+   {done === index ?
                                         <>
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                                 <View>
@@ -520,94 +615,8 @@ const OrderHistory1 = (props) => {
                                                 null
                                             }
 
-                                        </>
-                                        : <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <View>
-                                                <Image
-                                                    style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 100 }}
-                                                    source={user.user_role === 3 ? item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image : item?.providers_profile_image ? { uri: BASE_URL + item?.providers_profile_image } : placeholder_image}
-                                                />
-                                            </View>
-                                            <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
-                                            </View>
-                                        </View>
-                                    }
-                                </TouchableOpacity>
-                            )
-                        }}
-                    />
-                    <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
-                    <View style={{ height: 30 }}></View>
-                </Content>
-                {loader && <Loader />}
-            </Container>
-        </SafeAreaView>
-    )
-}
+                                        </>: 
+                                            ..data
+                                        }
 
-export default OrderHistory1;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: LS_COLORS.global.white,
-        paddingHorizontal: 10,
-        paddingBottom: 10
-    },
-    alexiContainer: {
-        maxHeight: '100%',
-        width: "95%",
-        alignSelf: 'center',
-        borderRadius: 6,
-        padding: 10
-    },
-    save: {
-        justifyContent: "center",
-        alignItems: 'center',
-        height: 32,
-        width: 111,
-        backgroundColor: LS_COLORS.global.green,
-        borderRadius: 28,
-        alignSelf: 'center',
-        marginTop: 20
-    },
-    saveText: {
-        textAlign: "center",
-        fontSize: 12,
-        fontFamily: LS_FONTS.PoppinsMedium,
-        color: LS_COLORS.global.white
-    },
-    greenTextStyle: {
-        fontSize: 12,
-        fontFamily: LS_FONTS.PoppinsMedium,
-        color: LS_COLORS.global.green
-    },
-    baseTextStyle: {
-        fontSize: 12,
-        fontFamily: LS_FONTS.PoppinsMedium,
-        color: "black"
-    },
-    save: {
-        justifyContent: "center",
-        alignItems: 'center',
-        height: 45,
-        width: 122,
-        backgroundColor: LS_COLORS.global.green,
-        borderRadius: 6,
-        alignSelf: 'center',
-        marginTop: 20,
-        borderRadius: 33
-    },
-    saveText: {
-        textAlign: "center",
-        fontSize: 12,
-        fontFamily: LS_FONTS.PoppinsMedium,
-        color: 'white'
-    }
-})
+*/

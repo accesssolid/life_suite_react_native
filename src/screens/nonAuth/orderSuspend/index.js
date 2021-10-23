@@ -1,6 +1,6 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, TouchableOpacity, Dimensions, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, Image, StatusBar, KeyboardAvoidingView, TouchableOpacity, Dimensions, ScrollView, Platform } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -8,8 +8,7 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card, Avatar } from 'react-native-elements'
-import {useNavigation} from '@react-navigation/native'
+import { Card, Avatar, CheckBox, Input } from 'react-native-elements'
 /* Components */;
 import Header from '../../../components/header';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
@@ -18,14 +17,14 @@ import { showToast } from '../../../components/validators';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
 import Loader from '../../../components/loader'
-import CancelModal from '../../../components/cancelModal';
 // placeholder image
 const placeholder_image = require("../../../assets/user.png")
 import _ from 'lodash'
 
 import { order_types, buttons_customer, buttons_types } from '../../../constants/globals'
 
-export default function OrderDetailUpdateCustomer(props) {
+
+export default function OrderSuspend(props) {
     const { item } = props.route.params
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
@@ -34,15 +33,10 @@ export default function OrderDetailUpdateCustomer(props) {
     const [loading, setLoading] = React.useState(false)
     const [totalWorkingMinutes, setTotalWorkingMinutes] = React.useState(0)
     const [reason, setReason] = React.useState("")
-    const [cancelModa, setCancelModal] = React.useState(false)
-    const [blockModal, setBlockModal] = React.useState(false)
+    const [reasonCheck, setReasonCheck] = React.useState("No Show")
 
     const [virtualdata, setVirtualData] = React.useState({})
     const [extraTime, setExtraTime] = React.useState("1 hour")
-
-    const [cancelOrderText,setCancelOrderText]=React.useState("You have 10 cancellation request remains.")
-
-
 
     const getOrderDetail = (order_id) => {
         setLoading(true)
@@ -69,19 +63,6 @@ export default function OrderDetailUpdateCustomer(props) {
                     } else {
 
                     }
-                    if(response.totalSettingData){
-                        let key_value=response.totalSettingData.find(x=>x.key=="cancel_order_by_customer")
-                        if(key_value){
-                            setCancelOrderText(`You have ${key_value.value} cancellation request remains.`)
-                            if(response.totalUserAction){
-                                let filteredValues=response.totalUserAction.filter(x=>x.key=="cancel_order_by_customer")
-                                if(filteredValues.length>0){
-                                    let total_remains=Number(key_value.value)-Number(filteredValues[0].no_of_action)
-                                    setCancelOrderText(`You have ${total_remains} cancellation request remains.`)
-                                }
-                            }
-                        }
-                    }
                 } else {
                     showToast(response.message)
                 }
@@ -91,42 +72,8 @@ export default function OrderDetailUpdateCustomer(props) {
             })
     }
 
-    const blockUser = async (provider_id,reason) => {
-        setLoader(true)
-        let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${access_token}`
-        }
-        let user_data = {
-            "provider_id": provider_id,
-            "reason_description": reason,
-        }
 
-        let config = {
-            headers: headers,
-            data: JSON.stringify(user_data),
-            endPoint: "/api/blockProvider",
-            type: 'post'
-        }
-        getApi(config)
-            .then((response) => {
-                console.log(response)
-                if (response.status == true) {
-                    showToast(response.message)
-                    props.navigation.pop()
-                    setLoader(false)
-                }
-                else {
-                    showToast(response.message)
-                    setLoader(false)
-                }
-            }).catch(err => {
-            }).finally(() => {
-                setLoader(false)
-            })
-    }
-    const submit = (order_status) => {
+    const submit = () => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -137,8 +84,8 @@ export default function OrderDetailUpdateCustomer(props) {
             headers: headers,
             data: JSON.stringify({
                 order_id: data.id,
-                order_status: order_status,
-                reason: reason
+                order_status: order_types.suspend,
+                reason: reasonCheck == "Other" ? reason : reasonCheck
             }),
             endPoint: "/api/customerOrderStatusUpdate",
             type: 'post'
@@ -148,9 +95,9 @@ export default function OrderDetailUpdateCustomer(props) {
             .then((response) => {
                 if (response.status == true) {
                     showToast(response.message)
-                    props.navigation.pop()
+                    props.navigation.navigate("MainDrawer", { screen: "Orders" })
                 } else {
-                    console.log("Error",response)
+                    console.log("Error", response)
                     showToast(response.message)
                 }
             }).catch(err => {
@@ -203,58 +150,41 @@ export default function OrderDetailUpdateCustomer(props) {
                 <View style={styles.container}>
                     {/* <RenderView Card Main/> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
-                        <Text style={[styles.client_info_text]}>Order Detail</Text>
+                        <Text style={[styles.client_info_text]}>Suspend in progress</Text>
                         <CardClientInfo virtual_data={virtualdata} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5 }]}>Reason</Text>
+                        {["No Show", "Tasks not performed", "Incorrect Products", "Other"].map(x => {
+                            return (
+                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                    <CheckBox
+                                        checked={reasonCheck == x}
+                                        onPress={() => {
+                                            setReasonCheck(x)
+                                        }}
+                                        containerStyle={{ marginVertical: 0 }}
+                                        checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                    />
+                                    <Text>{x}</Text>
+                                </View>)
+                        })}
+                        <Input disabled={reasonCheck != "Other"} value={reason} onChangeText={t => setReason(t)} multiline={true} containerStyle={{ height: 100, borderWidth: 1, width: "90%", alignSelf: "center", borderColor: "gray", borderRadius: 5 }} inputContainerStyle={{ borderBottomWidth: 0 }} inputStyle={{ fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black, borderWidth: 0 }} />
                     </ScrollView>
                     {/* lowerButton */}
-                    <GetButtons
-                        data={data}
-                        openCancelModal={() => setCancelModal(true)}
-                        submit={submit}
-                        openBlockModal={()=>setBlockModal(true)}
-                    />
+                    <View style={{ flexDirection: "row", marginBottom: 10, justifyContent: "space-evenly" }}>
+                        <TouchableOpacity onPress={submit} style={[styles.save, { borderRadius: 50, marginTop: 5 }]}>
+                            <Text style={styles.saveText}>Yes, Suspend</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            props.navigation.pop()
+                        }} style={[styles.save, { borderRadius: 50, marginTop: 5 }]}>
+                            <Text style={styles.saveText}>Keep Order</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
+                {Platform.OS == "ios" && <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={40} />}
             </SafeAreaView >
-            <CancelModal
-                title={cancelOrderText}
-                visible={cancelModa}
-                value={reason}
-                // pressHandler={()=>setCancelModal(false)}
-            
-                onChangeText={(t) => { setReason(t) }}
-                action1={() => {
-                    setCancelModal(false)
-                }}
-                action={() => {
-                    if (reason.trim() == "") {
-                        showToast("Reason cannot be empty!")
-                    }
-                    else {
-                        setCancelModal(false)
-                        setReason('')
-                        submit(order_types.cancel)
-                    }
-                }}
-            />
-              <CancelModal
-                title="Do you really want to block this user?"
-                visible={blockModal}
-                value={reason}
-                // pressHandler={()=>setCancelModal(false)}
-                onChangeText={(t) => { setReason(t) }}
-                action1={() => {
-                    setBlockModal(false)
-                }}
-                action={() => {
-                    if (reason.trim() == "") {
-                        showToast("Reason cannot be empty!")
-                    }
-                    else {
-                        setBlockModal(false)
-                        blockUser(data.provider_id,reason)
-                    }
-                }}
-            />
+
             {loading && <Loader />}
         </View>
     )
@@ -450,93 +380,6 @@ const OrderItemsDetail = ({ i }) => {
     )
 }
 
-const GetButtons = ({ data, openCancelModal,submit,openBlockModal}) => {
-    const [buttons, setButtons] = React.useState([])
-    console.log(data, "data")
-    const navigation=useNavigation()
-    React.useEffect(() => {
-        console.log(buttons)
-    }, [buttons])
-
-    React.useEffect(() => {
-        if (data && data.order_status) {
-            for (let type of Object.values(order_types)) {
-                if (data.order_status == type) {
-                    switch (type) {
-                        case order_types.update_acceptance:
-                            setButtons(buttons_customer[`${order_types.update_acceptance},${data?.is_in_progress > 0 ? order_types.processing : order_types.confirmed}`])
-                            break
-                        case order_types.update_accepted:
-                            setButtons(buttons_customer[`${order_types.update_accepted},${data?.is_in_progress > 0 ? order_types.processing : order_types.confirmed}`])
-                            break
-                        case order_types.update_reject:
-                            setButtons(buttons_customer[`${order_types.update_reject},${data?.is_in_progress > 0 ? order_types.processing : order_types.confirmed}`])
-                            break
-                        default:
-                            setButtons(buttons_customer[type])
-                    }
-                    break
-                }
-            }
-        }
-    }, [data])
-
-    const pressHandler = (type) => {
-        switch (type) {
-            case buttons_types.cancel:
-                openCancelModal()
-                break
-            case buttons_types['cancel&search']:
-                break
-            case buttons_types.chat:
-               navigation.navigate("ChatScreen", {
-                    item: {
-                        id: data.provider_id,
-                        email: data.providers_email,
-                        first_name: data.providers_first_name,
-                        last_name: data.providers_last_name,
-                        phone_number: data.providers_phone_number,
-                        profile_image: data.providers_profile_image
-                    }
-                })
-                break
-            case buttons_types.block:
-                openBlockModal()
-                break
-            case buttons_types.accept:
-                submit(order_types.update_accepted)
-                break
-            case buttons_types.reject:
-                submit(order_types.update_reject)
-                break
-            case buttons_types.delay_accept:
-                submit(order_types.delay_request_accept)
-                break
-            case buttons_types.decline:
-                submit(order_types.delay_request_reject)
-                break
-            case buttons_types.suspend:
-                navigation.navigate("OrderSuspend",{item:data})    
-            break
-            // case buttons_types.accept:
-
-        }
-    }
-
-    return (
-        <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
-            {buttons.map(x => {
-                return (
-                    <TouchableOpacity
-                        onPress={() => pressHandler(x.type)}
-                        style={[styles.save, { marginTop: 0, marginBottom: 10 }]}>
-                        <Text style={styles.saveText}>{x.title}</Text>
-                    </TouchableOpacity>
-                )
-            })}
-        </View>
-    )
-}
 
 const styles = StyleSheet.create({
     safeArea: {
