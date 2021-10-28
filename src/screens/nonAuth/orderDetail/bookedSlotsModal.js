@@ -24,6 +24,7 @@ export default function BookedSlotsModal({ visible,booked, setVisible }) {
                 <Pressable>
                     <Card containerStyle={{ maxHeight: 300,borderRadius:5}}>
                         <Card.Title style={{ fontFamily: LS_FONTS.PoppinsBold }}>Booked Slots</Card.Title>
+                        {booked.length==0&&<Text style={{ fontFamily: LS_FONTS.PoppinsRegular ,textAlign:"center"}}>No Booked list</Text>}
                         <ScrollView>
                             {booked.map(x => {
                                 return (

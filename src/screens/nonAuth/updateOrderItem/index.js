@@ -122,7 +122,7 @@ const OrderClientDetail = (props) => {
         }
 
 
-        console.log(config.data)
+        console.log("setData",JSON.stringify(config))
         getApi(config)
             .then((response) => {
                 console.log("/api/providerOrderUpdate", response)

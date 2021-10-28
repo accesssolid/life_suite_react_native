@@ -1,7 +1,7 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, Dimensions, Linking, ScrollView, Alert } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation ,useFocusEffect} from '@react-navigation/native'
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
@@ -28,7 +28,8 @@ import CancelModal from '../../../components/cancelModal';
 const placeholder_image = require("../../../assets/user.png")
 import _ from 'lodash'
 import openMap from 'react-native-open-maps';
-
+import { order_types, buttons_customer, buttons_provider, buttons_types } from '../../../constants/globals'
+import DelayModal from '../../../components/delayModal';
 
 
 function generate_series(step, start_time) {
@@ -53,6 +54,7 @@ const OrderClientDetail = (props) => {
     const toInputRef = useRef(null)
     const { servicedata, subService, item } = props.route.params
     const [data, setData] = useState(null)
+    const [virtualdata, setVirtualData] = React.useState({})
     const user = useSelector(state => state.authenticate.user)
     const [bookedModal, setBookedModal] = React.useState(false)
     const [availableStartTimes, setAvailableStartTimes] = React.useState([])
@@ -65,6 +67,10 @@ const OrderClientDetail = (props) => {
     const [estimated_time, setEstimatedTime] = React.useState("1 hr")
     const [reason, setReason] = React.useState("")
     const [cancelModa, setCancelModal] = React.useState(false)
+    const [blockModal, setBlockModal] = React.useState(false)
+    const [delayModalOpen,setDelayModalOpen]=React.useState(false)
+    const [textShowWithRed, settextShowWithRed] = React.useState("")
+
     // books data from  modal
     const [booked, setBooked] = React.useState([])
 
@@ -73,7 +79,6 @@ const OrderClientDetail = (props) => {
             let ds = generate_series(15, data.order_start_time)
             let end_time = moment(data.order_end_time, "YYYY-MM-DD HH:mm").subtract(totalWorkingMinutes, 'minutes')
             let filteredDs = ds.filter(x => x.toDate() >= moment(data.order_start_time, "YYYY-MM-DD HH:mm").toDate() && x.toDate() <= end_time.toDate())
-            console.log(filteredDs.map(x => x.format("HH:mm")), "dddddddd", ds.map(x => x.format("HH:mm")))
             if (filteredDs[0]) {
                 setSelectedStartTime(filteredDs[0])
             } else {
@@ -128,6 +133,7 @@ const OrderClientDetail = (props) => {
                 if (response.status == true) {
                     if (response.data) {
                         setBooked(response.data)
+
                     } else {
 
                     }
@@ -153,7 +159,6 @@ const OrderClientDetail = (props) => {
                 }
             }
         }).catch(err => {
-            console.log(err)
         })
     }, [toCoordinates, fromCoordinates])
 
@@ -206,11 +211,9 @@ const OrderClientDetail = (props) => {
         if (hasLocationPermission) {
             Geolocation.getCurrentPosition(
                 (position) => {
-                    console.log("Position", position)
                     getCurrentPlace()
                 },
                 (error) => {
-                    console.log(error.code, error.message);
                 },
                 { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
             );
@@ -245,10 +248,10 @@ const OrderClientDetail = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log("Response", response)
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
+                        setVirtualData(response.data.virtual_order)
                     } else {
 
                     }
@@ -286,7 +289,7 @@ const OrderClientDetail = (props) => {
 
     }
 
-    const submit = (order_status) => {
+    const submit = (order_status,delay_time) => {
         // console.log(selectedStartTime)
         // return 
         if (order_status == 3) {
@@ -302,13 +305,17 @@ const OrderClientDetail = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
+        const datac={
+            order_id: data.id,
+            order_status: order_status,
+            reason: reason
+        }
+        if(delay_time){
+            datac[`delay_time`]=delay_time
+        }
         let config = {
             headers: headers,
-            data: JSON.stringify({
-                order_id: data.id,
-                order_status: order_status,
-                reason: reason
-            }),
+            data: JSON.stringify(datac),
             endPoint: "/api/providerOrderStatusUpdate",
             type: 'post'
         }
@@ -320,10 +327,8 @@ const OrderClientDetail = (props) => {
                 order_end_time: _.cloneDeep(selectedStartTime)?.add(totalWorkingMinutes, "minutes").format("YYYY-MM-DD HH:mm"),
             })
         }
-        console.log(config)
         getApi(config)
             .then((response) => {
-                console.log("Response",response)
                 if (response.status == true) {
                     setData(response.data)
                 } else {
@@ -343,6 +348,11 @@ const OrderClientDetail = (props) => {
         }
     }, [item])
 
+    useFocusEffect(React.useCallback(()=>{
+        if (item.id) {
+            getOrderDetail(item.id)
+        }
+    },[]))
 
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
@@ -381,7 +391,8 @@ const OrderClientDetail = (props) => {
                     {/* <RenderView /> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Client Info</Text>
-                        <CardClientInfo data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        <CardClientInfo settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        <Text style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>
                         <RenderAddressFromTO currentAddress={fromCoordinates} addresses={{
                             from: data?.order_from_address, //from address
                             to: data?.order_placed_address, //to address
@@ -395,24 +406,28 @@ const OrderClientDetail = (props) => {
                         </View>
 
                         {/* only show if order status is pending i.e 1 */}
-                        {(data?.order_status == 1 || data?.order_status == 3 || data?.order_status == 4 || data?.order_status == 6 || data?.order_status == 5 || data?.order_status == 12 || data?.order_status == 9 || data?.order_status == 10 || data?.order_status == 11) && <><View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
-                            <View>
-                                <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Available Start Time</Text>
-                                <Text onPress={() => setBookedModal(true)} style={[styles.baseTextStyle, { color: "skyblue" }]}>(View Booked Slots)</Text>
-                            </View>
-                            <View>
-                                <DropDown
-                                    item={availableStartTimes.map(x => x.format("hh:mm a"))}
-                                    value={selectedStartTime?.format("hh:mm a")}
-                                    onChangeValue={(index, value) => {
-                                        setSelectedStartTime(availableStartTimes[index])
-                                    }}
-                                    containerStyle={{ width: 150, alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0, }}
-                                    dropdownStyle={{ height: 120, width: 150 }}
-                                />
-                            </View>
-                        </View>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                        {(data?.order_status == 1 || data?.order_status == 3 || data?.order_status == 4 || data?.order_status == 6 || data?.order_status == 5 || data?.order_status == 12 || data?.order_status == 9 || data?.order_status == 10 || data?.order_status == 11) &&
+                            <>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                                    <View>
+                                        <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Available Start Time</Text>
+                                        <Text onPress={() => setBookedModal(true)} style={[styles.baseTextStyle, { color: "skyblue" }]}>(View Booked Slots)</Text>
+                                    </View>
+                                    <View>
+                                        <DropDown
+                                            item={availableStartTimes.map(x => x.format("hh:mm a"))}
+                                            value={selectedStartTime?.format("hh:mm a")}
+                                            onChangeValue={(index, value) => {
+                                                setSelectedStartTime(availableStartTimes[index])
+                                            }}
+                                            containerStyle={{ width: 150, alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0, }}
+                                            dropdownStyle={{ height: 120, width: 150 }}
+                                        />
+                                    </View>
+                                </View>
+                            </>
+                        }
+                        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                                 <View>
                                     <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Estimated Drive Time</Text>
                                     <Text style={[styles.baseTextStyle]}>(From Current Location)</Text>
@@ -432,8 +447,8 @@ const OrderClientDetail = (props) => {
                                     onPress={() => setCancelModal(true)}>
                                     <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Decline</Text>
                                 </TouchableOpacity>
-                            </View>}
-                            {data?.order_status != 1 &&
+                            </View>} */}
+                        {/* {data?.order_status!=1&&
                                 <>
                                     <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
                                         <TouchableOpacity
@@ -484,8 +499,8 @@ const OrderClientDetail = (props) => {
                                     </View>
                                 </>
                             }
-                        </>}
-                        {data?.order_status == 7 &&
+                        </>} */}
+                        {/* {data?.order_status == 7 &&
                             <>
                                 <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
                                     <TouchableOpacity
@@ -499,14 +514,6 @@ const OrderClientDetail = (props) => {
                                         }}>
                                         <Text style={styles.saveText}>Update Order</Text>
                                     </TouchableOpacity>
-                                    {/* <TouchableOpacity
-                                        style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
-                                        activeOpacity={0.7}
-                                        onPress={() => {
-
-                                        }}>
-                                        <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Delay Order</Text>
-                                    </TouchableOpacity> */}
                                 </View>
                                 <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20 }}>
                                 <TouchableOpacity
@@ -536,8 +543,21 @@ const OrderClientDetail = (props) => {
                                     </TouchableOpacity>
                                 </View>
                             </>
-                        }
+                        } */}
                     </ScrollView>
+                    <GetButtons
+                        data={data}
+                        checkBookedInTime={checkBookedInTime}
+                        openCancelModal={() => setCancelModal(true)}
+                        submit={submit}
+                        openDelayModal={()=>setDelayModalOpen(true)}
+                        openBlockModal={() => setBlockModal(true)}
+                        gotoUpdateScreen={() => {
+                            props.navigation.navigate("UpdateOrderItems", {
+                                servicedata, subService, item
+                            })
+                        }}
+                    />
                 </View>
             </SafeAreaView >
             <BookedSlotsModal visible={bookedModal} booked={booked} setVisible={setBookedModal} />
@@ -561,24 +581,70 @@ const OrderClientDetail = (props) => {
                     }
                 }}
             />
+            <DelayModal 
+                open={delayModalOpen}
+                pressHandler={()=>{
+                    setDelayModalOpen(false)
+                }}
+                submit={(value)=>{
+                    setDelayModalOpen(false)
+                    submit(order_types.will_be_delayed,value)
+                }}
+            />
             {loading && <Loader />}
-        </View>
+        </View >
     )
 }
 
 export default OrderClientDetail;
 
-const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
+const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkingMinutes }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
+    const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
     const [totalTime, setTotalTime] = React.useState(0)
+    const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
+    const [showVirtualData, setShowVirtualData] = React.useState(false)
 
     useEffect(() => {
-        if (items) {
+        if(showVirtualData){
+            if (totalTime && totalVirtualTime) {
+                if (totalTime < totalVirtualTime) {
+                    settextShowWithRed(`Adding new service requires ${totalVirtualTime - totalTime} min extra`)
+                } else if (totalTime > totalVirtualTime) {
+                    settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
+                } else if (totalTime === totalVirtualTime) {
+                    settextShowWithRed(`New updated order require ${totalVirtualTime} min`)
+                }
+            }
+        }else{
+            settextShowWithRed(``)
+        }
+       
+    }, [totalVirtualTime, totalTime,showVirtualData])
+    useEffect(() => {
+        console.log("virtual_data", virtual_data)
+        if (virtual_data?.id) {
+            setVirtualOrdersItems(virtual_data.order_items)
+        }
+    }, [virtual_data])
+
+    useEffect(() => {
+        if (virtualOrdersItems.length > 0) {
+            let t = virtualOrdersItems.map(x => x.duration_time).filter(x => x)
+            let total = t.reduce((a, b) => a + Number(b), 0)
+            setTotalVirtualTime(total)
+            // setTotalWorkingMinutes(total)
+        }
+    }, [virtualOrdersItems])
+
+    useEffect(() => {
+        console.log("items", JSON.stringify(items))
+        if (items.length > 0) {
             let t = items.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalTime(total)
-            setTotalWorkingMinutes(total)
+            // setTotalWorkingMinutes(total)
         }
     }, [items])
 
@@ -589,6 +655,11 @@ const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
                 let c = d[d.length - 1]
                 setCountry(c)
             }
+
+            if (data.order_status == order_types.update_acceptance) {
+                setShowVirtualData(true)
+            }
+
             if (data.order_items) {
                 setItems(data.order_items.filter(x => x.service_items_name))
             }
@@ -596,14 +667,26 @@ const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
     }, [data])
 
     const getTimeInHours = (minute) => {
-        let d = parseInt(minute / 60) + "hrs"
+        let d = parseInt(minute / 60) + " Hr"
         if (minute % 60 !== 0) {
-            d += ` ${parseInt(minute % 60)}min`
+            d += ` ${parseInt(minute % 60)} Mins`
         }
         return `${d}`
     }
     const user = useSelector(state => state.authenticate.user)
-
+    const getTotalVirtualAmount=(dtype,amount,totalAmount)=>{
+        if(amount&&amount!==""&&amount!=0){
+            let totalAmount1=totalAmount
+            if(dtype=="flat"){
+                totalAmount1=totalAmount-amount
+            }else if(dtype=="per"){
+                totalAmount1=totalAmount-(amount*100/totalAmount)
+            }
+            return totalAmount1
+        }else{
+            return totalAmount
+        }
+    }
     return (
         <Card containerStyle={{ borderRadius: 10 }}>
             <View style={{ flexDirection: "row" }}>
@@ -623,76 +706,106 @@ const CardClientInfo = ({ data, setTotalWorkingMinutes }) => {
                     <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
                 </View>
             </View>
+            {/* request data */}
+            {showVirtualData && <Text style={[styles.client_info_text, { textAlign: "left", fontSize: 14, marginTop: 10 }]}>User Requested Order</Text>}
             {items?.map((i) => {
+                return (<OrderItemsDetail i={i} />)
+            })}
+            {/* New Request products and Service */}
+            {showVirtualData && virtualOrdersItems.length > 0 && <View style={{ marginVertical: 20 }}>
+                <Text style={[styles.client_info_text, { textAlign: "left", fontSize: 14 }]}>Provider Updated Order</Text>
+                {virtualOrdersItems?.map((i) => {
+                    return (<OrderItemsDetail i={i} />)
+                })}
+            </View>}
+            {showVirtualData&&virtual_data?.discount_amount&&virtual_data?.discount_amount!=0&&<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text style={styles.greenTextStyle}>Discount</Text>
+                <Text style={styles.greenTextStyle}>{virtual_data?.discount_type=="flat"?`$${virtual_data?.discount_amount}`:`${virtual_data?.discount_amount}%`}</Text>
+            </View>}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text style={styles.greenTextStyle}>Total Amount</Text>
+                <Text style={styles.greenTextStyle}>${showVirtualData ?getTotalVirtualAmount(virtual_data?.discount_type,virtual_data?.discount_amount,virtual_data?.order_total_price) : data?.order_total_price}</Text>
+            </View>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text style={styles.greenTextStyle}>Total Time</Text>
+                <Text style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
+            </View>
+        </Card>
+    )
+}
+
+const OrderItemsDetail = ({ i }) => {
+    return (
+        <>
+            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} numberOfLines={1}>{i.service_items_name + "  (Service Charge)"}</Text>
+                <View style={{ height: 20, flexDirection: "row" }}>
+                    <Text style={styles.baseTextStyle}>{"$" + i.price}</Text>
+                </View>
+            </View>
+            {i.product.map((itemData, index) => {
+                return (
+                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                        <View style={{}} >
+                            <Text style={{ marginLeft: 20 }}>
+                                <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
+                            </Text>
+                        </View>
+                        <View style={{ height: 20, flexDirection: "row" }}>
+                            <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
+                        </View>
+                    </View>
+                )
+            })
+            }
+            {i.extra_product.map((itemData, index) => {
+                return (
+                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                        <View style={{}} >
+                            <Text style={{ marginLeft: 20 }}>
+                                <Text style={styles.baseTextStyle}>{itemData.product_name + "(Other Product)"}</Text>
+                            </Text>
+                        </View>
+                        <View style={{ height: 20, flexDirection: "row" }}>
+                            <Text style={styles.baseTextStyle}>{"$" + itemData.product_price}</Text>
+                        </View>
+                    </View>
+                )
+            })
+            }
+            {i.other_data.map((itemData, index) => {
+                let other = itemData.other
+                let have_own = itemData.have_own
+                let need_recommendation = itemData.need_recommendation
                 return (
                     <>
-                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                            <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>{i.service_items_name + "  (Service Charge)"}</Text>
-                            <View style={{ height: 20, flexDirection: "row" }}>
-                                <Text style={styles.baseTextStyle}>{"$" + i.price}</Text>
+                        {other && other.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                            <View style={{}} >
+                                <Text style={{ marginLeft: 20 }}>
+                                    <Text style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
+                                </Text>
                             </View>
                         </View>
-                        {i.product.map((itemData, index) => {
-                            return (
-                                <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                    <View style={{}} >
-                                        <Text style={{ marginLeft: 20 }}>
-                                            <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
-                                        </Text>
-                                    </View>
-                                    <View style={{ height: 20, flexDirection: "row" }}>
-                                        <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
-                                    </View>
-                                </View>
-                            )
-                        })
                         }
-                        {i.other_data.map((itemData, index) => {
-                            let other = itemData.other
-                            let have_own = itemData.have_own
-                            let need_recommendation = itemData.need_recommendation
-
-                            return (
-                                <>
-                                    {other && other.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                        <View style={{}} >
-                                            <Text style={{ marginLeft: 20 }}>
-                                                <Text style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
-                                            </Text>
-                                        </View>
-                                    </View>
-                                    }
-                                    {have_own && have_own.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                        <View style={{}} >
-                                            <Text style={{ marginLeft: 20 }}>
-                                                <Text style={styles.baseTextStyle}>{have_own + "(Have Own Product)"}</Text>
-                                            </Text>
-                                        </View>
-                                    </View>}
-                                    {need_recommendation && need_recommendation == "true" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                        <View style={{}} >
-                                            <Text style={{ marginLeft: 20 }}>
-                                                <Text style={styles.baseTextStyle}>Need Recommendation</Text>
-                                            </Text>
-                                        </View>
-                                    </View>}
-                                </>
-                            )
-                        })
-                        }
+                        {have_own && have_own.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                            <View style={{}} >
+                                <Text style={{ marginLeft: 20 }}>
+                                    <Text style={styles.baseTextStyle}>{have_own + "(Have Own Product)"}</Text>
+                                </Text>
+                            </View>
+                        </View>}
+                        {need_recommendation && need_recommendation == "true" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                            <View style={{}} >
+                                <Text style={{ marginLeft: 20 }}>
+                                    <Text style={styles.baseTextStyle}>Need Recommendation</Text>
+                                </Text>
+                            </View>
+                        </View>}
                     </>
                 )
             })
             }
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text style={styles.greenTextStyle}>Total Amount</Text>
-                <Text style={styles.greenTextStyle}>${data?.order_total_price}</Text>
-            </View>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text style={styles.greenTextStyle}>Total Time</Text>
-                <Text style={styles.greenTextStyle}>{getTimeInHours(totalTime)}</Text>
-            </View>
-        </Card>
+        </>
     )
 }
 
@@ -746,6 +859,96 @@ const RenderAddressFromTO = ({ addresses, currentAddress }) => {
                 </TouchableOpacity>
             </View>
 
+        </View>
+    )
+}
+
+
+
+const GetButtons = ({ data, openCancelModal, submit, openBlockModal,openDelayModal, checkBookedInTime, gotoUpdateScreen }) => {
+    const [buttons, setButtons] = React.useState([])
+    console.log(data, "data")
+    const navigation = useNavigation()
+
+
+    React.useEffect(() => {
+        if (data && data.order_status) {
+            for (let type of Object.values(order_types)) {
+                if (data.order_status == type) {
+                    switch (type) {
+                        case order_types.update_acceptance:
+                            setButtons(buttons_provider[`${order_types.update_acceptance},${data?.is_in_progress > 0 ? order_types.processing : order_types.confirmed}`])
+                            break
+                        case order_types.update_accepted:
+                            setButtons(buttons_provider[`${order_types.update_accepted},${data?.is_in_progress > 0 ? order_types.processing : order_types.confirmed}`])
+                            break
+                        case order_types.update_reject:
+                            setButtons(buttons_provider[`${order_types.update_reject},${data?.is_in_progress > 0 ? order_types.processing : order_types.confirmed}`])
+                            break
+                        default:
+                            setButtons(buttons_provider[type])
+                    }
+                    break
+                }
+            }
+        }
+    }, [data])
+
+    const pressHandler = (type) => {
+        switch (type) {
+            case buttons_types.cancel:
+                openCancelModal()
+                break
+            case buttons_types['cancel&search']:
+                break
+            case buttons_types.chat:
+                navigation.navigate("ChatScreen", {
+                    item: {
+                        id: data.customer_id,
+                        email: data.customers_email,
+                        first_name: data.customers_first_name,
+                        last_name: data.customers_last_name,
+                        phone_number: data.customers_phone_number,
+                        profile_image: data.customers_profile_image
+                    }
+                })
+                break
+            case buttons_types.block:
+                openBlockModal()
+                break
+            case buttons_types.accept:
+                checkBookedInTime()
+                break
+            case buttons_types.decline:
+                openCancelModal()
+                break
+            case buttons_types.delay_order:
+                openDelayModal()   
+             break
+            case buttons_types.start_order:
+                submit(order_types.processing)
+            case buttons_types.suspend:
+                navigation.navigate("OrderSuspend", { item: data })
+                break
+            case buttons_types.update_order:
+                gotoUpdateScreen()
+                break
+            // case buttons_types.accept:
+
+        }
+    }
+
+    return (
+        <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
+            {buttons.map(x => {
+                return (
+                    <TouchableOpacity
+                        onPress={() => pressHandler(x.type)}
+                        style={[styles.save, { marginTop: 0, marginBottom: 10 }]}>
+                        <Text style={styles.saveText}>{x.title}</Text>
+                    </TouchableOpacity>
+                )
+            })}
         </View>
     )
 }

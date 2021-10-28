@@ -16,6 +16,7 @@ import OrderHistory from '../screens/nonAuth/orderHistory';
 import Favourites from '../screens/nonAuth/favourites';
 import TermsModal from '../components/termsModal';
 import PrivacyModal from '../components/privacyModal';
+import BankModal from '../components/bankModal';
 import CopyRightModal from '../components/copyrightModal';
 import SoftwareModal from '../components/softwareModal';
 import AboutUs from '../screens/nonAuth/aboutUs';
@@ -29,8 +30,12 @@ import SelectLocation from '../screens/nonAuth/selectLocation';
 import MapScreen from '../screens/nonAuth/map';
 import AddTimeFrame from '../screens/nonAuth/addTimeFrame';
 import OrderHistory1 from '../screens/nonAuth/orderHistory1';
-
+import { getApi } from '../api/api';
 import { role } from '../constants/globals';
+import { useDispatch } from 'react-redux';
+import { updateBankModelData } from '../redux/features/bankModel'
+import { showToast, storeItem } from '../components/validators';
+
 const Drawer = createDrawerNavigator();
 
 const MainDrawer = (props) => {
@@ -40,6 +45,125 @@ const MainDrawer = (props) => {
     const [copyVisible, setCopyVisible] = useState(false)
     const [softwareVisible, setSoftwareVisible] = useState(false)
     const navigation = useNavigation()
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const dispatch = useDispatch()
+    const getConnectAccountDetail = () => {
+        try {
+            let headers = {
+                'Content-Type': 'multipart/form-data',
+                "Authorization": `Bearer ${access_token}`
+            }
+            let config = {
+                headers: headers,
+                data: JSON.stringify({}),
+                endPoint: '/api/isAccountSetupDetail',
+                type: 'post'
+            }
+            getApi(config).then(response => {
+                console.log(response)
+                if (response.status == true) {
+                    if (response.data) {
+                        if (response.data.email && response.data.details_submitted) {
+
+                        } else {
+                            dispatch(updateBankModelData({data:{
+                                title: "Select Account",
+                                subtitle: "You do not have any active accounts.",
+                                buttonTitle: "Add Stripe Money",
+                                type:"provider",
+                                open: true
+                            }}))
+                        }
+                    }
+                }
+                else {
+                    showToast(response.message, 'danger')
+                }
+            })
+                .catch(err => {
+
+                })
+        } catch (err) {
+
+        }
+    }
+    const getAccountLink = () => {
+        try {
+            let headers = {
+                'Content-Type': 'multipart/form-data',
+                "Authorization": `Bearer ${access_token}`
+            }
+            let config = {
+                headers: headers,
+                data: JSON.stringify({}),
+                endPoint: '/api/addConnectAccountLink',
+                type: 'post'
+            }
+            getApi(config).then(response => {
+                console.log(response)
+                if (response.status == true) {
+                    if (response.data) {
+                        props.navigation.navigate("UserStack", { screen: "CustomWebView", params: { uri: response.data.url } })
+                    }
+                }
+                else {
+                    showToast(response.message, 'danger')
+                }
+            })
+                .catch(err => {
+
+                })
+        } catch (err) {
+
+        }
+    }
+    const getCards = () => {
+     
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let config = {
+            headers: headers,
+            endPoint: '/api/customerSaveCardList',
+            type: 'get'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true && response.data) {
+                   if(response.data.length==0){
+                    dispatch(updateBankModelData({data:{
+                        title: "Add Cards",
+                        subtitle: "You do not have any active cards to start order.",
+                        buttonTitle: "Add Card",
+                        type:"customer",
+                        open: true
+                    }}))
+                   }
+                }
+                else {
+                    dispatch(updateBankModelData({data:{
+                        title: "Add Cards",
+                        subtitle: "You do not have any active cards to start order.",
+                        buttonTitle: "Add Card",
+                        type:"customer",
+                        open: true
+                    }}))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            }).finally(() => {
+            })
+    }
+    React.useEffect(() => {
+        if (user.user_role == role.customer) {
+            getCards()
+        } else if (user.user_role == role.provider) {
+            getConnectAccountDetail()
+        }
+    }, [])
 
     return (
         <>
@@ -179,6 +303,7 @@ const MainDrawer = (props) => {
                 isVisible={softwareVisible}
                 setVisible={setSoftwareVisible}
             />
+            <BankModal />
         </>
     )
 }
@@ -191,11 +316,11 @@ const CustomDrawerContent = (props) => {
     return (
         <DrawerContentScrollView {...props}>
             <View >
-                <Image source={require('../assets/splash/logo.png')}  resizeMode="contain" style={{ height: 100, width: '80%',marginLeft:10 ,}} />
-                <Text style={{fontFamily:LS_FONTS.PoppinsSemiBold,fontSize:15,marginLeft:10}}>{user?.user_role==role.customer?"Customer":"Service Provider"}</Text>
+                <Image source={require('../assets/splash/logo.png')} resizeMode="contain" style={{ height: 100, width: '80%', marginLeft: 10, }} />
+                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.user_role == role.customer ? "Customer" : "Service Provider"}</Text>
             </View>
-            <View style={{flexDirection:"row",alignItems:"center",justifyContent:"center",marginVertical:10,backgroundColor:LS_COLORS.global.drawer_name,paddingVertical:5}}>
-                <Text style={{fontFamily:LS_FONTS.PoppinsSemiBold,fontSize:15,marginLeft:10}}>{user?.first_name} {user?.last_name}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
+                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
             </View>
             <DrawerItemList {...props} />
             <DrawerItem

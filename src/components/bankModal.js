@@ -8,15 +8,19 @@ import {
   Text,
 } from 'react-native';
 import { Card, Container, Content } from 'native-base';
-
+import { useNavigation } from '@react-navigation/core';
 import LS_FONTS from '../constants/fonts';
 import LS_COLORS from '../constants/colors';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { updateBankModelData } from '../redux/features/bankModel'
 const BankModal = props => {
   const [search, setSearch] = useState('');
+  const bankData = useSelector(state => state.bank_model)
+  const dispatch = useDispatch()
+  const navigation=useNavigation()
   return (
     <Modal
-      visible={props.visible}
+      visible={bankData?.open}
       animationType="fade"
       transparent={true}
       {...props}>
@@ -29,26 +33,57 @@ const BankModal = props => {
             borderRadius: 10,
             padding: 20,
           }}>
-          <Text style={styles.sure}>Select Account</Text>
+          <Text style={styles.sure}>{bankData?.title}</Text>
           <View style={{ height: 2, width: 84, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
-          <Text style = {{...styles.subtext,marginTop:"10%"}}>You do not have any</Text>
-          <Text style = {styles.subtext}> active accounts.</Text>
+          <Text style={{ ...styles.subtext, marginTop: "10%" }}>{bankData?.subtitle}</Text>
           <View style={{ marginTop: '10%' }}>
             <TouchableOpacity
               style={styles.save}
               activeOpacity={0.7}
               onPress={() => {
-                props.navigation.navigate("OrderHistory")
+                if(bankData.type=="customer"){
+                  navigation.navigate("Profile")
+                  dispatch(updateBankModelData({
+                    data: {
+                      title: "Select Account",
+                      subtitle: "You do not have any active accounts.",
+                      buttonTitle: "Add Stripe Money",
+                      type:"provider",
+                      open: false
+                    }
+                  }))
+                }else{
+                  navigation.navigate("Profile")
+                  dispatch(updateBankModelData({
+                    data: {
+                      title: "Select Account",
+                      subtitle: "You do not have any active accounts.",
+                      buttonTitle: "Add Stripe Money",
+                      type:"provider",
+                      open: false
+                    }
+                  }))
+                }
               }}
             >
-              <Text style={styles.saveText}>Yes</Text>
+              <Text style={styles.saveText}>{bankData?.buttonTitle}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.save1}
+              style={[styles.save, { marginTop: 20 }]}
               activeOpacity={0.7}
-              onPress = {props.action1}
+              onPress={() => {
+                dispatch(updateBankModelData({
+                  data: {
+                    title: "Select Account",
+                    subtitle: "You do not have any active accounts.",
+                    buttonTitle: "Add Stripe Money",
+                    type:"provider",
+                    open: false
+                  }
+                }))
+              }}
             >
-              <Text style={styles.saveText1}>No</Text>
+              <Text style={styles.saveText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -124,11 +159,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 20
   },
-  subtext:{
-      fontSize:16,
-      fontFamily:LS_FONTS.PoppinsRegular,
-      color:"black",
-      alignSelf:'center'
+  subtext: {
+    fontSize: 16,
+    fontFamily: LS_FONTS.PoppinsRegular,
+    color: "black",
+    alignSelf: 'center'
   }
 });
 

@@ -9,7 +9,7 @@ import LS_FONTS from '../../../constants/fonts';
 /* Packages */
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, Avatar } from 'react-native-elements'
-import {useNavigation} from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 /* Components */;
 import Header from '../../../components/header';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
@@ -40,8 +40,8 @@ export default function OrderDetailUpdateCustomer(props) {
     const [virtualdata, setVirtualData] = React.useState({})
     const [extraTime, setExtraTime] = React.useState("1 hour")
 
-    const [cancelOrderText,setCancelOrderText]=React.useState("You have 10 cancellation request remains.")
-
+    const [cancelOrderText, setCancelOrderText] = React.useState("You have 10 cancellation request remains.")
+    const [textShowWithRed, settextShowWithRed] = React.useState("")
 
 
     const getOrderDetail = (order_id) => {
@@ -60,7 +60,6 @@ export default function OrderDetailUpdateCustomer(props) {
 
         getApi(config)
             .then((response) => {
-                console.log("Response", response)
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
@@ -69,14 +68,14 @@ export default function OrderDetailUpdateCustomer(props) {
                     } else {
 
                     }
-                    if(response.totalSettingData){
-                        let key_value=response.totalSettingData.find(x=>x.key=="cancel_order_by_customer")
-                        if(key_value){
+                    if (response.totalSettingData) {
+                        let key_value = response.totalSettingData.find(x => x.key == "cancel_order_by_customer")
+                        if (key_value) {
                             setCancelOrderText(`You have ${key_value.value} cancellation request remains.`)
-                            if(response.totalUserAction){
-                                let filteredValues=response.totalUserAction.filter(x=>x.key=="cancel_order_by_customer")
-                                if(filteredValues.length>0){
-                                    let total_remains=Number(key_value.value)-Number(filteredValues[0].no_of_action)
+                            if (response.totalUserAction) {
+                                let filteredValues = response.totalUserAction.filter(x => x.key == "cancel_order_by_customer")
+                                if (filteredValues.length > 0) {
+                                    let total_remains = Number(key_value.value) - Number(filteredValues[0].no_of_action)
                                     setCancelOrderText(`You have ${total_remains} cancellation request remains.`)
                                 }
                             }
@@ -91,7 +90,7 @@ export default function OrderDetailUpdateCustomer(props) {
             })
     }
 
-    const blockUser = async (provider_id,reason) => {
+    const blockUser = async (provider_id, reason) => {
         setLoader(true)
         let headers = {
             Accept: "application/json",
@@ -143,14 +142,13 @@ export default function OrderDetailUpdateCustomer(props) {
             endPoint: "/api/customerOrderStatusUpdate",
             type: 'post'
         }
-        console.log(JSON.stringify(config))
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     showToast(response.message)
                     props.navigation.pop()
                 } else {
-                    console.log("Error",response)
+                    console.log("Error", response)
                     showToast(response.message)
                 }
             }).catch(err => {
@@ -204,14 +202,15 @@ export default function OrderDetailUpdateCustomer(props) {
                     {/* <RenderView Card Main/> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Order Detail</Text>
-                        <CardClientInfo virtual_data={virtualdata} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        <CardClientInfo virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        <Text style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>
                     </ScrollView>
                     {/* lowerButton */}
                     <GetButtons
                         data={data}
                         openCancelModal={() => setCancelModal(true)}
                         submit={submit}
-                        openBlockModal={()=>setBlockModal(true)}
+                        openBlockModal={() => setBlockModal(true)}
                     />
                 </View>
             </SafeAreaView >
@@ -220,7 +219,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 visible={cancelModa}
                 value={reason}
                 // pressHandler={()=>setCancelModal(false)}
-            
+
                 onChangeText={(t) => { setReason(t) }}
                 action1={() => {
                     setCancelModal(false)
@@ -236,7 +235,7 @@ export default function OrderDetailUpdateCustomer(props) {
                     }
                 }}
             />
-              <CancelModal
+            <CancelModal
                 title="Do you really want to block this user?"
                 visible={blockModal}
                 value={reason}
@@ -251,7 +250,7 @@ export default function OrderDetailUpdateCustomer(props) {
                     }
                     else {
                         setBlockModal(false)
-                        blockUser(data.provider_id,reason)
+                        blockUser(data.provider_id, reason)
                     }
                 }}
             />
@@ -262,13 +261,30 @@ export default function OrderDetailUpdateCustomer(props) {
 
 
 //items && virtual order items manage screens
-const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes }) => {
+const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextShowWithRed }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
     const [totalTime, setTotalTime] = React.useState(0)
     const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
     const [showVirtualData, setShowVirtualData] = React.useState(false)
+
+    useEffect(() => {
+        if (showVirtualData) {
+            if (totalTime && totalVirtualTime) {
+                if (totalTime < totalVirtualTime) {
+                    settextShowWithRed(`Adding new service requires ${totalVirtualTime - totalTime} min extra`)
+                } else if (totalTime > totalVirtualTime) {
+                    settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
+                } else if (totalTime === totalVirtualTime) {
+                    settextShowWithRed(`New updated order require ${totalVirtualTime} min`)
+
+                }
+            }
+        } else {
+            settextShowWithRed(``)
+        }
+    }, [totalVirtualTime, totalTime])
 
     useEffect(() => {
         if (virtual_data?.id) {
@@ -281,7 +297,6 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes }) => {
             let t = virtualOrdersItems.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalVirtualTime(total)
-            // setTotalWorkingMinutes(total)
         }
     }, [virtualOrdersItems])
 
@@ -322,6 +337,20 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes }) => {
     }
     const user = useSelector(state => state.authenticate.user)
 
+    const getTotalVirtualAmount = (dtype, amount, totalAmount) => {
+        if (amount && amount !== "" && amount != 0) {
+            let totalAmount1 = totalAmount
+            if (dtype == "flat") {
+                totalAmount1 = totalAmount - amount
+            } else if (dtype == "per") {
+                totalAmount1 = totalAmount - (amount * 100 / totalAmount)
+            }
+            return totalAmount1
+        } else {
+            return totalAmount
+        }
+    }
+
     return (
         <Card containerStyle={{ borderRadius: 10 }}>
             <View style={{ flexDirection: "row" }}>
@@ -353,10 +382,13 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes }) => {
                     return (<OrderItemsDetail i={i} />)
                 })}
             </View>}
-
+            {showVirtualData && virtual_data?.discount_amount && virtual_data?.discount_amount != 0 && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text style={styles.greenTextStyle}>Discount</Text>
+                <Text style={styles.greenTextStyle}>{virtual_data?.discount_type == "flat" ? `$${virtual_data?.discount_amount}` : `${virtual_data?.discount_amount}%`}</Text>
+            </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>
-                <Text style={styles.greenTextStyle}>${showVirtualData ? virtual_data?.order_total_price : data?.order_total_price}</Text>
+                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : data?.order_total_price}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Order Start Time</Text>
@@ -450,10 +482,10 @@ const OrderItemsDetail = ({ i }) => {
     )
 }
 
-const GetButtons = ({ data, openCancelModal,submit,openBlockModal}) => {
+const GetButtons = ({ data, openCancelModal, submit, openBlockModal }) => {
     const [buttons, setButtons] = React.useState([])
     console.log(data, "data")
-    const navigation=useNavigation()
+    const navigation = useNavigation()
     React.useEffect(() => {
         console.log(buttons)
     }, [buttons])
@@ -489,7 +521,7 @@ const GetButtons = ({ data, openCancelModal,submit,openBlockModal}) => {
             case buttons_types['cancel&search']:
                 break
             case buttons_types.chat:
-               navigation.navigate("ChatScreen", {
+                navigation.navigate("ChatScreen", {
                     item: {
                         id: data.provider_id,
                         email: data.providers_email,
@@ -516,8 +548,8 @@ const GetButtons = ({ data, openCancelModal,submit,openBlockModal}) => {
                 submit(order_types.delay_request_reject)
                 break
             case buttons_types.suspend:
-                navigation.navigate("OrderSuspend",{item:data})    
-            break
+                navigation.navigate("OrderSuspend", { item: data })
+                break
             // case buttons_types.accept:
 
         }

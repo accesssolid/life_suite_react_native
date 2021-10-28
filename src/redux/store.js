@@ -4,13 +4,16 @@ import ServiceReducer from './features/services'
 import ProviderReducer from './features/provider'
 import TotalReducer from "./features/total"
 import ChatUsersReducer from './features/chatUser'
+import BankModelReducer from './features/bankModel'
+
 const store = configureStore({
     reducer: {
         authenticate: AuthenticateReducer,
         services: ServiceReducer,
         provider: ProviderReducer,
         total : TotalReducer,
-        chat_users:ChatUsersReducer
+        chat_users:ChatUsersReducer,
+        bank_model:BankModelReducer
     },
 })
 

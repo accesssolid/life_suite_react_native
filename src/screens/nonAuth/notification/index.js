@@ -96,7 +96,6 @@ const Notification = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
                     setNotifications(response.data)
                 }

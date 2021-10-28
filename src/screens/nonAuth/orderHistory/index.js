@@ -172,7 +172,9 @@ const OrderHistory = (props) => {
                         }}
                         renderItem={({ item, index }) => {
                             let serviceNames=[...new Set(item.order_items?.map(x=>x.services_name))]
-
+                            if(item?.hide_order>0){
+                                return null
+                            }
 
                             return (<TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
                                 props.navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item } })
