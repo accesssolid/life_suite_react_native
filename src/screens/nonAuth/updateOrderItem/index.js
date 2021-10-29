@@ -197,7 +197,14 @@ const OrderClientDetail = (props) => {
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
             <StatusBar translucent backgroundColor={"transparent"} barStyle="light-content" />
-            <HeaderView data={data} navigation={props.navigation} subService={subService} />
+            <HeaderView action={()=>{
+                if(productShow){
+                    setProductShow(false)
+                    setSelectedItem(null)
+                }else{
+                    props.navigation.goBack()
+                }
+            }} data={data} navigation={props.navigation} subService={subService} />
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={{ flexDirection: "row", justifyContent: "space-around", backgroundColor: "white", paddingTop: 10 }}>
                     <TouchableOpacity
@@ -491,7 +498,7 @@ const convertMinsToHrsMins = (mins) => {
     return `${h} hr ${m} min`;
 }
 
-const HeaderView = ({ subService, navigation, data }) => {
+const HeaderView = ({ subService, navigation, data,action }) => {
     return (
         <View style={{ width: '100%', height: '20%', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, overflow: "hidden" }}>
             <ImageBackground
@@ -504,7 +511,12 @@ const HeaderView = ({ subService, navigation, data }) => {
                             <Header
                                 imageUrl={require("../../../assets/backWhite.png")}
                                 action={() => {
-                                    navigation.goBack()
+                                    if(action){
+                                        action()
+                                    }else{
+                                        navigation.goBack()
+                                    }
+                                    
                                 }}
                                 title={data?.order_items && data?.order_items[0]?.services_name}
                                 titleStyle={{ color: "white" }}

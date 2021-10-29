@@ -28,15 +28,11 @@ import SureModal from '../../../components/sureModal';
 // #liahs_before_providers
 
 const MechanicLocation = (props) => {
-    const DATE = props.route.params.data
-    const fromInputRef = useRef(null)
-    const toInputRef = useRef(null)
-    const { servicedata, subService, extraData } = props.route.params
+    const { servicedata, subService, extraData, orderData } = props.route.params
     console.log("SubService==>", subService)
     const user = useSelector(state => state.authenticate.user)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
-    const category_array = ['01:00', '02:00', '03:00', '4:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00']
     const [startTime, setStartTime] = useState(moment())
     const [endTime, setEndTime] = useState(moment())
     const [fromAddress, setFromAddress] = useState("")
@@ -47,6 +43,29 @@ const MechanicLocation = (props) => {
     React.useEffect(() => {
         console.log("Params", props.route.params)
     }, [props.route.params])
+
+    React.useEffect(() => {
+        if (orderData) {
+            if (orderData.order_from_address) {
+                setFromAddress(orderData.order_from_address)
+            }
+            if (orderData.order_from_lat && orderData.order_from_long) {
+                setFromCoordinates({
+                    latitude: Number(orderData.order_from_lat),
+                    longitude:Number(orderData.order_from_long),
+                })
+            }
+            if (orderData.order_placed_address) {
+                setToAddress(orderData.order_placed_address)
+            }
+            if (orderData.order_placed_lat && orderData.order_placed_long) {
+                setToCoordinates({
+                    latitude:Number(orderData.order_placed_lat),
+                    longitude:Number(orderData.order_placed_long),
+                })
+            }
+        }
+    }, [orderData])
 
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
@@ -138,8 +157,6 @@ const MechanicLocation = (props) => {
             })
             .catch((error) => console.log(error.message));
     }
-
-
 
     const submit = () => {
         let arr = []
@@ -244,7 +261,7 @@ const MechanicLocation = (props) => {
                             }}
                             style={styles.fromContainer}>
                             <Text style={{ flex: 1, }} numberOfLines={1}>
-                                {fromAddress == ""? "Select Address" : fromAddress}
+                                {fromAddress == "" ? "Select Address" : fromAddress}
                             </Text>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })}

@@ -9,7 +9,7 @@ import LS_FONTS from '../../../constants/fonts';
 /* Packages */
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, Avatar } from 'react-native-elements'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 /* Components */;
 import Header from '../../../components/header';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
@@ -19,6 +19,8 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import Loader from '../../../components/loader'
 import CancelModal from '../../../components/cancelModal';
+import BlockModal from '../../../components/blockModal';
+import ReorderModal from '../../../components/reorderModal';
 // placeholder image
 const placeholder_image = require("../../../assets/user.png")
 import _ from 'lodash'
@@ -36,11 +38,11 @@ export default function OrderDetailUpdateCustomer(props) {
     const [reason, setReason] = React.useState("")
     const [cancelModa, setCancelModal] = React.useState(false)
     const [blockModal, setBlockModal] = React.useState(false)
-
+    const [cancelSearchModal, setCancelSearcHModal] = React.useState(false)
     const [virtualdata, setVirtualData] = React.useState({})
-    const [extraTime, setExtraTime] = React.useState("1 hour")
+    const [reorderModal,setReorderModal]=React.useState(false)
 
-    const [cancelOrderText, setCancelOrderText] = React.useState("You have 10 cancellation request remains.")
+    const [cancelOrderText, setCancelOrderText] = React.useState("Remaining cancellation requests: 10")
     const [textShowWithRed, settextShowWithRed] = React.useState("")
 
 
@@ -71,12 +73,12 @@ export default function OrderDetailUpdateCustomer(props) {
                     if (response.totalSettingData) {
                         let key_value = response.totalSettingData.find(x => x.key == "cancel_order_by_customer")
                         if (key_value) {
-                            setCancelOrderText(`You have ${key_value.value} cancellation request remains.`)
+                            setCancelOrderText(`Remaining cancellation requests: ${key_value.value}.`)
                             if (response.totalUserAction) {
                                 let filteredValues = response.totalUserAction.filter(x => x.key == "cancel_order_by_customer")
                                 if (filteredValues.length > 0) {
                                     let total_remains = Number(key_value.value) - Number(filteredValues[0].no_of_action)
-                                    setCancelOrderText(`You have ${total_remains} cancellation request remains.`)
+                                    setCancelOrderText(`Remaining cancellation requests: ${total_remains}`)
                                 }
                             }
                         }
@@ -90,16 +92,15 @@ export default function OrderDetailUpdateCustomer(props) {
             })
     }
 
-    const blockUser = async (provider_id, reason) => {
-        setLoader(true)
+    const blockUser = async () => {
+        setLoading(true)
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
         let user_data = {
-            "provider_id": provider_id,
-            "reason_description": reason,
+            "provider_id": data?.provider_id,
         }
 
         let config = {
@@ -113,18 +114,55 @@ export default function OrderDetailUpdateCustomer(props) {
                 console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
-                    props.navigation.pop()
-                    setLoader(false)
+                    getOrderDetail(item.id)
+                    setLoading(false)
                 }
                 else {
                     showToast(response.message)
-                    setLoader(false)
+                    setLoading(false)
                 }
             }).catch(err => {
             }).finally(() => {
-                setLoader(false)
+                setLoading(false)
             })
     }
+
+    const unBlockUser = async () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let user_data = {
+            "provider_id": data?.provider_id
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: "/api/unBlockProvider",
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                    showToast(response.message)
+                    // props.navigation.pop()
+                    getOrderDetail(item.id)
+                    setLoading(false)
+                }
+                else {
+                    showToast(response.message)
+                    setLoading(false)
+                }
+            }).catch(err => {
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
+
     const submit = (order_status) => {
         setLoading(true)
         let headers = {
@@ -146,7 +184,22 @@ export default function OrderDetailUpdateCustomer(props) {
             .then((response) => {
                 if (response.status == true) {
                     showToast(response.message)
-                    props.navigation.pop()
+                    if (cancelSearchModal) {
+                        setCancelSearcHModal(false)
+                        props.navigation.navigate("MechanicLocation", {
+                            servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
+                            subService: {
+                                name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
+                                image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
+                                location_type: data?.order_items[0]?.services_location_type ?? 0
+                            },
+                            extraData: [],
+                            orderData: data
+                        })
+                    } else {
+                        props.navigation.pop()
+                    }
+
                 } else {
                     console.log("Error", response)
                     showToast(response.message)
@@ -165,6 +218,59 @@ export default function OrderDetailUpdateCustomer(props) {
         }
     }, [item])
 
+    useFocusEffect(React.useCallback(() => {
+        getOrderDetail(item.id)
+    }, []))
+
+    const searchAgain = () => {
+        props.navigation.navigate("MechanicLocation", {
+            servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
+            subService: {
+                name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
+                image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
+                location_type: data?.order_items[0]?.services_location_type ?? 0
+            },
+            extraData: [],
+            orderData: data
+        })
+    }
+
+    const reOrder = async (start_time,end_time) => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({
+                order_id: data.id,
+                order_start_time: start_time , //"2021-10-07 10:00:00",
+                order_end_time:end_time // "2021-11-07 12:00:00"
+            }),
+            endPoint: "/api/reorderCreate",
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    showToast(response.message)
+
+                    props.navigation.pop()
+
+
+                } else {
+                    console.log("Error", response)
+                    showToast(response.message)
+                }
+            }).catch(err => {
+
+            }).finally(() => {
+                setLoading(false)
+
+            })
+    }
 
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
@@ -173,7 +279,7 @@ export default function OrderDetailUpdateCustomer(props) {
             <View style={{ width: '100%', height: '20%', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, overflow: "hidden" }}>
                 <ImageBackground
                     resizeMode="cover"
-                    source={{ uri: BASE_URL + data?.order_items[0]?.services_image }}
+                    source={{ uri: BASE_URL + data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image }}
                     style={[styles.image]}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -183,7 +289,7 @@ export default function OrderDetailUpdateCustomer(props) {
                                     action={() => {
                                         props.navigation.goBack()
                                     }}
-                                    title={data?.order_items && data?.order_items[0]?.services_name}
+                                    title={data?.order_items && (data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name)}
                                     titleStyle={{ color: "white" }}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
@@ -209,7 +315,10 @@ export default function OrderDetailUpdateCustomer(props) {
                     <GetButtons
                         data={data}
                         openCancelModal={() => setCancelModal(true)}
+                        openCancelSearchModal={() => setCancelSearcHModal(true)}
+                        searchAgain={() => searchAgain()}
                         submit={submit}
+                        openReorderModal={()=>setReorderModal(true)}
                         openBlockModal={() => setBlockModal(true)}
                     />
                 </View>
@@ -236,23 +345,46 @@ export default function OrderDetailUpdateCustomer(props) {
                 }}
             />
             <CancelModal
-                title="Do you really want to block this user?"
-                visible={blockModal}
+                title={cancelOrderText}
+                visible={cancelSearchModal}
                 value={reason}
                 // pressHandler={()=>setCancelModal(false)}
                 onChangeText={(t) => { setReason(t) }}
                 action1={() => {
-                    setBlockModal(false)
+                    setCancelSearcHModal(false)
+
                 }}
                 action={() => {
                     if (reason.trim() == "") {
                         showToast("Reason cannot be empty!")
                     }
                     else {
-                        setBlockModal(false)
-                        blockUser(data.provider_id, reason)
+                        submit(order_types.cancel)
+                        // goto before provider listing screen
+
                     }
                 }}
+            />
+            <BlockModal
+                title={`Do you want to ${data?.blocked_to_user ? "un" : ""}block this user?`}
+                visible={blockModal}
+                onPressYes={() => {
+                    if (data.blocked_to_user) {
+                        unBlockUser()
+                    } else {
+                        blockUser()
+                    }
+
+                }}
+                setVisible={setBlockModal}
+            />
+             <ReorderModal
+                title={`Reorder`}
+                visible={reorderModal}
+                onPressYes={(start_time,end_time) => {
+                    reOrder(start_time,end_time)
+                }}
+                setVisible={setReorderModal}
             />
             {loading && <Loader />}
         </View>
@@ -482,7 +614,7 @@ const OrderItemsDetail = ({ i }) => {
     )
 }
 
-const GetButtons = ({ data, openCancelModal, submit, openBlockModal }) => {
+const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, openBlockModal, searchAgain,openReorderModal }) => {
     const [buttons, setButtons] = React.useState([])
     console.log(data, "data")
     const navigation = useNavigation()
@@ -519,6 +651,7 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal }) => {
                 openCancelModal()
                 break
             case buttons_types['cancel&search']:
+                openCancelSearchModal()
                 break
             case buttons_types.chat:
                 navigation.navigate("ChatScreen", {
@@ -550,6 +683,12 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal }) => {
             case buttons_types.suspend:
                 navigation.navigate("OrderSuspend", { item: data })
                 break
+            case buttons_types.search_again:
+                searchAgain()
+                break
+            case buttons_types.reorder:
+                openReorderModal()
+                break
             // case buttons_types.accept:
 
         }
@@ -558,11 +697,15 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal }) => {
     return (
         <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
             {buttons.map(x => {
+                let title = x.title
+                if (x.type == buttons_types.block && data.blocked_to_user) {
+                    title = "Unblock"
+                }
                 return (
                     <TouchableOpacity
                         onPress={() => pressHandler(x.type)}
                         style={[styles.save, { marginTop: 0, marginBottom: 10 }]}>
-                        <Text style={styles.saveText}>{x.title}</Text>
+                        <Text style={styles.saveText}>{title}</Text>
                     </TouchableOpacity>
                 )
             })}

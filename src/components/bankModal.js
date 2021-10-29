@@ -42,7 +42,7 @@ const BankModal = props => {
               activeOpacity={0.7}
               onPress={() => {
                 if(bankData.type=="customer"){
-                  navigation.navigate("Profile")
+                  navigation.navigate("UserStack",{screen:"AddCard",params:{type:"add"}})
                   dispatch(updateBankModelData({
                     data: {
                       title: "Select Account",

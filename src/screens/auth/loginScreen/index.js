@@ -26,7 +26,7 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import { CommonActions } from '@react-navigation/native';
 
 const LoginScreen = (props) => {
-    const[fcmToken,setFcmToken] = useState("")
+    const [fcmToken, setFcmToken] = useState("")
     const dispatch = useDispatch()
     const passRef = useRef(null)
     const role = useSelector(state => state.authenticate.user_role)
@@ -38,21 +38,21 @@ const LoginScreen = (props) => {
     const switchRole = () => {
         dispatch(setUserRole({ data: role == 1 ? 2 : 1 }))
     }
-    
+
     useEffect(() => {
         GetToken()
-     },[])
+    }, [])
 
-    const GetToken = async() => {
+    const GetToken = async () => {
         const authorizationStatus = await messaging().requestPermission();
         if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
             const token = await messaging().getToken()
-            console.log('TOKEN==>>>>',token)
+            console.log('TOKEN==>>>>', token)
             setFcmToken(token)
-          } 
+        }
     }
 
-console.log(fcmToken)
+    console.log(fcmToken)
     function on_press_login() {
         setLoader(true)
         if (email.length == 0 || password.length == 0) {
@@ -79,14 +79,14 @@ console.log(fcmToken)
         }
 
         getApi(config)
-            .then((response) => {
+            .then(async (response) => {
                 console.log(response)
                 if (response.status == true) {
                     setLoader(false)
                     showToast(response.message, 'success')
-                    storeItem('user', response.data)
-                    storeItem('user_bio_data', response.data)
-                    storeItem('access_token', response.access_token)
+                    await storeItem('user', response.data)
+                    await storeItem('user_bio_data', response.data)
+                    await storeItem('access_token', response.access_token)
                     dispatch(setAuthToken({ data: response.access_token }))
                     dispatch(loginReducer(response.data))
                     setEmail("")

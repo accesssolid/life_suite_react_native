@@ -24,6 +24,7 @@ import moment from 'moment';
 import BookedSlotsModal from './bookedSlotsModal';
 import Loader from '../../../components/loader'
 import CancelModal from '../../../components/cancelModal';
+import BlockModal from '../../../components/blockModal';
 // placeholder image
 const placeholder_image = require("../../../assets/user.png")
 import _ from 'lodash'
@@ -341,7 +342,77 @@ const OrderClientDetail = (props) => {
 
             })
     }
+    const blockUser = async () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let user_data = {
+            "customer_id": data?.customer_id,
+            "reason_description": "",
+        }
 
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: "/api/blockCustomer",
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                    showToast(response.message)
+                    getOrderDetail(item.id)
+                    setLoading(false)
+                }
+                else {
+                    showToast(response.message)
+                    setLoading(false)
+                }
+            }).catch(err => {
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
+    const unBlockUser=async()=>{
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let user_data = {
+            "customer_id": data?.customer_id,
+            "reason_description": "",
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: "/api/unBlockCustomer",
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                    showToast(response.message)
+                    // props.navigation.pop()
+                    getOrderDetail(item.id)
+                    setLoading(false)
+                }
+                else {
+                    showToast(response.message)
+                    setLoading(false)
+                }
+            }).catch(err => {
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
     useEffect(() => {
         if (item.id) {
             getOrderDetail(item.id)
@@ -427,123 +498,7 @@ const OrderClientDetail = (props) => {
                                 </View>
                             </>
                         }
-                        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
-                                <View>
-                                    <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Estimated Drive Time</Text>
-                                    <Text style={[styles.baseTextStyle]}>(From Current Location)</Text>
-                                </View>
-                                <Text style={[styles.baseTextStyle]}>{estimated_time}</Text>
-                            </View>
-                            {data?.order_status == 1 && <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
-                                <TouchableOpacity
-                                    style={styles.save}
-                                    activeOpacity={0.7}
-                                    onPress={() => checkBookedInTime()}>
-                                    <Text style={styles.saveText}>Accept</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
-                                    activeOpacity={0.7}
-                                    onPress={() => setCancelModal(true)}>
-                                    <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Decline</Text>
-                                </TouchableOpacity>
-                            </View>} */}
-                        {/* {data?.order_status!=1&&
-                                <>
-                                    <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
-                                        <TouchableOpacity
-                                            style={styles.save}
-                                            activeOpacity={0.7}
-                                            onPress={() => {
-                                                submit(7)
-                                            }}>
-                                            <Text style={styles.saveText}>Start Order</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
-                                            activeOpacity={0.7}
-                                            onPress={() => {
-
-                                            }}>
-                                            <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Delay Order</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
-                                        <TouchableOpacity
-                                            style={styles.save}
-                                            activeOpacity={0.7}
-                                            onPress={() => {
-                                                props.navigation.navigate("UpdateOrderItems", {
-                                                    servicedata, subService, item
-                                                })
-                                            }}>
-                                            <Text style={styles.saveText}>Update Order</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
-                                            activeOpacity={0.7}
-                                            onPress={() => {
-                                                props.navigation.navigate("ChatScreen", {
-                                                    item: {
-                                                        id: data.customer_id,
-                                                        email: data.customers_email,
-                                                        first_name: data.customers_first_name,
-                                                        last_name: data.customers_last_name,
-                                                        phone_number: data.customers_phone_number,
-                                                        profile_image: data.customers_profile_image
-                                                    }
-                                                })
-                                            }}>
-                                            <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Chat</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </>
-                            }
-                        </>} */}
-                        {/* {data?.order_status == 7 &&
-                            <>
-                                <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginTop: 10 }}>
-                                    <TouchableOpacity
-                                        style={styles.save}
-                                        activeOpacity={0.7}
-                                        onPress={() => {
-                                            props.navigation.navigate("UpdateOrderItems", {
-                                                servicedata, subService, item
-                                            })
-                                           
-                                        }}>
-                                        <Text style={styles.saveText}>Update Order</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20 }}>
-                                <TouchableOpacity
-                                        style={[styles.save, { backgroundColor: LS_COLORS.global.white, borderWidth: 1, borderColor: LS_COLORS.global.green }]}
-                                        activeOpacity={0.7}
-                                        onPress={() => {
-                                            props.navigation.navigate("ChatScreen", {
-                                                item: {
-                                                    id: data.customer_id,
-                                                    email: data.customers_email,
-                                                    first_name: data.customers_first_name,
-                                                    last_name: data.customers_last_name,
-                                                    phone_number: data.customers_phone_number,
-                                                    profile_image: data.customers_profile_image
-                                                }
-                                            })
-                                        }}>
-                                        <Text style={[styles.saveText, { color: LS_COLORS.global.green }]}>Chat</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={styles.save}
-                                        activeOpacity={0.7}
-                                        onPress={() => {
-                                            submit(15)
-                                        }}>
-                                        <Text style={styles.saveText}>Finish Order</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </>
-                        } */}
+           
                     </ScrollView>
                     <GetButtons
                         data={data}
@@ -580,6 +535,39 @@ const OrderClientDetail = (props) => {
                         submit(2)
                     }
                 }}
+            />
+              <CancelModal
+                title="Kindly fill the reason for rejection."
+                visible={cancelModa}
+                value={reason}
+                // pressHandler={()=>setCancelModal(false)}
+                onChangeText={(t) => { setReason(t) }}
+                action1={() => {
+                    setCancelModal(false)
+                }}
+                action={() => {
+                    if (reason.trim() == "") {
+                        showToast("Reason cannot be empty!")
+                    }
+                    else {
+                        setCancelModal(false)
+                        setReason('')
+                        submit(2)
+                    }
+                }}
+            />
+             <BlockModal
+                title={`Do you want to ${data?.blocked_to_user?"un":""}block this user?`}
+                visible={blockModal}
+                onPressYes={()=>{
+                    if(data.blocked_to_user){
+                        unBlockUser()
+                    }else{
+                        blockUser()
+                    }
+                   
+                }}
+               setVisible={setBlockModal}
             />
             <DelayModal 
                 open={delayModalOpen}
@@ -825,7 +813,6 @@ const RenderAddressFromTO = ({ addresses, currentAddress }) => {
                             } else {
                                 Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
                             }
-
                         }
                     }}
                     style={{ height: 20, width: 40 }}
@@ -869,7 +856,7 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal,openDelayMod
     const [buttons, setButtons] = React.useState([])
     console.log(data, "data")
     const navigation = useNavigation()
-
+    
 
     React.useEffect(() => {
         if (data && data.order_status) {
@@ -941,11 +928,15 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal,openDelayMod
     return (
         <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
             {buttons.map(x => {
+                let title=x.title
+                if(x.type==buttons_types.block&&data.blocked_to_user){
+                    title="Unblock"
+                }
                 return (
                     <TouchableOpacity
                         onPress={() => pressHandler(x.type)}
                         style={[styles.save, { marginTop: 0, marginBottom: 10 }]}>
-                        <Text style={styles.saveText}>{x.title}</Text>
+                        <Text style={styles.saveText}>{title}</Text>
                     </TouchableOpacity>
                 )
             })}

@@ -14,7 +14,7 @@ import { loginReducer, setAuthToken } from '../../redux/features/loginReducer';
 import { getApi } from '../../api/api';
 import { getJsonData, storeJsonData } from '../../asyncStorage/async'
 import { StackActions, NavigationActions, CommonActions } from '@react-navigation/native';
-
+import {role} from '../../constants/globals'
 const Splash = (props) => {
     const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -29,7 +29,7 @@ const Splash = (props) => {
         if (access_token !== null) {
             getUser(user.id)
         }
-    }, [access_token])
+    }, [access_token,user])
 
     const getUser = (id) => {
         let headers = {
@@ -43,7 +43,7 @@ const Splash = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify(user_data),
-            endPoint: user.user_role == 2 ? '/api/customer_detail' : '/api/provider_detail',
+            endPoint: user.user_role == role.customer ? '/api/customer_detail' : '/api/provider_detail',
             type: 'post'
         }
 
@@ -71,7 +71,7 @@ const Splash = (props) => {
                 }
                 else {
                     if (response.message !== "The user id field is required.") {
-                        showToast(response.message, 'danger')
+                        // showToast(response.message, 'danger')
                     }
                     setLoader(false)
                 }

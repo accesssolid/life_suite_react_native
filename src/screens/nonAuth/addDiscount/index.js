@@ -17,6 +17,7 @@ export default function AddDiscount({ navigation, route }) {
     const [flat_amount, setFlatAmount] = React.useState("")
     const [per_amount, setPerAmount] = React.useState("")
     const [totalPrice1,setTotalPrice1]=React.useState(0)
+    
     React.useEffect(() => {
         setTotalPrice1(totalPrice)
         if (discount?.discount_type == "flat") {
@@ -60,15 +61,15 @@ export default function AddDiscount({ navigation, route }) {
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{ width: "40%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                    <TextInput value={flat_amount}  onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
                             <><View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                <TextInput  value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                <TextInput  value={`per_amount+"%"`} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                             </View>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput maxLength={2} value={String(Number(per_amount)*totalPrice/100)??""} keyboardType={"numeric"} placeholder={"Calculated Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                    <TextInput maxLength={2} value={(String(Number(per_amount)*totalPrice/100))??""} keyboardType={"numeric"} placeholder={"Calculated Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                                 </View>
                             </>
                         }
