@@ -37,10 +37,10 @@ export default function AddDiscount({ navigation, route }) {
                 action={() => {
                     navigation.goBack()
                 }}
-                imageUrl1={require("../../../assets/home.png")}
-                action1={() => {
-                    navigation.navigate("HomeScreen")
-                }}
+                // imageUrl1={require("../../../assets/home.png")}
+                // action1={() => {
+                //     navigation.navigate("MainDrawer")
+                // }}
             />
             <Container>
                 <Content>
@@ -66,7 +66,7 @@ export default function AddDiscount({ navigation, route }) {
                             </View>}
                         {type == types[1] &&
                             <><View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                <TextInput  value={`per_amount+"%"`} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                <TextInput  value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                             </View>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
                                     <TextInput maxLength={2} value={(String(Number(per_amount)*totalPrice/100))??""} keyboardType={"numeric"} placeholder={"Calculated Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />

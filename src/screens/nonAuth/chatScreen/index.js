@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, TextInput, StatusBar, Modal, Image, TouchableOpacity, FlatList, Platform, Pressable } from 'react-native'
+import { View, StyleSheet, Text, TextInput, StatusBar, Modal, Image, TouchableOpacity, FlatList, Platform, Pressable ,KeyboardAvoidingView, Keyboard} from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -675,6 +675,8 @@ const ChatScreen = (props) => {
                     </View>
                     {loader && <Loader />}
                 </View>
+
+                {Platform.OS=="ios"&&<KeyboardAvoidingView behavior="padding" />}
             </SafeAreaView>
             <MenuModal visible={visible1} role={user.user_role} user1={data.id.toString()} setVisible={setVisible1} navigation={props.navigation} />
         </>

@@ -46,6 +46,7 @@ const SuspendInProgress = (props) => {
     const [userData, setUserData] = useState({ ...user })
     const [checkData, setCheckData] = useState([...checkList])
     const [isOpen, setIsOpen] = useState(false)
+    const [cancelOrderText, setCancelOrderText] = React.useState("Remaining suspend requests: 10")
 
     const setChecked = (index) => {
         let obj = {

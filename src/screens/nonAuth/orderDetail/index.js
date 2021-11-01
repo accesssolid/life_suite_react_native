@@ -1,7 +1,7 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, Dimensions, Linking, ScrollView, Alert } from 'react-native'
-import { useNavigation ,useFocusEffect} from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
@@ -69,7 +69,7 @@ const OrderClientDetail = (props) => {
     const [reason, setReason] = React.useState("")
     const [cancelModa, setCancelModal] = React.useState(false)
     const [blockModal, setBlockModal] = React.useState(false)
-    const [delayModalOpen,setDelayModalOpen]=React.useState(false)
+    const [delayModalOpen, setDelayModalOpen] = React.useState(false)
     const [textShowWithRed, settextShowWithRed] = React.useState("")
 
     // books data from  modal
@@ -100,6 +100,7 @@ const OrderClientDetail = (props) => {
     })
 
     React.useEffect(() => {
+        console.log("Data", JSON.stringify(data))
         if (data?.id) {
             if (data.order_from_lat && data.order_from_long) {
                 setToCoordinates({
@@ -290,7 +291,7 @@ const OrderClientDetail = (props) => {
 
     }
 
-    const submit = (order_status,delay_time) => {
+    const submit = (order_status, delay_time) => {
         // console.log(selectedStartTime)
         // return 
         if (order_status == 3) {
@@ -306,13 +307,13 @@ const OrderClientDetail = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-        const datac={
+        const datac = {
             order_id: data.id,
             order_status: order_status,
             reason: reason
         }
-        if(delay_time){
-            datac[`delay_time`]=delay_time
+        if (delay_time) {
+            datac[`delay_time`] = delay_time
         }
         let config = {
             headers: headers,
@@ -377,7 +378,7 @@ const OrderClientDetail = (props) => {
                 setLoading(false)
             })
     }
-    const unBlockUser=async()=>{
+    const unBlockUser = async () => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -419,12 +420,20 @@ const OrderClientDetail = (props) => {
         }
     }, [item])
 
-    useFocusEffect(React.useCallback(()=>{
+    useFocusEffect(React.useCallback(() => {
         if (item.id) {
             getOrderDetail(item.id)
         }
-    },[]))
-
+    }, []))
+    
+    const getReasonForCancellationText = () => {
+        let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
+        let d = x?.filter(x => x.reason_description != null && x.reason_description != "")
+        if (d?.length > 0) {
+            return d[d.length - 1].reason_description
+        }
+        return null
+    }
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
             <StatusBar translucent backgroundColor={"transparent"} barStyle="light-content" />
@@ -463,21 +472,31 @@ const OrderClientDetail = (props) => {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Client Info</Text>
                         <CardClientInfo settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        <Text style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>
-                        <RenderAddressFromTO currentAddress={fromCoordinates} addresses={{
-                            from: data?.order_from_address, //from address
-                            to: data?.order_placed_address, //to address
-                            fromCoordinates: { latitude: Number(data?.order_from_lat), longitude: Number(data?.order_from_long) }, //from in lat && long
-                            toCoordinates: { latitude: Number(data?.order_placed_lat), longitude: Number(data?.order_placed_long) } //to in lat && long
-                        }}
+                        {getReasonForCancellationText() && <Text style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10 ,marginHorizontal:20}]}><Text style={{color:"red"}}>Reason</Text>: {getReasonForCancellationText()}</Text>}
+                        <RenderAddressFromTO
+                            fromShow={data?.order_items[0]?.services_location_type == 2}
+                            toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
+                            currentAddress={fromCoordinates} addresses={{
+                                from: data?.order_from_address, //from address
+                                to: data?.order_placed_address, //to address
+                                fromCoordinates: { latitude: Number(data?.order_from_lat), longitude: Number(data?.order_from_long) }, //from in lat && long
+                                toCoordinates: { latitude: Number(data?.order_placed_lat), longitude: Number(data?.order_placed_long) } //to in lat && long
+                            }}
                         />
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
                             <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>User Requested Time Frame </Text>
-                            <Text style={styles.baseTextStyle}>{moment(data?.order_start_time).format("hh:mm a")} - {moment(data?.order_end_time).format("hh:mm a")}</Text>
+                            <Text style={styles.baseTextStyle}>{moment(data?.requested_start_time).format("hh:mm a")} - {moment(data?.requested_end_time).format("hh:mm a")}</Text>
                         </View>
-
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                            <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order Start Time</Text>
+                            <Text style={styles.baseTextStyle}>{moment(data?.order_start_time).format("hh:mm a")}</Text>
+                        </View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                            <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order End Time </Text>
+                            <Text style={styles.baseTextStyle}>{moment(data?.order_end_time).format("hh:mm a")}</Text>
+                        </View>
                         {/* only show if order status is pending i.e 1 */}
-                        {(data?.order_status == 1 || data?.order_status == 3 || data?.order_status == 4 || data?.order_status == 6 || data?.order_status == 5 || data?.order_status == 12 || data?.order_status == 9 || data?.order_status == 10 || data?.order_status == 11) &&
+                        {(data?.order_status == 1) &&
                             <>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                                     <View>
@@ -498,14 +517,14 @@ const OrderClientDetail = (props) => {
                                 </View>
                             </>
                         }
-           
+                        {textShowWithRed !== "" && <Text style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>}
                     </ScrollView>
                     <GetButtons
                         data={data}
                         checkBookedInTime={checkBookedInTime}
                         openCancelModal={() => setCancelModal(true)}
                         submit={submit}
-                        openDelayModal={()=>setDelayModalOpen(true)}
+                        openDelayModal={() => setDelayModalOpen(true)}
                         openBlockModal={() => setBlockModal(true)}
                         gotoUpdateScreen={() => {
                             props.navigation.navigate("UpdateOrderItems", {
@@ -536,7 +555,7 @@ const OrderClientDetail = (props) => {
                     }
                 }}
             />
-              <CancelModal
+            <CancelModal
                 title="Kindly fill the reason for rejection."
                 visible={cancelModa}
                 value={reason}
@@ -556,27 +575,27 @@ const OrderClientDetail = (props) => {
                     }
                 }}
             />
-             <BlockModal
-                title={`Do you want to ${data?.blocked_to_user?"un":""}block this user?`}
+            <BlockModal
+                title={`Do you want to ${data?.blocked_to_user ? "un" : ""}block this user?`}
                 visible={blockModal}
-                onPressYes={()=>{
-                    if(data.blocked_to_user){
+                onPressYes={() => {
+                    if (data.blocked_to_user) {
                         unBlockUser()
-                    }else{
+                    } else {
                         blockUser()
                     }
-                   
+
                 }}
-               setVisible={setBlockModal}
+                setVisible={setBlockModal}
             />
-            <DelayModal 
+            <DelayModal
                 open={delayModalOpen}
-                pressHandler={()=>{
+                pressHandler={() => {
                     setDelayModalOpen(false)
                 }}
-                submit={(value)=>{
+                submit={(value) => {
                     setDelayModalOpen(false)
-                    submit(order_types.will_be_delayed,value)
+                    submit(order_types.will_be_delayed, value)
                 }}
             />
             {loading && <Loader />}
@@ -595,21 +614,21 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
     const [showVirtualData, setShowVirtualData] = React.useState(false)
 
     useEffect(() => {
-        if(showVirtualData){
+        if (showVirtualData) {
             if (totalTime && totalVirtualTime) {
                 if (totalTime < totalVirtualTime) {
                     settextShowWithRed(`Adding new service requires ${totalVirtualTime - totalTime} min extra`)
                 } else if (totalTime > totalVirtualTime) {
-                    settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
+                    // settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
                 } else if (totalTime === totalVirtualTime) {
-                    settextShowWithRed(`New updated order require ${totalVirtualTime} min`)
+                    // settextShowWithRed(`New updated order require ${totalVirtualTime} min`)
                 }
             }
-        }else{
+        } else {
             settextShowWithRed(``)
         }
-       
-    }, [totalVirtualTime, totalTime,showVirtualData])
+
+    }, [totalVirtualTime, totalTime, showVirtualData])
     useEffect(() => {
         console.log("virtual_data", virtual_data)
         if (virtual_data?.id) {
@@ -632,7 +651,7 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
             let t = items.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalTime(total)
-            // setTotalWorkingMinutes(total)
+            setTotalWorkingMinutes(total)
         }
     }, [items])
 
@@ -662,17 +681,25 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
         return `${d}`
     }
     const user = useSelector(state => state.authenticate.user)
-    const getTotalVirtualAmount=(dtype,amount,totalAmount)=>{
-        if(amount&&amount!==""&&amount!=0){
-            let totalAmount1=totalAmount
-            if(dtype=="flat"){
-                totalAmount1=totalAmount-amount
-            }else if(dtype=="per"){
-                totalAmount1=totalAmount-(amount*100/totalAmount)
+    const getTotalVirtualAmount = (dtype, amount, totalAmount) => {
+        if (amount && amount !== "" && amount != 0) {
+            let totalAmount1 = totalAmount
+            if (dtype == "flat") {
+                totalAmount1 = totalAmount - amount
+            } else if (dtype == "per") {
+                totalAmount1 = totalAmount - (amount * 100 / totalAmount)
             }
             return totalAmount1
-        }else{
+        } else {
             return totalAmount
+        }
+    }
+
+    const checkforDiscountToShow = (discount_amount, show) => {
+        if (show && discount_amount && discount_amount != 0) {
+            return true
+        } else {
+            return false
         }
     }
     return (
@@ -706,13 +733,13 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                     return (<OrderItemsDetail i={i} />)
                 })}
             </View>}
-            {showVirtualData&&virtual_data?.discount_amount&&virtual_data?.discount_amount!=0&&<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            {checkforDiscountToShow(showVirtualData, virtual_data?.discount_amount) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Discount</Text>
-                <Text style={styles.greenTextStyle}>{virtual_data?.discount_type=="flat"?`$${virtual_data?.discount_amount}`:`${virtual_data?.discount_amount}%`}</Text>
+                <Text style={styles.greenTextStyle}>{virtual_data?.discount_type == "flat" ? `$${virtual_data?.discount_amount}` : `${virtual_data?.discount_amount}%`}</Text>
             </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>
-                <Text style={styles.greenTextStyle}>${showVirtualData ?getTotalVirtualAmount(virtual_data?.discount_type,virtual_data?.discount_amount,virtual_data?.order_total_price) : data?.order_total_price}</Text>
+                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : data?.order_total_price}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Time</Text>
@@ -797,66 +824,95 @@ const OrderItemsDetail = ({ i }) => {
     )
 }
 
-const RenderAddressFromTO = ({ addresses, currentAddress }) => {
+const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) => {
     const navigation = useNavigation()
     return (
-        <View style={{ marginHorizontal: 20, marginTop: 20 }}>
-            <Text style={[styles.baseTextStyle, { marginBottom: 8 }]}>From</Text>
-            <View style={styles.fromContainer}>
-                <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.from}</Text>
-                <TouchableOpacity
-                    onPress={() => {
-                        // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
-                        if (addresses.fromCoordinates?.latitude && addresses.fromCoordinates?.longitude) {
-                            if (Platform.OS == "android") {
-                                Linking.openURL(`google.navigation:q=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
-                            } else {
-                                Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+        <View style={{ marginHorizontal: 20 }}>
+            {fromShow &&
+                <>
+                    <Text style={[styles.baseTextStyle, { marginBottom: 8 }]}>From</Text>
+                    <TouchableOpacity
+                        onPress={() => {
+                            // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
+                            if (addresses.fromCoordinates?.latitude && addresses.fromCoordinates?.longitude) {
+                                if (Platform.OS == "android") {
+                                    Linking.openURL(`google.navigation:q=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                                } else {
+                                    Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                                }
                             }
-                        }
-                    }}
-                    style={{ height: 20, width: 40 }}
-                    activeOpacity={0.7}>
-                    <Image
-                        style={{ flex: 1, resizeMode: "contain" }}
-                        source={require("../../../assets/location.png")}
-                    />
-                </TouchableOpacity>
-            </View>
-            <Text style={[styles.baseTextStyle, { marginTop: 16, marginBottom: 8 }]}>To</Text>
-            <View style={styles.fromContainer}>
-                <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.to}</Text>
-                <TouchableOpacity
-                    onPress={() => {
-                        if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {
-                            if (Platform.OS == "android") {
-                                Linking.openURL(`google.navigation:q=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
-                            } else {
-                                Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                        }}
+                        style={styles.fromContainer}>
+                        <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.from}</Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
+                                if (addresses.fromCoordinates?.latitude && addresses.fromCoordinates?.longitude) {
+                                    if (Platform.OS == "android") {
+                                        Linking.openURL(`google.navigation:q=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                                    } else {
+                                        Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                                    }
+                                }
+                            }}
+                            style={{ height: 20, width: 40 }}
+                            activeOpacity={0.7}>
+                            <Image
+                                style={{ flex: 1, resizeMode: "contain" }}
+                                source={require("../../../assets/location.png")}
+                            />
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </>
+            }
+            {toShow &&
+                <>
+                    <Text style={[styles.baseTextStyle, { marginTop: 16, marginBottom: 8 }]}>To</Text>
+                    <TouchableOpacity
+                        onPress={() => {
+                            if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {
+                                if (Platform.OS == "android") {
+                                    Linking.openURL(`google.navigation:q=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                                } else {
+                                    Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                                }
                             }
-                        }
-                        // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.toCoordinates })
-                    }}
-                    style={{ height: 20, width: 40 }}
-                    activeOpacity={0.7}>
-                    <Image
-                        style={{ flex: 1, resizeMode: "contain" }}
-                        source={require("../../../assets/location.png")}
-                    />
-                </TouchableOpacity>
-            </View>
-
+                            // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.toCoordinates })
+                        }}
+                        style={styles.fromContainer}>
+                        <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.to}</Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {
+                                    if (Platform.OS == "android") {
+                                        Linking.openURL(`google.navigation:q=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                                    } else {
+                                        Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                                    }
+                                }
+                                // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.toCoordinates })
+                            }}
+                            style={{ height: 20, width: 40 }}
+                            activeOpacity={0.7}>
+                            <Image
+                                style={{ flex: 1, resizeMode: "contain" }}
+                                source={require("../../../assets/location.png")}
+                            />
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </>
+            }
         </View>
     )
 }
 
 
 
-const GetButtons = ({ data, openCancelModal, submit, openBlockModal,openDelayModal, checkBookedInTime, gotoUpdateScreen }) => {
+const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen }) => {
     const [buttons, setButtons] = React.useState([])
-    console.log(data, "data")
+    console.log(JSON.stringify(data), "data")
     const navigation = useNavigation()
-    
+
 
     React.useEffect(() => {
         if (data && data.order_status) {
@@ -910,8 +966,8 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal,openDelayMod
                 openCancelModal()
                 break
             case buttons_types.delay_order:
-                openDelayModal()   
-             break
+                openDelayModal()
+                break
             case buttons_types.start_order:
                 submit(order_types.processing)
             case buttons_types.suspend:
@@ -919,6 +975,9 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal,openDelayMod
                 break
             case buttons_types.update_order:
                 gotoUpdateScreen()
+                break
+            case buttons_types.completed:
+                submit(order_types.service_finished)
                 break
             // case buttons_types.accept:
 
@@ -928,9 +987,9 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal,openDelayMod
     return (
         <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
             {buttons.map(x => {
-                let title=x.title
-                if(x.type==buttons_types.block&&data.blocked_to_user){
-                    title="Unblock"
+                let title = x.title
+                if (x.type == buttons_types.block && data.blocked_to_user) {
+                    title = "Unblock"
                 }
                 return (
                     <TouchableOpacity

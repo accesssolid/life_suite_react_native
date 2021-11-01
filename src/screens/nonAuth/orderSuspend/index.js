@@ -34,7 +34,7 @@ export default function OrderSuspend(props) {
     const [totalWorkingMinutes, setTotalWorkingMinutes] = React.useState(0)
     const [reason, setReason] = React.useState("")
     const [reasonCheck, setReasonCheck] = React.useState("No Show")
-
+    const [cancelOrderText, setCancelOrderText] = React.useState("Remaining suspend requests: 10")
     const [virtualdata, setVirtualData] = React.useState({})
     const [extraTime, setExtraTime] = React.useState("1 hour")
 
@@ -60,6 +60,19 @@ export default function OrderSuspend(props) {
                         setData(response.data)
                         console.log("Order Detail", JSON.stringify(response.data))
                         setVirtualData(response.data.virtual_order)
+                        if (response.totalSettingData) {
+                            let key_value = response.totalSettingData.find(x => x.key == "suspend_order_by_customer_inprogress")
+                            if (key_value) {
+                                setCancelOrderText(`Remaining suspend requests: ${key_value.value}.`)
+                                if (response.totalUserAction) {
+                                    let filteredValues = response.totalUserAction.filter(x => x.key == "suspend_order_by_customer_inprogress")
+                                    if (filteredValues.length > 0) {
+                                        let total_remains = Number(key_value.value) - Number(filteredValues[0].no_of_action)
+                                        setCancelOrderText(`Remaining suspend requests: ${total_remains}`)
+                                    }
+                                }
+                            }
+                        }
                     } else {
 
                     }
@@ -152,7 +165,8 @@ export default function OrderSuspend(props) {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Suspend in progress</Text>
                         <CardClientInfo virtual_data={virtualdata} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5 }]}>Reason</Text>
+                        <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5,color:"red"}]}>{cancelOrderText}</Text>
+                         <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5 }]}>Reason</Text>
                         {["No Show", "Tasks not performed", "Incorrect Products", "Other"].map(x => {
                             return (
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>

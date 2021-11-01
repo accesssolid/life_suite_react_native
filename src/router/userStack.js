@@ -33,6 +33,7 @@ import CardList from '../screens/nonAuth/cardlist';
 import AddCard from '../screens/nonAuth/addCard'
 import OrderDetailCustomer from '../screens/nonAuth/orderDetailCustomer';
 import OrderSuspend from '../screens/nonAuth/orderSuspend'
+import FinishPay from '../screens/nonAuth/finishPay';
 const Stack = createStackNavigator();
 
 const UserStack = () => {
@@ -62,6 +63,7 @@ const UserStack = () => {
             <Stack.Screen name="AddCard" component={AddCard} />
             <Stack.Screen name="OrderDetailCustomer" component={OrderDetailCustomer} />
             <Stack.Screen name="OrderSuspend" component={OrderSuspend} />
+            <Stack.Screen name="FinishPay" component={FinishPay} />
         </Stack.Navigator>
     )
 }

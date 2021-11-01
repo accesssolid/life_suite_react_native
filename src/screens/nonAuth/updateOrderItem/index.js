@@ -26,11 +26,6 @@ import moment from 'moment';
 
 
 
-
-
-
-
-
 const OrderClientDetail = (props) => {
     const { subService, item } = props.route.params
     const [data, setData] = useState(null)
@@ -46,6 +41,9 @@ const OrderClientDetail = (props) => {
     const [otherProducts, setOtherProducts] = React.useState([])
     const [selectedItem, setSelectedItem] = React.useState(null)
     const [productShow, setProductShow] = React.useState(false)
+    // for checking if there is data updation or not
+    const [selectedItems1, setSelectedItems1] = React.useState([])
+    const [selectedProducts1, setSelectedProducts1] = React.useState([])
 
     const [discount, setDiscount] = React.useState({
         discount_type: "",
@@ -75,26 +73,53 @@ const OrderClientDetail = (props) => {
             setOrderItems(data?.order_items)
             let i = []
             let p = []
+            let extras=[]
             for (let item of data?.order_items) {
                 i.push(item.item_id)
                 for (let product of item.product?.map(x => x.product_id)) {
                     p.push(product)
                 }
+                for (let product of item.extra_product) {
+                    extras.push({item_id:item.item_id,product_name: product.product_name, product_price: product.product_price })
+                }
             }
             setSelectedItems(i)
             setSelectedProducts(p)
+            setSelectedProducts1(p)
+            setSelectedItems1(i)
+            setOtherProducts(extras)
         }
     }, [data])
 
+    const checkTimeFrameIncrease = () => {
+        if (moment(data.order_start_time).add(newTimeNeeded, "minutes").toDate() > moment(data.requested_end_time).toDate()) {
+            return moment(data.order_start_time).add(newTimeNeeded, "minutes").format("YYYY-MM-DD HH:mm:[00]")
+        } else {
+            return data.requested_end_time
+        }
+    }
+
+    const checkforUpdate=()=>{
+        let si=[...selectedItems].sort((a,b)=>Number(a)-Number(b)).join("")
+        let si1=[...selectedItems1].sort((a,b)=>Number(a)-Number(b)).join("")
+        let pi=[...selectedProducts].sort((a,b)=>Number(a)-Number(b)).join("")
+        let pi1=[...selectedProducts1].sort((a,b)=>Number(a)-Number(b)).join("")
+        if(pi==pi1&&si==si1&&otherProducts.length==0&&discount.discount_amount<=0){
+            return true
+        }
+        return false
+    }
 
     const submitOrderUpdateDetail = () => {
+        if(checkforUpdate()){
+            return
+        }
         setLoading(true)
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({
@@ -105,6 +130,8 @@ const OrderClientDetail = (props) => {
                     order_end_time: moment(data.order_start_time).add(newTimeNeeded, "minutes").format("YYYY-MM-DD HH:mm:[00]"),
                     items: selectedItems,
                     products: selectedProducts,
+                    requested_start_time: data.requested_start_time,
+                    requested_end_time: checkTimeFrameIncrease(),
                     other_options: [],
                     extra_products: otherProducts
                 }),
@@ -115,14 +142,12 @@ const OrderClientDetail = (props) => {
                 order_from_long: data.order_from_long,
                 order_from_address: data.order_from_address,
                 discount_type: discount.discount_type,
-                discount_amount: discount.discount_amount
+                discount_amount: discount.discount_amount,
+
             }),
             endPoint: '/api/providerOrderUpdate',
             type: 'post'
         }
-
-
-        console.log("setData",JSON.stringify(config))
         getApi(config)
             .then((response) => {
                 console.log("/api/providerOrderUpdate", response)
@@ -155,7 +180,7 @@ const OrderClientDetail = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log("/api/providerOrderUpdateDetail", response)
+                console.log("/api/providerOrderUpdateDetail", JSON.stringify(response))
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
@@ -197,11 +222,11 @@ const OrderClientDetail = (props) => {
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
             <StatusBar translucent backgroundColor={"transparent"} barStyle="light-content" />
-            <HeaderView action={()=>{
-                if(productShow){
+            <HeaderView action={() => {
+                if (productShow) {
                     setProductShow(false)
                     setSelectedItem(null)
-                }else{
+                } else {
                     props.navigation.goBack()
                 }
             }} data={data} navigation={props.navigation} subService={subService} />
@@ -338,6 +363,11 @@ const ItemView = ({
                         onPress={() => {
                             setSelectedItem(item.id)
                             setProductShow(true)
+                            // if(isSelected){
+                            //     setSelectedItems(state => state.filter(x => x != item.id))
+                            // }else{
+                                setSelectedItems(state => [...new Set([...state,item.id])])
+                            // }
                         }}
                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
@@ -391,7 +421,7 @@ const ItemView = ({
                                 checked={otherProductsForItem.length > 0}
                                 onPress={() => {
                                     if (otherProductsForItem.length <= 0) {
-                                        setOtherProducts(state => [...state, { item_id: item.id, product_name: "", product_price: "" }])
+                                        setOtherProducts(state => [...state, { item_id: item.id,product_name: "", product_price: "" }])
                                         if (!isSelected) {
                                             setSelectedItems(state => [...state, item.id])
                                         }
@@ -438,7 +468,7 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
         <View key={"S"} style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-evenly', alignItems: 'center' }}>
             <View style={{ marginRight: '2.5%' }}>
                 <TextInput
-                    style={[styles.inputStyle, , { width: 120 ,height:40}]}
+                    style={[styles.inputStyle, , { width: 120, height: 40 }]}
                     color="black"
                     placeholder="Product Name"
                     // editable={props.selectedNewProducts.includes(item.temp_id)}
@@ -456,7 +486,7 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
             </View>
             <View style={{ marginRight: '2%' }}>
                 <TextInput
-                    style={[styles.inputStyle, { width: 60,height:40 }]}
+                    style={[styles.inputStyle, { width: 60, height: 40 }]}
                     color="black"
                     placeholder="$000"
                     // editable={props.selectedNewProducts.includes(item.temp_id)}
@@ -498,7 +528,7 @@ const convertMinsToHrsMins = (mins) => {
     return `${h} hr ${m} min`;
 }
 
-const HeaderView = ({ subService, navigation, data,action }) => {
+const HeaderView = ({ subService, navigation, data, action }) => {
     return (
         <View style={{ width: '100%', height: '20%', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, overflow: "hidden" }}>
             <ImageBackground
@@ -511,12 +541,12 @@ const HeaderView = ({ subService, navigation, data,action }) => {
                             <Header
                                 imageUrl={require("../../../assets/backWhite.png")}
                                 action={() => {
-                                    if(action){
+                                    if (action) {
                                         action()
-                                    }else{
+                                    } else {
                                         navigation.goBack()
                                     }
-                                    
+
                                 }}
                                 title={data?.order_items && data?.order_items[0]?.services_name}
                                 titleStyle={{ color: "white" }}

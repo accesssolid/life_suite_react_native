@@ -64,10 +64,16 @@ const OrderHistory1 = (props) => {
     useEffect(() => {
         getOrders(selected.id)
     }, [selected])
-
+    function filterwithNameAndService(item){
+        let serviceNames=[...new Set(item.order_items?.map(x=>x.services_name))]
+        if(`${item.providers_first_name} ${item.providers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase())||serviceNames.filter(x=>x?.toLowerCase()?.includes(searchData.text?.toLowerCase()))?.length>0){
+            return true
+        }
+        return false
+    }
     useEffect(() => {
         if (searchData.text?.trim() !== "") {
-            let dataCopy = data.filter(x => `${x.providers_first_name} ${x.providers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase()))
+            let dataCopy = data.filter(filterwithNameAndService)
             setSearchData(state => ({ ...state, data: dataCopy }))
         } else {
             setSearchData(state => ({ ...state, data: data }))
@@ -199,7 +205,7 @@ const OrderHistory1 = (props) => {
                 setLoader(false)
             })
     }
-
+  
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <CancelModal

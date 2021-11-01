@@ -130,7 +130,7 @@ const Notification = (props) => {
                         borderColor: '#4141411A',
                         width: "90%",
                         overflow: "hidden",
-                        height: 50
+                        height:62
                     }}
                     activeOpacity={0.7}
                 >
@@ -142,6 +142,7 @@ const Notification = (props) => {
                         <View style={{ width: "20%", justifyContent: "center", alignItems: "flex-end" }}>
                             <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>
                         </View>
+                     
                     </View>
                 </Card>
             </Pressable>

@@ -1,6 +1,6 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, TouchableOpacity, Dimensions, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, TouchableOpacity, Dimensions, ScrollView, Image, Linking } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -24,6 +24,7 @@ import ReorderModal from '../../../components/reorderModal';
 // placeholder image
 const placeholder_image = require("../../../assets/user.png")
 import _ from 'lodash'
+import RNGooglePlaces from 'react-native-google-places';
 
 import { order_types, buttons_customer, buttons_types } from '../../../constants/globals'
 
@@ -40,11 +41,36 @@ export default function OrderDetailUpdateCustomer(props) {
     const [blockModal, setBlockModal] = React.useState(false)
     const [cancelSearchModal, setCancelSearcHModal] = React.useState(false)
     const [virtualdata, setVirtualData] = React.useState({})
-    const [reorderModal,setReorderModal]=React.useState(false)
+    const [reorderModal, setReorderModal] = React.useState(false)
 
     const [cancelOrderText, setCancelOrderText] = React.useState("Remaining cancellation requests: 10")
     const [textShowWithRed, settextShowWithRed] = React.useState("")
+    const [fromCoordinates, setFromCoordinates] = useState({
+        latitude: 37.78825,
+        longitude: -122.4324,
+    })
 
+    const [toCoordinates, setToCoordinates] = useState({
+        latitude: 37.78825,
+        longitude: -122.4324,
+    })
+
+    React.useEffect(() => {
+        console.log("Data", JSON.stringify(data))
+        if (data?.id) {
+            if (data.order_from_lat && data.order_from_long) {
+                setToCoordinates({
+                    latitude: data.order_from_lat,
+                    longitude: data.order_from_long,
+                })
+            } else if (data.order_to_lat && data.order_to_long) {
+                setToCoordinates({
+                    latitude: data.order_to_lat,
+                    longitude: data.order_to_long,
+                })
+            }
+        }
+    }, [data])
 
     const getOrderDetail = (order_id) => {
         setLoading(true)
@@ -220,7 +246,46 @@ export default function OrderDetailUpdateCustomer(props) {
 
     useFocusEffect(React.useCallback(() => {
         getOrderDetail(item.id)
+        getLocationPermission()
     }, []))
+
+    const getLocationPermission = async () => {
+        let hasLocationPermission = false
+        if (Platform.OS == "ios") {
+            Geolocation.requestAuthorization('always').then((res) => {
+                if (res == "granted") {
+                    hasLocationPermission = true
+                    getCurrentLocation(hasLocationPermission)
+                } else {
+                    hasLocationPermission = false
+                    getCurrentLocation(hasLocationPermission)
+                }
+            })
+        } else {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        title: "Lifesuite Location Permission",
+                        message:
+                            "Lifesuite needs to access your location ",
+                        buttonNeutral: "Ask Me Later",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK"
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    hasLocationPermission = true
+                    getCurrentLocation(hasLocationPermission)
+                } else {
+                    hasLocationPermission = false
+                    getCurrentLocation(hasLocationPermission)
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+    }
 
     const searchAgain = () => {
         props.navigation.navigate("MechanicLocation", {
@@ -234,8 +299,44 @@ export default function OrderDetailUpdateCustomer(props) {
             orderData: data
         })
     }
+    const gotToForReorder = () => {
+        props.navigation.navigate("MechanicLocation", {
+            servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
+            subService: {
+                name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
+                image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
+                location_type: data?.order_items[0]?.services_location_type ?? 0
+            },
+            reorder: true,
+            extraData: [],
+            orderData: data
+        })
+    }
+    const getCurrentPlace = () => {
+        RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
+            .then((results) => {
+                setFromAddress(results[0].address)
+                setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
 
-    const reOrder = async (start_time,end_time) => {
+            })
+            .catch((error) => console.log(error.message));
+    }
+
+    const getCurrentLocation = (hasLocationPermission) => {
+        if (hasLocationPermission) {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    getCurrentPlace()
+                },
+                (error) => {
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+            );
+        } else {
+            showToast("Location permission not granted")
+        }
+    }
+    const reOrder = async (start_time, end_time) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -246,8 +347,8 @@ export default function OrderDetailUpdateCustomer(props) {
             headers: headers,
             data: JSON.stringify({
                 order_id: data.id,
-                order_start_time: start_time , //"2021-10-07 10:00:00",
-                order_end_time:end_time // "2021-11-07 12:00:00"
+                order_start_time: start_time, //"2021-10-07 10:00:00",
+                order_end_time: end_time // "2021-11-07 12:00:00"
             }),
             endPoint: "/api/reorderCreate",
             type: 'post'
@@ -270,6 +371,15 @@ export default function OrderDetailUpdateCustomer(props) {
                 setLoading(false)
 
             })
+    }
+
+    const getReasonForCancellationText = () => {
+        let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
+        let d = x?.filter(x => x.reason_description != null && x.reason_description != "")
+        if (d?.length > 0) {
+            return d[d.length - 1].reason_description
+        }
+        return null
     }
 
     return (
@@ -309,7 +419,39 @@ export default function OrderDetailUpdateCustomer(props) {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Order Detail</Text>
                         <CardClientInfo virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        <Text style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>
+                        {getReasonForCancellationText() && <Text style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10 ,marginHorizontal:20}]}><Text style={{color:"red"}}>Reason</Text>: {getReasonForCancellationText()}</Text>}
+                        <RenderAddressFromTO
+                            fromShow={data?.order_items[0]?.services_location_type == 2}
+                            toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
+                            currentAddress={fromCoordinates}
+                            addresses={{
+                                from: data?.order_from_address, //from address
+                                to: data?.order_placed_address, //to address
+                                fromCoordinates: { latitude: Number(data?.order_from_lat), longitude: Number(data?.order_from_long) }, //from in lat && long
+                                toCoordinates: { latitude: Number(data?.order_placed_lat), longitude: Number(data?.order_placed_long) } //to in lat && long
+                            }}
+                        />
+                        {data?.order_status == order_types.will_be_delayed &&
+                            <><View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                                <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Job has been delayed </Text>
+                                <Text style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>~{moment(data?.order_start_new_time).diff(moment(data?.order_start_time), "minutes")} minutes</Text>
+                            </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                                    <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Est. Old Start Time </Text>
+                                    <Text style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>{moment(data?.order_start_time).format("hh:mm a")}</Text>
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                                    <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Est. New Start Time</Text>
+                                    <Text style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>{moment(data?.order_start_new_time).format("hh:mm a")}</Text>
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                                    <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Est. New End Time</Text>
+                                    <Text style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>{moment(data?.order_end_new_time).format("hh:mm a")}</Text>
+                                </View>
+                            </>
+                        }
+                        {/* <TextReasonForCancel data= /> */}
+                        {textShowWithRed !== "" && <Text style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>}
                     </ScrollView>
                     {/* lowerButton */}
                     <GetButtons
@@ -317,8 +459,9 @@ export default function OrderDetailUpdateCustomer(props) {
                         openCancelModal={() => setCancelModal(true)}
                         openCancelSearchModal={() => setCancelSearcHModal(true)}
                         searchAgain={() => searchAgain()}
+                        gotToForReorder={() => gotToForReorder()}
                         submit={submit}
-                        openReorderModal={()=>setReorderModal(true)}
+                        openReorderModal={() => setReorderModal(true)}
                         openBlockModal={() => setBlockModal(true)}
                     />
                 </View>
@@ -378,11 +521,11 @@ export default function OrderDetailUpdateCustomer(props) {
                 }}
                 setVisible={setBlockModal}
             />
-             <ReorderModal
+            <ReorderModal
                 title={`Reorder`}
                 visible={reorderModal}
-                onPressYes={(start_time,end_time) => {
-                    reOrder(start_time,end_time)
+                onPressYes={(start_time, end_time) => {
+                    reOrder(start_time, end_time)
                 }}
                 setVisible={setReorderModal}
             />
@@ -407,9 +550,9 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 if (totalTime < totalVirtualTime) {
                     settextShowWithRed(`Adding new service requires ${totalVirtualTime - totalTime} min extra`)
                 } else if (totalTime > totalVirtualTime) {
-                    settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
+                    // settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
                 } else if (totalTime === totalVirtualTime) {
-                    settextShowWithRed(`New updated order require ${totalVirtualTime} min`)
+                    // settextShowWithRed(`New updated order require ${totalVirtualTime} min`)
 
                 }
             }
@@ -438,7 +581,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
             let t = items.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalTime(total)
-            // setTotalWorkingMinutes(total)
+            setTotalWorkingMinutes(total)
         }
     }, [items])
 
@@ -483,6 +626,13 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
         }
     }
 
+    const checkforDiscountToShow = (discount_amount, show) => {
+        if (show && discount_amount && discount_amount != 0) {
+            return true
+        } else {
+            return false
+        }
+    }
     return (
         <Card containerStyle={{ borderRadius: 10 }}>
             <View style={{ flexDirection: "row" }}>
@@ -514,7 +664,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     return (<OrderItemsDetail i={i} />)
                 })}
             </View>}
-            {showVirtualData && virtual_data?.discount_amount && virtual_data?.discount_amount != 0 && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            {checkforDiscountToShow(showVirtualData, virtual_data?.discount_amount) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Discount</Text>
                 <Text style={styles.greenTextStyle}>{virtual_data?.discount_type == "flat" ? `$${virtual_data?.discount_amount}` : `${virtual_data?.discount_amount}%`}</Text>
             </View>}
@@ -614,9 +764,92 @@ const OrderItemsDetail = ({ i }) => {
     )
 }
 
-const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, openBlockModal, searchAgain,openReorderModal }) => {
+
+const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) => {
+    const navigation = useNavigation()
+    return (
+        <View style={{ marginHorizontal: 20, marginTop: 0 }}>
+            {fromShow &&
+                <>
+                    <Text style={[styles.baseTextStyle, { marginBottom: 8 }]}>Requested From</Text>
+                    <TouchableOpacity
+                        onPress={() => {
+                            // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
+                            if (addresses.fromCoordinates?.latitude && addresses.fromCoordinates?.longitude) {
+                                if (Platform.OS == "android") {
+                                    Linking.openURL(`google.navigation:q=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                                } else {
+                                    Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                                }
+                            }
+                        }}
+                        style={styles.fromContainer}>
+                        <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.from}</Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
+                                if (addresses.fromCoordinates?.latitude && addresses.fromCoordinates?.longitude) {
+                                    if (Platform.OS == "android") {
+                                        Linking.openURL(`google.navigation:q=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                                    } else {
+                                        Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.fromCoordinates?.latitude}+${addresses.fromCoordinates?.longitude}`)
+                                    }
+                                }
+                            }}
+                            style={{ height: 20, width: 40 }}
+                            activeOpacity={0.7}>
+                            <Image
+                                style={{ flex: 1, resizeMode: "contain" }}
+                                source={require("../../../assets/location.png")}
+                            />
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </>
+            }
+            {toShow &&
+                <>
+                    <Text style={[styles.baseTextStyle, { marginTop: 16, marginBottom: 8 }]}>Requested To</Text>
+                    <TouchableOpacity
+                        onPress={() => {
+                            if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {
+                                if (Platform.OS == "android") {
+                                    Linking.openURL(`google.navigation:q=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                                } else {
+                                    Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                                }
+                            }
+                            // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.toCoordinates })
+                        }}
+                        style={styles.fromContainer}>
+                        <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.to}</Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {
+                                    if (Platform.OS == "android") {
+                                        Linking.openURL(`google.navigation:q=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                                    } else {
+                                        Linking.openURL(`maps://app?saddr=${currentAddress.latitude}+${currentAddress.longitude}&daddr=${addresses.toCoordinates?.latitude}+${addresses.toCoordinates?.longitude}`)
+                                    }
+                                }
+                                // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.toCoordinates })
+                            }}
+                            style={{ height: 20, width: 40 }}
+                            activeOpacity={0.7}>
+                            <Image
+                                style={{ flex: 1, resizeMode: "contain" }}
+                                source={require("../../../assets/location.png")}
+                            />
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </>
+            }
+        </View>
+    )
+}
+
+const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, openBlockModal, searchAgain, openReorderModal, gotToForReorder }) => {
     const [buttons, setButtons] = React.useState([])
-    console.log(data, "data")
+    console.log(JSON.stringify(data), "data")
     const navigation = useNavigation()
     React.useEffect(() => {
         console.log(buttons)
@@ -687,7 +920,10 @@ const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, open
                 searchAgain()
                 break
             case buttons_types.reorder:
-                openReorderModal()
+                gotToForReorder()
+                break
+            case buttons_types.pay:
+                navigation.navigate("FinishPay", { item: data,submit:submit.bind(this) })
                 break
             // case buttons_types.accept:
 

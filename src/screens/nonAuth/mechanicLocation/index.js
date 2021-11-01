@@ -11,25 +11,25 @@ import MapView, { Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { BASE_URL, getApi } from '../../../api/api';
 
 /* Components */;
 import Header from '../../../components/header';
 import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { TextInput } from 'react-native-gesture-handler';
-import { BASE_URL } from '../../../api/api';
 import { Dimensions } from 'react-native';
 import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
 import SureModal from '../../../components/sureModal';
+import Loader from '../../../components/loader';
 
 // #liahs_before_providers
 
 const MechanicLocation = (props) => {
-    const { servicedata, subService, extraData, orderData } = props.route.params
-    console.log("SubService==>", subService)
+    const { servicedata, subService, extraData, orderData, reorder } = props.route.params
     const user = useSelector(state => state.authenticate.user)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
@@ -39,6 +39,8 @@ const MechanicLocation = (props) => {
     const [toAddress, setToAddress] = useState("")
     const [date, setDate] = useState("")
     const [open, setOpen] = useState(false)
+    const [loading,setLoading]=React.useState(false)
+    const access_token = useSelector(state => state.authenticate.access_token)
 
     React.useEffect(() => {
         console.log("Params", props.route.params)
@@ -52,7 +54,7 @@ const MechanicLocation = (props) => {
             if (orderData.order_from_lat && orderData.order_from_long) {
                 setFromCoordinates({
                     latitude: Number(orderData.order_from_lat),
-                    longitude:Number(orderData.order_from_long),
+                    longitude: Number(orderData.order_from_long),
                 })
             }
             if (orderData.order_placed_address) {
@@ -60,8 +62,8 @@ const MechanicLocation = (props) => {
             }
             if (orderData.order_placed_lat && orderData.order_placed_long) {
                 setToCoordinates({
-                    latitude:Number(orderData.order_placed_lat),
-                    longitude:Number(orderData.order_placed_long),
+                    latitude: Number(orderData.order_placed_lat),
+                    longitude: Number(orderData.order_placed_long),
                 })
             }
         }
@@ -158,7 +160,58 @@ const MechanicLocation = (props) => {
             .catch((error) => console.log(error.message));
     }
 
+    const reOrder = async (start_time, end_time) => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({
+                order_id: orderData.id,
+                order_start_time: start_time, //"2021-10-07 10:00:00",
+                order_end_time: end_time, // "2021-11-07 12:00:00"
+                "order_placed_address": toAddress,
+                "order_placed_lat": toCoordinates.latitude,
+                "order_placed_long": toCoordinates.longitude,
+                "order_from_lat": fromCoordinates.latitude,
+                "order_from_long": fromCoordinates.longitude,
+                "order_from_address": fromAddress
+            }),
+            endPoint: "/api/reorderCreate",
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    showToast(response.message)
+                    props.navigation.pop()
+                } else {
+                    console.log("Error", response)
+                    showToast(response.message)
+                }
+            }).catch(err => {
+
+            }).finally(() => {
+                setLoading(false)
+
+            })
+    }
+
     const submit = () => {
+        if (reorder) {
+            if (date.trim() == "") {
+                showToast("Please select date")
+                return
+            } else if (startTime.toString() === endTime.toString()) {
+                showToast("Start Time and End Time Cannot Be Same")
+                return
+            }
+            reOrder(moment(date).format("YYYY-MM-DD") + " " + moment(startTime).format('HH:mm') + ":00", moment(date).format("YYYY-MM-DD") + " " + moment(endTime).format('HH:mm') + ":00")
+            return
+        }
         let arr = []
         servicedata.forEach(element => {
             arr.push(element.item_id)
@@ -387,6 +440,7 @@ const MechanicLocation = (props) => {
                     {renderView()}
                 </View>
             </SafeAreaView >
+            {loading&& <Loader />}
         </>
     )
 }

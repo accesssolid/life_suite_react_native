@@ -4,6 +4,7 @@ import {
     StyleSheet,
     Pressable,
     View,
+    ScrollView,
     TouchableOpacity,
     Text,
     TextInput
@@ -32,17 +33,18 @@ const DelayModal = props => {
                         borderRadius: 10,
                         padding: 20,
                     }}>
+                        <ScrollView>
                     <Text style={styles.sure}>Delay Order</Text>
                     <View style={{ height: 2, width: 84, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
-                    <Text style={{ ...styles.subtext, marginTop: "10%" }}>Enter delay time in minutes? </Text>
+                    <Text style={{ ...styles.subtext, marginTop: "10%" }}>Enter delay time (In minutes)</Text>
                     <View style={{marginTop:10}}>
                         <TextInput 
                             value={delayTime}
                             onChangeText={t=>setDelayTime(t)}
                             keyboardType="numeric"
-                            placeholder="minute"
+                            placeholder="Minute"
                             placeholderTextColor={LS_COLORS.global.black}
-                            style={{borderWidth:1,borderColor:LS_COLORS.global.black,fontFamily:LS_FONTS.PoppinsRegular,borderRadius:5}}
+                            style={{borderWidth:1,borderColor:LS_COLORS.global.green,height:50,paddingHorizontal:10,fontFamily:LS_FONTS.PoppinsRegular,borderRadius:5}}
                         />
                     </View>
                     <View style={{ marginTop: 10 }}>
@@ -67,6 +69,7 @@ const DelayModal = props => {
                             <Text style={styles.saveText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
+                    </ScrollView>
                 </Pressable>
             </Pressable>
         </Modal>
