@@ -25,7 +25,7 @@ const CancelModal = props => {
             <Pressable onPress={props.pressHandler} style={styles.modalScreen}>
                 <View
                     style={{
-                        height: "50%",
+                        minHeight:350,
                         backgroundColor: 'white',
                         width: "80%",
                         borderRadius: 10,
@@ -33,9 +33,10 @@ const CancelModal = props => {
                     }}>
                     <Container style={{ flex: 1, backgroundColor: 'white' }}>
                         <Content>
-                            <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, alignSelf: "center", marginTop: "4%", color: 'black' }}>{props.title}</Text>
+                            <Text style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.title}</Text>
+                            <Text style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.subCancelText}</Text>
                             <View style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
-                            <Card style={{ marginTop: '15%' }}>
+                            <Card style={{ marginTop:20 }}>
                                 <TextInput
                                     multiline={true}
                                     style={{ padding: 10, height: 100, color: "black", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlignVertical: 'top' }}

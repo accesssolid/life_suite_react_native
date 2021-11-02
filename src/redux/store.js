@@ -5,6 +5,7 @@ import ProviderReducer from './features/provider'
 import TotalReducer from "./features/total"
 import ChatUsersReducer from './features/chatUser'
 import BankModelReducer from './features/bankModel'
+import NotificationReducer from './features/notification'
 
 const store = configureStore({
     reducer: {
@@ -13,7 +14,8 @@ const store = configureStore({
         provider: ProviderReducer,
         total : TotalReducer,
         chat_users:ChatUsersReducer,
-        bank_model:BankModelReducer
+        bank_model:BankModelReducer,
+        notification:NotificationReducer
     },
 })
 

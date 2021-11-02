@@ -117,6 +117,7 @@ const ReorderModal = ({ visible, setVisible, title, onPressYes }) => {
                     <DateTimePickerModal
                         isVisible={isDatePickerVisible1}
                         mode="time"
+
                         date={moment(endTime).toDate()}
                         onConfirm={handleConfirm1}
                         onCancel={() => setDatePickerVisibility1(false)}

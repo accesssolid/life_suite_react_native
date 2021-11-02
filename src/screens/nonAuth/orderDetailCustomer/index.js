@@ -25,7 +25,7 @@ import ReorderModal from '../../../components/reorderModal';
 const placeholder_image = require("../../../assets/user.png")
 import _ from 'lodash'
 import RNGooglePlaces from 'react-native-google-places';
-
+import { Rating } from 'react-native-ratings';
 import { order_types, buttons_customer, buttons_types } from '../../../constants/globals'
 
 export default function OrderDetailUpdateCustomer(props) {
@@ -49,7 +49,7 @@ export default function OrderDetailUpdateCustomer(props) {
         latitude: 37.78825,
         longitude: -122.4324,
     })
-
+    const [cancelRanges,setCancelRanges]=React.useState([])
     const [toCoordinates, setToCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -88,6 +88,7 @@ export default function OrderDetailUpdateCustomer(props) {
 
         getApi(config)
             .then((response) => {
+                console.log("Response",response)
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
@@ -95,6 +96,9 @@ export default function OrderDetailUpdateCustomer(props) {
                         setVirtualData(response.data.virtual_order)
                     } else {
 
+                    }
+                    if(response.cancel_charge_ranges){
+                        setCancelRanges(response.cancel_charge_ranges)
                     }
                     if (response.totalSettingData) {
                         let key_value = response.totalSettingData.find(x => x.key == "cancel_order_by_customer")
@@ -382,6 +386,22 @@ export default function OrderDetailUpdateCustomer(props) {
         return null
     }
 
+    const getCancellationText=()=>{
+        const order_start_time=moment(data?.order_start_time)
+        const time=moment().diff(order_start_time,"minutes")
+        let text=""
+        for(let d of cancelRanges){
+            if(d.start_minutes<time&&time>=d.end_minutes){
+                text=`You will be charged a $${d?.percentage}% or ${Number(d?.percentage)*Number(data?.order_total_price)/100} whichever is more than if within 24 hours. `
+                break
+            }
+        }
+        // if(time<=5){
+        //     return text
+        // }if(time>5 && time<=10)
+        return text
+    }
+
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
             <StatusBar translucent backgroundColor={"transparent"} barStyle="light-content" />
@@ -419,7 +439,7 @@ export default function OrderDetailUpdateCustomer(props) {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Order Detail</Text>
                         <CardClientInfo virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        {getReasonForCancellationText() && <Text style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10 ,marginHorizontal:20}]}><Text style={{color:"red"}}>Reason</Text>: {getReasonForCancellationText()}</Text>}
+                        {getReasonForCancellationText() && <Text style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
                         <RenderAddressFromTO
                             fromShow={data?.order_items[0]?.services_location_type == 2}
                             toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
@@ -471,7 +491,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 visible={cancelModa}
                 value={reason}
                 // pressHandler={()=>setCancelModal(false)}
-
+                subCancelText={getCancellationText()}
                 onChangeText={(t) => { setReason(t) }}
                 action1={() => {
                     setCancelModal(false)
@@ -491,6 +511,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 title={cancelOrderText}
                 visible={cancelSearchModal}
                 value={reason}
+                subCancelText={getCancellationText()}
                 // pressHandler={()=>setCancelModal(false)}
                 onChangeText={(t) => { setReason(t) }}
                 action1={() => {
@@ -543,6 +564,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
     const [totalTime, setTotalTime] = React.useState(0)
     const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
     const [showVirtualData, setShowVirtualData] = React.useState(false)
+    console.log("Data1",data)
 
     useEffect(() => {
         if (showVirtualData) {
@@ -553,7 +575,6 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     // settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
                 } else if (totalTime === totalVirtualTime) {
                     // settextShowWithRed(`New updated order require ${totalVirtualTime} min`)
-
                 }
             }
         } else {
@@ -645,6 +666,18 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     <View style={{ marginLeft: 10, justifyContent: "center" }}>
                         <Text style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
                         <Text style={[styles.baseTextStyle]}>{country}</Text>
+                        <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
+                            <Text style={[styles.baseTextStyle]}>Rating: {data?.providers_rating} </Text>
+                            <Rating
+                                readonly={true}
+                                imageSize={12}
+                                type="custom"
+                                ratingBackgroundColor="white"
+                                ratingColor="#04BFBF"
+                                tintColor="white"
+                                startingValue={1}
+                            />
+                        </View>
                     </View>
                 </View>
                 <View >
@@ -684,6 +717,20 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 <Text style={styles.greenTextStyle}>Total Time</Text>
                 <Text style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
             </View>
+            {data?.provider_rating_data?.id&&
+                 <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
+                 <Text style={[styles.greenTextStyle]}>Rating: </Text>
+                 <Rating
+                     readonly={true}
+                     imageSize={10}
+                     type="custom"
+                     ratingBackgroundColor="white"
+                     ratingColor="#04BFBF"
+                     tintColor="white"
+                     startingValue={data?.provider_rating_data?.rating}
+                 />
+             </View>
+            }
         </Card>
     )
 }
@@ -923,7 +970,7 @@ const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, open
                 gotToForReorder()
                 break
             case buttons_types.pay:
-                navigation.navigate("FinishPay", { item: data,submit:submit.bind(this) })
+                navigation.navigate("FinishPay", { item: data, submit: submit.bind(this) })
                 break
             // case buttons_types.accept:
 

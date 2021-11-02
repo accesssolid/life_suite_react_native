@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity,Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -23,7 +23,7 @@ export default function FinishPay({ navigation, route }) {
     const [per_amount, setPerAmount] = React.useState("")
     const [totalPrice,setTotalPrice]=React.useState(0)
     const access_token = useSelector(state => state.authenticate.access_token)
-    const [rating, setRating] = React.useState("1")
+    const [rating, setRating] = React.useState("0")
     const [reason,setReason]=React.useState("")
     const [loading,setLoading]=React.useState(false)
     React.useEffect(()=>{
@@ -35,8 +35,10 @@ export default function FinishPay({ navigation, route }) {
     },[item])
 
     const submit = () => {
-        // console.log(selectedStartTime)
-        // return 
+        if(Number(rating)<=0){
+            showToast("Please rate this job.")
+            return
+        }
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -88,7 +90,7 @@ export default function FinishPay({ navigation, route }) {
                     <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20 }}>
                         <Text style={[styles.textStyle, { fontSize: 14 }]}>Rate this Job</Text>
                         <Rating
-                            imageSize={30}
+                            imageSize={25}
                             type="custom"
                             ratingBackgroundColor="gray"
                             ratingColor="#04BFBF"
@@ -96,7 +98,7 @@ export default function FinishPay({ navigation, route }) {
                             onFinishRating={(rating) => {
                                 setRating(rating)
                             }}
-                            startingValue={1}
+                            startingValue={0}
                         />
                     </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, alignItems: "center", paddingHorizontal: 20 }}>
@@ -107,7 +109,7 @@ export default function FinishPay({ navigation, route }) {
                                 value={type}
                                 onChangeValue={(index, value) => { setType(value) }}
                                 containerStyle={{ width: "60%", borderRadius: 6, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0 }}
-                                dropdownStyle={{ width: "40%", height: 100 }}
+                                dropdownStyle={{ width: "40%", height: 90,marginTop:Platform.OS=="android"?-30:0 }}
                             />
                         </View>
 
@@ -121,10 +123,10 @@ export default function FinishPay({ navigation, route }) {
                             </View>}
                         {type == types[1] &&
                             <><View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                             </View>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput maxLength={2} value={(String(Number(per_amount) * totalPrice / 100)) ?? ""} keyboardType={"numeric"} placeholder={"Calculated Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                    <Text  style={{ height: 40 ,textAlign:"center",textAlignVertical:"center"}} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
                                 </View>
                             </>
                         }

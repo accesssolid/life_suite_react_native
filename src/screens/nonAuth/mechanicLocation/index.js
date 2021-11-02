@@ -39,15 +39,17 @@ const MechanicLocation = (props) => {
     const [toAddress, setToAddress] = useState("")
     const [date, setDate] = useState("")
     const [open, setOpen] = useState(false)
-    const [loading,setLoading]=React.useState(false)
+    const [loading, setLoading] = React.useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
 
+    const [isLoadCurrentLocation, setIsLoadCurrentLocation] = React.useState(false)
     React.useEffect(() => {
         console.log("Params", props.route.params)
     }, [props.route.params])
 
     React.useEffect(() => {
         if (orderData) {
+            setIsLoadCurrentLocation(false)
             if (orderData.order_from_address) {
                 setFromAddress(orderData.order_from_address)
             }
@@ -66,6 +68,8 @@ const MechanicLocation = (props) => {
                     longitude: Number(orderData.order_placed_long),
                 })
             }
+        } else {
+            setIsLoadCurrentLocation(true)
         }
     }, [orderData])
 
@@ -94,8 +98,11 @@ const MechanicLocation = (props) => {
 
     useEffect(() => {
         // subService.location_type : 2 - Both , 1 - From only
-        getLocationPermission()
-    }, [])
+        if (isLoadCurrentLocation) {
+            getLocationPermission()
+        }
+
+    }, [isLoadCurrentLocation])
 
     const getLocationPermission = async () => {
         let hasLocationPermission = false
@@ -208,7 +215,11 @@ const MechanicLocation = (props) => {
             } else if (startTime.toString() === endTime.toString()) {
                 showToast("Start Time and End Time Cannot Be Same")
                 return
-            }
+            } 
+            // else if (moment(startTime).date() >  moment(endTime).date()) {
+            //     showToast("Start Time and End Time Cannot Be Same")
+            //     return
+            // }
             reOrder(moment(date).format("YYYY-MM-DD") + " " + moment(startTime).format('HH:mm') + ":00", moment(date).format("YYYY-MM-DD") + " " + moment(endTime).format('HH:mm') + ":00")
             return
         }
@@ -239,6 +250,8 @@ const MechanicLocation = (props) => {
             showToast("Please select date")
         } else if (startTime.toString() === endTime.toString()) {
             showToast("Start Time and End Time Cannot Be Same")
+        } else if (startTime.toDate() > endTime.toDate()) {
+            showToast("Start Time must be grater than End Time. ")
         } else {
             props.navigation.navigate("Mechanics", { data: data, subService: subService, extraData })
         }
@@ -250,10 +263,14 @@ const MechanicLocation = (props) => {
     };
 
     const handleConfirm1 = (date) => {
+        console.log(date)
         if (moment(date).toDate() > moment(startTime).toDate()) {
             setEndTime(date)
         } else {
-            showToast("End time must be greater than start time.")
+            setTimeout(()=>{
+                showToast("End time must be greater than start time.")
+
+            },200)
         }
         setDatePickerVisibility1(false);
 
@@ -440,7 +457,7 @@ const MechanicLocation = (props) => {
                     {renderView()}
                 </View>
             </SafeAreaView >
-            {loading&& <Loader />}
+            {loading && <Loader />}
         </>
     )
 }

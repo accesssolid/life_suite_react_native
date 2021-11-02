@@ -25,13 +25,13 @@ import BookedSlotsModal from './bookedSlotsModal';
 import Loader from '../../../components/loader'
 import CancelModal from '../../../components/cancelModal';
 import BlockModal from '../../../components/blockModal';
+import RatingModal from '../../../components/ratingModal'
 // placeholder image
 const placeholder_image = require("../../../assets/user.png")
 import _ from 'lodash'
-import openMap from 'react-native-open-maps';
 import { order_types, buttons_customer, buttons_provider, buttons_types } from '../../../constants/globals'
 import DelayModal from '../../../components/delayModal';
-
+import { Rating } from 'react-native-ratings'
 
 function generate_series(step, start_time) {
     const dt = moment(start_time, 'YYYY-MM-DD HH:mm').toDate()
@@ -70,6 +70,7 @@ const OrderClientDetail = (props) => {
     const [cancelModa, setCancelModal] = React.useState(false)
     const [blockModal, setBlockModal] = React.useState(false)
     const [delayModalOpen, setDelayModalOpen] = React.useState(false)
+    const [ratingModal, setRatingModal] = React.useState(false)
     const [textShowWithRed, settextShowWithRed] = React.useState("")
 
     // books data from  modal
@@ -425,7 +426,7 @@ const OrderClientDetail = (props) => {
             getOrderDetail(item.id)
         }
     }, []))
-    
+
     const getReasonForCancellationText = () => {
         let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
         let d = x?.filter(x => x.reason_description != null && x.reason_description != "")
@@ -472,7 +473,7 @@ const OrderClientDetail = (props) => {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Client Info</Text>
                         <CardClientInfo settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        {getReasonForCancellationText() && <Text style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10 ,marginHorizontal:20}]}><Text style={{color:"red"}}>Reason</Text>: {getReasonForCancellationText()}</Text>}
+                        {getReasonForCancellationText() && <Text style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
                         <RenderAddressFromTO
                             fromShow={data?.order_items[0]?.services_location_type == 2}
                             toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
@@ -526,6 +527,7 @@ const OrderClientDetail = (props) => {
                         submit={submit}
                         openDelayModal={() => setDelayModalOpen(true)}
                         openBlockModal={() => setBlockModal(true)}
+                        openRatingModal={() => setRatingModal(true)}
                         gotoUpdateScreen={() => {
                             props.navigation.navigate("UpdateOrderItems", {
                                 servicedata, subService, item
@@ -587,6 +589,16 @@ const OrderClientDetail = (props) => {
 
                 }}
                 setVisible={setBlockModal}
+            />
+            <RatingModal
+                title={`Rating`}
+                visible={ratingModal}
+                data={data?.provider_rating_data}
+                onPressYes={() => {
+                 
+
+                }}
+                setVisible={setRatingModal}
             />
             <DelayModal
                 open={delayModalOpen}
@@ -745,6 +757,20 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                 <Text style={styles.greenTextStyle}>Total Time</Text>
                 <Text style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
             </View>
+            {/* {data?.provider_rating_data?.id&&
+                 <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
+                 <Text style={[styles.greenTextStyle]}>Rating: </Text>
+                 <Rating
+                     readonly={true}
+                     imageSize={10}
+                     type="custom"
+                     ratingBackgroundColor="white"
+                     ratingColor="#04BFBF"
+                     tintColor="white"
+                     startingValue={data?.provider_rating_data?.rating}
+                 />
+             </View>
+            } */}
         </Card>
     )
 }
@@ -908,7 +934,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
 
 
 
-const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen }) => {
+const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen,openRatingModal }) => {
     const [buttons, setButtons] = React.useState([])
     console.log(JSON.stringify(data), "data")
     const navigation = useNavigation()
@@ -978,6 +1004,9 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayMo
                 break
             case buttons_types.completed:
                 submit(order_types.service_finished)
+                break
+            case buttons_types.view_rating:
+                openRatingModal()
                 break
             // case buttons_types.accept:
 

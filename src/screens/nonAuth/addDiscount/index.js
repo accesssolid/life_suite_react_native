@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, SafeAreaView, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native'
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
@@ -13,11 +13,11 @@ const types = ["Flat Amount", "Percentage"]
 
 export default function AddDiscount({ navigation, route }) {
     const [type, setType] = React.useState("Flat Amount")
-    const { discount, setDiscount,totalPrice } = route.params ?? {}
+    const { discount, setDiscount, totalPrice } = route.params ?? {}
     const [flat_amount, setFlatAmount] = React.useState("")
     const [per_amount, setPerAmount] = React.useState("")
-    const [totalPrice1,setTotalPrice1]=React.useState(0)
-    
+    const [totalPrice1, setTotalPrice1] = React.useState(0)
+
     React.useEffect(() => {
         setTotalPrice1(totalPrice)
         if (discount?.discount_type == "flat") {
@@ -27,7 +27,7 @@ export default function AddDiscount({ navigation, route }) {
             setType(types[1])
             setPerAmount(discount.discount_amount)
         }
-    }, [discount, setDiscount,totalPrice])
+    }, [discount, setDiscount, totalPrice])
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -37,10 +37,10 @@ export default function AddDiscount({ navigation, route }) {
                 action={() => {
                     navigation.goBack()
                 }}
-                // imageUrl1={require("../../../assets/home.png")}
-                // action1={() => {
-                //     navigation.navigate("MainDrawer")
-                // }}
+            // imageUrl1={require("../../../assets/home.png")}
+            // action1={() => {
+            //     navigation.navigate("MainDrawer")
+            // }}
             />
             <Container>
                 <Content>
@@ -52,7 +52,7 @@ export default function AddDiscount({ navigation, route }) {
                                 value={type}
                                 onChangeValue={(index, value) => { setType(value) }}
                                 containerStyle={{ width: "60%", borderRadius: 6, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0 }}
-                                dropdownStyle={{ width: "40%", height: 100 }}
+                                dropdownStyle={{ width: "40%", height: 90, marginTop: Platform.OS == "android" ? -30 : 0 }}
                             />
                         </View>
 
@@ -61,15 +61,15 @@ export default function AddDiscount({ navigation, route }) {
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{ width: "40%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={flat_amount}  onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
                             <><View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                <TextInput  value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                             </View>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput maxLength={2} value={(String(Number(per_amount)*totalPrice/100))??""} keyboardType={"numeric"} placeholder={"Calculated Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                    <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center",lineHeight:40 }} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
                                 </View>
                             </>
                         }

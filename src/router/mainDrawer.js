@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 /* Packages */
-import { createDrawerNavigator, DrawerItemList, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerItemList, DrawerContentScrollView, DrawerItem,useIsDrawerOpen } from '@react-navigation/drawer';
 
 /* Screens */
 import LS_FONTS from '../constants/fonts';
@@ -34,8 +34,9 @@ import { getApi } from '../api/api';
 import { role } from '../constants/globals';
 import { useDispatch } from 'react-redux';
 import { updateBankModelData } from '../redux/features/bankModel'
+import { loadNotificaitonsThunk } from '../redux/features/notification'
 import { showToast, storeItem } from '../components/validators';
-
+import { Badge } from 'react-native-elements/dist/badge/Badge';
 const Drawer = createDrawerNavigator();
 
 const MainDrawer = (props) => {
@@ -46,7 +47,22 @@ const MainDrawer = (props) => {
     const [softwareVisible, setSoftwareVisible] = useState(false)
     const navigation = useNavigation()
     const access_token = useSelector(state => state.authenticate.access_token)
+    const notifications = useSelector(state => state.notification)?.data
     const dispatch = useDispatch()
+    // get badge component
+    const GetBadge = () => {
+        if(notifications?.filter(x => x.is_read == "0").length==0){
+            return null
+        }
+        return (<View style={{ height: 20, borderRadius: 20, backgroundColor: "red",marginLeft:10,justifyContent:"center" }} >
+            <Text style={{ color: LS_COLORS.global.white, marginHorizontal: 5 }}>{notifications?.filter(x => x.is_read == "0").length}</Text>
+        </View>
+        )
+    }
+    React.useEffect(()=>{
+        dispatch(loadNotificaitonsThunk())
+    },[props])
+
     const getConnectAccountDetail = () => {
         try {
             let headers = {
@@ -66,13 +82,15 @@ const MainDrawer = (props) => {
                         if (response.data.email && response.data.details_submitted) {
 
                         } else {
-                            dispatch(updateBankModelData({data:{
-                                title: "Select Account",
-                                subtitle: "You do not have any active accounts.",
-                                buttonTitle: "Add Stripe Money",
-                                type:"provider",
-                                open: true
-                            }}))
+                            dispatch(updateBankModelData({
+                                data: {
+                                    title: "Select Account",
+                                    subtitle: "You do not have any active accounts.",
+                                    buttonTitle: "Add Stripe Money",
+                                    type: "provider",
+                                    open: true
+                                }
+                            }))
                         }
                     }
                 }
@@ -118,7 +136,7 @@ const MainDrawer = (props) => {
         }
     }
     const getCards = () => {
-     
+
         let headers = {
             "Authorization": `Bearer ${access_token}`
         }
@@ -132,24 +150,28 @@ const MainDrawer = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true && response.data) {
-                   if(response.data.length==0){
-                    dispatch(updateBankModelData({data:{
-                        title: "Add Cards",
-                        subtitle: "You do not have any active cards to start order.",
-                        buttonTitle: "Add Card",
-                        type:"customer",
-                        open: true
-                    }}))
-                   }
+                    if (response.data.length == 0) {
+                        dispatch(updateBankModelData({
+                            data: {
+                                title: "Add Cards",
+                                subtitle: "You do not have any active cards to start order.",
+                                buttonTitle: "Add Card",
+                                type: "customer",
+                                open: true
+                            }
+                        }))
+                    }
                 }
                 else {
-                    dispatch(updateBankModelData({data:{
-                        title: "Add Cards",
-                        subtitle: "You do not have any active cards to start order.",
-                        buttonTitle: "Add Card",
-                        type:"customer",
-                        open: true
-                    }}))
+                    dispatch(updateBankModelData({
+                        data: {
+                            title: "Add Cards",
+                            subtitle: "You do not have any active cards to start order.",
+                            buttonTitle: "Add Card",
+                            type: "customer",
+                            open: true
+                        }
+                    }))
                 }
             })
             .catch(err => {
@@ -163,6 +185,8 @@ const MainDrawer = (props) => {
         } else if (user.user_role == role.provider) {
             getConnectAccountDetail()
         }
+        // notification thunk dispatch
+        dispatch(loadNotificaitonsThunk())
     }, [])
 
     return (
@@ -206,6 +230,7 @@ const MainDrawer = (props) => {
                 <Drawer.Screen
                     name="Messages"
                     component={ChatUsers}
+
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/message.png')} style={{ height: 20, width: 20 }} />,
                     }}
@@ -213,7 +238,9 @@ const MainDrawer = (props) => {
                 <Drawer.Screen
                     name="Favorites"
                     component={Favourites}
+
                     options={{
+
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />,
                     }}
                 />
@@ -221,6 +248,13 @@ const MainDrawer = (props) => {
                     name="Notification"
                     component={Notification}
                     options={{
+                        drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 14,
+                            color: LS_COLORS.global.darkBlack,
+                        }}>Notification</Text>
+                            <GetBadge />
+                        </View>,
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />,
                     }}
                 />
