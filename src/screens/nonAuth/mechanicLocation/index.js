@@ -210,12 +210,18 @@ const MechanicLocation = (props) => {
     const submit = () => {
         if (reorder) {
             if (date.trim() == "") {
-                showToast("Please select date")
+                setTimeout(()=>{
+                    showToast("Please select date")
+                },100)
+                
                 return
-            } else if (startTime.toString() === endTime.toString()) {
-                showToast("Start Time and End Time Cannot Be Same")
+            } else if (moment(startTime).toString() === moment(endTime).toString()) {
+                setTimeout(()=>{
+                    showToast("Start Time and End Time Cannot Be Same")
+                },100)
+                
                 return
-            } 
+            }
             // else if (moment(startTime).date() >  moment(endTime).date()) {
             //     showToast("Start Time and End Time Cannot Be Same")
             //     return
@@ -246,12 +252,19 @@ const MechanicLocation = (props) => {
             showToast("Please add to address")
         } else if (data.order_from_address.trim() == "") {
             showToast("Please add from address")
-        } else if (date.trim() == "") {
-            showToast("Please select date")
-        } else if (startTime.toString() === endTime.toString()) {
-            showToast("Start Time and End Time Cannot Be Same")
-        } else if (startTime.toDate() > endTime.toDate()) {
-            showToast("Start Time must be grater than End Time. ")
+        } 
+        else if (date.trim() == "") {
+            setTimeout(() => {
+                showToast("Please select date")
+            }, 200)
+        } else if (moment(startTime).toString() === moment(endTime).toString()) {
+            setTimeout(() => {
+                showToast("Start Time and End Time Cannot Be Same")
+            }, 200)
+        } else if (moment(startTime).toDate() > moment(endTime).toDate()) {
+            setTimeout(() => {
+                showToast("Start Time must be grater than End Time. ")
+            }, 200)
         } else {
             props.navigation.navigate("Mechanics", { data: data, subService: subService, extraData })
         }
@@ -264,13 +277,13 @@ const MechanicLocation = (props) => {
 
     const handleConfirm1 = (date) => {
         console.log(date)
+        setDatePickerVisibility1(false);
         if (moment(date).toDate() > moment(startTime).toDate()) {
             setEndTime(date)
         } else {
-            setTimeout(()=>{
+            // setTimeout(() => {
                 showToast("End time must be greater than start time.")
-
-            },200)
+            // }, 00)
         }
         setDatePickerVisibility1(false);
 

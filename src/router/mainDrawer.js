@@ -37,6 +37,7 @@ import { updateBankModelData } from '../redux/features/bankModel'
 import { loadNotificaitonsThunk } from '../redux/features/notification'
 import { showToast, storeItem } from '../components/validators';
 import { Badge } from 'react-native-elements/dist/badge/Badge';
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 const Drawer = createDrawerNavigator();
 
 const MainDrawer = (props) => {
@@ -255,7 +256,7 @@ const MainDrawer = (props) => {
                         }}>Notification</Text>
                             <GetBadge />
                         </View>,
-                        drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />,
+                        drawerIcon: ({ focused,size, color }) => <FontAwesome name="bell" color={color} size={20} />,
                     }}
                 />
                 <Drawer.Screen

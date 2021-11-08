@@ -699,7 +699,7 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
             if (dtype == "flat") {
                 totalAmount1 = totalAmount - amount
             } else if (dtype == "per") {
-                totalAmount1 = totalAmount - (amount * 100 / totalAmount)
+                totalAmount1 = totalAmount - (amount * totalAmount/100)
             }
             return totalAmount1
         } else {
@@ -707,9 +707,19 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
         }
     }
 
-    const checkforDiscountToShow = (discount_amount, show) => {
-        if (show && discount_amount && discount_amount != 0) {
-            return true
+    const checkforDiscountToShow = (v_a,v_t,d_a,d_t) => {
+        if (v_a&&v_a!==""){
+            if(v_t=="flat"){
+                return `$${v_a}`
+            }else{
+                return `${v_a}%`
+            }
+        }else if(d_a&&d_a!==""){
+            if( d_t=="flat"){
+                return `$${d_a}`
+            }else{
+                return `${d_a}%`
+            }
         } else {
             return false
         }
@@ -745,13 +755,13 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                     return (<OrderItemsDetail i={i} />)
                 })}
             </View>}
-            {checkforDiscountToShow(showVirtualData, virtual_data?.discount_amount) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            {checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Discount</Text>
-                <Text style={styles.greenTextStyle}>{virtual_data?.discount_type == "flat" ? `$${virtual_data?.discount_amount}` : `${virtual_data?.discount_amount}%`}</Text>
+                <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type)}</Text>
             </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>
-                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : data?.order_total_price}</Text>
+                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type,data?.discount_amount,data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Time</Text>

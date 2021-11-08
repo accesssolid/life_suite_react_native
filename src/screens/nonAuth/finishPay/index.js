@@ -52,6 +52,7 @@ export default function FinishPay({ navigation, route }) {
             rating:rating,
             tip:type==types[0]?flat_amount:(Number(per_amount)*Number(totalPrice)/100)
         }
+        console.log(datac)
         let config = {
             headers: headers,
             data: JSON.stringify(datac),
@@ -126,13 +127,13 @@ export default function FinishPay({ navigation, route }) {
                                 <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                             </View>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <Text  style={{ height: 40 ,textAlign:"center",textAlignVertical:"center"}} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
+                                    <Text  style={{ height: 40 ,textAlign:"center",textAlignVertical:"center",lineHeight:40}} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
                                 </View>
                             </>
                         }
                     </View>
                     <View style={{ width: "90%",alignSelf:"center",marginTop:20, borderRadius: 6, height: 200, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                        <TextInput value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top"  placeholder={"Your Comments"}  placeholderTextColor="gray" style={{ height: 200}}/>
+                        <TextInput value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top"  placeholder={"Your Comments"}  placeholderTextColor="gray" style={{ height: 200,padding:10}}/>
                     </View>
                 </Content>
                 <TouchableOpacity
