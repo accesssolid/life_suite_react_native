@@ -26,7 +26,8 @@ function CustomInput({
     multiline,
     customContainerStyles,
     customInputStyles,
-    bottomText
+    bottomText,
+    blurOnSubmit
 }) {
     return (
         <Item
@@ -66,6 +67,8 @@ function CustomInput({
                 maxLength={maxLength}
                 editable={editable}
                 multiline={multiline}
+                blurOnSubmit={blurOnSubmit}
+                
             />
 
             <TouchableOpacity onPress={action} style={{ right: 10 }}>

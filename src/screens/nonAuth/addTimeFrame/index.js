@@ -34,7 +34,6 @@ const moment = MomentRange.extendMoment(Moment)
 const AddTimeFrame = (props) => {
     const dispatch = useDispatch()
     const { serviceData } = props.route.params
-    console.log("Service Data", JSON.stringify(serviceData))
     const calendarRef = useRef(null)
     const [selectedDates, setSelectedDates] = useState([])
     const user = useSelector(state => state.authenticate.user)
@@ -49,8 +48,10 @@ const AddTimeFrame = (props) => {
     const [markedDates, setMarkedDates] = useState({})
 
     useEffect(() => {
-        if (!isAddServiceMode)
+        if (!isAddServiceMode){
             getTimeFrames()
+        }
+            
     }, [])
 
 
@@ -221,12 +222,13 @@ const AddTimeFrame = (props) => {
         }
         getApi(config)
             .then((response) => {
+                console.log("response",response)
                 if (response.status == true) {
                     setLoading(false)
                     let styles = [];
                     let dates = [];
                     Object.keys(response.data).forEach((ele) => {
-                        response.data[ele].forEach(element => {
+                            let element=response.data[`${ele}`]
                             dates.push(moment(element.start_time).format("DD/MM/YYYY"))
                             styles.push({
                                 id: element.id,
@@ -239,10 +241,10 @@ const AddTimeFrame = (props) => {
                                 from_time: element.from_time,
                                 to_time: element.to_time
                             });
-                        });
+                      
                     })
-                    console.log("Styles==>", styles)
                     setSelectedDates([...dates])
+                    console.warn(dates)
                     setCustomDatesStyles(styles)
                 }
                 else {
@@ -250,6 +252,7 @@ const AddTimeFrame = (props) => {
                 }
             }).catch(err => {
                 setLoading(false)
+                console.error(err)
             })
     }
 
@@ -324,7 +327,6 @@ const AddTimeFrame = (props) => {
             } else {
                 const fromTime = moment(styleDate.from_time, 'hh:mm a').toDate();
                 const toTime1 = moment(toTime, 'hh:mm a').toDate();
-                console.log("orders",fromTime,toTime)
                 if (fromTime < toTime1) {
                     setMarkedDates({})
                     styles[activeIndex].to_time = toTime
@@ -394,7 +396,6 @@ const AddTimeFrame = (props) => {
 
 
     const getAllMarkedDates = (markedObject) => {
-        console.log(markedObject)
         let keys = Object.keys(markedObject)
         if (keys.length == 2) {
             let range = moment().range(keys[0], keys[1])

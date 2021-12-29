@@ -183,6 +183,7 @@ const Profile = (props) => {
     // 
     const [isConnectedToAccount, setIsConnectedToAccount] = React.useState(false)
     // 
+    const [connectedDetail,setConnectedDetail]=React.useState({})
     const [selection, setSelection] = React.useState({ start: 0 })
 
     function logout() {
@@ -515,6 +516,7 @@ const Profile = (props) => {
                     if (response.data) {
                         if (response.data.email && response.data.details_submitted) {
                             setIsConnectedToAccount(true)
+                            setConnectedDetail(response.data)
                         }
                     }
                 }
@@ -904,18 +906,17 @@ const Profile = (props) => {
                                     setUserData({ ...userData, about: text })
                                 }}
                                 inpuRef={bioRef}
-                                returnKeyType="default"
                                 customContainerStyles={{ paddingVertical: '2.5%' }}
                                 customInputStyles={{ height: 75 }}
                                 multiline
                                 maxLength={255}
                                 numberOfLines={3}
                                 onSubmitEditing={() => {
-                                    console.log(bioRef.current.blur)
+                                    // bioRef?.current?.blur()
                                 }}
-                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
-
+                                returnKeyType="done"
                                 bottomText={userData?.about?.length + "/255"}
+                                blurOnSubmit={true}
                             />}
 
                             <CustomInput
@@ -990,9 +991,9 @@ const Profile = (props) => {
                                     textInputProps={{
                                         onSubmitEditing: () => workAddressRef.current.focus(),
                                         placeholderTextColor: LS_COLORS.global.placeholder,
-                                        selection:selection,
-                                        onBlur:()=>{setSelection({start:0})},
-                                        onFocus:()=>{setSelection(null)}
+                                        selection: selection,
+                                        onBlur: () => { setSelection({ start: 0 }) },
+                                        onFocus: () => { setSelection(null) }
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -1058,9 +1059,9 @@ const Profile = (props) => {
                                     textInputProps={{
                                         editable: !isSameAddress,
                                         placeholderTextColor: LS_COLORS.global.placeholder,
-                                        selection:selection,
-                                        onBlur:()=>{setSelection({start:0})},
-                                        onFocus:()=>{setSelection(null)}
+                                        selection: selection,
+                                        onBlur: () => { setSelection({ start: 0 }) },
+                                        onFocus: () => { setSelection(null) }
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -1104,7 +1105,7 @@ const Profile = (props) => {
                                     value={notificationType}
                                     onChangeValue={(index, value) => { setNotificationType(value) }}
                                     containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                    // dropdownStyle={{ height: 120 }}
+                                // dropdownStyle={{ height: 120 }}
                                 />
                                 {/* } */}
                                 <View style={{ height: 40 }}></View>
@@ -1135,8 +1136,13 @@ const Profile = (props) => {
                                                 getAccountLink()
                                             }
                                         }}>
-                                        {isConnectedToAccount ? <Text>Connect Account Linked</Text> : <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
+                                        {isConnectedToAccount ? <View>
+                                            <Text style={{fontFamily:LS_FONTS.PoppinsRegular,fontSize:11}}>Connected ({connectedDetail?.email})</Text>
+                                        </View> : <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
                                     </TouchableOpacity>
+                                    <Text onPress={()=>{
+                                        // Alert.alert("Message","It will remove ")
+                                    }} style={{textAlign:"center",fontFamily:LS_FONTS.PoppinsRegular,fontSize:11,color:"red"}}>Change</Text>
                                 </View>
                         }
                         {/* <TouchableOpacity
