@@ -37,6 +37,8 @@ export const loadNotificaitonsThunk = () => async (dispatch,getState) => {
             .then((response) => {
                 if (response.status == true) {
                     dispatch(setNotifications({data:response.data}))
+                }else{
+                    dispatch(setNotifications({data:[]}))
                 }
             }).catch(err => {
                 dispatch(setNotifications({data:[]}))

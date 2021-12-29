@@ -26,13 +26,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native'
 import { role } from '../../../constants/globals';
+import { loadNotificaitonsThunk } from '../../../redux/features/notification';
 const Notification = (props) => {
     const [loading, setLoading] = React.useState(false)
     const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
+    const notifications = useSelector(state => state.notification)?.data
 
-    const [notifications, setNotifications] = useState([])
+    // const [notifications, setNotifications] = useState([])
 
     const seenNotification = async (data) => {
         if (data.is_read == "0") {
@@ -109,7 +111,9 @@ const Notification = (props) => {
     }
 
     useFocusEffect(React.useCallback(() => {
-        getNotifications()
+        // getNotifications()
+        dispatch(loadNotificaitonsThunk())
+
     }, []))
 
     const renderData = ({ item }) => {

@@ -1,10 +1,11 @@
 import React from 'react'
-import { View, Text, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native'
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
 import { globalStyles, showToast } from '../../../utils';
 import { Content, Container } from 'native-base'
+import { SafeAreaView } from 'react-native-safe-area-context';
 /* Components */
 import Header from '../../../components/header';
 import DropDown from '../../../components/dropDown';
@@ -61,17 +62,18 @@ export default function AddDiscount({ navigation, route }) {
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{ width: "40%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount ($)"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
-                            <><View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
-                            </View>
+                            <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center",lineHeight:40 }} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
+                                    <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage (%)"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
                                 </View>
-                            </>
+                                <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginTop: 20, backgroundColor: LS_COLORS.global.lightGrey }}>
+                                    <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40 }} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
+                                </View>
+                            </View>
                         }
                     </View>
                 </Content>

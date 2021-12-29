@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 /* Packages */
-import { createDrawerNavigator, DrawerItemList, DrawerContentScrollView, DrawerItem,useIsDrawerOpen } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerItemList, DrawerContentScrollView, DrawerItem, useIsDrawerOpen } from '@react-navigation/drawer';
 
 /* Screens */
 import LS_FONTS from '../constants/fonts';
@@ -36,8 +36,9 @@ import { useDispatch } from 'react-redux';
 import { updateBankModelData } from '../redux/features/bankModel'
 import { loadNotificaitonsThunk } from '../redux/features/notification'
 import { showToast, storeItem } from '../components/validators';
-import { Badge } from 'react-native-elements/dist/badge/Badge';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import firestore from '@react-native-firebase/firestore';
+
 const Drawer = createDrawerNavigator();
 
 const MainDrawer = (props) => {
@@ -50,19 +51,52 @@ const MainDrawer = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const notifications = useSelector(state => state.notification)?.data
     const dispatch = useDispatch()
+    const [unSeen, setUnSeen] = React.useState(0)
     // get badge component
     const GetBadge = () => {
-        if(notifications?.filter(x => x.is_read == "0").length==0){
+        if (notifications?.filter(x => x.is_read == "0").length == 0) {
             return null
         }
-        return (<View style={{ height: 20, borderRadius: 20, backgroundColor: "red",marginLeft:10,justifyContent:"center" }} >
+        return (<View style={{ height: 20, borderRadius: 20, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
             <Text style={{ color: LS_COLORS.global.white, marginHorizontal: 5 }}>{notifications?.filter(x => x.is_read == "0").length}</Text>
         </View>
         )
     }
-    React.useEffect(()=>{
+
+    const MessageBadge=()=>{
+        if(unSeen==0){
+            return null
+        }
+        return(
+            <View style={{ height: 20, borderRadius: 20, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
+            <Text style={{ color: LS_COLORS.global.white, marginHorizontal: 5 }}>{unSeen}</Text>
+        </View>
+        )
+    }
+
+    React.useEffect(() => {
         dispatch(loadNotificaitonsThunk())
-    },[props])
+        let unsubscribe = firestore()
+            .collection('Chats')
+            .onSnapshot(querySnapshot => {
+                let data1 = []
+                data1 = querySnapshot._docs.filter((i) => {
+                    let u1 = i._data.participants.user1
+                    let u2 = i._data.participants.user2
+                    if (u1.id == user.id.toString() || u2.id == user.id.toString()) {
+                        if (u1.id == user.id.toString()) {
+                            return i._data.readOffSet.user1.read > 0
+                        } else {
+                            return i._data.readOffSet.user2.read > 0
+                        }
+                    } else {
+                        return false
+                    }
+                })
+                setUnSeen(data1.length)
+            });
+        return () => unsubscribe();
+    }, [props])
 
     const getConnectAccountDetail = () => {
         try {
@@ -234,6 +268,13 @@ const MainDrawer = (props) => {
 
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/message.png')} style={{ height: 20, width: 20 }} />,
+                        drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 14,
+                            color: LS_COLORS.global.darkBlack,
+                        }}>Messages</Text>
+                            <MessageBadge />
+                        </View>,
                     }}
                 />
                 <Drawer.Screen
@@ -256,7 +297,7 @@ const MainDrawer = (props) => {
                         }}>Notification</Text>
                             <GetBadge />
                         </View>,
-                        drawerIcon: ({ focused,size, color }) => <FontAwesome name="bell" color={color} size={20} />,
+                        drawerIcon: ({ focused, size, color }) => <FontAwesome name="bell" color={color} size={20} />,
                     }}
                 />
                 <Drawer.Screen

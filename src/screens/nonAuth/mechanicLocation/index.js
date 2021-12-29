@@ -194,7 +194,7 @@ const MechanicLocation = (props) => {
             .then((response) => {
                 if (response.status == true) {
                     showToast(response.message)
-                    props.navigation.pop()
+                    props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})
                 } else {
                     console.log("Error", response)
                     showToast(response.message)

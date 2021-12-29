@@ -13,7 +13,7 @@ import RNGooglePlaces from 'react-native-google-places';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 /* Components */;
-import Header from '../../../components/header';
+import {ChatHeader} from '../../../components/header';
 import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Row } from 'native-base'
@@ -337,7 +337,7 @@ const ChatScreen = (props) => {
                 visible = {visible}
                 /> */}
                 {renderAddmodal()}
-                <Header
+                <ChatHeader
                     title={data.first_name}
                     imageUrl={require("../../../assets/back.png")}
                     action={() => {

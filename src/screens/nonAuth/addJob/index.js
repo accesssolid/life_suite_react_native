@@ -71,7 +71,7 @@ const addJob = (props) => {
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
-
+                            
                         }}
                     >
                         <Text style={styles.order}>

@@ -22,13 +22,43 @@ const Header = (props) => {
                 />
             </TouchableOpacity>
             <View style={styles.middleView}>
-                <Text style={[styles.title,props.titleStyle]}>{props.title}</Text>
+                <Text style={[styles.title, props.titleStyle]}>{props.title}</Text>
             </View>
             <TouchableOpacity style={styles.rightView}
                 onPress={props.action1}
                 activeOpacity={0.7}>
                 <Image
-                    style={[{ height: 25, width: 25, resizeMode: 'contain',tintColor:"black" },props.imageStyle1]}
+                    style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "black" }, props.imageStyle1]}
+                    source={props.imageUrl1}
+                />
+            </TouchableOpacity>
+        </View>
+    )
+}
+
+export function ChatHeader(props) {
+    return (
+        <View style={styles.container}>
+            <TouchableOpacity style={styles.leftView}
+                onPress={props.action}
+                activeOpacity={0.7}>
+                <Image
+                    style={{ height: '80%', width: '80%', resizeMode: 'contain' }}
+                    source={props.imageUrl}
+                />
+            </TouchableOpacity>
+            <View style={[styles.middleView, { flexDirection: "row" }]}>
+                <Text style={[styles.title, props.titleStyle]}>{props.title}</Text>
+                <View style={{ borderWidth: 1, height: 30, borderRadius: 50, width: 30, justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{}}>i</Text>
+
+                </View>
+            </View>
+            <TouchableOpacity style={styles.rightView}
+                onPress={props.action1}
+                activeOpacity={0.7}>
+                <Image
+                    style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "black" }, props.imageStyle1]}
                     source={props.imageUrl1}
                 />
             </TouchableOpacity>
@@ -47,15 +77,15 @@ const styles = StyleSheet.create({
     },
     leftView: {
         left: 20,
-        aspectRatio:1,
+        aspectRatio: 1,
         alignItems: 'center',
         height: 30,
-        alignItems:'center',
-        justifyContent:'center'
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     middleView: {
         alignItems: 'center',
-        justifyContent:'center'
+        justifyContent: 'center'
     },
     rightView: {
         right: 20,

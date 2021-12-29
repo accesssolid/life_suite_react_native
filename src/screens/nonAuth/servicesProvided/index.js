@@ -104,7 +104,6 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response, "Response")
                 if (response.status == true) {
                     setModelList(response.data)
                     // setSelectedModel(response.data)
@@ -160,11 +159,7 @@ const ServicesProvided = (props) => {
             })
     }
 
-    useEffect(() => {
-        console.log("SelectedItems", selectedItems)
-        console.log("SelectedProducts", selectedProducts)
-        console.log("ExtraData", extraData)
-    }, [selectedItems, selectedProducts, extraData])
+ 
 
     useEffect(() => {
         if (subService.id == 14) {
@@ -200,7 +195,7 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log("Response",response)
+                console.log("Response",JSON.stringify(response))
                 if (response.status == true) {
                     setLoading(false)
                     setItemList([...response.data])
@@ -241,7 +236,6 @@ const ServicesProvided = (props) => {
     const next = () => {
         let servicedata = []
         itemList.forEach(element => {
-            console.log("dkjndjk", element)
             if (selectedItems.includes(element.id)) {
                 servicedata.push({
                     "item_id": element.id,
@@ -286,7 +280,9 @@ const ServicesProvided = (props) => {
     }
 
     const saveRequest = () => {
+        console.log(activeItem,selectedProducts)
         let isSelected = false
+       
         activeItem.products.forEach(element => {
             if (selectedProducts.includes(element.id)) {
                 isSelected = true
@@ -296,7 +292,10 @@ const ServicesProvided = (props) => {
         if (activeItem.products.length == 0) {
             isSelected = true
         }
-
+        if(activeItem.is_product_mandatory=="0"){
+            isSelected=true
+        }
+        
         if (isSelected) {
             setActiveItem(null)
         } else {
@@ -305,7 +304,6 @@ const ServicesProvided = (props) => {
     }
 
     const setExtraData = (data, item) => {
-        console.log("Data", data, item)
 
         let obj = {
             parent_id: item.id,
@@ -322,7 +320,6 @@ const ServicesProvided = (props) => {
             obj['have_own'] = ''
         }
         obj['need_recommendation'] = data.need_recommendation
-        console.log("Object", obj)
         let temp = _.cloneDeep(extraData)
         if (temp.length == 0) {
             temp.push(obj)
@@ -339,7 +336,6 @@ const ServicesProvided = (props) => {
             //     }
             // });
         }
-        console.log(extraData)
         setExtraDataa([...temp])
     }
 

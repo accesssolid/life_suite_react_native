@@ -35,13 +35,7 @@ const ChatUsers = (props) => {
     const [array, setArray] = useState([])
 
     useFocusEffect(useCallback(() => {
-        get_user()
-    }, []))
-
-
-
-    async function get_user() {
-        firestore()
+        let unsubscribe = firestore()
             .collection('Chats')
             .onSnapshot(querySnapshot => {
                 let _data = querySnapshot.docs.filter((i) => {
@@ -71,6 +65,12 @@ const ChatUsers = (props) => {
                 }
             });
         return () => unsubscribe();
+    }, []))
+
+
+
+    async function get_user() {
+
     }
 
     const renderData = (itemData) => {
@@ -124,12 +124,8 @@ const ChatUsers = (props) => {
                         {readcount ?
                             <View style={{ height: 25, width: 25, borderRadius: 30, justifyContent: 'center', alignItems: 'center', backgroundColor: LS_COLORS.global.green, alignSelf: "flex-end" }}>
                                 <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: 'white', alignSelf: 'center' }}>{readcount}</Text>
-                            </View>
-                            :
-                            null
-                        }
-                        <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular }}>{moment(itemData.item._data.lastMessageTime).format('hh:mm A')}</Text>
-
+                            </View> : null}
+                        <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular }}>{moment(itemData?.item?._data?.lastMessageTime).format('hh:mm A')}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -147,7 +143,7 @@ const ChatUsers = (props) => {
                     action={() => {
                         props.navigation.goBack()
                     }}
-                   
+
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
                     <View style={{
