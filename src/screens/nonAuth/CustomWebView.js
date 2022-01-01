@@ -4,7 +4,8 @@ import { StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview';
 import Loader from '../../components/loader';
 const CustomWebView = ({ navigation ,route}) => {
-    const {uri,title}=route.params
+    const {uri,change}=route.params
+    console.log(change)
     const [loader,setLoader] = React.useState(false)
 
     return (

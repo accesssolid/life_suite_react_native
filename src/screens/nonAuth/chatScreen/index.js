@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, TextInput, StatusBar, Modal, Image, TouchableOpacity, FlatList, Platform, Pressable ,KeyboardAvoidingView, Keyboard} from 'react-native'
+import { View, StyleSheet, Text, TextInput, StatusBar, Modal, Image, TouchableOpacity, FlatList, Platform, Pressable, KeyboardAvoidingView, Keyboard, ImageBackground } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -13,11 +13,11 @@ import RNGooglePlaces from 'react-native-google-places';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 /* Components */;
-import {ChatHeader} from '../../../components/header';
+import { ChatHeader } from '../../../components/header';
 import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Row } from 'native-base'
-import { BASE_URL } from '../../../api/api';
+import { BASE_URL, getApi } from '../../../api/api';
 import { Dimensions } from 'react-native';
 import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
@@ -26,7 +26,7 @@ import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
-import uuid from 'react-native-uuid';
+import { role } from '../../../constants/globals';
 import FastImage from 'react-native-fast-image'
 import DocumentPicker from 'react-native-document-picker'
 import RNFetchBlob from 'rn-fetch-blob';
@@ -35,7 +35,9 @@ import Loader from '../../../components/loader';
 
 const ChatScreen = (props) => {
     const data = props.route.params.item
-    const user = useSelector(state => state.authenticate.user)
+    const user = useSelector(state => state.authenticate?.user)
+    const access_token = useSelector(state => state.authenticate?.access_token)
+
     const [messages, setMessages] = useState("");
     const flatlistRef = useRef();
     const [visible, setVisible] = useState(false)
@@ -43,7 +45,8 @@ const ChatScreen = (props) => {
     const [arr, setArr] = useState([])
     const [read, setRead] = useState(0)
     const [loader, setLoader] = useState(false)
-
+    const [servicesList, setServicesList] = useState([])
+    const [infoModal, setInfoModal] = React.useState(false)
     const getRoomName = () => {
         let temp = [user.id.toString(), data.id.toString()].sort()
         let roomname = temp.join('_');
@@ -58,7 +61,40 @@ const ChatScreen = (props) => {
         if (Platform.OS == "android") {
             getPermissons()
         }
+        getServiceList()
     }, [])
+
+    const getServiceList = () => {
+
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+
+
+        let config = {
+            headers: headers,
+            endPoint: '/api/providersAdeddServices',
+            type: 'post',
+            data: JSON.stringify({ provider_id: data.id })
+        }
+        console.log(config)
+        if (user.user_role == role.customer) {
+            getApi(config)
+                .then((response) => {
+                    console.log(response)
+                    if (response.status == true) {
+                        setServicesList(response.data)
+                    }
+                    else {
+
+                    }
+                }).catch(err => {
+                })
+        }
+
+    }
 
     const pickImage = () => {
         ImagePicker.openPicker({
@@ -343,13 +379,16 @@ const ChatScreen = (props) => {
                     action={() => {
                         props.navigation.goBack()
                     }}
+                    showList={() => {
+                        setInfoModal(true)
+                    }}
+                    show_i={user.user_role == role.customer}
                     imageUrl1={require("../../../assets/3dot.png")}
                     action1={() => {
                         setVisible1(true)
                     }}
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
-
                     <FlatList
                         contentContainerStyle={{ justifyContent: 'flex-end' }}
                         showsVerticalScrollIndicator={false}
@@ -676,9 +715,10 @@ const ChatScreen = (props) => {
                     {loader && <Loader />}
                 </View>
 
-                {Platform.OS=="ios"&&<KeyboardAvoidingView behavior="padding" />}
+                {Platform.OS == "ios" && <KeyboardAvoidingView behavior="padding" />}
             </SafeAreaView>
             <MenuModal visible={visible1} role={user.user_role} user1={data.id.toString()} setVisible={setVisible1} navigation={props.navigation} />
+            <ServicesProvidedModal data={servicesList} visible={infoModal} setVisible={setInfoModal} />
         </>
     )
 }
@@ -704,6 +744,32 @@ const MenuModal = ({ visible, setVisible, role, navigation, user1 }) => {
                     }}
                     style={{ height: 30, justifyContent: "center", borderColor: LS_COLORS.global.green, alignItems: "center", width: 100, backgroundColor: "white", borderRadius: 2, borderWidth: 1, marginRight: 5 }}>
                     <Text style={[styles.msgText, { color: "black", fontSize: 14 }]}>Order History</Text>
+                </Pressable>
+            </Pressable>
+        </Modal>
+    )
+}
+
+const ServicesProvidedModal = ({ data, visible, setVisible }) => {
+    console.log("data", data)
+    return (
+        <Modal
+            visible={visible}
+            transparent={true}
+            style={{ flex: 1 }}
+        >
+            <Pressable onPress={() => setVisible(false)} style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0005" }}>
+                <Pressable style={{ padding: 10, borderRadius: 10, justifyContent: "center", width: "95%", backgroundColor: "white" }}>
+                    <Text style={[{ color: "black", fontSize: 16, textAlign: "center",fontFamily:LS_FONTS.PoppinsSemiBold }]}>Services</Text>
+                    {data.map(x => {
+                        return (
+                            <ImageBackground source={{ uri: BASE_URL + x?.image }} style={{ width: "100%", marginTop: 5, borderRadius: 5, overflow: "hidden", height: 60 }}>
+                                <View style={{ flex: 1, backgroundColor: "#0005", justifyContent: "center", alignItems: "center" }}>
+                                    <Text style={[styles.msgText, { color: "white", fontSize: 12 }]}>{x.name}</Text>
+                                </View>
+                            </ImageBackground>
+                        )
+                    })}
                 </Pressable>
             </Pressable>
         </Modal>
@@ -755,6 +821,7 @@ const styles = StyleSheet.create({
     msgText: {
         fontSize: 20,
         color: "white",
+        fontFamily: LS_FONTS.PoppinsRegular
     },
     inputStyle: {
         padding: 10,

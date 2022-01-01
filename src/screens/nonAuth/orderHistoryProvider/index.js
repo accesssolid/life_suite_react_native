@@ -42,7 +42,7 @@ const order_types = [
 const OrderHistory = (props) => {
     const dispatch = useDispatch()
     const { user1 } = props.route.params
-    const [selected, setselected] = useState(order_types[0])
+    const [selected, setselected] = useState(order_types[1])
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)

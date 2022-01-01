@@ -1005,7 +1005,19 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayMo
                 openDelayModal()
                 break
             case buttons_types.start_order:
-                submit(order_types.processing)
+                let current=Date.now()
+                let job_start=moment(data?.requested_start_time,"YYYY-MM-DD HH:mm:[00]").unix()*1000
+                if(current<job_start){
+                    Alert.alert("Start Order",`Order requested time is ${moment(data?.requested_start_time).format("YYYY-MM-DD hh:mm a")}. Do you still want to start job right now?`,[
+                        {text:"No",onPress:()=>{}},
+                        {text:"Yes",onPress:()=>{
+                            submit(order_types.processing)
+                        }},
+                    ])
+                }else{
+                    submit(order_types.processing)
+                }
+             break
             case buttons_types.suspend:
                 navigation.navigate("OrderSuspend", { item: data })
                 break

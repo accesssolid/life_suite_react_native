@@ -183,7 +183,7 @@ const Profile = (props) => {
     // 
     const [isConnectedToAccount, setIsConnectedToAccount] = React.useState(false)
     // 
-    const [connectedDetail,setConnectedDetail]=React.useState({})
+    const [connectedDetail, setConnectedDetail] = React.useState({})
     const [selection, setSelection] = React.useState({ start: 0 })
 
     function logout() {
@@ -559,6 +559,42 @@ const Profile = (props) => {
                 })
         } catch (err) {
 
+        }
+    }
+
+
+    const createNewConnect = () => {
+        
+        try {
+            setLoader(true)
+            let headers = {
+                'Content-Type': 'multipart/form-data',
+                "Authorization": `Bearer ${access_token}`
+            }
+            let config = {
+                headers: headers,
+                data: JSON.stringify({}),
+                endPoint: '/api/providerCreateNewConnect',
+                type: 'post'
+            }
+            getApi(config).then(response => {
+                console.log("response", JSON.stringify(response))
+                if (response.status == true) {
+                    if (response.data) {
+                        props.navigation.navigate("UserStack", { screen: "CustomWebView", params: { uri: response.data.url, change: true } })
+                    }
+                }
+                else {
+                    showToast(response.message, 'danger')
+                }
+            })
+                .catch(err => {
+
+                })
+        } catch (err) {
+
+        } finally {
+            setLoader(false)
         }
     }
     useEffect(() => {
@@ -1137,12 +1173,12 @@ const Profile = (props) => {
                                             }
                                         }}>
                                         {isConnectedToAccount ? <View>
-                                            <Text style={{fontFamily:LS_FONTS.PoppinsRegular,fontSize:11}}>Connected ({connectedDetail?.email})</Text>
+                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11 }}>Connected ({connectedDetail?.email})</Text>
                                         </View> : <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
                                     </TouchableOpacity>
-                                    <Text onPress={()=>{
-                                        // Alert.alert("Message","It will remove ")
-                                    }} style={{textAlign:"center",fontFamily:LS_FONTS.PoppinsRegular,fontSize:11,color:"red"}}>Change</Text>
+                                    <Text onPress={() => {
+                                        createNewConnect()
+                                    }} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: "red" }}>Change</Text>
                                 </View>
                         }
                         {/* <TouchableOpacity

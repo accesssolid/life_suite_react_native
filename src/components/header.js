@@ -47,12 +47,15 @@ export function ChatHeader(props) {
                     source={props.imageUrl}
                 />
             </TouchableOpacity>
-            <View style={[styles.middleView, { flexDirection: "row" }]}>
+            <View style={[styles.middleView, { flexDirection: "row" ,justifyContent:"center",alignItems:"center"}]}>
                 <Text style={[styles.title, props.titleStyle]}>{props.title}</Text>
-                <View style={{ borderWidth: 1, height: 30, borderRadius: 50, width: 30, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{}}>i</Text>
-
-                </View>
+                {props.show_i&&<TouchableOpacity onPress={()=>{
+                    if(props?.showList){
+                        props.showList()
+                    }
+                }} style={{ borderWidth: 1, height: 20, borderRadius: 50,marginLeft:5, width: 20, justifyContent: "center", alignItems: "center" }}>
+                    <Text style={[styles.title,{fontSize:12,textTransform:"lowercase"}]}>i</Text>
+                </TouchableOpacity>}
             </View>
             <TouchableOpacity style={styles.rightView}
                 onPress={props.action1}

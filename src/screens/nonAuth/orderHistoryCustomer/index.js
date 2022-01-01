@@ -45,7 +45,7 @@ const OrderHistory1 = (props) => {
     const [reason1, setReason1] = useState("")
     const [open1, setOpen1] = useState(false)
     const dispatch = useDispatch()
-    const [selected, setselected] = useState(order_types[0])
+    const [selected, setselected] = useState(order_types[1])
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)

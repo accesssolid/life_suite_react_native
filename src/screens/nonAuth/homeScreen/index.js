@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView,ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -35,7 +35,7 @@ const HomeScreen = (props) => {
     const [items, setItems] = useState([...services])
     const [order, setOrder] = useState([])
     const [orders, setOrders] = useState()
-    const [scrollEnabled,setScrollEnabled]=React.useState(true)
+    const [scrollEnabled, setScrollEnabled] = React.useState(true)
     useEffect(() => {
         const backAction = () => {
             return true;
@@ -184,6 +184,35 @@ const HomeScreen = (props) => {
             })
     }
 
+    const deleteMyJob = (service_id) => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let user_data = {
+            "service_id": service_id
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify(user_data),
+            endPoint: '/api/deleteAddedServices',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    getMyJobs()
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
             props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
@@ -313,7 +342,10 @@ const HomeScreen = (props) => {
                 </View>
                 {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7} onPress={() => setIsAddJobActive(!isAddJobActive)}>
                     <View style={{ height: 30, aspectRatio: 1 }}>
-                        <Image source={require('../../../assets/addgreen.png')} resizeMode="contain" style={{ width: '100%', height: '100%' }} />
+                        {!isAddJobActive && <Image source={require('../../../assets/addgreen.png')} resizeMode="contain" style={{ width: '100%', height: '100%' }} />}
+                        {isAddJobActive && <View style={{ height: 30, width: 30, borderRadius: 20, backgroundColor: LS_COLORS.global.green, justifyContent: "center", alignItems: "center" }}>
+                            <View style={{ height: 2, width: 18, backgroundColor: "white" }} />
+                        </View>}
                     </View>
                     <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 18, letterSpacing: 0.36, color: LS_COLORS.global.black, marginLeft: 11 }}>ADD JOB</Text>
                 </TouchableOpacity>}
@@ -360,6 +392,10 @@ const HomeScreen = (props) => {
                                             action={() => {
                                                 props.navigation.navigate("ServicesProvided", { subService: item });
                                             }}
+                                            showDelete={true}
+                                            deleteService={()=>{
+                                                deleteMyJob(item.id)
+                                            }}
                                         />
                                     )
                                 }}
@@ -389,7 +425,7 @@ const HomeScreen = (props) => {
                                     console.log("Drag was released, the blocks are in the following order: ", arr)
                                 }}
                                 onDragStart={() => {
-                                        setScrollEnabled(false)
+                                    setScrollEnabled(false)
                                 }}>
                                 {items.map((item, index) =>
                                     <View key={index}
