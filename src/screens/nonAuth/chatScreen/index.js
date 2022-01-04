@@ -760,14 +760,10 @@ const ServicesProvidedModal = ({ data, visible, setVisible }) => {
         >
             <Pressable onPress={() => setVisible(false)} style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0005" }}>
                 <Pressable style={{ padding: 10, borderRadius: 10, justifyContent: "center", width: "95%", backgroundColor: "white" }}>
-                    <Text style={[{ color: "black", fontSize: 16, textAlign: "center",fontFamily:LS_FONTS.PoppinsSemiBold }]}>Services</Text>
-                    {data.map(x => {
+                    <Text style={[{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }]}>Services</Text>
+                    {data.map((x, index) => {
                         return (
-                            <ImageBackground source={{ uri: BASE_URL + x?.image }} style={{ width: "100%", marginTop: 5, borderRadius: 5, overflow: "hidden", height: 60 }}>
-                                <View style={{ flex: 1, backgroundColor: "#0005", justifyContent: "center", alignItems: "center" }}>
-                                    <Text style={[styles.msgText, { color: "white", fontSize: 12 }]}>{x.name}</Text>
-                                </View>
-                            </ImageBackground>
+                            <Text style={[styles.msgText, { color: "black", fontSize: 12 }]}>{index+1}.{x.name}</Text>
                         )
                     })}
                 </Pressable>

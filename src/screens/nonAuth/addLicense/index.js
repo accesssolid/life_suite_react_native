@@ -21,6 +21,14 @@ import { setAddServiceData, setAddServiceMode } from '../../../redux/features/se
 import { Alert } from 'react-native';
 import { Dimensions } from 'react-native';
 
+const upload_types = [
+    { id: 1, text: "Upload Certificate or Business Certificate", button_text: "Add Certificate" },
+    { id: 2, text: "Upload Driver or State License", button_text: "Add License" },
+    { id: 3, text: "Upload Certificate and License " }
+]
+
+
+
 const AddLicense = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -30,7 +38,16 @@ const AddLicense = (props) => {
     const addServiceData = useSelector(state => state.services.addServiceData)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [resizeMode, setresizemode] = useState("cover")
+    const [upload_type, setUploadType] = React.useState(upload_types[2])
+    const [selected, setSelected] = React.useState(0)
+    const [showSelector, setShowSelector] = React.useState(false)
     const [images, setImages] = useState([{
+        uri: require('../../../assets/camera.png'),
+        name: '',
+        type: '',
+    }])
+
+    const [images1, setImages1] = useState([{
         uri: require('../../../assets/camera.png'),
         name: '',
         type: '',
@@ -39,6 +56,32 @@ const AddLicense = (props) => {
     useEffect(() => {
         toggleResize()
     }, [])
+
+    useEffect(() => {
+        if (showSelector) {
+            if (selected == 0) {
+                setUploadType(upload_types[0])
+            } else if (selected == 1) {
+                setUploadType(upload_types[1])
+            }
+        }
+    }, [selected, showSelector])
+
+    useEffect(() => {
+        if (subService?.upload_type>0) {
+            if (subService.upload_type <= 3) {
+                let d = upload_types.find(x => x.id == subService.upload_type)
+                if (d) {
+                    if (d.id == 3) {
+                        setShowSelector(true)
+                    } else {
+                        setUploadType(d)
+                    }
+
+                }
+            }
+        }
+    }, [subService])
 
     useEffect(() => {
         if (images[0].uri !== require('../../../assets/camera.png')) {
@@ -58,7 +101,8 @@ const AddLicense = (props) => {
 
     useEffect(() => {
         if (!isAddServiceMode && subService && subService.license_data && subService.license_data.length > 0) {
-            const imageData = subService.license_data.map((item, index) => {
+            console.log("Service data", subService)
+            const imageData = subService.license_data?.filter(x => x.file_type == "license")?.map((item, index) => {
                 return {
                     id: item.id,
                     uri: BASE_URL + item.file_url,
@@ -67,6 +111,17 @@ const AddLicense = (props) => {
                 }
             })
 
+            const imagesData1 = subService?.license_data?.filter(x => x.file_type == "certificate")?.map((item, index) => {
+                return ({
+                    id: item.id,
+                    uri: BASE_URL + item.file_url,
+                    name: item.file_url.split("/")[item.file_url.split("/").length - 1],
+                    type: 'image/png',
+                })
+            })
+            if (imagesData1.length > 0) {
+                setImages1(imagesData1)
+            }
             if (imageData.length > 0) {
                 setImages(imageData)
             }
@@ -90,6 +145,9 @@ const AddLicense = (props) => {
                             cropping: true
                         }).then(image => {
                             let data = [...images]
+                            if (upload_type.id == 1) {
+                                data = [...images1]
+                            }
                             if (data.length <= 1) {
                                 data[data.length - 1] = {
                                     uri: image.path,
@@ -103,7 +161,12 @@ const AddLicense = (props) => {
                                     type: image.mime,
                                 })
                             }
-                            setImages([...data])
+                            if (upload_type.id == 1) {
+                                setImages1([...data])
+                            } else if (upload_type.id == 2) {
+                                setImages([...data])
+                            }
+
                         })
                     },
                 },
@@ -115,6 +178,9 @@ const AddLicense = (props) => {
                             cropping: true
                         }).then(image => {
                             let data = [...images]
+                            if (upload_type.id == 1) {
+                                data = [...images1]
+                            }
                             if (data[data.length - 1].uri == require('../../../assets/camera.png')) {
                                 data[data.length - 1] = {
                                     uri: image.path,
@@ -128,7 +194,11 @@ const AddLicense = (props) => {
                                     type: image.mime,
                                 })
                             }
-                            setImages([...data])
+                            if (upload_type.id == 1) {
+                                setImages1([...data])
+                            } else if (upload_type.id == 2) {
+                                setImages([...data])
+                            }
                         }).catch(err => {
                             console.log("Image picker error : ", err)
                         })
@@ -140,6 +210,9 @@ const AddLicense = (props) => {
 
     const updateImage = (index) => {
         let imagesData = [...images]
+        if (upload_type.id == 1) {
+            imagesData = [...images1]
+        }
         Alert.alert(
             "LifeSuite",
             "Pick image from...",
@@ -160,7 +233,12 @@ const AddLicense = (props) => {
                                 name: image.filename ? image.filename : image.path.split("/").pop(),
                                 type: image.mime,
                             }
-                            setImages([...imagesData])
+                            if (upload_type.id == 1) {
+                                setImages1([...imagesData])
+                            } else if (upload_type.id == 2) {
+                                setImages([...imagesData])
+                            }
+
                         })
                     },
                 },
@@ -176,7 +254,11 @@ const AddLicense = (props) => {
                                 name: image.filename ? image.filename : image.path.split("/").pop(),
                                 type: image.mime,
                             }
-                            setImages([...imagesData])
+                            if (upload_type.id == 1) {
+                                setImages1([...imagesData])
+                            } else if (upload_type.id == 2) {
+                                setImages([...imagesData])
+                            }
                         }).catch(err => {
                             console.log("Image picker error : ", err)
                         })
@@ -187,65 +269,30 @@ const AddLicense = (props) => {
     }
 
     const next = () => {
-        if (images[0].uri !== require('../../../assets/camera.png')) {
-            dispatch(setAddServiceData({ data: { ...addServiceData, images: images } }))
+        let goToNext = false
+        if (showSelector) {
+            if (images1[0].uri !== require('../../../assets/camera.png') && images[0].uri !== require('../../../assets/camera.png')) {
+                goToNext = true
+            }
+        } else {
+            if (upload_type.id == 1) {
+                if (images1[0].uri !== require('../../../assets/camera.png')) {
+                    goToNext = true
+                }
+            } else if (upload_type.id == 2) {
+                if (images[0].uri !== require('../../../assets/camera.png')) {
+                    goToNext = true
+                }
+            }
+        }
+
+        if (goToNext) {
+            dispatch(setAddServiceData({ data: { ...addServiceData, images: images, certificates: images1 } }))
             props.navigation.navigate('SelectLocation', { subService: subService })
         } else {
             showToast("Please select certificate or licence image")
         }
         // saveNewService()
-    }
-
-    const saveNewService = () => {
-        if (images[0].uri !== require('../../../assets/camera.png')) {
-            setLoading(true)
-            let headers = {
-                'Content-Type': 'multipart/form-data',
-                "Authorization": `Bearer ${access_token}`
-            }
-
-            var formdata = new FormData();
-            formdata.append("user_id", user.id);
-            formdata.append("service_id", addServiceData.service_id);
-            formdata.append("json_data", JSON.stringify({ ...addServiceData.json_data, products: [] }));
-
-            images.forEach((item, index) => {
-                if (!item.uri.startsWith(BASE_URL)) {
-                    formdata.append('license_file[]', {
-                        uri: Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri,
-                        name: item.name,
-                        type: item.type,
-                    })
-                }
-            })
-
-            let config = {
-                headers: headers,
-                data: formdata,
-                endPoint: '/api/providerServicesAdd',
-                type: 'post'
-            }
-
-            getApi(config)
-                .then((response) => {
-                    if (response.status == true) {
-                        setLoading(false)
-                        showToast(response.message, 'success')
-                        getMyJobs(true)
-                    }
-                    else {
-                        setLoading(false)
-                        showToast(response.message, 'danger')
-                    }
-                })
-                .catch(err => {
-                    setLoading(false)
-                    console.log("error =>", err)
-                })
-        } else {
-            setLoading(false)
-            showToast("Please select certificate or licence image")
-        }
     }
 
     const getMyJobs = (shouldNavigate) => {
@@ -290,8 +337,16 @@ const AddLicense = (props) => {
 
     const removeImage = (index) => {
         let temp = [...images]
+        if (upload_type.id == 1) {
+            temp = [...images1]
+        }
         temp.splice(index, 1)
-        setImages([...temp])
+        if (upload_type.id == 1) {
+            setImages1([...temp])
+        } else if (upload_type.id == 2) {
+            setImages([...temp])
+
+        }
     }
 
     const removeLicense = (item, index) => {
@@ -327,11 +382,20 @@ const AddLicense = (props) => {
     }
 
     const onImagePress = (image, index) => {
-        if (images[0].uri == require('../../../assets/camera.png')) {
-            pickImage()
-        } else {
-            updateImage(index)
+        if (upload_type.id == 1) {
+            if (images1[0].uri == require('../../../assets/camera.png')) {
+                pickImage()
+            } else {
+                updateImage(index)
+            }
+        } else if (upload_type.id == 2) {
+            if (images[0].uri == require('../../../assets/camera.png')) {
+                pickImage()
+            } else {
+                updateImage(index)
+            }
         }
+
     }
 
     return (
@@ -366,25 +430,49 @@ const AddLicense = (props) => {
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
                     <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                        <Text style={styles.service}>{subService.upload_type == 2 ? "Upload Driver or State License" : "Upload Certificate or Business Certificate"}</Text>
-                        {
-                            images.map((item, index) => {
-                                return (
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => onImagePress(item, index)} key={index} style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
-                                        {
-                                            item.uri == require('../../../assets/camera.png')
-                                                ?
-                                                <Image style={{ height: '25%', width: '25%' }} resizeMode="contain" source={require('../../../assets/camera.png')} />
-                                                :
-                                                <Image style={{ height: '100%', width: '100%' }} resizeMode={resizeMode} source={{ uri: item.uri }} />
-                                        }
-                                        {images.length > 1 && <TouchableOpacity activeOpacity={0.7} onPress={() => removeLicense(item, index)} style={{ height: 30, aspectRatio: 1, position: 'absolute', top: -15, right: -15 }}>
-                                            <Image source={require('../../../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
-                                        </TouchableOpacity>}
-                                    </TouchableOpacity>
-                                )
-                            })
+                        <Text style={styles.service}>{upload_type.text}</Text>
+                        {showSelector && <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green, marginHorizontal: 20, marginBottom: 10 }}>
+                            <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
+                                <Text  style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
+                            </TouchableOpacity>
+                            <View style={{ width: 1, backgroundColor: LS_COLORS.global.green }} />
+                            <TouchableOpacity onPress={() => setSelected(1)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 1 ? LS_COLORS.global.green : "white" }}>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 1 ? "white" : "black" }}>Upload License</Text>
+                            </TouchableOpacity>
+                        </View>}
+                        {upload_type.id == 2 && images.map((item, index) => {
+                            return (
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => onImagePress(item, index)} key={index} style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
+                                    {
+                                        item.uri == require('../../../assets/camera.png')
+                                            ?
+                                            <Image style={{ height: '25%', width: '25%' }} resizeMode="contain" source={require('../../../assets/camera.png')} />
+                                            :
+                                            <Image style={{ height: '100%', width: '100%' }} resizeMode={resizeMode} source={{ uri: item.uri }} />
+                                    }
+                                    {images.length > 1 && <TouchableOpacity activeOpacity={0.7} onPress={() => removeLicense(item, index)} style={{ height: 30, aspectRatio: 1, position: 'absolute', top: -15, right: -15 }}>
+                                        <Image source={require('../../../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                    </TouchableOpacity>}
+                                </TouchableOpacity>
+                            )
+                        })
                         }
+                        {upload_type.id == 1 && images1.map((item, index) => {
+                            return (
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => onImagePress(item, index)} key={index} style={{ width: '50%', aspectRatio: 1, borderWidth: 2, borderColor: LS_COLORS.global.divider, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
+                                    {
+                                        item.uri == require('../../../assets/camera.png')
+                                            ?
+                                            <Image style={{ height: '25%', width: '25%' }} resizeMode="contain" source={require('../../../assets/camera.png')} />
+                                            :
+                                            <Image style={{ height: '100%', width: '100%' }} resizeMode={resizeMode} source={{ uri: item.uri }} />
+                                    }
+                                    {images1.length > 1 && <TouchableOpacity activeOpacity={0.7} onPress={() => removeLicense(item, index)} style={{ height: 30, aspectRatio: 1, position: 'absolute', top: -15, right: -15 }}>
+                                        <Image source={require('../../../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                    </TouchableOpacity>}
+                                </TouchableOpacity>
+                            )
+                        })}
 
                         <View style={{ flex: 1 }} />
                         <View style={{ paddingBottom: '15%' }}>
@@ -394,15 +482,15 @@ const AddLicense = (props) => {
                                 customTextStyles={{ color: LS_COLORS.global.green }}
                                 action={() => pickImage()}
                             />
-                        </View>                        
+                        </View>
                     </Content>
                     <View style={{ paddingBottom: '2.5%', }}>
-                            <CustomButton
-                                title={"NEXT"}
-                                customStyles={{ width: '50%', borderRadius: 6 }}
-                                action={() => next()}
-                            />
-                        </View>
+                        <CustomButton
+                            title={"NEXT"}
+                            customStyles={{ width: '50%', borderRadius: 6 }}
+                            action={() => next()}
+                        />
+                    </View>
                 </Container>
                 {loading && <Loader />}
             </SafeAreaView >

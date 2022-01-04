@@ -38,7 +38,8 @@ const initialState={
             "new_products": []
         },
         "license file": null,
-        images: []
+        images: [],
+        certificates:[]
     },
     isAddServiceMode: false
 }

@@ -6,7 +6,8 @@ import {
     View,
     TextInput,
     Text,
-    TouchableOpacity
+    TouchableOpacity,
+    Keyboard
 } from 'react-native';
 import { Card, Container, Content } from 'native-base';
 
@@ -23,16 +24,19 @@ const CancelModal = props => {
             transparent={true}
             {...props}>
             <Pressable onPress={props.pressHandler} style={styles.modalScreen}>
-                <View
+                <Pressable
+                    onPress={()=>{
+                        Keyboard.dismiss()
+                    }}
                     style={{
-                        minHeight:350,
+                        // minHeight:350,
                         backgroundColor: 'white',
                         width: "80%",
                         borderRadius: 10,
                         padding: 20,
                     }}>
-                    <Container style={{ flex: 1, backgroundColor: 'white' }}>
-                        <Content>
+                    {/* <Container style={{ flex: 1, backgroundColor: 'white' }}> */}
+                        {/* <Content> */}
                             <Text style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.title}</Text>
                             <Text style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.subCancelText}</Text>
                             <View style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
@@ -64,9 +68,9 @@ const CancelModal = props => {
                                 <Text style={styles.saveText}>Submit</Text>
                             </TouchableOpacity>
                             </View>
-                        </Content>
-                    </Container>
-                </View>
+                        {/* </Content> */}
+                    {/* </Container> */}
+                </Pressable>
             </Pressable>
         </Modal >
     );

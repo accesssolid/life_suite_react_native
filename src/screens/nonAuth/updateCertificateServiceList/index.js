@@ -21,7 +21,7 @@ import CustomButton from '../../../components/customButton';
 
 export default function UpdateCertificateService({ navigation, route }) {
     const myJobs = useSelector(state => state.provider.myJobs)
-
+    
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header

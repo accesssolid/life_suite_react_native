@@ -1,42 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lifesuite">
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <application
-      android:name=".MainApplication"
-      android:label="@string/app_name"
-      android:icon="@mipmap/ic_launcher"
-      android:roundIcon="@mipmap/ic_launcher_round"
-      android:allowBackup="false"
-      android:usesCleartextTraffic="true"
-      android:theme="@style/AppTheme">
-      <activity
-        android:name=".MainActivity"
-        android:label="@string/app_name"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
-        android:launchMode="singleTask"
-        android:windowSoftInputMode="adjustResize"
-        android:screenOrientation = "portrait"
-       >
-               <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-      </activity>
-       <provider
-        android:name="androidx.core.content.FileProvider"
-        android:authorities="${applicationId}.provider"
-        android:exported="false"
-        android:grantUriPermissions="true">
-       </provider>   
-      <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyDY5JgaWK8EK2TC6Zm6460Qwo0G4NbWM-I"/>
-      <!-- You will also only need to add this uses-library tag -->
-      <uses-library android:name="org.apache.http.legacy" android:required="false"/>
-    </application>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.CAMERA"/>
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.VIBRATE"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+  <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="false" android:usesCleartextTraffic="true" android:theme="@style/AppTheme">
+    <activity android:name=".MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize" android:screenOrientation="portrait">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <data android:scheme="lifesuite"/>
+      </intent-filter>
+    </activity>
+    <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.provider" android:exported="false" android:grantUriPermissions="true"/>
+    <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDY5JgaWK8EK2TC6Zm6460Qwo0G4NbWM-I"/>
+    <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+  </application>
 </manifest>

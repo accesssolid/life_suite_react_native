@@ -11,3 +11,8 @@ onScrollToIndexFailed={info=>{console.log(info)}}
 node_modules/react-native-google-places-autocomplete/GooglePlacesAutocomplete.js
 line number: 765
 nestedScrollEnabled={true}
+
+//first ios bundleidentifier
+org.LifeSuite
+
+com.LifeSuite

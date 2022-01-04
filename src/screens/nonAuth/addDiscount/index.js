@@ -9,16 +9,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 /* Components */
 import Header from '../../../components/header';
 import DropDown from '../../../components/dropDown';
-
+import { useSelector } from 'react-redux';
+import { getApi } from '../../../api/api';
+import Loader from '../../../components/loader';
 const types = ["Flat Amount", "Percentage"]
 
 export default function AddDiscount({ navigation, route }) {
     const [type, setType] = React.useState("Flat Amount")
-    const { discount, setDiscount, totalPrice } = route.params ?? {}
+    const { discount, setDiscount, totalPrice, order_id } = route.params ?? {}
     const [flat_amount, setFlatAmount] = React.useState("")
     const [per_amount, setPerAmount] = React.useState("")
     const [totalPrice1, setTotalPrice1] = React.useState(0)
-
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const [loader, setLoader] = React.useState(false)
     React.useEffect(() => {
         setTotalPrice1(totalPrice)
         if (discount?.discount_type == "flat") {
@@ -29,6 +32,39 @@ export default function AddDiscount({ navigation, route }) {
             setPerAmount(discount.discount_amount)
         }
     }, [discount, setDiscount, totalPrice])
+
+    const addDiscount = async (data) => {
+
+        try {
+            setLoader(true)
+            let headers = {
+                "Authorization": `Bearer ${access_token}`
+            }
+            const formdata=new FormData()
+            formdata.append("order_id",order_id)
+            formdata.append("discount_type",data.discount_type)
+            formdata.append("discount_amount",data.discount_amount)
+
+            let config = {
+                headers: headers,
+                data: formdata,
+                endPoint: '/api/addDiscountOrder',
+                type: 'post'
+            }
+            const response = await getApi(config)
+            if (response.status) {
+                showToast("Discount added successfully")
+                navigation.goBack()
+            } else {
+                showToast(response.message)
+            }
+        } catch (Err) {
+
+        } finally {
+            setLoader(false)
+
+        }
+    }
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -61,16 +97,16 @@ export default function AddDiscount({ navigation, route }) {
                     <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", paddingHorizontal: 20 }}>
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
-                                <View style={{ width: "40%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount ($)"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                <View style={{ width: "50%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
+                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount ($)"} placeholderTextColor="black" style={{ height: 40,color:"black"  }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
-                                <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage (%)"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                <View style={{ width: "50%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
+                                    <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage (%)"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40,color:"black" }} textAlign="center" />
                                 </View>
-                                <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginTop: 20, backgroundColor: LS_COLORS.global.lightGrey }}>
+                                <View style={{ width: "50%", alignSelf: "center", borderRadius: 6, height: 40, marginTop: 20, backgroundColor: LS_COLORS.global.lightGrey }}>
                                     <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40 }} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
                                 </View>
                             </View>
@@ -85,10 +121,14 @@ export default function AddDiscount({ navigation, route }) {
                             discount_type: type == types[0] ? "flat" : "per",
                             discount_amount: type == types[0] ? flat_amount : per_amount
                         })
-                        navigation.pop()
+                        addDiscount({
+                            discount_type: type == types[0] ? "flat" : "per",
+                            discount_amount: type == types[0] ? flat_amount : per_amount
+                        })
                     }}>
                     <Text style={styles.saveText}>Confirm</Text>
                 </TouchableOpacity>
+                {loader && <Loader />}
             </Container>
         </SafeAreaView>
     )

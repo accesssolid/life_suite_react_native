@@ -187,18 +187,36 @@ const SelectLocation = (props) => {
                 formdata.append("service_id", addServiceData.service_id);
 
                 addServiceData.images.forEach((item, index) => {
-                    let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
-                    if (!item.uri.startsWith(BASE_URL)) {
-                        formdata.append('license_file[]', {
-                            uri: PATH_TO_THE_FILE,
-                            name: item.name,
-                            type: item.type,
-                        })
+                    if (item.name != "") {
+                        let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
+
+                        if (!String(item.uri).startsWith(BASE_URL)) {
+                            formdata.append('license_file[]', {
+                                uri: PATH_TO_THE_FILE,
+                                name: item.name,
+                                type: item.type,
+                            })
+                        }
+                    }
+
+                })
+
+                addServiceData.certificates.forEach((item, index) => {
+                    if (item.name != "") {
+                        let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
+                        if (!String(item.uri).startsWith(BASE_URL)) {
+                            formdata.append('certificate_file[]', {
+                                uri: PATH_TO_THE_FILE,
+                                name: item.name,
+                                type: item.type,
+                            })
+                        }
                     }
                 })
 
                 return props.navigation.navigate('AddTimeFrame', { serviceData: { json_data, formdata, subService } })
             } catch (error) {
+                console.log(error)
             } finally {
                 setLoading(false)
             }

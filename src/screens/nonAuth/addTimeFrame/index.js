@@ -159,16 +159,6 @@ const AddTimeFrame = (props) => {
             }
         })
 
-        // for(let i=0;i<data.length;i++){
-        //     for(let j=0;j<data.length;j++ ){
-        //         if(i!=j){
-        //             if(moment(data[i].start_date,"YYYY-MM-DD")>moment(data[i].end_date,"YYYY-MM-DD")){
-
-        //             }
-        //         }
-        //     }
-        // }
-
         if (data.length == 0) {
             setLoading(false)
             return showToast("Invalid time frame data")

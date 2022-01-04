@@ -630,7 +630,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = S94D73XQXZ;
+				DEVELOPMENT_TEAM = RSWZ8MVF9V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = LifeSuite/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -643,9 +643,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite;
+				PRODUCT_BUNDLE_IDENTIFIER = com.LifeSuite;
 				PRODUCT_NAME = LifeSuite;
-				PROVISIONING_PROFILE_SPECIFIER = "LifeSuite Dev";
+				PROVISIONING_PROFILE_SPECIFIER = LifeSuiteDev;
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeSuite-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -665,7 +665,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = S94D73XQXZ;
+				DEVELOPMENT_TEAM = RSWZ8MVF9V;
 				INFOPLIST_FILE = LifeSuite/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -678,9 +678,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.LifeSuite;
+				PRODUCT_BUNDLE_IDENTIFIER = com.LifeSuite;
 				PRODUCT_NAME = LifeSuite;
-				PROVISIONING_PROFILE_SPECIFIER = "LifeSuite Dev";
+				PROVISIONING_PROFILE_SPECIFIER = LifeSuiteDev;
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeSuite-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

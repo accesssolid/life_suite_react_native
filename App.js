@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Platform, StatusBar, LogBox } from 'react-native'
+import { Platform, StatusBar, Linking } from 'react-native'
 
 /* Packages */
 import { Provider as StoreProvider } from 'react-redux';
@@ -8,6 +8,7 @@ import { Root } from 'native-base';
 import PushNotificationIOS from "@react-native-community/push-notification-ios";
 import PushNotification from "react-native-push-notification";
 import messaging from '@react-native-firebase/messaging';
+import { NavigationContainer } from '@react-navigation/native';
 
 /* Constants */
 import LS_COLORS from './src/constants/colors';
@@ -17,25 +18,55 @@ import store from './src/redux/store';
 
 /* Root Navigator */
 import Router from './src/router';
-import UpdateOrder from './src/screens/nonAuth/updateOrder';
+
+PushNotification.configure({
+  onNotification: function (notification) {
+    console.log("NOTIFICATION:", notification);
+    // process the notification
+    if(notification.data?.link){
+      Linking.openURL(notification.data?.link)
+    }
+    // (required) Called when a remote is received or opened, or local notification is opened
+    notification.finish(PushNotificationIOS.FetchResult.NoData);
+  },
+})
+
+const deepLinksConf = {
+  screens: {
+    ProviderStack: {
+      screens: {
+        OrderDetail: "provider_order_detail/:order_id",
+      }
+    },
+    UserStack:{
+      screens: {
+        OrderDetailCustomer: "customer_order_detail/:order_id",
+      }
+    }
+  },
+};
+
+const linking = {
+  prefixes: ['lifesuite://'],
+  config: deepLinksConf
+}
 
 const App = () => {
-  LogBox.ignoreAllLogs();
-
   // function for getting noti token from #liahs
   const getToken = async () => {
-    try{
+    try {
       let gg = await messaging().getToken()
       console.log(gg, "Token")
-    }catch(err){
-      
+    } catch (err) {
+
     }
-    
+
   }
 
   useEffect(() => {
     // getToken()
     const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log(remoteMessage)
       if (Platform.OS == 'android') {
         PushNotification.createChannel(
           {
@@ -46,11 +77,11 @@ const App = () => {
           (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
         );
         PushNotification.localNotification({
-
+        
           channelId: "channel-id", // (required) channelId, if the channel doesn't exist, notification will not trigger.
           title: remoteMessage.notification.title, // (optional)
           message: remoteMessage.notification.body, // (required)
-
+          userInfo:remoteMessage.data
         });
       }
 
@@ -62,6 +93,7 @@ const App = () => {
           id: 'test',
           title: remoteMessage.notification.title,
           body: remoteMessage.notification.body,
+          userInfo:remoteMessage.data
 
         });
       }
@@ -74,7 +106,9 @@ const App = () => {
       <StoreProvider store={store}>
         <StatusBar backgroundColor={LS_COLORS.global.cyan} barStyle="dark-content" />
         <SafeAreaProvider>
+        <NavigationContainer linking={linking} >
           <Router />
+          </NavigationContainer>
         </SafeAreaProvider>
       </StoreProvider>
     </Root>

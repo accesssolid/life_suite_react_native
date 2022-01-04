@@ -53,7 +53,7 @@ const OrderClientDetail = (props) => {
     const DATE = props.route.params.data
     const fromInputRef = useRef(null)
     const toInputRef = useRef(null)
-    const { servicedata, subService, item } = props.route.params
+    let { servicedata, subService, item, order_id } = props.route.params
     const [data, setData] = useState(null)
     const [virtualdata, setVirtualData] = React.useState({})
     const user = useSelector(state => state.authenticate.user)
@@ -75,6 +75,12 @@ const OrderClientDetail = (props) => {
 
     // books data from  modal
     const [booked, setBooked] = React.useState([])
+
+    useEffect(() => {
+        if (order_id >= 0) {
+            item = { id: order_id }
+        }
+    }, [order_id])
 
     React.useEffect(() => {
         if (data) {
@@ -595,7 +601,7 @@ const OrderClientDetail = (props) => {
                 visible={ratingModal}
                 data={data?.provider_rating_data}
                 onPressYes={() => {
-                 
+
 
                 }}
                 setVisible={setRatingModal}
@@ -699,7 +705,7 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
             if (dtype == "flat") {
                 totalAmount1 = totalAmount - amount
             } else if (dtype == "per") {
-                totalAmount1 = totalAmount - (amount * totalAmount/100)
+                totalAmount1 = totalAmount - (amount * totalAmount / 100)
             }
             return totalAmount1
         } else {
@@ -707,18 +713,18 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
         }
     }
 
-    const checkforDiscountToShow = (v_a,v_t,d_a,d_t) => {
-        if (v_a&&v_a!==""){
-            if(v_t=="flat"){
+    const checkforDiscountToShow = (v_a, v_t, d_a, d_t, v_total, d_total) => {
+        if (v_a && v_a !== "") {
+            if (v_t == "flat") {
                 return `$${v_a}`
-            }else{
-                return `${v_a}%`
+            } else {
+                return `$${v_a * v_total / 100}`
             }
-        }else if(d_a&&d_a!==""){
-            if( d_t=="flat"){
+        } else if (d_a && d_a !== "") {
+            if (d_t == "flat") {
                 return `$${d_a}`
-            }else{
-                return `${d_a}%`
+            } else {
+                return `$${d_a * d_total / 100}`
             }
         } else {
             return false
@@ -755,13 +761,13 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                     return (<OrderItemsDetail i={i} />)
                 })}
             </View>}
-            {checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            {checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Discount</Text>
-                <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type)}</Text>
+                <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price)}</Text>
             </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>
-                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type,data?.discount_amount,data?.order_total_price)}</Text>
+                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Time</Text>
@@ -944,7 +950,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
 
 
 
-const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen,openRatingModal }) => {
+const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen, openRatingModal }) => {
     const [buttons, setButtons] = React.useState([])
     console.log(JSON.stringify(data), "data")
     const navigation = useNavigation()
@@ -1005,19 +1011,21 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayMo
                 openDelayModal()
                 break
             case buttons_types.start_order:
-                let current=Date.now()
-                let job_start=moment(data?.requested_start_time,"YYYY-MM-DD HH:mm:[00]").unix()*1000
-                if(current<job_start){
-                    Alert.alert("Start Order",`Order requested time is ${moment(data?.requested_start_time).format("YYYY-MM-DD hh:mm a")}. Do you still want to start job right now?`,[
-                        {text:"No",onPress:()=>{}},
-                        {text:"Yes",onPress:()=>{
-                            submit(order_types.processing)
-                        }},
+                let current = Date.now()
+                let job_start = moment(data?.requested_start_time, "YYYY-MM-DD HH:mm:[00]").unix() * 1000
+                if (current < job_start) {
+                    Alert.alert('Start Order', `Customer requested job start time is ${moment(data?.requested_start_time).format("DD/MM/YYYY, hh:mm a")}. Do you still want to start the job right now?`, [
+                        { text: "No", onPress: () => { } },
+                        {
+                            text: "Yes", onPress: () => {
+                                submit(order_types.processing)
+                            }
+                        },
                     ])
-                }else{
+                } else {
                     submit(order_types.processing)
                 }
-             break
+                break
             case buttons_types.suspend:
                 navigation.navigate("OrderSuspend", { item: data })
                 break

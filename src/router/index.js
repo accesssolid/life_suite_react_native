@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 /* Packages */
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 /* Components */
@@ -30,7 +29,7 @@ const Router = () => {
 
   return (
     <>
-      <NavigationContainer>
+     
         <Stack.Navigator headerMode={'none'}>
           <Stack.Screen name="Splash" component={Splash} />
           <Stack.Screen name="WelcomeScreen" component={Welcomescreen} />
@@ -44,7 +43,7 @@ const Router = () => {
           <Stack.Screen name="OrderHistoryCustomer" component={OrderHistoryCustomer} />
           <Stack.Screen name="OrderHistoryProvider" component={OrderHistoryProvider} />
         </Stack.Navigator>
-      </NavigationContainer>
+     
       {loading && <Loader />}
     </>
   )

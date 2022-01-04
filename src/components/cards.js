@@ -29,7 +29,7 @@ const Cards = props => {
                 </TouchableOpacity>}
                 {props.showDelete && <TouchableOpacity onPress={() => {
 
-                    Alert.alert("Remove service", "Do you really want to remove this service from your list ?", [
+                    Alert.alert("Remove service", "Do you want to remove this service from your offered services?", [
                         { text: "no" },
                         {
                             text: "yes", onPress: () => {

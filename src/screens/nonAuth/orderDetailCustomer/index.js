@@ -1,10 +1,11 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, TouchableOpacity, Dimensions, ScrollView, Image, Linking } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar,PermissionsAndroid,TouchableOpacity, Dimensions, ScrollView, Image, Linking } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
+import Geolocation from 'react-native-geolocation-service';
 
 /* Packages */
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,7 +30,7 @@ import { Rating } from 'react-native-ratings';
 import { order_types, buttons_customer, buttons_types } from '../../../constants/globals'
 
 export default function OrderDetailUpdateCustomer(props) {
-    const { item } = props.route.params
+    let { item,order_id } = props.route.params
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
 
@@ -54,7 +55,11 @@ export default function OrderDetailUpdateCustomer(props) {
         latitude: 37.78825,
         longitude: -122.4324,
     })
-
+    useEffect(() => {
+        if (order_id >= 0) {
+            item = { id: order_id }
+        }
+    }, [order_id])
     React.useEffect(() => {
         console.log("Data", JSON.stringify(data))
         if (data?.id) {
@@ -647,18 +652,18 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
         }
     }
 
-    const checkforDiscountToShow = (v_a,v_t,d_a,d_t) => {
+    const checkforDiscountToShow = (v_a,v_t,d_a,d_t,v_total,d_total) => {
         if (v_a&&v_a!==""){
             if(v_t=="flat"){
                 return `$${v_a}`
             }else{
-                return `${v_a}%`
+                return `$${v_a*v_total/100}`
             }
         }else if(d_a&&d_a!==""){
             if( d_t=="flat"){
                 return `$${d_a}`
             }else{
-                return `${d_a}%`
+                return `$${d_a*d_total/100}`
             }
         } else {
             return false
@@ -707,9 +712,9 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     return (<OrderItemsDetail i={i} />)
                 })}
             </View>}
-            {checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            {checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type, virtual_data?.order_total_price,data?.order_total_price) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Discount</Text>
-                <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type)}</Text>
+                <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type, virtual_data?.order_total_price,data?.order_total_price)}</Text>
             </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>

@@ -159,15 +159,16 @@ const OrderHistory = (props) => {
                         customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0 }}
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
+                       <View style={{ flexDirection: "row", alignItems: "center",justifyContent:"space-between", marginTop: 20 }}>
                         <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>List of orders</Text>
-                        <View style={{ flex: 0.8, alignSelf: "flex-end", marginRight: 20, alignItems: "flex-end" }}>
-                            <DropDown
-                                item={order_types.map(x => x.title)}
-                                value={selected.title}
-                                onChangeValue={(index, value) => { setselected(order_types[index]) }}
-                                containerStyle={{ marginLeft: 20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
-                            />
+                        <View style={{ flex: 0.8,alignSelf:"flex-end", marginRight: 20, alignItems: "flex-end" }}>
+                           <DropDown
+                               item={order_types.map(x => x.title)}
+                               value={selected.title}
+                               onChangeValue={(index, value) => { setselected(order_types[index]) }}
+                               containerStyle={{ marginLeft:20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10,borderWidth: 0 }}
+                               dropdownStyle={{height:order_types.length*40}}
+                           />
                         </View>
                     </View>
                     <FlatList

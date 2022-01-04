@@ -141,8 +141,8 @@ const OrderClientDetail = (props) => {
                 order_from_lat: data.order_from_lat,
                 order_from_long: data.order_from_long,
                 order_from_address: data.order_from_address,
-                discount_type: discount.discount_type,
-                discount_amount: discount.discount_amount,
+                // discount_type: discount.discount_type,
+                // discount_amount: discount.discount_amount,
 
             }),
             endPoint: '/api/providerOrderUpdate',
@@ -235,7 +235,7 @@ const OrderClientDetail = (props) => {
                     <TouchableOpacity
                         style={[styles.save, { borderRadius: 40, height: 35, marginTop: 0 }]}
                         activeOpacity={0.7}
-                        onPress={() => { props.navigation.navigate("AddDiscount", { totalPrice, setDiscount: setDiscount.bind(this), discount: discount }) }}>
+                        onPress={() => { props.navigation.navigate("AddDiscount", { totalPrice, setDiscount: setDiscount.bind(this), discount: discount ,order_id:item.id}) }}>
                         <Text style={styles.saveText}>Add Discount</Text>
                     </TouchableOpacity>
                 </View>

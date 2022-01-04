@@ -563,8 +563,8 @@ const Profile = (props) => {
     }
 
 
-    const createNewConnect = () => {
-        
+    const createNewConnect = async () => {
+
         try {
             setLoader(true)
             let headers = {
@@ -577,20 +577,15 @@ const Profile = (props) => {
                 endPoint: '/api/providerCreateNewConnect',
                 type: 'post'
             }
-            getApi(config).then(response => {
-                console.log("response", JSON.stringify(response))
-                if (response.status == true) {
-                    if (response.data) {
-                        props.navigation.navigate("UserStack", { screen: "CustomWebView", params: { uri: response.data.url, change: true } })
-                    }
-                }
-                else {
+            let response = await getApi(config)
+            if (response.status) {
+                if (response.data) {
+                    props.navigation.navigate("UserStack", { screen: "CustomWebView", params: { uri: response.data.url, change: true,connect_account_id:response.connect_account_id} })
+                } else {
                     showToast(response.message, 'danger')
                 }
-            })
-                .catch(err => {
+            }
 
-                })
         } catch (err) {
 
         } finally {

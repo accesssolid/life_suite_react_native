@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, FlatList, SafeAreaView, Dimensions, Alert } from 'react-native'
+import { View, StyleSheet, Image, Text, FlatList, SafeAreaView, TouchableOpacity, Dimensions, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -21,17 +21,33 @@ import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import ImagePicker from 'react-native-image-crop-picker';
 
+
+const upload_types = [
+    { id: 1, text: "Upload Certificate or Business Certificate", button_text: "Add Certificate" },
+    { id: 2, text: "Upload Driver or State License", button_text: "Add License" },
+    { id: 3, text: "Upload Certificate and License " }
+]
+
+
 export default function UpdateCertificates({ navigation, route }) {
     const myJobs = useSelector(state => state.provider.myJobs)
-    const { title, service_id,service } = route.params
+    const { title, service_id, service } = route.params
+    const [current_upload_type, setCurrentUploadType] = React.useState(upload_types[0])
     const access_token = useSelector(state => state.authenticate.access_token)
     const [cerrtificates, setCertificates] = React.useState([])
+    const [licences, setLicenses] = React.useState([])
     const [loader, setLoader] = React.useState(false)
 
     useEffect(() => {
         getCertificateList()
     }, [])
 
+    useEffect(() => {
+        if (service?.upload_type) {
+            setCurrentUploadType(upload_types[service?.upload_type - 1])
+            // setCurrentUploadType(upload_types[2])
+        }
+    }, [service])
     const getCertificateList = async () => {
         try {
             setLoader(true)
@@ -47,7 +63,7 @@ export default function UpdateCertificates({ navigation, route }) {
                 type: 'post'
             }
             let response = await getApi(config)
-            console.log("response", response)
+            console.log("certificates list", response)
             if (response.status) {
                 if (response.data) {
                     setCertificates(response.data)
@@ -88,6 +104,7 @@ export default function UpdateCertificates({ navigation, route }) {
             setLoader(false)
         }
     }
+
     const addCertificate = async (data) => {
         try {
             setLoader(true)
@@ -116,7 +133,7 @@ export default function UpdateCertificates({ navigation, route }) {
     }
 
 
-    const pickImage = () => {
+    const pickImage = (type) => {
         Alert.alert(
             "LifeSuite",
             "Pick image from...",
@@ -140,6 +157,11 @@ export default function UpdateCertificates({ navigation, route }) {
                             let formdata = new FormData()
                             formdata.append("service_id", service_id)
                             formdata.append("certificate", i)
+                            if(type==0){
+                                formdata.append("file_type","certificate")
+                            }else{
+                                formdata.append("file_type","license")
+                            }
                             addCertificate(formdata)
                         })
                     },
@@ -159,6 +181,11 @@ export default function UpdateCertificates({ navigation, route }) {
                             let formdata = new FormData()
                             formdata.append("service_id", service_id)
                             formdata.append("certificate", i)
+                            if(type==0){
+                                formdata.append("file_type","certificate")
+                            }else{
+                                formdata.append("file_type","license")
+                            }
                             addCertificate(formdata)
                         }).catch(err => {
                             console.log("Image picker error : ", err)
@@ -169,10 +196,33 @@ export default function UpdateCertificates({ navigation, route }) {
         );
     }
 
+    const renderItem = ({ item, index }) => {
+        return (<View
+            style={{ height: 200, width: "90%", alignSelf: "center", marginTop: 10, borderRadius: 4, overflow: "hidden", backgroundColor: "#0005", borderWidth: 1, borderColor: LS_COLORS.global.green }}
+        >
+            <Image
+                style={{ height: "100%", aspectRatio: 1, alignSelf: "center" }}
+                source={{ uri: BASE_URL + item.file_url }}
+                resizeMode='contain'
+            />
+            <FontAwesome
+                onPress={() => {
+                    Alert.alert("Delete", "Do you want to remove this certificate? ", [
+                        { text: "no" },
+                        { text: "yes", onPress: () => deleteCertificate(item.id) }])
+                }}
+                name='delete'
+                color={LS_COLORS.global.danger}
+                size={25}
+                style={{ position: "absolute", right: 10, top: 10 }}
+            />
+        </View>)
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
-                title={`${title} Certificates`}
+                title={`${title}`}
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     navigation.goBack()
@@ -183,37 +233,24 @@ export default function UpdateCertificates({ navigation, route }) {
                 }}
             />
             <Container style={styles.container}>
-            <Text style={styles.service}>{service?.upload_type == 2 ? "Upload Driver or State License" : "Upload Certificate or Business Certificate"}</Text>
-                <FlatList
+                <Text style={styles.service}>{current_upload_type.text}</Text>
+                {current_upload_type.id !== upload_types[2].id && <><FlatList
                     data={cerrtificates}
                     keyExtractor={(item, index) => item.id + "" + index}
                     style={{ marginTop: 20 }}
-                    renderItem={({ item, index }) => {
-                        return <View
-                            style={{ height: 200, width: "90%", alignSelf: "center", marginTop: 10, borderRadius: 4, overflow: "hidden", backgroundColor: "#0005", borderWidth: 1, borderColor: LS_COLORS.global.green }}
-                        >
-                            <Image
-                                style={{ height: "100%", aspectRatio: 1, alignSelf: "center" }}
-                                source={{ uri: BASE_URL + item.file_url }}
-                                resizeMode='contain'
-                            />
-                            <FontAwesome
-                                onPress={() => {
-                                    Alert.alert("Delete", "Do you want to remove this certificate? ", [
-                                        { text: "no" },
-                                        { text: "yes", onPress: () => deleteCertificate(item.id) }])
-                                }}
-                                name='delete'
-                                color={LS_COLORS.global.danger}
-                                size={25}
-                                style={{ position: "absolute", right: 10, top: 10 }}
-                            />
-                        </View>
-                    }}
+                    renderItem={renderItem}
                 />
-                <CustomButton action={() => {
-                    pickImage()
-                }} title="Add Certificate" />
+                    <CustomButton action={() => {
+                        if(current_upload_type.id==1){
+                            pickImage(0)
+                        }else{
+                            pickImage(1)
+                        }
+                       
+                    }} title={current_upload_type.button_text} />
+                </>
+                }
+                {current_upload_type.id == upload_types[2].id && <BothTab data={cerrtificates} renderItem={renderItem} pickImage={pickImage} />}
             </Container>
 
             {loader && <Loader />}
@@ -221,6 +258,48 @@ export default function UpdateCertificates({ navigation, route }) {
     )
 }
 
+const BothTab = ({ data, renderItem, pickImage }) => {
+    const [certificates, setCertificates] = React.useState([])
+    const [licenses, setLicenses] = React.useState([])
+    const [selected, setSelected] = React.useState(0)
+
+    React.useEffect(() => {
+        if (data) {
+            setCertificates(data.filter(x => x.file_type == "certificate"))
+            setLicenses(data.filter(x => x.file_type == "license"))
+        }
+    }, [data])
+
+    return (
+        <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green }}>
+                <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
+                    <Text  style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
+                </TouchableOpacity>
+                <View style={{ width: 1, backgroundColor: LS_COLORS.global.green }} />
+                <TouchableOpacity onPress={() => setSelected(1)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 1 ? LS_COLORS.global.green : "white" }}>
+                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 1 ? "white" : "black" }}>Upload License</Text>
+                </TouchableOpacity>
+            </View>
+            {selected == 0 ? <FlatList
+                data={certificates}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index + "" + item.id}
+            /> :
+                <FlatList
+                    data={licenses}
+                    renderItem={renderItem}
+                    keyExtractor={(item, index) => index + "" + item.id}
+                />
+            }
+            <CustomButton action={() => {
+                if (pickImage) {
+                    pickImage(selected)
+                }
+            }} title={selected == 0 ? "Add Certificate" : "Add License"} />
+        </View>
+    )
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -246,7 +325,7 @@ const styles = StyleSheet.create({
         elevation: 5,
         marginVertical: 5
     },
-    service:{
+    service: {
         fontSize: 14,
         fontFamily: LS_FONTS.PoppinsRegular,
         color: "black",
