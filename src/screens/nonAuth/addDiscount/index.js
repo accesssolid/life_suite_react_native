@@ -42,7 +42,7 @@ export default function AddDiscount({ navigation, route }) {
             }
             const formdata=new FormData()
             formdata.append("order_id",order_id)
-            formdata.append("discount_type",data.discount_type)
+            formdata.append("discount_type","flat")
             formdata.append("discount_amount",data.discount_amount)
 
             let config = {
@@ -54,7 +54,8 @@ export default function AddDiscount({ navigation, route }) {
             const response = await getApi(config)
             if (response.status) {
                 showToast("Discount added successfully")
-                navigation.goBack()
+               navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item:{id:order_id} } })
+
             } else {
                 showToast(response.message)
             }
@@ -107,7 +108,7 @@ export default function AddDiscount({ navigation, route }) {
                                     <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage (%)"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40,color:"black" }} textAlign="center" />
                                 </View>
                                 <View style={{ width: "50%", alignSelf: "center", borderRadius: 6, height: 40, marginTop: 20, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40 }} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
+                                    <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40 }} >{Number(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2)) ?? "Calculated Amount"}</Text>
                                 </View>
                             </View>
                         }
@@ -123,7 +124,7 @@ export default function AddDiscount({ navigation, route }) {
                         })
                         addDiscount({
                             discount_type: type == types[0] ? "flat" : "per",
-                            discount_amount: type == types[0] ? flat_amount : per_amount
+                            discount_amount: type == types[0] ? flat_amount : Number(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))
                         })
                     }}>
                     <Text style={styles.saveText}>Confirm</Text>

@@ -77,6 +77,8 @@ const Splash = (props) => {
                 }
             })
             .catch(err => {
+                // setLoader(false)
+
 
             })
     }

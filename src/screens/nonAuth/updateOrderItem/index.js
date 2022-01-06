@@ -104,7 +104,7 @@ const OrderClientDetail = (props) => {
         let si1=[...selectedItems1].sort((a,b)=>Number(a)-Number(b)).join("")
         let pi=[...selectedProducts].sort((a,b)=>Number(a)-Number(b)).join("")
         let pi1=[...selectedProducts1].sort((a,b)=>Number(a)-Number(b)).join("")
-        if(pi==pi1&&si==si1&&otherProducts.length==0&&discount.discount_amount<=0){
+        if(pi==pi1&&si==si1&&otherProducts.length==0){
             return true
         }
         return false

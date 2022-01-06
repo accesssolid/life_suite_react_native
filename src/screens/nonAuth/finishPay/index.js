@@ -99,7 +99,7 @@ export default function FinishPay({ navigation, route }) {
                             onFinishRating={(rating) => {
                                 setRating(rating)
                             }}
-                            startingValue={0}
+                            startingValue={"0"}
                         />
                     </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, alignItems: "center", paddingHorizontal: 20 }}>
@@ -119,7 +119,7 @@ export default function FinishPay({ navigation, route }) {
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{ width: "40%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Tip Amount"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Tip Amount"} placeholderTextColor="black" style={{ height: 40,color:"black" }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
@@ -133,7 +133,7 @@ export default function FinishPay({ navigation, route }) {
                         }
                     </View>
                     <View style={{ width: "90%",alignSelf:"center",marginTop:20, borderRadius: 6, height: 200, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                        <TextInput value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top"  placeholder={"Your Comments"}  placeholderTextColor="gray" style={{ height: 200,padding:10}}/>
+                        <TextInput value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top"  placeholder={"Your Comments"}  placeholderTextColor="gray" style={{ height: 200,padding:10,color:"black"}}/>
                     </View>
                 </Content>
                 <TouchableOpacity

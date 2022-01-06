@@ -25,6 +25,7 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import SureModal from '../../../components/sureModal';
 import Loader from '../../../components/loader';
+import * as RNLocalize from "react-native-localize";
 
 // #liahs_before_providers
 
@@ -185,7 +186,8 @@ const MechanicLocation = (props) => {
                 "order_placed_long": toCoordinates.longitude,
                 "order_from_lat": fromCoordinates.latitude,
                 "order_from_long": fromCoordinates.longitude,
-                "order_from_address": fromAddress
+                "order_from_address": fromAddress,
+                "timezone":RNLocalize.getTimeZone()
             }),
             endPoint: "/api/reorderCreate",
             type: 'post'
@@ -270,20 +272,37 @@ const MechanicLocation = (props) => {
         }
     }
 
-    const handleConfirm = (date) => {
-        setStartTime(date)
+    const handleConfirm = (d) => {
+        const moment1=moment(d).format("HH:mm")
+        // const dateNow=new Date()
+        // if(date1<dateNow){
+        //     showToast("Please choose valid start time") 
+        //     setDatePickerVisibility(false);
+        //     return
+        // }
+        if(date==""){
+            showToast("Please select date first.")
+            setDatePickerVisibility(false);
+            return
+
+        }
+        if(moment().toDate()>moment(moment(date).format("MM-DD-YYYY")+" "+moment1,"MM-DD-YYYY HH:mm").toDate()){
+            showToast("Please select valid start time")
+            setDatePickerVisibility(false);
+            return
+        }
+        setStartTime(d)
         setDatePickerVisibility(false);
+
     };
 
-    const handleConfirm1 = (date) => {
-        console.log(date)
+    const handleConfirm1 = (d) => {
         setDatePickerVisibility1(false);
-        if (moment(date).toDate() > moment(startTime).toDate()) {
-            setEndTime(date)
+        if (moment(d).toDate() > moment(startTime).toDate()) {
+            setEndTime(d)
         } else {
-            // setTimeout(() => {
-                showToast("End time must be greater than start time.")
-            // }, 00)
+            showToast("End time must be greater than start time.")
+            
         }
         setDatePickerVisibility1(false);
 

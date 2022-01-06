@@ -1,6 +1,6 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar,PermissionsAndroid,TouchableOpacity, Dimensions, ScrollView, Image, Linking } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, PermissionsAndroid, TouchableOpacity, Dimensions, ScrollView, Image, Linking } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -28,9 +28,10 @@ import _ from 'lodash'
 import RNGooglePlaces from 'react-native-google-places';
 import { Rating } from 'react-native-ratings';
 import { order_types, buttons_customer, buttons_types } from '../../../constants/globals'
+import * as RNLocalize from "react-native-localize";
 
 export default function OrderDetailUpdateCustomer(props) {
-    let { item,order_id } = props.route.params
+    let { item, order_id } = props.route.params
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
 
@@ -50,7 +51,7 @@ export default function OrderDetailUpdateCustomer(props) {
         latitude: 37.78825,
         longitude: -122.4324,
     })
-    const [cancelRanges,setCancelRanges]=React.useState([])
+    const [cancelRanges, setCancelRanges] = React.useState([])
     const [toCoordinates, setToCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -93,7 +94,7 @@ export default function OrderDetailUpdateCustomer(props) {
 
         getApi(config)
             .then((response) => {
-                console.log("Response",response)
+                console.log("Response", response)
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
@@ -102,7 +103,7 @@ export default function OrderDetailUpdateCustomer(props) {
                     } else {
 
                     }
-                    if(response.cancel_charge_ranges){
+                    if (response.cancel_charge_ranges) {
                         setCancelRanges(response.cancel_charge_ranges)
                     }
                     if (response.totalSettingData) {
@@ -357,7 +358,9 @@ export default function OrderDetailUpdateCustomer(props) {
             data: JSON.stringify({
                 order_id: data.id,
                 order_start_time: start_time, //"2021-10-07 10:00:00",
-                order_end_time: end_time // "2021-11-07 12:00:00"
+                order_end_time: end_time, // "2021-11-07 12:00:00",
+                "timezone":RNLocalize.getTimeZone()
+
             }),
             endPoint: "/api/reorderCreate",
             type: 'post'
@@ -391,13 +394,13 @@ export default function OrderDetailUpdateCustomer(props) {
         return null
     }
 
-    const getCancellationText=()=>{
-        const order_start_time=moment(data?.order_start_time)
-        const time=moment().diff(order_start_time,"minutes")
-        let text=""
-        for(let d of cancelRanges){
-            if(d.start_minutes<time&&time>=d.end_minutes){
-                text=`You will be charged a $${d?.percentage}% or ${Number(d?.percentage)*Number(data?.order_total_price)/100} whichever is more than if within 24 hours. `
+    const getCancellationText = () => {
+        const order_start_time = moment(data?.order_start_time)
+        const time = moment().diff(order_start_time, "minutes")
+        let text = ""
+        for (let d of cancelRanges) {
+            if (d.start_minutes < time && time >= d.end_minutes) {
+                text = `You will be charged a $${d?.percentage}% or ${Number(d?.percentage) * Number(data?.order_total_price) / 100} whichever is more than if within 24 hours. `
                 break
             }
         }
@@ -569,7 +572,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
     const [totalTime, setTotalTime] = React.useState(0)
     const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
     const [showVirtualData, setShowVirtualData] = React.useState(false)
-    console.log("Data1",data)
+    console.log("Data1", data)
 
     useEffect(() => {
         if (showVirtualData) {
@@ -644,7 +647,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
             if (dtype == "flat") {
                 totalAmount1 = totalAmount - amount
             } else if (dtype == "per") {
-                totalAmount1 = totalAmount - (amount * totalAmount/100)
+                totalAmount1 = totalAmount - (amount * totalAmount / 100)
             }
             return totalAmount1
         } else {
@@ -652,18 +655,18 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
         }
     }
 
-    const checkforDiscountToShow = (v_a,v_t,d_a,d_t,v_total,d_total) => {
-        if (v_a&&v_a!==""){
-            if(v_t=="flat"){
+    const checkforDiscountToShow = (v_a, v_t, d_a, d_t, v_total, d_total) => {
+        if (v_a && v_a !== "") {
+            if (v_t == "flat") {
                 return `$${v_a}`
-            }else{
-                return `$${v_a*v_total/100}`
+            } else {
+                return `$${v_a * v_total / 100}`
             }
-        }else if(d_a&&d_a!==""){
-            if( d_t=="flat"){
+        } else if (d_a && d_a !== "") {
+            if (d_t == "flat") {
                 return `$${d_a}`
-            }else{
-                return `$${d_a*d_total/100}`
+            } else {
+                return `$${d_a * d_total / 100}`
             }
         } else {
             return false
@@ -712,13 +715,13 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     return (<OrderItemsDetail i={i} />)
                 })}
             </View>}
-            {checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type, virtual_data?.order_total_price,data?.order_total_price) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            {checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Discount</Text>
-                <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount,virtual_data?.discount_type,data?.discount_amount,data?.discount_type, virtual_data?.order_total_price,data?.order_total_price)}</Text>
+                <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price)}</Text>
             </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>
-                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type,data?.discount_amount,data?.order_total_price)}</Text>
+                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Order Start Time</Text>
@@ -732,19 +735,25 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 <Text style={styles.greenTextStyle}>Total Time</Text>
                 <Text style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
             </View>
-            {data?.provider_rating_data?.id&&
-                 <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
-                 <Text style={[styles.greenTextStyle]}>Rating: </Text>
-                 <Rating
-                     readonly={true}
-                     imageSize={10}
-                     type="custom"
-                     ratingBackgroundColor="white"
-                     ratingColor="#04BFBF"
-                     tintColor="white"
-                     startingValue={data?.provider_rating_data?.rating}
-                 />
-             </View>
+            {data?.provider_rating_data?.id &&
+                <>
+                    <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
+                        <Text style={[styles.greenTextStyle]}>Rating: </Text>
+                        <Rating
+                            readonly={true}
+                            imageSize={10}
+                            type="custom"
+                            ratingBackgroundColor="white"
+                            ratingColor="#04BFBF"
+                            tintColor="white"
+                            startingValue={data?.provider_rating_data?.rating}
+                        />
+
+                    </View>
+                    <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
+                        <Text style={[styles.greenTextStyle]}>Tip: ${data?.provider_rating_data?.tip??0} </Text>
+                    </View>
+                </>
             }
         </Card>
     )
@@ -911,11 +920,8 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
 
 const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, openBlockModal, searchAgain, openReorderModal, gotToForReorder }) => {
     const [buttons, setButtons] = React.useState([])
-    console.log(JSON.stringify(data), "data")
     const navigation = useNavigation()
-    React.useEffect(() => {
-        console.log(buttons)
-    }, [buttons])
+
 
     React.useEffect(() => {
         if (data && data.order_status) {

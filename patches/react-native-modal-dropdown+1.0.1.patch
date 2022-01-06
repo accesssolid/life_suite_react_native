@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-modal-dropdown/components/ModalDropdown.js b/node_modules/react-native-modal-dropdown/components/ModalDropdown.js
+index 8a6744d..533847c 100644
+--- a/node_modules/react-native-modal-dropdown/components/ModalDropdown.js
++++ b/node_modules/react-native-modal-dropdown/components/ModalDropdown.js
+@@ -371,6 +371,7 @@ export default class ModalDropdown extends Component {
+         style={styles.list}
+         keyExtractor={(item, i) => (`key-${i}`)}
+         renderItem={this._renderItem}
++        onScrollToIndexFailed={info=>{console.log(info)}}
+         ItemSeparatorComponent={renderSeparator || this._renderSeparator}
+         automaticallyAdjustContentInsets={false}
+         showsVerticalScrollIndicator={showsVerticalScrollIndicator}

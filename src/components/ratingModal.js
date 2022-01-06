@@ -17,7 +17,7 @@ import { Rating } from 'react-native-ratings';
 
 const RatingModal = ({ visible, data, setVisible, title, onPressYes }) => {
     const [search, setSearch] = useState('');
-
+    console.log(data)
     return (
         <Modal
             visible={visible}
@@ -39,11 +39,10 @@ const RatingModal = ({ visible, data, setVisible, title, onPressYes }) => {
                         <Text style={[styles.saveText, { color: "black" }]}>Rating:  </Text>
                         <Rating
                             readonly={true}
-                            imageSize={15}
+                            imageSize={20}
                             type="custom"
-                            ratingBackgroundColor="gray"
+                            ratingBackgroundColor="white"
                             ratingColor="#04BFBF"
-
                             tintColor="white"
                             startingValue={data?.rating ?? "0"}
                         />

@@ -40,8 +40,9 @@ const ServicesProvided = (props) => {
     const [selectedMake, setSelectedMake] = React.useState("")
     const [selectedModel, setSelectedModel] = React.useState("")
     const [selectedYear, setSelectedYear] = React.useState("")
+    const [vehicle_types, setVehicleTypes] = React.useState(['Car', 'Truck', 'Suv', 'Van', 'MotorCycle'])
 
-
+    console.log("SubService", subService)
 
     const getMakeList = () => {
         setLoading(true)
@@ -74,8 +75,42 @@ const ServicesProvided = (props) => {
             })
     }
 
+    const getVariantData = () => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ service_id: subService?.id }),
+            endPoint: '/api/variantData',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    if (response.data?.length > 0) {
+                        setVehicleTypes(response.data?.map(x => x.name))
+                    } else {
+                        setVehicleTypes([])
+                    }
+                }
+                else {
+
+                }
+            }).catch(err => {
+
+            }).finally(() => {
+
+
+            })
+    }
+
     React.useEffect(() => {
         getMakeList()
+        getVariantData()
     }, [])
 
     React.useEffect(() => {
@@ -159,7 +194,7 @@ const ServicesProvided = (props) => {
             })
     }
 
- 
+
 
     useEffect(() => {
         if (subService.id == 14) {
@@ -195,7 +230,7 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log("Response",JSON.stringify(response))
+                console.log("Response", JSON.stringify(response))
                 if (response.status == true) {
                     setLoading(false)
                     setItemList([...response.data])
@@ -280,9 +315,9 @@ const ServicesProvided = (props) => {
     }
 
     const saveRequest = () => {
-        console.log(activeItem,selectedProducts)
+        console.log(activeItem, selectedProducts)
         let isSelected = false
-       
+
         activeItem.products.forEach(element => {
             if (selectedProducts.includes(element.id)) {
                 isSelected = true
@@ -292,10 +327,10 @@ const ServicesProvided = (props) => {
         if (activeItem.products.length == 0) {
             isSelected = true
         }
-        if(activeItem.is_product_mandatory=="0"){
-            isSelected=true
+        if (activeItem.is_product_mandatory == "0") {
+            isSelected = true
         }
-        
+
         if (isSelected) {
             setActiveItem(null)
         } else {
@@ -420,7 +455,7 @@ const ServicesProvided = (props) => {
                     {subService.id == 14 && activeItem == null && <View style={{}}>
                         <DropDown
                             title="Vehicle Type"
-                            item={['Car', 'Truck', 'Suv', 'Van']}
+                            item={vehicle_types}
                             value={vehicleType}
                             onChangeValue={(index, value) => onChangeVehicleType(value)}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}

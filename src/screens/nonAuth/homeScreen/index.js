@@ -393,7 +393,7 @@ const HomeScreen = (props) => {
                                                 props.navigation.navigate("ServicesProvided", { subService: item });
                                             }}
                                             showDelete={true}
-                                            deleteService={()=>{
+                                            deleteService={() => {
                                                 deleteMyJob(item.id)
                                             }}
                                         />
@@ -450,33 +450,33 @@ const HomeScreen = (props) => {
                     </ScrollView>
                 }
                 {!loading && <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                    <View style={styles.orderContainer}>
-                        <TouchableOpacity
-                            activeOpacity={0.7}
-                            onPress={() => props.navigation.navigate("Orders")}>
+                    <TouchableOpacity  activeOpacity={0.7} onPress={() => props.navigation.navigate("Orders")} style={styles.orderContainer}>
+                        <View
+                           
+                        >
                             <Text style={styles.order}>
                                 ORDER
                             </Text>
-                        </TouchableOpacity>
-                    </View>
-                    {user.user_role == 3 && <View style={styles.orderContainer}>
-                        <TouchableOpacity
-                            activeOpacity={0.7}
-                            onPress={() => showToast("WORK IN PROGRESS")}>
+                        </View>
+                    </TouchableOpacity>
+                    {user.user_role == 3 && <TouchableOpacity  activeOpacity={0.7}  onPress={() => showToast("WORK IN PROGRESS")} style={styles.orderContainer}>
+                        <View
+                         
+                          >
                             <Text style={styles.order}>
                                 LOCATION
                             </Text>
-                        </TouchableOpacity>
-                    </View>}
-                    {user.user_role == 3 && <View style={styles.orderContainer}>
-                        <TouchableOpacity
-                            activeOpacity={0.7}
-                            onPress={() => props.navigation.navigate('AddTimeFrame', { serviceData: {} })}>
+                        </View>
+                    </TouchableOpacity>}
+                    {user.user_role == 3 && <TouchableOpacity    activeOpacity={0.7}
+                            onPress={() => props.navigation.navigate('AddTimeFrame', { serviceData: {} })} style={styles.orderContainer}>
+                        <View
+                         >
                             <Text style={styles.order}>
                                 SCHEDULE
                             </Text>
-                        </TouchableOpacity>
-                    </View>}
+                        </View>
+                    </TouchableOpacity>}
                 </View>}
             </View>
             {loading && <Loader />}

@@ -760,31 +760,34 @@ const ServicesProvided = (props) => {
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
                     <Text style={styles.service}>SERVICES</Text>
-                    <View style={{ marginVertical: 10, flexDirection: 'row', overflow: 'scroll', paddingHorizontal: '5%', justifyContent: 'center' }}>
-                        {variants.length > 0 && variants.map((item, index) => {
-                            return (
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => toggleVariant(item)} key={index}
-                                    style={{
-                                        backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
-                                        marginHorizontal: 10,
-                                        paddingHorizontal: 15,
-                                        paddingVertical: 5,
-                                        borderRadius: 100,
-                                        borderWidth: selectedVariant == item.id ? 1 : 1,
-                                        borderColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.green
-                                    }}>
-                                    <Text style={{
-                                        fontFamily: LS_FONTS.PoppinsMedium,
-                                        fontSize: 14,
-                                        textTransform: 'uppercase',
-                                        color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
-                                    }}>
-                                        {item.name}
-                                    </Text>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </View>
+                    {variants.length > 0 && <View style={{ height: 70 }}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 10, marginHorizontal: 15, height: 70 }}>
+                            {variants.map((item, index) => {
+                                return (
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => toggleVariant(item)} key={index}
+                                        style={{
+                                            backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
+                                            marginHorizontal: 10,
+                                            paddingHorizontal: 15,
+                                            paddingVertical: 5,
+                                            borderRadius: 100,
+                                            height: 40,
+                                            borderWidth: selectedVariant == item.id ? 1 : 1,
+                                            borderColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.green
+                                        }}>
+                                        <Text style={{
+                                            fontFamily: LS_FONTS.PoppinsMedium,
+                                            fontSize: 14,
+                                            textTransform: 'uppercase',
+                                            color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
+                                        }}>
+                                            {item.name}
+                                        </Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </ScrollView>
+                    </View>}
                     {activeItem !== null && <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: '2%' }}>
                         <View style={{ alignItems: 'center' }}>
                             <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Time</Text>

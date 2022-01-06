@@ -5,6 +5,7 @@ import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, To
 import LS_COLORS from '../../../constants/colors';
 import { globalStyles, showToast } from '../../../utils';
 import LS_FONTS from '../../../constants/fonts';
+import * as RNLocalize from "react-native-localize";
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
@@ -153,6 +154,7 @@ const Mechanics = (props) => {
             endPoint: '/api/providerListOrder',
             type: 'post'
         }
+        console.log("Check",JSON.stringify({...data,...rangeData}))
         getApi(config)
             .then((response) => {
                 console.log(response, "response")
@@ -213,6 +215,7 @@ const Mechanics = (props) => {
         formdata.append("order_from_address", data.order_from_address)
         formdata.append("order_from_lat", data.order_from_lat.toString())
         formdata.append("order_from_long", data.order_from_long.toString())
+        formdata.append("timezone",RNLocalize.getTimeZone())
         setLoading(true)
         let headers = {
             "Content-Type": "multipart/form-data",

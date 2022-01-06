@@ -54,6 +54,7 @@ const OrderClientDetail = (props) => {
     const fromInputRef = useRef(null)
     const toInputRef = useRef(null)
     let { servicedata, subService, item, order_id } = props.route.params
+    const [itemdata,setitemData]=React.useState({})
     const [data, setData] = useState(null)
     const [virtualdata, setVirtualData] = React.useState({})
     const user = useSelector(state => state.authenticate.user)
@@ -78,11 +79,15 @@ const OrderClientDetail = (props) => {
 
     useEffect(() => {
         if (order_id >= 0) {
-            item = { id: order_id }
+            setitemData({ id: order_id })
+        }
+        if(item){
+            setitemData(item)
         }
     }, [order_id])
 
     React.useEffect(() => {
+        console.log("order_data", data)
         if (data) {
             let ds = generate_series(15, data.order_start_time)
             let end_time = moment(data.order_end_time, "YYYY-MM-DD HH:mm").subtract(totalWorkingMinutes, 'minutes')
@@ -336,6 +341,7 @@ const OrderClientDetail = (props) => {
                 order_end_time: _.cloneDeep(selectedStartTime)?.add(totalWorkingMinutes, "minutes").format("YYYY-MM-DD HH:mm"),
             })
         }
+
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
@@ -373,7 +379,7 @@ const OrderClientDetail = (props) => {
                 console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
-                    getOrderDetail(item.id)
+                    getOrderDetail(itemdata.id)
                     setLoading(false)
                 }
                 else {
@@ -409,7 +415,7 @@ const OrderClientDetail = (props) => {
                 if (response.status == true) {
                     showToast(response.message)
                     // props.navigation.pop()
-                    getOrderDetail(item.id)
+                    getOrderDetail(itemdata.id)
                     setLoading(false)
                 }
                 else {
@@ -422,14 +428,14 @@ const OrderClientDetail = (props) => {
             })
     }
     useEffect(() => {
-        if (item.id) {
-            getOrderDetail(item.id)
+        if (itemdata.id) {
+            getOrderDetail(itemdata.id)
         }
-    }, [item])
+    }, [itemdata])
 
     useFocusEffect(React.useCallback(() => {
-        if (item.id) {
-            getOrderDetail(item.id)
+        if (itemdata.id) {
+            getOrderDetail(itemdata.id)
         }
     }, []))
 
@@ -502,6 +508,7 @@ const OrderClientDetail = (props) => {
                             <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order End Time </Text>
                             <Text style={styles.baseTextStyle}>{moment(data?.order_end_time).format("hh:mm a")}</Text>
                         </View>
+                        
                         {/* only show if order status is pending i.e 1 */}
                         {(data?.order_status == 1) &&
                             <>
@@ -536,7 +543,7 @@ const OrderClientDetail = (props) => {
                         openRatingModal={() => setRatingModal(true)}
                         gotoUpdateScreen={() => {
                             props.navigation.navigate("UpdateOrderItems", {
-                                servicedata, subService, item
+                                servicedata, subService, item:itemdata
                             })
                         }}
                     />
@@ -747,6 +754,7 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                 <View >
                     <Text style={[styles.greenTextStyle, { textAlign: "right" }]}>{moment(data?.created_at).fromNow()}</Text>
                     <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
+                    <Text style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" },styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD YYYY")}</Text>
                 </View>
             </View>
             {/* request data */}
@@ -773,8 +781,9 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                 <Text style={styles.greenTextStyle}>Total Time</Text>
                 <Text style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
             </View>
-            {/* {data?.provider_rating_data?.id&&
-                 <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
+            {data?.provider_rating_data?.id &&
+                <>
+                    {/* <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
                  <Text style={[styles.greenTextStyle]}>Rating: </Text>
                  <Rating
                      readonly={true}
@@ -785,8 +794,12 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                      tintColor="white"
                      startingValue={data?.provider_rating_data?.rating}
                  />
-             </View>
-            } */}
+             </View> */}
+                    <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
+                        <Text style={[styles.greenTextStyle]}>Tip: ${data?.provider_rating_data?.tip ?? 0} </Text>
+                    </View>
+                </>
+            }
         </Card>
     )
 }
