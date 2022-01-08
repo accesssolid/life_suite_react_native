@@ -48,6 +48,7 @@ const ScheduleTime = (props) => {
     const [initialDate, setInitialDate] = useState(new Date())
     const [markedDates, setMarkedDates] = useState({})
     const [currentTab, setCurrentTab] = React.useState(1)
+    const [currentDate,setCurrentDate]=React.useState(new Date())
     useEffect(() => {
         if (!isAddServiceMode) {
             getTimeFrames()
@@ -374,7 +375,6 @@ const ScheduleTime = (props) => {
                             onDayPress={(day) => {
                                 onDateChange(day)
                             }}
-                            // markingType={Object.keys(markedDates).length == 2 ? "period" : 'custom'}
                             hideArrows={false}
                             hideExtraDays={true}
                             disableMonthChange={false}
@@ -387,7 +387,24 @@ const ScheduleTime = (props) => {
                             disableArrowRight={false}
                             disableAllTouchEventsForDisabledDays={true}
                             enableSwipeMonths={false}
-                            // markedDates={getAllMarkedDates(markedDates)}
+                            dayComponent={({ date, state }) => {
+                                const isToday = state == "today"
+                                const isSelected = date.dateString == currentDate
+                                let marked_dates = []
+                                const isThereAnyData = marked_dates.includes(date.dateString)
+
+                                return (
+                                    <TouchableOpacity onPress={() => {
+                                        if (state !== "disabled") {
+                                            setCurrentDate(date.dateString)
+                                        }
+                                    }} style={{ position: "relative", padding: 5, width: 40,height:40, borderRadius: 20, justifyContent: "center", backgroundColor: isSelected ? "#0007" : (isThereAnyData && state !== 'disabled' ? "green" : "white") }}>
+                                        <Text style={{ textAlign: 'center', fontSize: 14, color: state === 'disabled' ? 'gray' : (isThereAnyData ? 'white' : 'black'), fontFamily:LS_FONTS.PoppinsRegular }}>
+                                            {date.day}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            }}
                             minDate={new Date()}
                         />
                         <OrderList title="Mechanic" />
