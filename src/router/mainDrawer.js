@@ -363,14 +363,14 @@ const MainDrawer = (props) => {
                         drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
                     }}
                 />
-                {/* <Drawer.Screen
+                <Drawer.Screen
                     name="UpdateCertificateStack"
                     component={UpdateCertificateStack}
                     options={{
                         drawerIcon: ({ focused, color }) => <View style={{ height: 0 }} />,
                         drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
                     }}
-                /> */}
+                />
             </Drawer.Navigator>
             <TermsModal
                 isVisible={termsVisible}
@@ -408,7 +408,7 @@ const CustomDrawerContent = (props) => {
                 <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
             </View>
             <DrawerItemList {...props} />
-            {/* {user?.user_role == role.provider &&<DrawerItem
+            {user?.user_role == role.provider &&<DrawerItem
                 style={{ marginTop: -185 }}
                 label="Update Certificate"
                 labelStyle={{
@@ -420,10 +420,10 @@ const CustomDrawerContent = (props) => {
                 onPress={() => {
                     navigation.navigate("UpdateCertificateStack",{screen:"UpdateCertificateServiceList"})
                 }}
-            />} */}
+            />}
             <DrawerItem
-                // style={{ marginTop: user?.user_role == role.customer?-185:0 }}
-                style={{ marginTop: -155 }}
+                style={{ marginTop: user?.user_role == role.customer?-185:0 }}
+                // style={{ marginTop: -155 }}
                 label="Legal"
                 labelStyle={{
                     fontFamily: LS_FONTS.PoppinsMedium,

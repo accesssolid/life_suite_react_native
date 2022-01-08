@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 /* Packages */
 import { createStackNavigator } from '@react-navigation/stack';
@@ -27,23 +27,24 @@ const Stack = createStackNavigator();
 const Router = () => {
   const loading = useSelector(state => state.authenticate.loading)
 
+
   return (
     <>
-     
-        <Stack.Navigator headerMode={'none'}>
-          <Stack.Screen name="Splash" component={Splash} />
-          <Stack.Screen name="WelcomeScreen" component={Welcomescreen} />
-          <Stack.Screen name="AuthStack" component={AuthStack} />
-          <Stack.Screen name="UserStack" component={UserStack} />
-          <Stack.Screen name="ProviderStack" component={ProviderStack} />
-          <Stack.Screen name="Passcode" component={Passcode} />
-          <Stack.Screen name="MainDrawer" component={MainDrawer} />
-          <Stack.Screen name="ChatScreen" component={ChatScreen} />
-          <Stack.Screen name="ChatMembers" component={ChatMembers} />
-          <Stack.Screen name="OrderHistoryCustomer" component={OrderHistoryCustomer} />
-          <Stack.Screen name="OrderHistoryProvider" component={OrderHistoryProvider} />
-        </Stack.Navigator>
-     
+
+      <Stack.Navigator headerMode={'none'}>
+        <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen name="WelcomeScreen" component={Welcomescreen} />
+        <Stack.Screen name="AuthStack" component={AuthStack} />
+        <Stack.Screen name="UserStack" component={UserStack} />
+        <Stack.Screen name="ProviderStack" component={ProviderStack} />
+        <Stack.Screen name="Passcode" component={Passcode} />
+        <Stack.Screen name="MainDrawer" component={MainDrawer} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} />
+        <Stack.Screen name="ChatMembers" component={ChatMembers} />
+        <Stack.Screen name="OrderHistoryCustomer" component={OrderHistoryCustomer} />
+        <Stack.Screen name="OrderHistoryProvider" component={OrderHistoryProvider} />
+      </Stack.Navigator>
+
       {loading && <Loader />}
     </>
   )

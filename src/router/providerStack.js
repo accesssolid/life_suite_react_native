@@ -27,6 +27,10 @@ import OrderClientDetail from '../screens/nonAuth/orderDetail';
 import CustomWebView from '../screens/nonAuth/CustomWebView';
 import UpdateOrderItems from '../screens/nonAuth/updateOrderItem';
 import AddDiscount from '../screens/nonAuth/addDiscount';
+import LocationServiceSelect from '../screens/nonAuth/locationSelect/selectService'
+import LocationUpdate from '../screens/nonAuth/locationSelect/location'
+import ScheduleTime from '../screens/nonAuth/schedule_time';
+import AddTimeFrameForService from '../screens/nonAuth/schedule_time/AddTimeForService';
 const Stack = createStackNavigator();
 
 const ProviderStack = () => {
@@ -43,6 +47,7 @@ const ProviderStack = () => {
             <Stack.Screen name="AddLicense" component={AddLicense} />
             <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name="AddTimeFrame" component={AddTimeFrame} />
+            <Stack.Screen name="ScheduleTime" component={ScheduleTime} />
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="SetPassCode" component={SetPassCode} />
             <Stack.Screen name="ConfirmSetPassCode" component={ConfirmSetPassCode} />
@@ -53,6 +58,10 @@ const ProviderStack = () => {
             <Stack.Screen name="CustomWebView" component={CustomWebView} />
             <Stack.Screen name="UpdateOrderItems" component={UpdateOrderItems} />
             <Stack.Screen name="AddDiscount" component={AddDiscount} />
+           
+            <Stack.Screen name="LocationServiceSelect" component={LocationServiceSelect} />
+            <Stack.Screen name="LocationUpdate" component={LocationUpdate} />
+            <Stack.Screen name="AddTimeFrameForService" component={AddTimeFrameForService} />
         </Stack.Navigator>
     )
 }

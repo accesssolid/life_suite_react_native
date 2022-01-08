@@ -42,8 +42,6 @@ const ServicesProvided = (props) => {
     const [selectedYear, setSelectedYear] = React.useState("")
     const [vehicle_types, setVehicleTypes] = React.useState(['Car', 'Truck', 'Suv', 'Van', 'MotorCycle'])
 
-    console.log("SubService", subService)
-
     const getMakeList = () => {
         setLoading(true)
         let headers = {

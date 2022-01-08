@@ -763,7 +763,10 @@ const ServicesProvidedModal = ({ data, visible, setVisible }) => {
                     <Text style={[{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }]}>Services</Text>
                     {data.map((x, index) => {
                         return (
-                            <Text style={[styles.msgText, { color: "black", fontSize: 12 }]}>{index+1}.{x.name}</Text>
+                            <View style={{flexDirection:"row",alignItems:"center"}}>
+                                <Text  style={[styles.msgText, { color: "black", fontSize: 12 ,width:15}]}>{index + 1}.</Text>
+                                <Text style={[styles.msgText, { color: "black", fontSize: 12, }]}>{x.name}</Text>
+                            </View>
                         )
                     })}
                 </Pressable>

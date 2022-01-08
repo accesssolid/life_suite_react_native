@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -154,7 +154,7 @@ const Mechanics = (props) => {
             endPoint: '/api/providerListOrder',
             type: 'post'
         }
-        console.log("Check",JSON.stringify({...data,...rangeData}))
+        console.log("Check", JSON.stringify({ ...data, ...rangeData }))
         getApi(config)
             .then((response) => {
                 console.log(response, "response")
@@ -203,11 +203,10 @@ const Mechanics = (props) => {
 
 
 
-    const placeOrder = (jsonData) => {
-        console.log(jsonData, "JSONData")
-        console.log(JSON.stringify(jsonData), "JSONData")
+    const placeOrder = (jsonData, continuous_order = 0) => {
         setLoading(true)
         var formdata = new FormData();
+        console.log("Json data",JSON.stringify(jsonData))
         formdata.append("items_data", JSON.stringify(jsonData))
         formdata.append("order_placed_address", data.order_placed_address)
         formdata.append("order_placed_lat", data.order_placed_lat.toString())
@@ -215,7 +214,10 @@ const Mechanics = (props) => {
         formdata.append("order_from_address", data.order_from_address)
         formdata.append("order_from_lat", data.order_from_lat.toString())
         formdata.append("order_from_long", data.order_from_long.toString())
-        formdata.append("timezone",RNLocalize.getTimeZone())
+        formdata.append("timezone", RNLocalize.getTimeZone())
+        if (continuous_order) {
+            formdata.append("continuous_order", continuous_order)
+        }
         setLoading(true)
         let headers = {
             "Content-Type": "multipart/form-data",
@@ -230,13 +232,23 @@ const Mechanics = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(JSON.stringify(response), "Create ORder")
+                console.log(response, "Create ORder")
                 if (response.status == true) {
                     setLoading(false)
                     props.navigation.navigate("MainDrawer", { screen: "Orders" })
                 }
                 else {
                     showToast(response.message)
+                    if (response.warning_alert == 1) {
+                        Alert.alert("Continue Order", "Are you sure you want to continue?", [
+                            {
+                                text: "no"
+                            },
+                            {
+                                text: "yes",
+                                onPress: () => placeOrder(jsonData, 1)
+                            }])
+                    }
                     setLoading(false)
                 }
             }).catch(err => {

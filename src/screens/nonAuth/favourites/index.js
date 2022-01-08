@@ -19,6 +19,7 @@ import { BASE_URL, getApi } from '../../../api/api';
 import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/core';
 import { setAddServiceMode } from '../../../redux/features/services';
+import { role } from '../../../constants/globals';
 
 const Favourites = (props) => {
     const dispatch = useDispatch()
@@ -152,12 +153,17 @@ const Favourites = (props) => {
 
     const onItemPress = (item) => {
         dispatch(setAddServiceMode({ data: true }))
-        navigation.navigate("ServicesProvided", { subService: item, items: [] })
+        if(user?.user_role==role.customer){
+            navigation.navigate("HomeScreen",{screen:"ServicesProvided",params:{ subService: item, items: [] }})
+        }else{
+            navigation.navigate("ServicesProvided",{ subService: item, items: [] })
+        }
     }
 
     const goBack = () => {
         dispatch(setAddServiceMode({ data: false }))
-        props.navigation.goBack()
+        navigation.navigate("HomeScreen",{screen:"HomeScreen"})
+
     }
 
     return (
@@ -168,7 +174,7 @@ const Favourites = (props) => {
                 action={() => goBack()}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
-                    navigation.navigate("HomeScreen")
+                    navigation.navigate("HomeScreen",{screen:"HomeScreen"})
                 }}
             />
             <Container style={styles.container}>

@@ -43,7 +43,7 @@ const ServicesProvided = (props) => {
     const [activeIndex, setActiveIndex] = useState(null)
     const [activeItem, setActiveItem] = useState(null)
     const itemRef = useRef(null)
-
+  
     useEffect(() => {
         setServicesData([])
         getServiceItems()

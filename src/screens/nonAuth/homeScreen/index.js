@@ -54,7 +54,7 @@ const HomeScreen = (props) => {
     ), [navigation]);
 
     useEffect(() => {
-        getServices()
+        getServices(true)
         if (user.user_role == 3) {
             getMyJobs()
         }
@@ -81,11 +81,14 @@ const HomeScreen = (props) => {
                     setIsAddJobActive(false)
                 }
             }
+            getServices(false)
         }, [props.route])
     );
 
-    const getServices = () => {
-        setLoading(true)
+    const getServices = (load=true) => {
+        if(load){
+            setLoading(true)
+        }
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -109,7 +112,7 @@ const HomeScreen = (props) => {
                     setLoading(false)
                 }
                 else {
-                    showToast(response.message, 'danger')
+                    // showToast(response.message, 'danger')
                     setLoading(false)
                 }
             }).catch(err => {
@@ -306,7 +309,7 @@ const HomeScreen = (props) => {
         getApi(config)
             .then((response) => {
             }).catch(err => {
-                console.log("updateLocation err =>> ", err)
+                console.warn("updateLocation err =>> ", err)
             })
     }
 
@@ -459,7 +462,9 @@ const HomeScreen = (props) => {
                             </Text>
                         </View>
                     </TouchableOpacity>
-                    {user.user_role == 3 && <TouchableOpacity  activeOpacity={0.7}  onPress={() => showToast("WORK IN PROGRESS")} style={styles.orderContainer}>
+                    {user.user_role == 3 && <TouchableOpacity   activeOpacity={0.7}  onPress={() => {
+                        props.navigation.navigate("LocationServiceSelect")
+                    }} style={styles.orderContainer}>
                         <View
                          
                           >
@@ -469,7 +474,7 @@ const HomeScreen = (props) => {
                         </View>
                     </TouchableOpacity>}
                     {user.user_role == 3 && <TouchableOpacity    activeOpacity={0.7}
-                            onPress={() => props.navigation.navigate('AddTimeFrame', { serviceData: {} })} style={styles.orderContainer}>
+                            onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={styles.orderContainer}>
                         <View
                          >
                             <Text style={styles.order}>

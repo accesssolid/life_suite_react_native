@@ -8,7 +8,7 @@ import { globalStyles, showToast } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-
+import {useFocusEffect} from '@react-navigation/native'
 /* Components */
 import Header from '../../../components/header';
 import { Card, Container, Content } from 'native-base';
@@ -61,9 +61,12 @@ const OrderHistory1 = (props) => {
         current_page: 1,
         total: 0
     })
-    useEffect(() => {
+    useFocusEffect(React.useCallback(() => {
         getOrders(selected.id)
-    }, [selected])
+    }, [selected]))
+
+
+
     function filterwithNameAndService(item){
         let serviceNames=[...new Set(item.order_items?.map(x=>x.services_name))]
         if(`${item.providers_first_name} ${item.providers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase())||serviceNames.filter(x=>x?.toLowerCase()?.includes(searchData.text?.toLowerCase()))?.length>0){

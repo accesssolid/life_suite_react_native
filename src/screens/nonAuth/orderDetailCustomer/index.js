@@ -44,7 +44,7 @@ export default function OrderDetailUpdateCustomer(props) {
     const [cancelSearchModal, setCancelSearcHModal] = React.useState(false)
     const [virtualdata, setVirtualData] = React.useState({})
     const [reorderModal, setReorderModal] = React.useState(false)
-
+    const [itemData,setItemData]=React.useState({})
     const [cancelOrderText, setCancelOrderText] = React.useState("Remaining cancellation requests: 10")
     const [textShowWithRed, settextShowWithRed] = React.useState("")
     const [fromCoordinates, setFromCoordinates] = useState({
@@ -57,10 +57,15 @@ export default function OrderDetailUpdateCustomer(props) {
         longitude: -122.4324,
     })
     useEffect(() => {
-        if (order_id >= 0) {
-            item = { id: order_id }
+        if(item?.id){
+            setItemData(item)
         }
-    }, [order_id])
+        if (order_id >= 0) {
+            let item1 = { id: order_id }
+            setItemData(item1)
+        }
+    }, [order_id,item])
+
     React.useEffect(() => {
         console.log("Data", JSON.stringify(data))
         if (data?.id) {
@@ -150,7 +155,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
-                    getOrderDetail(item.id)
+                    getOrderDetail(itemData?.id)
                     setLoading(false)
                 }
                 else {
@@ -186,7 +191,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 if (response.status == true) {
                     showToast(response.message)
                     // props.navigation.pop()
-                    getOrderDetail(item.id)
+                    getOrderDetail(itemData?.id)
                     setLoading(false)
                 }
                 else {
@@ -249,15 +254,18 @@ export default function OrderDetailUpdateCustomer(props) {
     }
 
     useEffect(() => {
-        if (item.id) {
-            getOrderDetail(item.id)
+        if (itemData?.id) {
+            getOrderDetail(itemData?.id)
         }
-    }, [item])
+    }, [itemData])
 
     useFocusEffect(React.useCallback(() => {
-        getOrderDetail(item.id)
+        if(itemData?.id){
+            getOrderDetail(itemData?.id)
+        }
+        
         getLocationPermission()
-    }, []))
+    }, [itemData]))
 
     const getLocationPermission = async () => {
         let hasLocationPermission = false
@@ -643,15 +651,26 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
 
     const getTotalVirtualAmount = (dtype, amount, totalAmount) => {
         if (amount && amount !== "" && amount != 0) {
-            let totalAmount1 = totalAmount
+            let totalAmount1 =  Number(totalAmount)
             if (dtype == "flat") {
-                totalAmount1 = totalAmount - amount
+                totalAmount1 = totalAmount - Number(amount)
             } else if (dtype == "per") {
                 totalAmount1 = totalAmount - (amount * totalAmount / 100)
             }
-            return totalAmount1
+            let return_value= Number(totalAmount1)+Number(data?.provider_rating_data?.tip ?? 0)
+            if(Number.isNaN(return_value)){
+                return 0
+            }else{
+                return return_value
+            }
         } else {
-            return totalAmount
+            let return_value=Number(totalAmount)+Number(data?.provider_rating_data?.tip ?? 0)
+            if(Number.isNaN(return_value)){
+                return 0
+            }else{
+                return return_value
+
+            }
         }
     }
 
@@ -701,6 +720,8 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 <View >
                     <Text style={[styles.greenTextStyle, { textAlign: "right" }]}>{moment(data?.created_at).fromNow()}</Text>
                     <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
+                    <Text style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" },styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD YYYY")}</Text>
+
                 </View>
             </View>
             {/* request data */}
@@ -719,6 +740,14 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 <Text style={styles.greenTextStyle}>Discount</Text>
                 <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price)}</Text>
             </View>}
+            {data?.provider_rating_data?.id &&
+                <>
+                    <View style={{ backgroundColor: "white", width: "100%", justifyContent: "space-between", flexDirection: "row", alignItems: "center",marginTop:10 }}>
+                    <Text style={styles.greenTextStyle}>Tip</Text>
+                        <Text style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ?? 0}</Text>
+                    </View>
+                </>
+            }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text style={styles.greenTextStyle}>Total Amount</Text>
                 <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
@@ -749,9 +778,6 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                             startingValue={data?.provider_rating_data?.rating}
                         />
 
-                    </View>
-                    <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
-                        <Text style={[styles.greenTextStyle]}>Tip: ${data?.provider_rating_data?.tip??0} </Text>
                     </View>
                 </>
             }
