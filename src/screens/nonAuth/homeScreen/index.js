@@ -63,10 +63,14 @@ const HomeScreen = (props) => {
     useFocusEffect(
         React.useCallback(() => {
             if (user.user_role == 3) {
-                getLocationPermission()
+                setTimeout(()=>{
+                    getLocationPermission()
+                },2000)
             }
         }, [])
     );
+
+  
 
     useFocusEffect(
         useCallback(() => {

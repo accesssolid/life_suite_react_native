@@ -33,27 +33,34 @@ const Settings = (props) => {
     }
 
     const setPassCode = async (v) => {
-        setPassCodeVerification(v)
-        let pass = await getJsonData("passcode")
-        let passVerification = await getJsonData("passcodeVerification")
-        if (v) {
-            if (pass && !passVerification) {
-                let x = await storeJsonData("passcodeVerification", true)
-                setPassCodeVerification(true)
+        try{
+            setPassCodeVerification(v)
+            let pass = await getJsonData("passcode")
+            let passVerification = await getJsonData("passcodeVerification")
+            console.log(pass,v,passVerification)
+            if (v) {
+                if (pass && !passVerification) {
+                    let x = await storeJsonData("passcodeVerification", true)
+                    setPassCodeVerification(true)
+                }
+                if (!pass) {
+                    props.navigation.navigate('SetPassCode')
+                }
             }
-            if (!pass) {
-                props.navigation.navigate('SetPassCode')
+            else {
+                if (passVerification) {
+                    let x = await storeJsonData("passcodeVerification", null)
+                    let y = await storeJsonData("fingerPrintVerification", null)
+                    storeJsonData("passcode",null)
+                    setPassCodeVerification(false)
+                    setBiometricVerification(false)
+                }
+                
             }
+        }catch(err){
+            console.error(err)
         }
-        else {
-            if (passVerification) {
-                let x = await storeJsonData("passcodeVerification", null)
-                let y = await storeJsonData("fingerPrintVerification", null)
-
-                setPassCodeVerification(false)
-                setBiometricVerification(false)
-            }
-        }
+       
     }
 
     const setBiometric = async (v) => {

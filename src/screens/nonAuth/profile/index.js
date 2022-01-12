@@ -141,7 +141,7 @@ const Profile = (props) => {
 
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
-    const [userData, setUserData] = useState({ ...user })
+    const [userData, setUserData] = useState({...user})
     const [loader, setLoader] = useState(false)
     const [cardDetails, setCardDetails] = useState({
         number: '',
@@ -205,6 +205,7 @@ const Profile = (props) => {
                 console.log("response", response)
                 if (response.status == true) {
                     storeItem('user', null)
+                    storeItem('passcode',null)
                     props.navigation.navigate('WelcomeScreen')
                     dispatch(logoutAll())
                 }
@@ -610,6 +611,8 @@ const Profile = (props) => {
         formdata.append("user_id", userData.id);
         formdata.append("email", userData.email);
         formdata.append("first_name", userData.first_name);
+        // formdata.append("middle_name", userData.middle_name??"");
+
         formdata.append("last_name", userData.last_name);
         formdata.append("phone_number", userData.phone_number.replace(/-/g, ""));
         if (user.user_role == role.provider) {
@@ -896,6 +899,16 @@ const Profile = (props) => {
                                 // onSubmitEditing={() => { lnameRef.current._root.focus() }}
                                 required={true}
                             />
+                              {/* <CustomInput
+                                text="Middle Name"
+                                value={userData.middle_name??""}
+                                onChangeText={(text) => {
+                                    setUserData({ ...userData, middle_name: text })
+                                }}
+                                inpuRef={fnameRef}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+                                required={true}
+                            /> */}
                             <CustomInput
                                 text="Last Name"
                                 value={userData.last_name}
@@ -1103,33 +1116,6 @@ const Profile = (props) => {
                             </View>
                             <View style={{ height: 20 }}></View>
                             <View style={{}}>
-                                {/* {
-                                    Platform.OS == "ios"
-                                        ?
-                                        <DropDownPicker
-                                            open={notifDropOpen}
-                                            value={notificationType}
-                                            items={notifItems}
-                                            showArrowIcon={true}
-                                            setOpen={setNotifDropOpen}
-                                            setValue={setNotificationType}
-                                            setItems={setNotifItems}
-                                            zIndex={99999999}
-                                            style={{
-                                                borderWidth: 0,
-                                                borderColor: LS_COLORS.global.borderColor,
-                                                backgroundColor: 'transparent',
-                                            }}
-                                            arrowIconContainerStyle={{ marginRight: '5%' }}
-                                            arrowIconStyle={{ tintColor: LS_COLORS.global.green }}
-                                            tickIconStyle={{ tintColor: LS_COLORS.global.green }}
-                                            containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0, zIndex: 1000000 }}
-                                            labelStyle={{ color: LS_COLORS.global.black, width: '100%', paddingLeft: '7.5%' }}
-                                            textStyle={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}
-                                            dropDownContainerStyle={{ borderWidth: 0.3, borderColor: LS_COLORS.global.grey, borderRadius: 0, zIndex: 9999999999 }}
-                                            listItemContainerStyle={{ zIndex: 999999999 }}
-                                        />
-                                        : */}
                                 <DropDown
                                     title="Notification type"
                                     item={["Email", "Push Notification", "Text", "All"]}

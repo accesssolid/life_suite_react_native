@@ -124,7 +124,7 @@ export default function FinishPay({ navigation, route }) {
                             </View>}
                         {type == types[1] &&
                             <><View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40 }} textAlign="center" />
+                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40,color:"black" }} textAlign="center" />
                             </View>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
                                     <Text  style={{ height: 40 ,textAlign:"center",textAlignVertical:"center",lineHeight:40}} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>

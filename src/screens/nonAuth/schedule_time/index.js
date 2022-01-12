@@ -48,12 +48,14 @@ const ScheduleTime = (props) => {
     const [initialDate, setInitialDate] = useState(new Date())
     const [markedDates, setMarkedDates] = useState({})
     const [currentTab, setCurrentTab] = React.useState(1)
-    const [currentDate,setCurrentDate]=React.useState(new Date())
+    const [currentDate, setCurrentDate] = React.useState(new Date())
+    const [orderData, setOrderData] = React.useState({})
+    const [timeFrameData, setTimeFrameData] = React.useState([])
     useEffect(() => {
         if (!isAddServiceMode) {
             getTimeFrames()
         }
-
+        getScheduleRange()
     }, [])
 
 
@@ -77,58 +79,62 @@ const ScheduleTime = (props) => {
     }, [customDatesStyles])
 
 
-    const save = () => {
-        // setLoading(true)
+    const getScheduleRange = () => {
         let headers = {
             Accept: "application/json",
             'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
         }
-        let data = []
-
-        customDatesStyles.map((item) => {
-            if (item.from_time.trim() !== '' && item.to_time.trim() !== '') {
-                var convertedFrom = moment(item.from_time, 'hh:mm A').format('HH:mm')
-                var convertedTo = moment(item.to_time, 'hh:mm A').format('HH:mm')
-                data.push({
-                    "start_date": moment(item.start_date).format("YYYY-MM-DD"),
-                    "end_date": moment(item.end_date).format("YYYY-MM-DD"),
-                    "from_time": convertedFrom,
-                    "to_time": convertedTo
-                })
-            }
+        let data = JSON.stringify({
+            start_time: moment().format("YYYY-MM-01")
         })
 
-        if (data.length == 0) {
-            setLoading(false)
-            return showToast("Invalid time frame data")
-        }
-        let { json_data, formdata } = serviceData
-        json_data = JSON.parse(json_data)
-        json_data['time_frame'] = data
-        formdata.append("json_data", JSON.stringify(json_data));
         let config = {
             headers: headers,
-            data: formdata,
-            endPoint: '/api/providerServicesAdd',
+            data: data,
+            endPoint: '/api/scheduleDataList',
             type: 'post'
         }
         getApi(config)
             .then((response) => {
-                if (response.status == true) {
-                    setLoading(false)
-                    showToast(response.message, 'success')
-                    data = []
-                    getMyJobs(true)
+                if (response.status) {
+                    let os = response.ordersData
+                    if (os.length > 0) {
+                        let z = {}
+                        for (let oitem of os) {
+                            let o_start_time = moment(oitem.order_start_time, "YYYY-MM-DD HH:mm").format("MM/DD/YYYY")
+                            if (z[o_start_time]) {
+                                z[o_start_time].push(oitem)
+                            } else {
+                                z[o_start_time] = [oitem]
+                            }
+                        }
+                        let clonez = Object.keys(z)
+                        clonez = clonez.sort((a, b) => moment(a, "MM/DD/YYYY") - moment(b, "MM/DD/YYYY"))
+                        let newz = {}
+                        for (let x of clonez) {
+                            newz[x] = z[x]
+                        }
+                        setOrderData(newz)
+                    } else {
+                        setOrderData({})
+                    }
+
+                    let ts = response.timeFrameData
+                    if (ts.length > 0) {
+                        setTimeFrameData(response.ordersData)
+                    } else {
+                        setTimeFrameData([])
+                    }
                 }
                 else {
                     setLoading(false)
-                    showToast(response.message, 'danger')
+                    // showToast(response.message, 'danger')
                 }
             })
             .catch(err => {
                 setLoading(false)
-                console.log("error =>", err)
+                console.error(err)
             }
             )
     }
@@ -152,7 +158,6 @@ const ScheduleTime = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log("response", response)
                 if (response.status == true) {
                     setLoading(false)
                     let styles = [];
@@ -224,130 +229,7 @@ const ScheduleTime = (props) => {
 
 
 
-    const setTime = (type, index) => {
-        setDateType(type)
-        setActiveIndex(index)
-        setDatePickerVisibility(true)
-        // setInitialDate(new Date(moment(`${customDatesStyles[index].date} ${type == "from" ? customDatesStyles[index].from_time : customDatesStyles[index].to_time}`)))
-    }
 
-
-    const handleConfirm = (date) => {
-        let styles = [...customDatesStyles];
-        setDatePickerVisibility(false)
-        if (dateType == "from") {
-            styles[activeIndex].from_time = moment(date).format('hh:mm a')
-        } else {
-            let styleDate = styles[activeIndex]
-            const start_date = moment(styleDate.start_date).format("MM-DD-YYYY")
-            const end_date = moment(styleDate.end_date).format("MM-DD-YYYY")
-            const toTime = moment(date).format('hh:mm a')
-            if (start_date !== end_date) {
-                const fromTime = moment(styleDate.from_time, 'hh:mm a').toDate();
-                const toTime1 = moment(toTime, 'hh:mm a').toDate();
-                if (fromTime < toTime1) {
-                    setMarkedDates({})
-                    styles[activeIndex].to_time = toTime
-                } else {
-                    setTimeout(() => {
-                        showToast("End time can not be smaller than start time.", 'warn')
-                    }, 500)
-                }
-            } else {
-                const fromTime = moment(styleDate.from_time, 'hh:mm a').toDate();
-                const toTime1 = moment(toTime, 'hh:mm a').toDate();
-                if (fromTime < toTime1) {
-                    setMarkedDates({})
-                    styles[activeIndex].to_time = toTime
-                } else {
-                    setTimeout(() => {
-                        showToast("End time can not be smaller than start time.", 'warn')
-                    }, 500)
-                }
-            }
-
-        }
-        setCustomDatesStyles([...styles])
-    };
-
-
-    const deleteFrame = (frame) => {
-        Alert.alert(
-            "Delete Time Frame",
-            "Are you sure ?",
-            [
-                {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                },
-                {
-                    text: "OK", onPress: () => {
-                        setMarkedDates({})
-                        setLoading(true)
-                        let headers = {
-                            Accept: "application/json",
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${access_token}`
-                        }
-                        let data = {
-                            "time_frame_id": frame.id
-                        }
-                        let config = {
-                            headers: headers,
-                            data: JSON.stringify({ ...data }),
-                            endPoint: '/api/timeFramesDelete',
-                            type: 'post'
-                        }
-                        getApi(config)
-                            .then((response) => {
-                                if (response.status == true) {
-                                    let dates = [...selectedDates]
-                                    let styles = [...customDatesStyles];
-                                    dates = dates.filter(item => item !== moment(frame.date).format('DD/MM/YYYY'))
-                                    styles = styles.filter(item => item.id !== frame.id)
-                                    setSelectedDates([...dates])
-                                    setCustomDatesStyles([...styles])
-                                    calendarRef.current.resetSelections()
-                                } else {
-                                    showToast(response.message, 'success')
-                                }
-                            }).catch(err => {
-                            }).finally(() => {
-                                setLoading(false)
-                            })
-                    }
-                }
-            ]
-        );
-    }
-
-
-
-    const getAllMarkedDates = (markedObject) => {
-        let keys = Object.keys(markedObject)
-        if (keys.length == 2) {
-            let range = moment().range(keys[0], keys[1])
-            let array = Array.from(range.by("days")).map((x, i) => ({ date: moment(x).format("YYYY-MM-DD"), index: i }))
-            // {"selected": true, "selectedColor": "#1AB8AA"}
-            let data = array.reduce((a, b) => ({ ...a, [b.date]: { "selected": true, "color": "#1AB8AA", startingDay: b.index == 0 ? true : false, endingDay: b.index == array.length - 1 ? true : false } }), {})
-            return data
-        } else {
-            let data = keys.reduce((a, b) => ({
-                ...a, [b]: {
-                    customStyles: {
-                        container: {
-                            backgroundColor: '#1AB8AA'
-                        },
-                        text: {
-                            color: 'white'
-                        }
-                    }
-                }
-            }), {})
-            return data
-        }
-    }
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
@@ -398,8 +280,8 @@ const ScheduleTime = (props) => {
                                         if (state !== "disabled") {
                                             setCurrentDate(date.dateString)
                                         }
-                                    }} style={{ position: "relative", padding: 5, width: 40,height:40, borderRadius: 20, justifyContent: "center", backgroundColor: isSelected ? "#0007" : (isThereAnyData && state !== 'disabled' ? "green" : "white") }}>
-                                        <Text style={{ textAlign: 'center', fontSize: 14, color: state === 'disabled' ? 'gray' : (isThereAnyData ? 'white' : 'black'), fontFamily:LS_FONTS.PoppinsRegular }}>
+                                    }} style={{ position: "relative", padding: 5, width: 40, height: 40, borderRadius: 20, justifyContent: "center", backgroundColor: isSelected ? "#0007" : (isThereAnyData && state !== 'disabled' ? "green" : "white") }}>
+                                        <Text style={{ textAlign: 'center', fontSize: 14, color: state === 'disabled' ? 'gray' : (isThereAnyData ? 'white' : 'black'), fontFamily: LS_FONTS.PoppinsRegular }}>
                                             {date.day}
                                         </Text>
                                     </TouchableOpacity>
@@ -407,21 +289,35 @@ const ScheduleTime = (props) => {
                             }}
                             minDate={new Date()}
                         />
-                        <OrderList title="Mechanic" />
-                        <OrderList title="PhotoGrapher" />
+                        {
+                            Object.keys(orderData).map(x => {
+                                let new_data = {}
+                                for (let order of orderData[x]) {
+                                    let s_title=order.sub_services_name??order.services_name
+                                    if (new_data[s_title]) {
+                                        new_data[s_title]?.push(order)
+                                    } else {
+                                        new_data[s_title] = [order]
+                                    }
+                                }
+                                return (
+                                    <>
+                                        <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>
+                                        {Object.keys(new_data)?.map(y => {
+                                            return (<OrderList data={new_data[y]} title={y}  timeFrameData={timeFrameData}/>)
+                                        })}
+                                    </>
+                                )
+                            })
+                        }
+
+
 
                     </View> :
                         <ServiceList title="" />
                     }
                 </ScrollView>
-                <DateTimePickerModal
-                    date={initialDate}
-                    isVisible={isDatePickerVisible}
-                    mode="time"
-                    onConfirm={handleConfirm}
-                    onCancel={() => setDatePickerVisibility(false)}
-                />
-                {selectedDates.length > 0 && serviceData.formdata && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginVertical: 10 }} action={() => save()} />}
+
             </View>
             {loading && <Loader />}
         </SafeAreaView>
@@ -456,19 +352,22 @@ const ServiceList = ({ title }) => {
     )
 }
 
-const OrderList = ({ title }) => {
+const OrderList = ({ title, data ,timeFrameData}) => {
     const [showOrder, setShowOrders] = React.useState(false)
+    const navigation = useNavigation()
+    console.log(timeFrameData.length)
+    let frames=timeFrameData.filter(x=>x.services_name?.toUpperCase()===title?.toUpperCase())
+    console.log("frames",frames)
     return (
-        <View style={{ marginHorizontal: 20, marginTop: 30 }}>
-            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14 }}>7/12/2021</Text>
+        <View style={{ marginHorizontal: 20, }}>
             <Pressable onPress={() => setShowOrders(!showOrder)} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: LS_COLORS.global.divider, borderRadius: 10, marginTop: 7 }}>
-                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} (2)</Text>
-                <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({data?.length ?? 0})</Text>
+                {frames.map(f=><View style={{ flexDirection: "row", marginBottom: 10 }}>
                     <View style={{ flex: 1 }}>
                         <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
                             <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                <Text>8:00 AM</Text>
+                                <Text>{f.from_time}</Text>
                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                 </View>
@@ -479,30 +378,34 @@ const OrderList = ({ title }) => {
                         <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                         <View style={{ flex: 1, flexDirection: 'row', height: 32, backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                             <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                <Text>11:00 AM</Text>
+                            <Text>{f.to_time}</Text>
                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                 </View>
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
+                </View>)}
             </Pressable>
             {showOrder && <>
-                <Pressable style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
-                    <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} (SARAH)</Text>
-                    <View style={{ flexDirection: "row" ,justifyContent:"space-between",marginTop:10}}>
-                        <Text style={{fontFamily:LS_FONTS.PoppinsRegular}}>Start Time : 8:00 AM</Text>
-                        <Text style={{fontFamily:LS_FONTS.PoppinsRegular}}>Est. End Time : 9:00 AM</Text>
-                    </View>
-                </Pressable>
-                <Pressable style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
-                    <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} (KAIRA)</Text>
-                    <View style={{ flexDirection: "row" ,justifyContent:"space-between",marginTop:10}}>
-                        <Text style={{fontFamily:LS_FONTS.PoppinsRegular}}>Start Time : 10:00 AM</Text>
-                        <Text style={{fontFamily:LS_FONTS.PoppinsRegular}}>Est. End Time : 12:00 AM</Text>
-                    </View>
-                </Pressable>
+                {data?.map(o => {
+                    return (
+                        <Pressable onPress={() => {
+                            navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
+                        }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
+                             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
+
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Start Time : {moment(o.order_start_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Est. End Time : {moment(o.order_end_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                            </View>
+                        </Pressable>
+                    )
+                })}
+
             </>}
         </View>
     )
