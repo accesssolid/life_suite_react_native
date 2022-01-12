@@ -1071,7 +1071,7 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
-  FBReactNativeSpec: d86276ffe0a9ab4562ba2594a6b1a92b7b217162
+  FBReactNativeSpec: 3539fa002c47b6a50404ebb3e1f31979ded75eb1
   Firebase: 21ac9f28b09a8bdfc005f34c984fca84e7e8786d
   FirebaseCore: 620b677f70f5470a8e59cb77f3ddc666f6f09785
   FirebaseCoreDiagnostics: 3721920bde3a9a6d5aa093c1d25e9d3e47f694af

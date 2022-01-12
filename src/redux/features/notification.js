@@ -2,20 +2,25 @@ import { createSlice } from "@reduxjs/toolkit";
 import { getApi } from "../../api/api";
 import { role } from "../../constants/globals";
 
+const initialState={
+    data:[]
+}
+
 const notificationSlice = createSlice({
     name: "notification",
-    initialState: {
-        data: []
-    },
+    initialState,
     reducers: {
         setNotifications: (state, action) => {
             state.data = action.payload.data
+        },
+        clearNotificationData:(state,action)=>{
+            return initialState
         }
     }
 
 })
 
-export const { setNotifications } = notificationSlice.actions
+export const { setNotifications ,clearNotificationData} = notificationSlice.actions
 
 export const loadNotificaitonsThunk = () => async (dispatch,getState) => {
     try {

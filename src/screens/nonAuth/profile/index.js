@@ -20,7 +20,7 @@ import CustomInput from "../../../components/textInput"
 import DropDown from '../../../components/dropDown';
 import { showToast, storeItem } from '../../../components/validators';
 import { BASE_URL, getApi } from '../../../api/api';
-import { loadauthentication, logout } from '../../../redux/features/loginReducer';
+import { loadauthentication, logout, logoutAll, logoutState } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
 import SearchableDropDown from '../../../components/searchableDropDown';
 import { Dimensions } from 'react-native';
@@ -189,7 +189,6 @@ const Profile = (props) => {
     function logout() {
         setLoader(true)
         let headers = {
-            Accept: "application/json",
             "Authorization": `Bearer ${access_token}`
         }
         var formdata = new FormData();
@@ -205,8 +204,9 @@ const Profile = (props) => {
             .then((response) => {
                 console.log("response", response)
                 if (response.status == true) {
-                    storeItem('user', null),
-                        props.navigation.navigate('WelcomeScreen')
+                    storeItem('user', null)
+                    props.navigation.navigate('WelcomeScreen')
+                    dispatch(logoutAll())
                 }
                 else {
                     setLoader(false)
@@ -266,23 +266,23 @@ const Profile = (props) => {
     }, [dropStateDataMaster])
 
     const [homeAddressData, setHomeAddressData] = useState({
-        address_line_1: userData.address[0].address_line_1,
-        address_line_2: userData.address[0].address_line_2,
-        city: userData.address[0].city,
-        state: userData.address[0].state,
-        zip: userData.address[0].zip_code,
-        lat: userData.address[0].lat,
-        lon: userData.address[0].long
+        address_line_1: userData?.address[0]?.address_line_1,
+        address_line_2: userData?.address[0]?.address_line_2,
+        city: userData?.address[0]?.city,
+        state: userData?.address[0]?.state,
+        zip: userData?.address[0]?.zip_code,
+        lat: userData?.address[0]?.lat,
+        lon: userData?.address[0]?.long
     })
 
     const [workAddressData, setWorkAddressData] = useState({
-        address_line_1: userData.address[1].address_line_1,
-        address_line_2: userData.address[1].address_line_2,
-        city: userData.address[1].city,
-        state: userData.address[1].state,
-        zip: userData.address[1].zip_code,
-        lat: userData.address[1].lat,
-        lon: userData.address[1].long
+        address_line_1: userData?.address[1]?.address_line_1,
+        address_line_2: userData?.address[1]?.address_line_2,
+        city: userData?.address[1]?.city,
+        state: userData?.address[1]?.state,
+        zip: userData?.address[1]?.zip_code,
+        lat: userData?.address[1]?.lat,
+        lon: userData?.address[1]?.long
     })
 
     useEffect(() => {
@@ -301,7 +301,7 @@ const Profile = (props) => {
             // setDropStateValueWork(dropStateValue)
             // setDropCityValueWork(dropCityValue)
         } else {
-            if (userData.address[1]) {
+            if (userData?.address[1]) {
                 setWorkAddressData({
                     address_line_1: userData.address[1]?.address_line_1,
                     address_line_2: userData.address[1]?.address_line_2,
@@ -1176,34 +1176,6 @@ const Profile = (props) => {
                                     }} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: "red" }}>Change</Text>
                                 </View>
                         }
-                        {/* <TouchableOpacity
-                            style={styles.save}
-                            activeOpacity={0.7}
-                            onPress={() => saveUser()}>
-                            <Text style={styles.saveText}>
-                                Save
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.save}
-                            activeOpacity={0.7}
-                            onPress={() => props.navigation.navigate('Settings')}>
-                            <Text style={styles.saveText}>
-                                Settings
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={{ ...styles.save, marginBottom: 15 }}
-                            activeOpacity={0.7}
-                            onPress={() => {
-                                storeItem('user', null)
-                                props.navigation.navigate('HomeScreen')
-                                props.navigation.navigate('WelcomeScreen')
-                            }}>
-                            <Text style={styles.saveText}>
-                                Logout
-                            </Text>
-                        </TouchableOpacity> */}
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -1212,7 +1184,8 @@ const Profile = (props) => {
                     <Image source={require('../../../assets/save.png')} style={{ height: 30, aspectRatio: 1 }} resizeMode="contain" />
                     <Text>Save</Text>
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate('Settings')} style={{ alignItems: "center" }}>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                    props.navigation.navigate("UserStack",{screen:'Settings'})}} style={{ alignItems: "center" }}>
                     <Image source={require('../../../assets/gear.png')} style={{ height: 30, aspectRatio: 1 }} resizeMode="contain" />
                     <Text>Settings</Text>
                 </TouchableOpacity>

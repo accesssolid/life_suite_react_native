@@ -89,9 +89,9 @@ const Passcode = (props) => {
                 if (response.status == true) {
                     dispatch(loginReducer(response.data))
                     if (response.data.user_role == 2) {
-                        props.navigation.navigate("UserStack")
+                        props.navigation.navigate("MainDrawer")
                     } else {
-                        props.navigation.navigate("ProviderStack")
+                        props.navigation.navigate("MainDrawer")
                     }
                     setLoading(false)
                 }

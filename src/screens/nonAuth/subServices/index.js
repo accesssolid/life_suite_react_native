@@ -105,7 +105,8 @@ const SubServices = (props) => {
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
-                    props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})
+                 
+                    props.navigation.navigate("HomeScreen",{screen:"HomeScreen"})
                 }}
             />
             <View style={styles.container}>

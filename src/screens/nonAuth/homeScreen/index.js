@@ -289,8 +289,6 @@ const HomeScreen = (props) => {
 
     const updateLocation = (data) => {
         let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
 

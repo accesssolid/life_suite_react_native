@@ -31,7 +31,15 @@ const ServicesProvided = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const [activeItem, setActiveItem] = useState(null)
     const [extraData, setExtraDataa] = useState([])
-    const [vehicleType, setVehicleType] = useState('Car')
+    const [vehicleType, setVehicleType] = useState(  {
+        "created_at": "2021-11-29 08:24:07",
+        "id": 3,
+        "name": "Car",
+        "service_variants_name": "Vehicle Type",
+        "status": 1,
+        "updated_at": "2021-11-29 08:24:07",
+        "variant_id": 4
+      })
     // vehicle
     const [makeList, setMakeList] = React.useState([])
     const [modelList, setModelList] = React.useState([])
@@ -40,7 +48,7 @@ const ServicesProvided = (props) => {
     const [selectedMake, setSelectedMake] = React.useState("")
     const [selectedModel, setSelectedModel] = React.useState("")
     const [selectedYear, setSelectedYear] = React.useState("")
-    const [vehicle_types, setVehicleTypes] = React.useState(['Car', 'Truck', 'Suv', 'Van', 'MotorCycle'])
+    const [vehicle_types, setVehicleTypes] = React.useState([])
 
     const getMakeList = () => {
         setLoading(true)
@@ -49,20 +57,24 @@ const ServicesProvided = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
+        const formdata=new FormData()
+        
+        formdata.append("variant_data_id",vehicleType.id)
         let config = {
             headers: headers,
-            data: JSON.stringify({}),
+            data: formdata,
             endPoint: '/api/makeList',
             type: 'post'
         }
 
         getApi(config)
             .then((response) => {
+                console.log("reponse makelist",response)
                 if (response.status == true) {
                     setMakeList(response.data)
                 }
                 else {
+                    setMakeList([])
                     setLoading(false)
                 }
             }).catch(err => {
@@ -88,9 +100,10 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
+                console.log("Vehicle Types",response.data)
                 if (response.status == true) {
                     if (response.data?.length > 0) {
-                        setVehicleTypes(response.data?.map(x => x.name))
+                        setVehicleTypes(response.data)
                     } else {
                         setVehicleTypes([])
                     }
@@ -109,7 +122,7 @@ const ServicesProvided = (props) => {
     React.useEffect(() => {
         getMakeList()
         getVariantData()
-    }, [])
+    }, [vehicleType])
 
     React.useEffect(() => {
         if (selectedMake && selectedMake != "") {
@@ -372,26 +385,15 @@ const ServicesProvided = (props) => {
         setExtraDataa([...temp])
     }
 
-    const getVariantId = (name) => {
-        switch (name) {
-            case 'Car':
-                return 3
-            case 'Truck':
-                return 4
-            case 'Suv':
-                return 5
-            case 'Van':
-                return 6
-        }
-    }
+
 
     const filterServices = () => {
-        const filtered = itemListMaster.filter(item => item.variant_data == getVariantId(vehicleType))
+        const filtered = itemListMaster.filter(item => item.variant_data == vehicleType.id)
         setItemList([...filtered])
     }
 
     const onChangeVehicleType = (value) => {
-        if (selectedItems.length > 0 && vehicleType !== value) {
+        if (selectedItems.length > 0 && vehicleType.id !== value.id) {
             Alert.alert(
                 "Are you sure ?",
                 "All selected items will be lost.",
@@ -434,7 +436,6 @@ const ServicesProvided = (props) => {
                                     } else {
                                         props.navigation.goBack()
                                     }
-
                                 }}
                                 imageUrl1={require("../../../assets/homeWhite.png")}
                                 action1={() => {
@@ -453,9 +454,9 @@ const ServicesProvided = (props) => {
                     {subService.id == 14 && activeItem == null && <View style={{}}>
                         <DropDown
                             title="Vehicle Type"
-                            item={vehicle_types}
-                            value={vehicleType}
-                            onChangeValue={(index, value) => onChangeVehicleType(value)}
+                            item={vehicle_types.map(x=>x.name)}
+                            value={vehicleType.name}
+                            onChangeValue={(index, value) => onChangeVehicleType(vehicle_types[index])}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                             dropdownStyle={{ maxHeight: 300 }}
                         />

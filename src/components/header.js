@@ -25,7 +25,14 @@ const Header = (props) => {
                 <Text style={[styles.title, props.titleStyle]}>{props.title}</Text>
             </View>
             <TouchableOpacity style={styles.rightView}
-                onPress={props.action1}
+                onPress={()=>{
+                    if(props.action1){
+                        console.log(props.action1)
+                        props.action1()
+                    }else{
+                      
+                    }
+                }}
                 activeOpacity={0.7}>
                 <Image
                     style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "black" }, props.imageStyle1]}
@@ -80,6 +87,7 @@ const styles = StyleSheet.create({
     },
     leftView: {
         left: 20,
+        padding:5,
         aspectRatio: 1,
         alignItems: 'center',
         height: 30,

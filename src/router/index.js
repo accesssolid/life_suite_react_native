@@ -21,7 +21,7 @@ import ChatScreen from '../screens/nonAuth/chatScreen';
 import ChatMembers from '../screens/nonAuth/chatMembers';
 import OrderHistoryCustomer from '../screens/nonAuth/orderHistoryCustomer'
 import OrderHistoryProvider from '../screens/nonAuth/orderHistoryProvider'
-
+import Settings from '../screens/nonAuth/settings';
 const Stack = createStackNavigator();
 
 const Router = () => {
@@ -43,6 +43,7 @@ const Router = () => {
         <Stack.Screen name="ChatMembers" component={ChatMembers} />
         <Stack.Screen name="OrderHistoryCustomer" component={OrderHistoryCustomer} />
         <Stack.Screen name="OrderHistoryProvider" component={OrderHistoryProvider} />
+        {/* <Stack.Screen name="Settings" component={Settings} /> */}
       </Stack.Navigator>
 
       {loading && <Loader />}

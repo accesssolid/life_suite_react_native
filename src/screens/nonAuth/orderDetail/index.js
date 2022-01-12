@@ -145,6 +145,7 @@ const OrderClientDetail = (props) => {
         }
         getApi(config)
             .then((response) => {
+                console.log(response,"Response")
                 if (response.status == true) {
                     if (response.data) {
                         setBooked(response.data)
@@ -510,7 +511,6 @@ const OrderClientDetail = (props) => {
                             <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order End Time </Text>
                             <Text style={styles.baseTextStyle}>{moment(data?.order_end_time).format("hh:mm a")}</Text>
                         </View>
-                        
                         {/* only show if order status is pending i.e 1 */}
                         {(data?.order_status == 1) &&
                             <>
@@ -639,9 +639,11 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
     const [totalTime, setTotalTime] = React.useState(0)
     const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
     const [showVirtualData, setShowVirtualData] = React.useState(false)
-
+    
     useEffect(() => {
         if (showVirtualData) {
+            console.log("virtual_data",virtual_data.order_end_time,data.order_end_time,virtual_data?.requested_end_time,data.requested_end_time)
+          
             if (totalTime && totalVirtualTime) {
                 if (totalTime < totalVirtualTime) {
                     settextShowWithRed(`Adding new service requires ${totalVirtualTime - totalTime} min extra`)
@@ -818,7 +820,7 @@ const OrderItemsDetail = ({ i }) => {
             </View>
             {i.product.map((itemData, index) => {
                 return (
-                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
+                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row',marginTop:10}}>
                         <View style={{}} >
                             <Text style={{ marginLeft: 20 }}>
                                 <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>

@@ -35,6 +35,7 @@ const OrderClientDetail = (props) => {
     const [selected, setSelected] = React.useState(0)
     const [items, setItems] = React.useState([])
     const [order_items, setOrderItems] = React.useState([])
+    const [order_id, setOrderId] = React.useState(null)
     // 
     const [selectedItems, setSelectedItems] = React.useState([])
     const [selectedProducts, setSelectedProducts] = React.useState([])
@@ -44,6 +45,10 @@ const OrderClientDetail = (props) => {
     // for checking if there is data updation or not
     const [selectedItems1, setSelectedItems1] = React.useState([])
     const [selectedProducts1, setSelectedProducts1] = React.useState([])
+
+    useEffect(() => {
+        setOrderId(item.id)
+    }, [])
 
     const [discount, setDiscount] = React.useState({
         discount_type: "",
@@ -73,14 +78,14 @@ const OrderClientDetail = (props) => {
             setOrderItems(data?.order_items)
             let i = []
             let p = []
-            let extras=[]
+            let extras = []
             for (let item of data?.order_items) {
                 i.push(item.item_id)
                 for (let product of item.product?.map(x => x.product_id)) {
                     p.push(product)
                 }
                 for (let product of item.extra_product) {
-                    extras.push({item_id:item.item_id,product_name: product.product_name, product_price: product.product_price })
+                    extras.push({ item_id: item.item_id, product_name: product.product_name, product_price: product.product_price })
                 }
             }
             setSelectedItems(i)
@@ -99,19 +104,20 @@ const OrderClientDetail = (props) => {
         }
     }
 
-    const checkforUpdate=()=>{
-        let si=[...selectedItems].sort((a,b)=>Number(a)-Number(b)).join("")
-        let si1=[...selectedItems1].sort((a,b)=>Number(a)-Number(b)).join("")
-        let pi=[...selectedProducts].sort((a,b)=>Number(a)-Number(b)).join("")
-        let pi1=[...selectedProducts1].sort((a,b)=>Number(a)-Number(b)).join("")
-        if(pi==pi1&&si==si1&&otherProducts.length==0){
+    const checkforUpdate = () => {
+        let si = [...selectedItems].sort((a, b) => Number(a) - Number(b)).join("")
+        let si1 = [...selectedItems1].sort((a, b) => Number(a) - Number(b)).join("")
+        let pi = [...selectedProducts].sort((a, b) => Number(a) - Number(b)).join("")
+        let pi1 = [...selectedProducts1].sort((a, b) => Number(a) - Number(b)).join("")
+        if (pi == pi1 && si == si1 && otherProducts.length == 0) {
             return true
         }
         return false
     }
 
     const submitOrderUpdateDetail = () => {
-        if(checkforUpdate()){
+  
+        if (checkforUpdate()) {
             return
         }
         setLoading(true)
@@ -123,7 +129,7 @@ const OrderClientDetail = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({
-                order_id: item.id,
+                order_id: order_id,
                 items_data: JSON.stringify({
                     estimated_reached_time: data.estimated_reached_time,
                     order_start_time: data.order_start_time,
@@ -165,6 +171,7 @@ const OrderClientDetail = (props) => {
 
 
     const getOrderDetail = (order_id) => {
+
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -235,7 +242,7 @@ const OrderClientDetail = (props) => {
                     <TouchableOpacity
                         style={[styles.save, { borderRadius: 40, height: 35, marginTop: 0 }]}
                         activeOpacity={0.7}
-                        onPress={() => { props.navigation.navigate("AddDiscount", { totalPrice, setDiscount: setDiscount.bind(this), discount: discount ,order_id:item.id}) }}>
+                        onPress={() => { props.navigation.navigate("AddDiscount", { totalPrice, setDiscount: setDiscount.bind(this), discount: discount, order_id: item.id }) }}>
                         <Text style={styles.saveText}>Add Discount</Text>
                     </TouchableOpacity>
                 </View>
@@ -363,11 +370,20 @@ const ItemView = ({
                         onPress={() => {
                             setSelectedItem(item.id)
                             setProductShow(true)
-                            // if(isSelected){
-                            //     setSelectedItems(state => state.filter(x => x != item.id))
-                            // }else{
-                                setSelectedItems(state => [...new Set([...state,item.id])])
-                            // }
+                            if (isSelected) {
+                                if (productShow) {
+                                    setSelectedItems(state => state.filter(x => x != item.id))
+                                    setOtherProducts(state => state.filter(x => x.item_id != item.id))
+                                    console.log("products", item.products, selectedProducts)
+                                    if (item?.products) {
+                                        item.products.forEach(p => {
+                                            setSelectedProducts(state => state.filter(x => p.id != x))
+                                        })
+                                    }
+                                }
+                            } else {
+                                setSelectedItems(state => [...new Set([...state, item.id])])
+                            }
                         }}
                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
@@ -421,7 +437,7 @@ const ItemView = ({
                                 checked={otherProductsForItem.length > 0}
                                 onPress={() => {
                                     if (otherProductsForItem.length <= 0) {
-                                        setOtherProducts(state => [...state, { item_id: item.id,product_name: "", product_price: "" }])
+                                        setOtherProducts(state => [...state, { item_id: item.id, product_name: "", product_price: "" }])
                                         if (!isSelected) {
                                             setSelectedItems(state => [...state, item.id])
                                         }

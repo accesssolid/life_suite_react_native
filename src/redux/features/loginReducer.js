@@ -1,6 +1,10 @@
 
 import { createSlice } from '@reduxjs/toolkit'
-
+import {clearBankModalData} from './bankModel'
+import {clearListChatUsers} from './chatUser'
+import {clearNotificationData} from './notification'
+import {clearMyJobs} from './provider'
+import {clearCleanData} from './services'
 const authenticateSlice = createSlice({
     name: "authenticate",
     initialState: {
@@ -29,7 +33,6 @@ const authenticateSlice = createSlice({
         },
         logoutState: (state, action) => {
             state.authenticate = false
-            state.user = {}
             state.friends = {}
         },
         modalState: (state, action) => {
@@ -106,9 +109,14 @@ export const InitialReducer = (data) => {
     }
 }
 
-export const logout = () => {
+export const logoutAll = () => {
     return async (dispatch) => {
         dispatch(logoutState())
+        dispatch(clearCleanData())
+        dispatch(clearListChatUsers())
+        dispatch(clearMyJobs())
+        dispatch(clearNotificationData())
+        dispatch(clearBankModalData())
         try {
 
         } catch (err) {

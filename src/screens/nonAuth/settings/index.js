@@ -131,7 +131,7 @@ const Settings = (props) => {
                     imageUrl={require("../../../assets/back.png")}
                     action={() => props.navigation.goBack()}
                     imageUrl1={require("../../../assets/home.png")}
-                    action1={() => props.navigation.navigate("HomeScreen")}
+                    action1={() => props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})}
                     title="Settings"
                 />
                 <Container>

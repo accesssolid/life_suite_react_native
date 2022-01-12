@@ -1,18 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { getApi } from '../../api/api'
+const initialState={
+    myJobs: []
+}
 const providerSlice = createSlice({
     name: "provider",
-    initialState: {
-        myJobs: []
-    },
+    initialState: initialState,
     reducers: {
         setMyJobs: (state, action) => {
             state.myJobs = action.payload.data
         },
+        clearMyJobs:(state,action)=>{
+            return initialState
+        }
     }
 })
 
-export const { setMyJobs } = providerSlice.actions
+export const { setMyJobs ,clearMyJobs} = providerSlice.actions
 
 export const getMyJobsThunk = (user_id,access_token) => {
     return (dispatch)=>{

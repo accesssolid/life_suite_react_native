@@ -68,8 +68,6 @@ const SelectLocation = (props) => {
         try {
             setLoading(true)
             let headers = {
-                Accept: "application/json",
-                "Content-Type": "application/json",
                 "Authorization": `Bearer ${access_token}`
             }
 
@@ -96,7 +94,7 @@ const SelectLocation = (props) => {
             }
 
         } catch (err) {
-
+            console.error("Error",err)
         } finally {
             setLoading(false)
 
