@@ -49,6 +49,7 @@ const ServicesProvided = (props) => {
         getServiceItems()
     }, [])
 
+
     useEffect(() => {
         setInitialServiceData()
     }, [itemList, itemListMaster])
@@ -104,13 +105,11 @@ const ServicesProvided = (props) => {
 
     const setCheckedData = (index, item) => {
         let arr = [...selectedItems]
-
         if (arr.includes(item.id)) {
             arr.splice(arr.indexOf(item.id), 1)
         } else {
             arr.push(item.id)
         }
-
         setSelectedItems([...arr])
     }
 
@@ -453,7 +452,7 @@ const ServicesProvided = (props) => {
                             onPress: () => { },
                             style: "cancel"
                         },
-                        { text: "OK", onPress: () => discardItem(item) }
+                        { text: "OK", onPress: () => discardItem(item)}
                     ]
                 );
             } else {
@@ -463,14 +462,50 @@ const ServicesProvided = (props) => {
             }
         }
     }
-
+    const onPressItem1 = (index, item) => {
+        if (!selectedItems.includes(item.id)) {
+            setCheckedData(null, item)
+        }
+        if (activeItem == null) {
+            setActiveIndex(index)
+            setActiveItem(item)
+            let filtered = selectedNewProducts.filter(itemm => itemm.item_id == item.id)
+            if (filtered?.length > 0) {
+                setIsOtherSelected(true)
+            } else {
+                setIsOtherSelected(false)
+            }
+        } else {
+            let filtered = selectedNewProducts.filter(itemm => itemm.item_id == item.id)
+            if (getSelectedNewProducts().length > 0||filtered?.length>0) {
+                Alert.alert(
+                    "Lifesuite",
+                    "Do you like to remove new selected item?",
+                    [
+                        {
+                            text: "Cancel",
+                            onPress: () => { },
+                            style: "cancel"
+                        },
+                        { text: "OK", onPress: () => {
+                            discardItem1(item)
+                        }}
+                    ]
+                );
+            } else {
+                if(getSelectedProducts().length ==0){
+                    setCheckedData(null, item)
+                }
+                setActiveIndex(null)
+                setActiveItem(null)
+            }
+        }
+    }
     const discardItem = (item) => {
         let pdata = selectedProducts.filter(element => element.item_id !== item.id)
         let pdataNew = selectedNewProducts.filter(itemm => itemm.item_id !== item.id)
-
         setSelectedProducts([...pdata])
         setSelectedNewProducts([...pdataNew])
-
         let newArr = []
         itemListMaster.map((item, index) => {
             item.products.forEach(element => {
@@ -517,14 +552,34 @@ const ServicesProvided = (props) => {
                 return ele
             }
         })
-
         setServicesData([...arr])
         setIsOtherSelected(false)
         setActiveItem(null)
         setActiveIndex(null)
         setCheckedData(null, item)
     }
-
+    const discardItem1 = (item) => {
+        let pdataNew = selectedNewProducts.filter(itemm => itemm.item_id !== item.id)
+        let pdata = selectedProducts.filter(element => element.item_id === item.id)
+        setSelectedNewProducts([...pdataNew])
+        let temp = []
+        temp.forEach((element, index) => {
+            if (element.item_id == item.id) {
+                if (type == "name") {
+                    temp[index].name = ''
+                    temp[index].price = ''
+                }
+            }
+        })
+        setNewProductsData([...temp])
+        setIsOtherSelected(false)
+        setActiveItem(null)
+        setActiveIndex(null)
+        if(pdata.length==0){
+            setCheckedData(null, item)
+        }
+       
+    }
     const saveRequest = () => {
         let hasSubProducts = false
         const selectedItemsss = itemListMaster.filter(item => selectedItems.includes(item.id))
@@ -726,7 +781,11 @@ const ServicesProvided = (props) => {
 
     const onBackPress = () => {
         if (activeItem !== null) {
-            onPressItem(activeIndex, activeItem)
+            if(isAddServiceMode){
+                onPressItem(activeIndex, activeItem)
+            }else{
+                onPressItem1(activeIndex, activeItem)
+            }
         } else {
             props.navigation.goBack()
         }

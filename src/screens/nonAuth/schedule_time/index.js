@@ -27,6 +27,7 @@ import { setAddServiceMode, clearCleanData } from '../../../redux/features/servi
 import { ScrollView } from 'react-native-gesture-handler';
 import Cards from '../../../components/cards';
 import { useNavigation } from '@react-navigation/native';
+import { set } from 'lodash';
 const Moment = require("moment")
 const MomentRange = require("moment-range")
 const moment = MomentRange.extendMoment(Moment)
@@ -46,11 +47,14 @@ const ScheduleTime = (props) => {
     const [dateType, setDateType] = useState(null)
     const [activeIndex, setActiveIndex] = useState(null)
     const [initialDate, setInitialDate] = useState(new Date())
+    const [currentMonth,setCurrentMonth]=React.useState(moment().format("MM"))
     const [markedDates, setMarkedDates] = useState({})
     const [currentTab, setCurrentTab] = React.useState(1)
-    const [currentDate, setCurrentDate] = React.useState(new Date())
+    const [currentDate, setCurrentDate] = React.useState(null)
+    const [g_data, setGdata] = React.useState({})
     const [orderData, setOrderData] = React.useState({})
     const [timeFrameData, setTimeFrameData] = React.useState([])
+
     useEffect(() => {
         if (!isAddServiceMode) {
             getTimeFrames()
@@ -58,17 +62,31 @@ const ScheduleTime = (props) => {
         getScheduleRange()
     }, [])
 
-
-    // "start_date" : "2021-07-16",  
-    // "end_date" : "2021-07-16", 
-    // "from_time" : "10:05",
-    // "to_time" : "23:00"
-
     const onDateChange = (date) => {
         console.log(date)
     }
 
+    useEffect(() => {
+        if (currentDate) {
+            // getScheduleRange(currentDate)
+            let d = moment(currentDate, "YYYY-MM-DD").format("MM/DD/YYYY")
+            let newC = g_data[d]
+            console.log(currentDate, d, newC)
+            if (newC) {
+                setOrderData({ [d]: newC })
+            } else {
+                setOrderData({})
+            }
 
+        }else{
+            let all_ds=Object.keys(g_data).filter(x=>moment(x,"MM/DD/YYYY").format("MM")==currentMonth)
+            let z={}
+            for(let f of all_ds){
+                z[f]=g_data[f]
+            }
+            setOrderData(z)
+        }
+    }, [currentDate,currentMonth,g_data])
 
 
 
@@ -79,22 +97,28 @@ const ScheduleTime = (props) => {
     }, [customDatesStyles])
 
 
-    const getScheduleRange = () => {
+    const getScheduleRange = (date = null) => {
+        setLoading(true)
         let headers = {
             Accept: "application/json",
-            'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
         }
-        let data = JSON.stringify({
+        let data = {
             start_time: moment().format("YYYY-MM-01")
-        })
+        }
+        if (date) {
+            data = {
+                start_time: date,
+            }
+        }
 
         let config = {
             headers: headers,
-            data: data,
+            data: JSON.stringify(data),
             endPoint: '/api/scheduleDataList',
             type: 'post'
         }
+
         getApi(config)
             .then((response) => {
                 if (response.status) {
@@ -115,28 +139,30 @@ const ScheduleTime = (props) => {
                         for (let x of clonez) {
                             newz[x] = z[x]
                         }
-                        setOrderData(newz)
+                        setGdata(newz)
                     } else {
                         setOrderData({})
+                        setGdata({})
                     }
 
                     let ts = response.timeFrameData
                     if (ts.length > 0) {
-                        setTimeFrameData(response.ordersData)
+                        setTimeFrameData(ts)
                     } else {
                         setTimeFrameData([])
                     }
                 }
                 else {
                     setLoading(false)
-                    // showToast(response.message, 'danger')
                 }
             })
             .catch(err => {
                 setLoading(false)
                 console.error(err)
             }
-            )
+            ).finally(() => {
+                setLoading(false)
+            })
     }
 
     const getTimeFrames = () => {
@@ -253,15 +279,23 @@ const ScheduleTime = (props) => {
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {currentTab == 1 ? <View style={styles.calendar}>
                         <Calendar
-                            current={new Date()}
-                            onDayPress={(day) => {
-                                onDateChange(day)
-                            }}
                             hideArrows={false}
                             hideExtraDays={true}
                             disableMonthChange={false}
                             firstDay={1}
                             hideDayNames={false}
+                            onMonthChange={(e) => {
+                                setCurrentDate(null)
+                                setCurrentMonth(moment(e.dateString,"YYYY-MM-DD").format("MM"))
+                            }}
+                            renderHeader={(e) => {
+                                return <Text onPress={() => {
+                                    setCurrentDate(null);
+                                    setCurrentMonth(moment(new Date(e)).format("MM"))
+                                }}
+                                    style={{ fontSize: 15, }}>{moment(new Date(e)).format("MMMM YYYY")}</Text>
+                            }}
+
                             showWeekNumbers={false}
                             onPressArrowLeft={subtractMonth => subtractMonth()}
                             onPressArrowRight={addMonth => addMonth()}
@@ -272,16 +306,14 @@ const ScheduleTime = (props) => {
                             dayComponent={({ date, state }) => {
                                 const isToday = state == "today"
                                 const isSelected = date.dateString == currentDate
-                                let marked_dates = []
-                                const isThereAnyData = marked_dates.includes(date.dateString)
+                                let marked_dates = Object.keys(g_data)
+                                const isThereAnyData = marked_dates.includes(moment(date.dateString, "YYYY-MM-DD").format("MM/DD/YYYY"))
 
                                 return (
                                     <TouchableOpacity onPress={() => {
-                                        if (state !== "disabled") {
-                                            setCurrentDate(date.dateString)
-                                        }
-                                    }} style={{ position: "relative", padding: 5, width: 40, height: 40, borderRadius: 20, justifyContent: "center", backgroundColor: isSelected ? "#0007" : (isThereAnyData && state !== 'disabled' ? "green" : "white") }}>
-                                        <Text style={{ textAlign: 'center', fontSize: 14, color: state === 'disabled' ? 'gray' : (isThereAnyData ? 'white' : 'black'), fontFamily: LS_FONTS.PoppinsRegular }}>
+                                        setCurrentDate(date.dateString)
+                                    }} style={{ position: "relative", padding: 5, width: 40, height: 40, borderRadius: 20, justifyContent: "center", backgroundColor: isSelected ? "#0007" : (isThereAnyData ? "green" : "white") }}>
+                                        <Text style={{ textAlign: 'center', fontSize: 14, color: isThereAnyData ? "white" : 'black', fontFamily: LS_FONTS.PoppinsRegular }}>
                                             {date.day}
                                         </Text>
                                     </TouchableOpacity>
@@ -293,7 +325,7 @@ const ScheduleTime = (props) => {
                             Object.keys(orderData).map(x => {
                                 let new_data = {}
                                 for (let order of orderData[x]) {
-                                    let s_title=order.sub_services_name??order.services_name
+                                    let s_title = order.sub_services_name ?? order.services_name
                                     if (new_data[s_title]) {
                                         new_data[s_title]?.push(order)
                                     } else {
@@ -304,7 +336,7 @@ const ScheduleTime = (props) => {
                                     <>
                                         <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>
                                         {Object.keys(new_data)?.map(y => {
-                                            return (<OrderList data={new_data[y]} title={y}  timeFrameData={timeFrameData}/>)
+                                            return (<OrderList key={y} data={new_data[y]} title={y} timeFrameData={timeFrameData} />)
                                         })}
                                     </>
                                 )
@@ -352,22 +384,20 @@ const ServiceList = ({ title }) => {
     )
 }
 
-const OrderList = ({ title, data ,timeFrameData}) => {
+const OrderList = ({ title, data, timeFrameData }) => {
     const [showOrder, setShowOrders] = React.useState(false)
     const navigation = useNavigation()
-    console.log(timeFrameData.length)
-    let frames=timeFrameData.filter(x=>x.services_name?.toUpperCase()===title?.toUpperCase())
-    console.log("frames",frames)
+    let frames = timeFrameData.filter(x => x.services_name == title)
     return (
         <View style={{ marginHorizontal: 20, }}>
             <Pressable onPress={() => setShowOrders(!showOrder)} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: LS_COLORS.global.divider, borderRadius: 10, marginTop: 7 }}>
                 <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({data?.length ?? 0})</Text>
-                {frames.map(f=><View style={{ flexDirection: "row", marginBottom: 10 }}>
+                {frames.map((f, i) => <View key={i + "" + i} style={{ flexDirection: "row", marginBottom: 10 }}>
                     <View style={{ flex: 1 }}>
                         <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
                             <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                <Text>{f.from_time}</Text>
+                                <Text>{moment(f.from_time, "HH:mm").format("hh:mm a")}</Text>
                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                 </View>
@@ -378,7 +408,7 @@ const OrderList = ({ title, data ,timeFrameData}) => {
                         <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                         <View style={{ flex: 1, flexDirection: 'row', height: 32, backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                             <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                            <Text>{f.to_time}</Text>
+                                <Text>{moment(f.to_time, "HH:mm").format("hh:mm a")}</Text>
                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                 </View>
@@ -393,9 +423,9 @@ const OrderList = ({ title, data ,timeFrameData}) => {
                         <Pressable onPress={() => {
                             navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
                         }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
-                             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
 
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
