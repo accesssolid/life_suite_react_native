@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Dimensions, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -20,7 +20,8 @@ import services, { setAddServiceData } from '../../../redux/features/services';
 import { showToast } from '../../../components/validators';
 import ServiceItem from '../../../components/serviceItem';
 import _ from 'lodash';
-
+import { getMyJobsThunk } from '../../../redux/features/provider';
+const { width } = Dimensions.get("window")
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -43,7 +44,7 @@ const ServicesProvided = (props) => {
     const [activeIndex, setActiveIndex] = useState(null)
     const [activeItem, setActiveItem] = useState(null)
     const itemRef = useRef(null)
-  
+
     useEffect(() => {
         setServicesData([])
         getServiceItems()
@@ -452,7 +453,7 @@ const ServicesProvided = (props) => {
                             onPress: () => { },
                             style: "cancel"
                         },
-                        { text: "OK", onPress: () => discardItem(item)}
+                        { text: "OK", onPress: () => discardItem(item) }
                     ]
                 );
             } else {
@@ -477,7 +478,7 @@ const ServicesProvided = (props) => {
             }
         } else {
             let filtered = selectedNewProducts.filter(itemm => itemm.item_id == item.id)
-            if (getSelectedNewProducts().length > 0||filtered?.length>0) {
+            if (getSelectedNewProducts().length > 0 || filtered?.length > 0) {
                 Alert.alert(
                     "Lifesuite",
                     "Do you like to remove new selected item?",
@@ -487,13 +488,15 @@ const ServicesProvided = (props) => {
                             onPress: () => { },
                             style: "cancel"
                         },
-                        { text: "OK", onPress: () => {
-                            discardItem1(item)
-                        }}
+                        {
+                            text: "OK", onPress: () => {
+                                discardItem1(item)
+                            }
+                        }
                     ]
                 );
             } else {
-                if(getSelectedProducts().length ==0){
+                if (getSelectedProducts().length == 0) {
                     setCheckedData(null, item)
                 }
                 setActiveIndex(null)
@@ -575,10 +578,10 @@ const ServicesProvided = (props) => {
         setIsOtherSelected(false)
         setActiveItem(null)
         setActiveIndex(null)
-        if(pdata.length==0){
+        if (pdata.length == 0) {
             setCheckedData(null, item)
         }
-       
+
     }
     const saveRequest = () => {
         let hasSubProducts = false
@@ -781,13 +784,65 @@ const ServicesProvided = (props) => {
 
     const onBackPress = () => {
         if (activeItem !== null) {
-            if(isAddServiceMode){
+            if (isAddServiceMode) {
                 onPressItem(activeIndex, activeItem)
-            }else{
+            } else {
                 onPressItem1(activeIndex, activeItem)
             }
         } else {
             props.navigation.goBack()
+        }
+    }
+
+    const saveData = async () => {
+        try {
+            setLoading(true)
+            let headers = {
+                "Authorization": `Bearer ${access_token}`
+            }
+            let formdata = new FormData()
+            let services = []
+            servicesData.forEach((itemm, index) => {
+                if (selectedItems.includes(itemm.item_id)) {
+                    var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
+                    var fieldArray = hoursDotMinutes.split(":");
+                    var minutes = Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
+                    let obj = {
+                        "item_id": itemm.item_id,
+                        "price": Number(itemm.price.replace('$', '')),
+                        "time_duration": minutes
+                    }
+                    services.push(obj)
+                }
+            })
+
+            let json_data = {
+                products: [...productsData].map(x=>({item_product_id:x.id,price:x.price})),
+                new_products: [...newProductsData],
+                services:[...services]
+            }
+            console.log(json_data)
+            formdata.append("service_id",subService.id)
+            formdata.append("json_data",JSON.stringify(json_data))
+            const config={
+                headers:headers,
+                data:formdata,
+                type:"post",
+                endPoint:"/api/providerServicesSaveIndividually"
+            }
+            let res = await getApi(config)
+         
+            if(res.status){
+                dispatch(getMyJobsThunk(user.id,access_token))
+                showToast(res.message)
+                props.navigation.navigate("HomeScreen")            
+            }else{
+                showToast(res.message)
+            }
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -896,7 +951,10 @@ const ServicesProvided = (props) => {
                     <View style={{ paddingBottom: '2.5%' }}>
                         {activeItem == null
                             ?
-                            selectedItems.length > 0 && <CustomButton title={"Next"} action={() => next()} />
+                            selectedItems.length > 0 && (isAddServiceMode ? <CustomButton title={"Next"} action={() => next()} /> : <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                                <CustomButton title={"Save"} action={() => { saveData() }} customStyles={{ width: width * 0.45 }} />
+                                <CustomButton title={"Next"} action={() => next()} customStyles={{ width: width * 0.45 }} />
+                            </View>)
                             :
                             <CustomButton title={"Save"} action={() => saveRequest()} />
                         }

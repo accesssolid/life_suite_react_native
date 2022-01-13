@@ -16,11 +16,12 @@ import { BASE_URL, getApi } from '../../../api/api';
 import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
-import { setMyJobs } from '../../../redux/features/provider';
+import { getMyJobsThunk, setMyJobs } from '../../../redux/features/provider';
 import { setAddServiceData, setAddServiceMode } from '../../../redux/features/services';
 import { Alert } from 'react-native';
 import { Dimensions } from 'react-native';
 
+const { width } = Dimensions.get("window")
 const upload_types = [
     { id: 1, text: "Upload Certificate or Business Certificate", button_text: "Add Certificate" },
     { id: 2, text: "Upload Driver or State License", button_text: "Add License" },
@@ -68,7 +69,7 @@ const AddLicense = (props) => {
     }, [selected, showSelector])
 
     useEffect(() => {
-        if (subService?.upload_type>0) {
+        if (subService?.upload_type > 0) {
             if (subService.upload_type <= 3) {
                 let d = upload_types.find(x => x.id == subService.upload_type)
                 if (d) {
@@ -398,6 +399,66 @@ const AddLicense = (props) => {
 
     }
 
+    const saveData=async()=>{
+        try{
+            setLoading(true)
+
+            let headers={
+                "Authorization": `Bearer ${access_token}`
+            }
+            let formdata=new FormData()
+            formdata.append("service_id",subService.id)
+            let json_data={
+                products: addServiceData?.json_data?.products?.map(x=>({item_product_id:x.id,price:x.price})),
+                new_products:addServiceData?.json_data?.new_products,
+                services:addServiceData?.json_data?.services
+            }
+            formdata.append("json_data",JSON.stringify(json_data))
+            for(let i of images){
+                if (i.name != "") {
+                    let PATH_TO_THE_FILE = Platform.OS == "ios" ? i.uri.replace('file:///', '') : i.uri
+                    if (!String(i.uri).startsWith(BASE_URL)) {
+                        formdata.append('license_file[]', {
+                            uri: PATH_TO_THE_FILE,
+                            name: i.name,
+                            type: i.type,
+                        })
+                    }
+                }
+            }
+            for(let item of images1){
+                if (item.name != "") {
+                    let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
+                    if (!String(item.uri).startsWith(BASE_URL)) {
+                        formdata.append('certificate_file[]', {
+                            uri: PATH_TO_THE_FILE,
+                            name: item.name,
+                            type: item.type,
+                        })
+                    }
+                }
+            }
+            const config={
+                headers,
+                data:formdata,
+                endPoint: '/api/providerServicesLicenseSaveIndividually',
+                type: 'post'
+            }
+            let res=await getApi(config)
+            if(res.status){
+                showToast(res.message)
+                dispatch(getMyJobsThunk(user.id,access_token))
+                props.navigation.navigate("HomeScreen")
+            }else{
+                showToast(res.message)
+
+            }
+        }catch(err){
+            console.error(err)
+        }finally{
+            setLoading(false)
+        }
+    }
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -433,7 +494,7 @@ const AddLicense = (props) => {
                         <Text style={styles.service}>{upload_type.text}</Text>
                         {showSelector && <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green, marginHorizontal: 20, marginBottom: 10 }}>
                             <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
-                                <Text  style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
                             </TouchableOpacity>
                             <View style={{ width: 1, backgroundColor: LS_COLORS.global.green }} />
                             <TouchableOpacity onPress={() => setSelected(1)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 1 ? LS_COLORS.global.green : "white" }}>
@@ -485,11 +546,18 @@ const AddLicense = (props) => {
                         </View>
                     </Content>
                     <View style={{ paddingBottom: '2.5%', }}>
-                        <CustomButton
+                        {isAddServiceMode ? <CustomButton
                             title={"NEXT"}
                             customStyles={{ width: '50%', borderRadius: 6 }}
                             action={() => next()}
-                        />
+                        /> :
+                            <View style={{ flexDirection: "row", justifyContent: "space-around", marginBottom: 10, marginHorizontal: 10 }}>
+                                <CustomButton title={"Save"} action={() => {
+                                        saveData()
+                                }} customStyles={{ width: width * 0.45, borderRadius: 6 }} />
+                                <CustomButton title={"Next"} action={() => next()} customStyles={{ width: width * 0.45, borderRadius: 6 }} />
+                            </View>
+                        }
                     </View>
                 </Container>
                 {loading && <Loader />}

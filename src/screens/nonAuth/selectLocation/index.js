@@ -14,12 +14,14 @@ import RNGooglePlaces from 'react-native-google-places';
 /* Components */;
 import Header from '../../../components/header';
 import { Container, Content } from 'native-base'
-import { BASE_URL } from '../../../api/api';
+import { BASE_URL, getApi } from '../../../api/api';
 import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
 import { Dimensions } from 'react-native';
 import CustomTextInput from '../../../components/customTextInput';
+import { getMyJobsThunk } from '../../../redux/features/provider';
+const { width } = Dimensions.get("window")
 
 const SelectLocation = (props) => {
     const dispatch = useDispatch()
@@ -50,6 +52,7 @@ const SelectLocation = (props) => {
     useEffect(() => {
         getLocationPermission()
     }, [])
+
 
     const setInitialData = () => {
         let coords = {
@@ -121,6 +124,7 @@ const SelectLocation = (props) => {
             setPreviousAddress()
         }
     }
+
 
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
@@ -232,6 +236,78 @@ const SelectLocation = (props) => {
         })
     }
 
+    const saveData=async()=>{
+        try {
+            setLoading(true)
+            let headers = {
+                "Authorization": `Bearer ${access_token}`
+            }
+
+            const formdata = new FormData()
+            formdata.append("service_id", subService.id)
+            let json_data={
+                products: addServiceData?.json_data?.products?.map(x=>({item_product_id:x.id,price:x.price})),
+                new_products:addServiceData?.json_data?.new_products,
+                services:addServiceData?.json_data?.services,
+                travel_distance:{
+                    travel_distance:travelDistance,
+                    address_text:address,
+                    lat:coordinates.latitude,
+                    long:coordinates.longitude
+                }
+            }
+            formdata.append("json_data",JSON.stringify(json_data))
+            addServiceData.images.forEach((item, index) => {
+                if (item.name != "") {
+                    let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
+
+                    if (!String(item.uri).startsWith(BASE_URL)) {
+                        formdata.append('license_file[]', {
+                            uri: PATH_TO_THE_FILE,
+                            name: item.name,
+                            type: item.type,
+                        })
+                    }
+                }
+
+            })
+
+            addServiceData.certificates.forEach((item, index) => {
+                if (item.name != "") {
+                    let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
+                    if (!String(item.uri).startsWith(BASE_URL)) {
+                        formdata.append('certificate_file[]', {
+                            uri: PATH_TO_THE_FILE,
+                            name: item.name,
+                            type: item.type,
+                        })
+                    }
+                }
+            })
+
+            let config = {
+                headers: headers,
+                data: formdata,
+                endPoint: '/api/providerServLicLocSaveIndividually',
+                type: 'post'
+            }
+            let response = await getApi(config)
+            if (response.status) {
+                showToast(response.message)
+                dispatch(getMyJobsThunk(user.id, access_token))
+                props.navigation.navigate("HomeScreen")
+            } else {
+                showToast(response.message, 'danger')
+            }
+
+        } catch (err) {
+            console.error("Error",err)
+        } finally {
+            setLoading(false)
+
+        }
+    }
+
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -315,11 +391,18 @@ const SelectLocation = (props) => {
                             />
                         </View>
                         <View style={{ paddingBottom: '2.5%' }}>
-                            <CustomButton
+                            {isAddServiceMode ? <CustomButton
                                 title={"Next"}
                                 customStyles={{ width: '50%', borderRadius: 6 }}
                                 action={() => next()}
-                            />
+                            /> :
+                                <View style={{ flexDirection: "row", justifyContent: "space-around", marginBottom: 10, marginHorizontal: 10 }}>
+                                    <CustomButton title={"Save"} action={() => {
+                                        saveData()
+                                    }} customStyles={{ width: width * 0.45, borderRadius: 6 }} />
+                                    <CustomButton title={"Next"} action={() => next()} customStyles={{ width: width * 0.45, borderRadius: 6 }} />
+                                </View>
+                            }
                         </View>
                     </Content>
                 </Container>

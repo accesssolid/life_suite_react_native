@@ -460,7 +460,7 @@ const HomeScreen = (props) => {
                            
                         >
                             <Text style={styles.order}>
-                                ORDER
+                                MY ORDERS
                             </Text>
                         </View>
                     </TouchableOpacity>

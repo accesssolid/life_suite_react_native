@@ -259,7 +259,9 @@ const MainDrawer = (props) => {
                     name="Orders"
                     component={user.user_role == role.customer ? OrderHistory1 : OrderHistory}
                     // component={OrderHistory}
+                    
                     options={{
+                        drawerLabel:"My Orders",
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/note.png')} style={{ height: 20, width: 20 }} />,
                     }}
                 />

@@ -31,8 +31,8 @@ import { Rating } from 'react-native-ratings';
 import CancelModal from '../../../components/cancelModal';
 
 const order_types = [
-    { id: 1, title: "Pending" },
-    { id: 3, title: "Future" },
+    { id: 1, title: "Requested" },
+    { id: 3, title: "Upcoming" },
     { id: 7, title: "InProgress" },
     { id: 8, title: "Completed" },
     { id: 2, title: "Cancelled" },
@@ -249,7 +249,7 @@ const OrderHistory1 = (props) => {
                 }}
             />
             <Header
-                title="ORDER HISTORY"
+                title="MY ORDER"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.goBack()
@@ -271,7 +271,7 @@ const OrderHistory1 = (props) => {
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
-                        <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>List of orders</Text>
+                        <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>Filter by</Text>
                         <View style={{ flex: 0.8, alignSelf: "flex-end", marginRight: 20, alignItems: "flex-end" }}>
                             <DropDown
                                 item={order_types.map(x => x.title)}

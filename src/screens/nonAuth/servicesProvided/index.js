@@ -31,7 +31,7 @@ const ServicesProvided = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const [activeItem, setActiveItem] = useState(null)
     const [extraData, setExtraDataa] = useState([])
-    const [vehicleType, setVehicleType] = useState(  {
+    const [vehicleType, setVehicleType] = useState({
         "created_at": "2021-11-29 08:24:07",
         "id": 3,
         "name": "Car",
@@ -39,7 +39,7 @@ const ServicesProvided = (props) => {
         "status": 1,
         "updated_at": "2021-11-29 08:24:07",
         "variant_id": 4
-      })
+    })
     // vehicle
     const [makeList, setMakeList] = React.useState([])
     const [modelList, setModelList] = React.useState([])
@@ -57,9 +57,9 @@ const ServicesProvided = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-        const formdata=new FormData()
-        
-        formdata.append("variant_data_id",vehicleType.id)
+        const formdata = new FormData()
+
+        formdata.append("variant_data_id", vehicleType.id)
         let config = {
             headers: headers,
             data: formdata,
@@ -69,7 +69,7 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log("reponse makelist",response)
+                console.log("reponse makelist", response)
                 if (response.status == true) {
                     setMakeList(response.data)
                 }
@@ -100,10 +100,11 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log("Vehicle Types",response.data)
+                console.log("Variant Data", response.data)
                 if (response.status == true) {
                     if (response.data?.length > 0) {
                         setVehicleTypes(response.data)
+                        setVehicleType(response.data[0])
                     } else {
                         setVehicleTypes([])
                     }
@@ -121,8 +122,11 @@ const ServicesProvided = (props) => {
 
     React.useEffect(() => {
         getMakeList()
-        getVariantData()
     }, [vehicleType])
+
+    useEffect(()=>{
+        getVariantData()
+    },[])
 
     React.useEffect(() => {
         if (selectedMake && selectedMake != "") {
@@ -208,13 +212,13 @@ const ServicesProvided = (props) => {
 
 
     useEffect(() => {
-        if (subService.id == 14) {
+        if (subService.id == 14||vehicle_types?.length>0) {
             filterServices()
         }
     }, [vehicleType, itemListMaster])
 
     useEffect(() => {
-        if (subService.id == 14) {
+        if (subService.id == 14||vehicle_types?.length>0) {
             filterServices()
         }
         getServiceItems()
@@ -246,7 +250,7 @@ const ServicesProvided = (props) => {
                     setLoading(false)
                     setItemList([...response.data])
                     setItemListMaster([...response.data])
-                    if (subService.id == 14) {
+                    if (subService.id == 14||vehicle_types?.length>0) {
                         filterServices()
                     }
                 }
@@ -451,10 +455,10 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    {subService.id == 14 && activeItem == null && <View style={{}}>
+                    {(subService.id == 14 && activeItem == null) ? <View style={{}}>
                         <DropDown
                             title="Vehicle Type"
-                            item={vehicle_types.map(x=>x.name)}
+                            item={vehicle_types.map(x => x.name)}
                             value={vehicleType.name}
                             onChangeValue={(index, value) => onChangeVehicleType(vehicle_types[index])}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
@@ -501,7 +505,20 @@ const ServicesProvided = (props) => {
                                 />
                             </View>
                         </View>
-                    </View>}
+                    </View> :
+                        <View style={{maxHeight:60}}>
+                        <ScrollView showsHorizontalScrollIndicator={false} horizontal >
+                        {vehicle_types.map(x=>{
+                            let isSelected=vehicleType.id==x.id
+                            return(
+                            <TouchableOpacity onPress={()=>setVehicleType(x)} style={{marginLeft:10,backgroundColor:isSelected?LS_COLORS.global.green:"white",borderColor:LS_COLORS.global.green,padding:5,margin:5,borderWidth:1,borderRadius:10}}>
+                                <Text style={{color:isSelected?"white":"black",fontFamily:LS_FONTS.PoppinsRegular}}>{x.name}</Text>
+                            </TouchableOpacity>
+                            )
+                        })}
+                        </ScrollView>
+                        </View>
+                    }
                     <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
                     <Container>
                         <Content>

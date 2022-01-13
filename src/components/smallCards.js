@@ -22,9 +22,9 @@ const SmallCards = props => {
                     resizeMode="cover"
                 />
             </View>
-            <View style={{height:"25%" ,justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row',alignContent:'center' }}>
-                <Text style={styles.text}>{props.title1}</Text>
-                <TouchableOpacity style = {{height:50,width:23,justifyContent:"center",alignItems:"center",right:3}} onPress={props.favorite}>
+            <View style={{height:"25%" ,justifyContent: 'space-between', alignItems: 'center',paddingHorizontal:3, flexDirection: 'row',alignContent:'center' }}>
+                <Text style={[styles.text,{flex:1}]} numberOfLines={2}>{props.title1}</Text>
+                <TouchableOpacity style = {{height:50,width:23,justifyContent:"center",alignItems:"center"}} onPress={props.favorite}>
                     {props.favStatus == 1 ?
                         <Image
                             style={{ height: 20, width: 22,resizeMode:'contain' }}
@@ -63,10 +63,8 @@ const styles = StyleSheet.create({
         margin: '1%'
     },
     text: {
-        textAlign: 'center',
         fontSize: 10,
         fontFamily: LS_FONTS.PoppinsMedium,
-        left: 3
     },
     room: {
         height: '100%',
