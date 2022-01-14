@@ -44,6 +44,7 @@ export default function OrderDetailUpdateCustomer(props) {
     const [cancelSearchModal, setCancelSearcHModal] = React.useState(false)
     const [virtualdata, setVirtualData] = React.useState({})
     const [reorderModal, setReorderModal] = React.useState(false)
+    const [fromAddress, setFromAddress] = useState("")
     const [itemData,setItemData]=React.useState({})
     const [cancelOrderText, setCancelOrderText] = React.useState("Remaining cancellation requests: 10")
     const [textShowWithRed, settextShowWithRed] = React.useState("")

@@ -41,7 +41,6 @@ const Mechanics = (props) => {
     const [selectedItems, setSelectedItems] = useState([])
     const [selectedItemsWithProviders, setSelectedItemsWithProviders] = useState([])
     const [selectedProducts, setSelectedProducts] = useState([])
-
     const [apiData, setApiData] = useState([])
 
     //    #liahs
@@ -154,7 +153,7 @@ const Mechanics = (props) => {
             endPoint: '/api/providerListOrder',
             type: 'post'
         }
-        console.log("Check", JSON.stringify({ ...data, ...rangeData }))
+        console.log(JSON.stringify({ ...data, ...rangeData }))
         getApi(config)
             .then((response) => {
                 console.log(response, "response")
@@ -215,6 +214,7 @@ const Mechanics = (props) => {
         formdata.append("order_from_lat", data.order_from_lat.toString())
         formdata.append("order_from_long", data.order_from_long.toString())
         formdata.append("timezone", RNLocalize.getTimeZone())
+        formdata.append("mile_distance",data.mile_distance)
         if (continuous_order) {
             formdata.append("continuous_order", continuous_order)
         }
@@ -532,7 +532,6 @@ const Mechanics = (props) => {
                                             }
                                             let service_id = i.service_item_id
                                             let extra = extraData.find(x => x.parent_id == service_id)
-                                            console.log("Extra Fuck", extra)
                                             return (
                                                 <>
                                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>

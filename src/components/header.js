@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Image, Touchable, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Text, Image, Pressable, TouchableOpacity } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -13,18 +13,18 @@ const Header = (props) => {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.leftView}
+            <Pressable style={styles.leftView}
                 onPress={props.action}
                 activeOpacity={0.7}>
                 <Image
                     style={{ height: '80%', width: '80%', resizeMode: 'contain' }}
                     source={props.imageUrl}
                 />
-            </TouchableOpacity>
+            </Pressable>
             <View style={styles.middleView}>
                 <Text style={[styles.title, props.titleStyle]}>{props.title}</Text>
             </View>
-            <TouchableOpacity style={styles.rightView}
+            <Pressable style={styles.rightView}
                 onPress={()=>{
                     if(props.action1){
                         console.log(props.action1)
@@ -38,7 +38,7 @@ const Header = (props) => {
                     style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "black" }, props.imageStyle1]}
                     source={props.imageUrl1}
                 />
-            </TouchableOpacity>
+            </Pressable>
         </View>
     )
 }
@@ -46,32 +46,32 @@ const Header = (props) => {
 export function ChatHeader(props) {
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.leftView}
+            <Pressable style={styles.leftView}
                 onPress={props.action}
                 activeOpacity={0.7}>
                 <Image
                     style={{ height: '80%', width: '80%', resizeMode: 'contain' }}
                     source={props.imageUrl}
                 />
-            </TouchableOpacity>
+            </Pressable>
             <View style={[styles.middleView, { flexDirection: "row" ,justifyContent:"center",alignItems:"center"}]}>
                 <Text style={[styles.title, props.titleStyle]}>{props.title}</Text>
-                {props.show_i&&<TouchableOpacity onPress={()=>{
+                {props.show_i&&<Pressable onPress={()=>{
                     if(props?.showList){
                         props.showList()
                     }
                 }} style={{ borderWidth: 1, height: 20, borderRadius: 50,marginLeft:5, width: 20, justifyContent: "center", alignItems: "center" }}>
                     <Text style={[styles.title,{fontSize:12,textTransform:"lowercase"}]}>i</Text>
-                </TouchableOpacity>}
+                </Pressable>}
             </View>
-            <TouchableOpacity style={styles.rightView}
+            <Pressable style={styles.rightView}
                 onPress={props.action1}
                 activeOpacity={0.7}>
                 <Image
                     style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "black" }, props.imageStyle1]}
                     source={props.imageUrl1}
                 />
-            </TouchableOpacity>
+            </Pressable>
         </View>
     )
 }

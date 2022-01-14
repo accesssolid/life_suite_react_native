@@ -365,10 +365,11 @@ const ScheduleTime = (props) => {
 
                                 if (isFrame) {
                                     backgroundColor = LS_COLORS.global.green
+                               
                                     textColor = "white"
                                 }
                                 if (isOrderAvailable) {
-                                    backgroundColor = "green"
+                                    backgroundColor = "#c8e9a2"
                                     textColor = "white"
                                 }
                                 let isPartiall = isPartiallFunc(date.dateString)

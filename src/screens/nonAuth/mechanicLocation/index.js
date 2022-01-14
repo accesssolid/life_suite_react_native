@@ -105,6 +105,22 @@ const MechanicLocation = (props) => {
 
     }, [isLoadCurrentLocation])
 
+    var rad = function(x) {
+        return x * Math.PI / 180;
+      };
+      
+      var getDistance = function(p1, p2) {
+        var R = 6378137; // Earth’s mean radius in meter
+        var dLat = rad(p2.latitude - p1.latitude);
+        var dLong = rad(p2.longitude - p1.longitude);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(rad(p1.latitude)) * Math.cos(rad(p2.latitude)) *
+          Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return d*0.000621371; // returns the distance in meter
+      };
+
     const getLocationPermission = async () => {
         let hasLocationPermission = false
         if (Platform.OS == "ios") {
@@ -208,6 +224,23 @@ const MechanicLocation = (props) => {
 
             })
     }
+    const [total_distance,setTotalDistance]=React.useState(0)
+    React.useEffect(() => {
+        fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyBtDBhUzqiZRbcFQezVwgfB9I6Wr4TkJkE`).then(res => {
+
+            return res.json()
+        }).then(res => {
+            if (res?.rows[0]) {
+                let element = res.rows[0].elements[0]
+                if(element?.distance?.value){
+                    setTotalDistance(element?.distance?.value*0.000621371)
+                }
+               console.log("Element",element)
+            }
+        }).catch(err => {
+            console.error(err)
+        })
+    }, [toCoordinates, fromCoordinates])
 
     const submit = () => {
         if (reorder) {
@@ -248,8 +281,10 @@ const MechanicLocation = (props) => {
             "order_end_time": moment(date).format("YYYY-MM-DD") + " " + moment(endTime).format('HH:mm') + ":00",
             "order_from_lat": fromCoordinates.latitude,
             "order_from_long": fromCoordinates.longitude,
-            "order_from_address": fromAddress
+            "order_from_address": fromAddress,
+            "mile_distance":total_distance
         }
+        
         if (subService.location_type == 2 && data.order_placed_address.trim() == "") {
             showToast("Please add to address")
         } else if (data.order_from_address.trim() == "") {

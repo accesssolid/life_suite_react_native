@@ -113,14 +113,18 @@ const HomeScreen = (props) => {
                 if (response.status == true) {
                     dispatch(setServices({ data: [...response.data] }))
                     setItems([...response.data])
-                    setLoading(false)
+                    
                 }
                 else {
                     // showToast(response.message, 'danger')
-                    setLoading(false)
+                    
                 }
             }).catch(err => {
-                setLoading(false)
+                
+            }).finally(()=>{
+                setTimeout(()=>{
+                    setLoading(false)
+                },1500)
             })
     }
 
@@ -144,18 +148,24 @@ const HomeScreen = (props) => {
                 .then((response) => {
                     console.log("Response===>>>", response)
                     if (response.status == true) {
-                        setLoading(false)
+                      
                     }
                     else {
                         showToast(response.message, 'danger')
-                        setLoading(false)
+                      
                     }
                 }).catch(err => {
                     console.log("error", err)
-                    setLoading(false)
+                   
+                }).finally(()=>{
+                    setTimeout(()=>{
+                        setLoading(false)
+                    },1500)
+                   
                 })
         } catch (err) {
             console.log("Error", err)
+            setLoading(false)
         }
 
     }
