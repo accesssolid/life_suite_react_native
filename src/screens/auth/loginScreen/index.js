@@ -24,6 +24,7 @@ import messaging from '@react-native-firebase/messaging';
 /* Icons */
 import Entypo from 'react-native-vector-icons/Entypo'
 import { CommonActions } from '@react-navigation/native';
+import * as RNLocalize from "react-native-localize";
 
 const LoginScreen = (props) => {
     const [fcmToken, setFcmToken] = useState("")
@@ -70,6 +71,7 @@ const LoginScreen = (props) => {
             "fcm_token": fcmToken,
             device_id: getUniqueId(),
             login_type: "biometric",
+            timezone:RNLocalize.getTimeZone()
         }
         let config = {
             headers: headers,
