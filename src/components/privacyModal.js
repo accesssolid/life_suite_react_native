@@ -25,14 +25,20 @@ const PrivacyModal = (props) => {
 
     const getPrivacy = () => {
         let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${access_token}`
+            // Accept: "application/json",
+            // "Content-Type": "application/json",
+            // "Authorization": `Bearer ${access_token}`
         }
-
+        let formdata= new FormData()
+        if(props.type){
+            formdata.append("type",props.type)
+        }else{
+            formdata.append("type","customer")
+        }
         let config = {
             headers: headers,
             endPoint: '/api/privacyPolicy',
+            data:formdata,
             type: 'post'
         }
 

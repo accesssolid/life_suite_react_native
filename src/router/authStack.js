@@ -12,7 +12,7 @@ import SignUpScreen from '../screens/auth/signUp';
 import VerificationCode from '../screens/auth/verificationScreen';
 import OtpScreen from '../screens/nonAuth/otpScreen';
 import ResetPassword from '../screens/auth/resetPassword';
-
+import CovidScreen from '../screens/auth/CovidScreen';
 const Stack = createStackNavigator();
 
 const AuthStack = () => {
@@ -25,6 +25,8 @@ const AuthStack = () => {
             <Stack.Screen name="OtpScreen" component={OtpScreen} />
             <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
+            <Stack.Screen name="CovidScreen" component={CovidScreen} />
+
         </Stack.Navigator>
     )
 }

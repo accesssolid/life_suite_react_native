@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, ImageBackground } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -13,15 +13,17 @@ import { CheckBox } from 'react-native-elements';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 /* Components */
-import CustomTextInput from '../../../components/customTextInput';
+import { CustomTextInput } from '../../../components/customTextInput';
 import CustomButton from '../../../components/customButton';
 import Loader from "../../../components/loader"
 import { showToast } from '../../../components/validators';
 import { getApi } from '../../../api/api';
-import DropDown from '../../../components/dropDown';
+import { DropDown } from '../../../components/dropDown';
 import { setUserRole } from '../../../redux/features/loginReducer';
 import SearchableDropDown from '../../../components/searchableDropDown';
-
+import { role as roles } from '../../../constants/globals';
+import TermsModal from '../../../components/termsModal';
+import PrivacyModal from '../../../components/privacyModal';
 /* Icons */
 import Entypo from 'react-native-vector-icons/Entypo'
 
@@ -67,7 +69,7 @@ const getKeyName = (key) => {
             return "Zip code"
     }
 }
-
+const m_filed_text = ["Agree to terms and conditions.", "Agree to privacy policy", "Agree to CDC guidelines."]
 const SignUpScreen = (props) => {
     const dispatch = useDispatch()
     const fnameRef = useRef(null)
@@ -121,6 +123,8 @@ const SignUpScreen = (props) => {
     const [isPassVisible, setIsPassVisible] = useState(false)
     const [isConfPassVisible, setIsConfPassVisible] = useState(false)
 
+    const [openPrivacyModal, setOpenPrivacyModal] = useState(false)
+    const [openTermsModal, setOpenTermsModal] = useState(false)
     useEffect(() => {
         setLoader(false)
     }, [])
@@ -173,7 +177,35 @@ const SignUpScreen = (props) => {
         lon: '',
     })
 
+    // for privacy policy checkbox and terms and conditions and cdc
+    const [m_field, setMField] = React.useState([])
+    // certifications
+    const [certs, setCerts] = React.useState([0])
+    const getMandototyFiled = async () => {
+        try {
+
+            let headers = {
+                "Content-Type": "application/json"
+            }
+
+            let config = {
+                headers: headers,
+                data: JSON.stringify({}),
+                endPoint: '/api/handleFlagsList',
+                type: 'post'
+            }
+            let res = await getApi(config)
+            console.log(res)
+            if (res.status) {
+                setMField(res.data)
+            }
+        } catch (err) {
+
+        }
+    }
+
     useEffect(() => {
+        getMandototyFiled()
         if (isSameAddress) {
             setWorkAddressData({
                 ...workAddressData,
@@ -207,6 +239,7 @@ const SignUpScreen = (props) => {
     const [signUpData, setSignUpData] = useState({
         first_name: '',
         last_name: '',
+        middle_name: '',
         prefer_name: '',
         bio: '',
         email: '',
@@ -215,7 +248,11 @@ const SignUpScreen = (props) => {
         phone_number: '',
         address: [],
         device_id: getUniqueId(),
-        fcm_token: '#fcm!234'
+        fcm_token: '#fcm!234',
+        is_accept_privatepolicy: 0,
+        is_accept_cdd: 0,
+        is_accept_termscondition: 0,
+        notification_prefrence: 1
     })
 
     async function on_press_register() {
@@ -450,6 +487,8 @@ const SignUpScreen = (props) => {
             })
     }
 
+
+
     const startGetCities = (value, type) => {
         const selectedItem = dropStateDataMaster.filter(item => item.name == value)
         if (type == "home") {
@@ -482,14 +521,20 @@ const SignUpScreen = (props) => {
                     <View style={{ flex: 1, width: '100%' }}>
                         <View style={styles.textContainer}>
                             <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
-                            <Text style={{ ...styles.loginText, fontSize: 24 }}>Signup</Text>
-                            <Text style={styles.text}>Add your details to Signup</Text>
-                            <Text style={styles.text}>or</Text>
+                            <Text style={{ ...styles.loginText }}>Signup</Text>
+                            <View style={{ marginTop: 10 }}>
+                                <ImageBackground source={require("../../../assets/signup/wedding.png")} style={{ width: 100, justifyContent: "center", alignItems: "center", alignSelf: "center", height: 100 }}>
+                                    <Image source={require("../../../assets/signup/photo.png")} style={{ width: 36, height: 28 }} />
+                                </ImageBackground>
+                            </View>
+                            <Text style={styles.text}>Add Profile Picture</Text>
+                            {/* <Text style={styles.text}>or</Text>
                             <TouchableOpacity onPress={() => switchRole()} activeOpacity={0.7}>
                                 <Text style={{ ...styles.text, textDecorationLine: 'underline' }}>Signup as {role == 1 ? "Service Provider" : "Customer"}</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
                         <View style={styles.textInputContainer}>
+                            <Text style={[styles.text, { marginTop: 0, marginBottom: 30, alignSelf: "flex-start", marginLeft: 20, textTransform: "uppercase" }]}>Personal Information</Text>
                             <CustomTextInput
                                 placeholder="First Name"
                                 title="First Name"
@@ -497,6 +542,18 @@ const SignUpScreen = (props) => {
                                 value={signUpData.first_name}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, first_name: text })
+                                }}
+                                inputRef={fnameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => lnameRef.current.focus()}
+                            />
+                            <CustomTextInput
+                                placeholder="Middle Name"
+                                title="Middle Name"
+
+                                value={signUpData.middle_name}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, middle_name: text })
                                 }}
                                 inputRef={fnameRef}
                                 returnKeyType="next"
@@ -525,10 +582,77 @@ const SignUpScreen = (props) => {
                                 returnKeyType="next"
                                 onSubmitEditing={() => bioRef.current.focus()}
                             />
+                            <CustomTextInput
+                                placeholder="mm/dd/yyyy"
+                                title="Date of birth"
+                                value={signUpData.dob}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, dob: text })
+                                }}
+                                inputRef={prefNameRef}
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => bioRef.current.focus()}
+                            />
+                            <CustomTextInput
+                                placeholder="Phone Number"
+                                title="Phone Number"
+                                required
+                                value={signUpData.phone_number}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, phone_number: formatPhoneNumber(text) })
+                                }}
+                                keyboardType='numeric'
+                                inputRef={phoneRef}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                returnKeyLabel="next"
+                                containerStyle={{ marginBottom: role !== 1 ? 0 : 30 }}
+                                maxLength={12}
+                                onSubmitEditing={() => {
+                                    setAddHomeAddressActive(true), setTimeout(() => {
+                                        homeAddressRef.current.focus()
+                                    }, 250)
+                                }}
+                            />
+                            {role !== 1 &&
+                                <View style={{ flexDirection: 'row', marginBottom: 30, alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
+                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
+                                    <CheckBox
+                                        style={{}}
+                                        containerStyle={{ width: 25 }}
+                                        wrapperStyle={{}}
+                                        checked={isSameAddress}
+                                        onPress={() => setIsSameAddress(!isSameAddress)}
+                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                    />
+                                </View>
+                            }
+                            {role !== 1 && <CustomTextInput
+                                placeholder="Preferred Name"
+                                title="Tag Line (Optional)"
+                                value={signUpData.prefer_name}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, prefer_name: text })
+                                }}
+                                inputRef={prefNameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => bioRef.current.focus()}
+                            />}
+                            {role !== 1 && <CustomTextInput
+                                placeholder="Preferred Name"
+                                title="Driver Licence # State ID # State"
+                                value={signUpData.prefer_name}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, prefer_name: text })
+                                }}
+                                inputRef={prefNameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => bioRef.current.focus()}
+                            />}
                             {role !== 1 && <CustomTextInput
                                 inputRef={bioRef}
                                 placeholder="Bio..."
-                                title="Bio"
+                                title="Bio (Optional)"
                                 value={signUpData.bio}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, bio: text })
@@ -557,6 +681,204 @@ const SignUpScreen = (props) => {
                                 keyboardType="email-address"
                                 onSubmitEditing={() => passRef.current.focus()}
                             />
+                            <View style={{ position: "relative", borderWidth: 1, marginBottom: role !== 1 ? 0 : 30, marginHorizontal: 10, borderColor: LS_COLORS.global.lightTextColor, borderRadius: 7 }}>
+                                <Text style={{
+                                    fontFamily: LS_FONTS.PoppinsRegular,
+                                    marginHorizontal: 20,
+                                    marginBottom: 5,
+                                    fontSize: 12, color: LS_COLORS.global.lightTextColor,
+                                    // color: LS_COLORS.global.black,
+                                    marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white",
+                                    zIndex: 1000
+
+                                }}>
+                                    {role == 1 ? 'Home' : 'Permanent'} Address{role == 1 ? '' : "*"}
+                                </Text>
+                                <GooglePlacesAutocomplete
+                                    ref={homeAddressRef}
+                                    styles={{
+                                        container: {
+                                            width: '100%',
+                                            backgroundColor: LS_COLORS.global.white,
+                                            borderRadius: 28,
+                                            // alignSelf: 'center',
+                                            fontSize: 14,
+                                            fontFamily: LS_FONTS.PoppinsRegular,
+                                            paddingTop: 5,
+                                            // paddingHorizontal: '10%',
+                                            maxHeight: 200
+                                        },
+                                        textInput: {
+                                            backgroundColor: LS_COLORS.global.white,
+                                            color: LS_COLORS.global.black,
+
+                                        },
+                                        listView: { paddingVertical: 5 },
+                                        separator: {}
+                                    }}
+                                    // placeholder={`${role == 1 ? 'Home' : 'Permanent'} address${role == 1 ? '' : "*"}`}
+                                    fetchDetails={true}
+                                    onPress={(data, details) => {
+                                        setHomeAddressData({
+                                            ...homeAddressData,
+                                            address_line_1: data.description,
+                                            lat: details.geometry.location.lat,
+                                            lon: details.geometry.location.lng
+                                        })
+                                    }}
+                                    textInputProps={{
+                                        onSubmitEditing: () => workAddressRef.current.focus(),
+                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                    }}
+                                    query={{
+                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        language: 'en',
+                                    }}
+                                />
+
+                            </View>
+                            {role !== 1 &&
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
+                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Provide service only at my address</Text>
+                                    <CheckBox
+                                        style={{}}
+                                        containerStyle={{ width: 25, marginBottom: 0 }}
+                                        wrapperStyle={{}}
+                                        checked={isSameAddress}
+                                        onPress={() => setIsSameAddress(!isSameAddress)}
+                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                    />
+                                </View>
+                            }
+                            {role !== 1 &&
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 30, marginHorizontal: 10, justifyContent: "space-between" }}>
+                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make address public</Text>
+                                    <CheckBox
+                                        style={{}}
+                                        containerStyle={{ width: 25, marginTop: 0 }}
+                                        wrapperStyle={{}}
+                                        checked={isSameAddress}
+                                        onPress={() => setIsSameAddress(!isSameAddress)}
+                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                    />
+                                </View>
+                            }
+                            <View style={{ position: "relative", borderWidth: 1, marginBottom: 0, marginHorizontal: 10, borderColor: LS_COLORS.global.lightTextColor, borderRadius: 7 }}>
+                                {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%' }}> */}
+                                <Text style={{
+                                    fontFamily: LS_FONTS.PoppinsRegular,
+                                    marginHorizontal: 20,
+                                    marginBottom: 5,
+                                    fontSize: 12, color: LS_COLORS.global.lightTextColor,
+                                    // color: LS_COLORS.global.black,
+                                    marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white",
+                                    zIndex: 1000
+
+                                }}>
+                                    {role == 1 ? 'Work' : 'Mailing'} Address{role == 1 ? '' : "*"}
+                                </Text>
+
+                                {/* </View> */}
+
+                                <GooglePlacesAutocomplete
+                                    ref={workAddressRef}
+                                    styles={{
+                                        container: {
+                                            width: '100%',
+                                            backgroundColor: LS_COLORS.global.white,
+                                            borderRadius: 28,
+                                            // alignSelf: 'center',
+                                            fontSize: 14,
+                                            fontFamily: LS_FONTS.PoppinsRegular,
+                                            paddingTop: 5,
+                                            // paddingHorizontal: '10%',
+                                            maxHeight: 200
+                                        },
+                                        textInput: {
+                                            backgroundColor: LS_COLORS.global.white,
+                                            color: LS_COLORS.global.black,
+                                        },
+                                        listView: { paddingVertical: 5 },
+                                        separator: {}
+                                    }}
+                                    // placeholder={`${role == 1 ? 'Work' : 'Mailing'} Address${role == 1 ? '' : "*"}`}
+                                    fetchDetails={true}
+                                    onPress={(data, details) => {
+                                        setWorkAddressData({
+                                            ...workAddressData,
+                                            address_line_1: data.description,
+                                            lat: details.geometry.location.lat,
+                                            lon: details.geometry.location.lng
+                                        })
+                                    }}
+                                    textInputProps={{
+                                        editable: !isSameAddress,
+                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                    }}
+                                    query={{
+                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        language: 'en',
+                                    }}
+                                />
+
+                            </View>
+                            <View style={{ flexDirection: 'row', marginBottom: 30, alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
+                                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Same as above</Text>
+                                <CheckBox
+                                    style={{}}
+                                    containerStyle={{ width: 25 }}
+                                    wrapperStyle={{}}
+                                    checked={isSameAddress}
+                                    onPress={() => setIsSameAddress(!isSameAddress)}
+                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                />
+                            </View>
+                            {role !== 1 &&
+                                <>
+                                    {certs.map(x => <CustomTextInput
+                                        // placeholder="Preferred Name"
+                                        title="Certifications"
+                                    // value={signUpData.prefer_name}
+                                    // onChangeText={(text) => {
+                                    //     setSignUpData({ ...signUpData, prefer_name: text })
+                                    // }}
+                                    // inputRef={prefNameRef}
+                                    // returnKeyType="next"
+                                    // onSubmitEditing={() => bioRef.current.focus()}
+                                    />)}
+                                    <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: "100%", marginBottom: 30 }} resizeMode="contain" />
+                                </>
+                            }
+                            {role !== 1 &&
+                                <CustomTextInput
+                                    // placeholder="Preferred Name"
+                                    title="Experience"
+
+                                />}
+                            <View style={{}}>
+                                <DropDown
+                                    title="Notification type"
+                                    item={["Email", "Push Notification", "Text", "All"]}
+                                    value={"Email"}
+                                // onChangeValue={(index, value) => { setNotificationType(value) }}
+                                // containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                // dropdownStyle={{ height: 120 }}
+                                />
+                                {/* } */}
+                            </View>
+                            {role !== 1 &&
+                                <View style={{ marginBottom: 30 ,marginHorizontal:10}}>
+                                    <Text style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
+                                    <View style={{ flexDirection: "row", flexWrap: "wrap" ,marginTop:10}}>
+                                        <View style={{ height: 100,borderRadius:5, width: 100,justifyContent:"center",alignItems:"center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='contain' source={require("../../../assets/signup/photo.png")} style={{height:70,width:70}} />
+                                        </View>
+                                    </View>
+                                </View>
+                            }
                             <CustomTextInput
                                 placeholder="Password"
                                 title="Password"
@@ -587,323 +909,47 @@ const SignUpScreen = (props) => {
                                 inlineImageLeft={<Entypo name={!isConfPassVisible ? "eye" : 'eye-with-line'} size={18} />}
                                 onLeftPress={() => setIsConfPassVisible(state => !state)}
                             />
-                            <CustomTextInput
-                                placeholder="Phone Number"
-                                title="Phone Number"
-                                required
-                                value={signUpData.phone_number}
-                                onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, phone_number: formatPhoneNumber(text) })
-                                }}
-                                keyboardType='numeric'
-                                inputRef={phoneRef}
-                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
-                                returnKeyLabel="next"
-                                maxLength={12}
-                                onSubmitEditing={() => {
-                                    setAddHomeAddressActive(true), setTimeout(() => {
-                                        homeAddressRef.current.focus()
-                                    }, 250)
-                                }}
-                            />
-                            <View style={{}}>
-                                <Text style={{
-                                    fontFamily: LS_FONTS.PoppinsMedium,
-                                    marginHorizontal: '10%',
-                                    marginBottom: 5,
-                                    color: LS_COLORS.global.black
-                                }}>
-                                    {role == 1 ? 'Home' : 'Permanent'} Address{role == 1 ? '' : "*"}
-                                </Text>
-                                <GooglePlacesAutocomplete
-                                    ref={homeAddressRef}
-                                    styles={{
-                                        container: {
-                                            width: '80%',
-                                            backgroundColor: LS_COLORS.global.lightGrey,
-                                            borderRadius: 28,
-                                            alignSelf: 'center',
-                                            fontSize: 14,
-                                            fontFamily: LS_FONTS.PoppinsRegular,
-                                            paddingTop: 5,
-                                            paddingHorizontal: '10%',
-                                            maxHeight: 200
-                                        },
-                                        textInput: {
-                                            backgroundColor: LS_COLORS.global.lightGrey,
-                                            color: LS_COLORS.global.black,
-
-                                        },
-                                        listView: { paddingVertical: 5 },
-                                        separator: {}
-                                    }}
-                                    placeholder={`${role == 1 ? 'Home' : 'Permanent'} address${role == 1 ? '' : "*"}`}
-                                    fetchDetails={true}
-                                    onPress={(data, details) => {
-                                        setHomeAddressData({
-                                            ...homeAddressData,
-                                            address_line_1: data.description,
-                                            lat: details.geometry.location.lat,
-                                            lon: details.geometry.location.lng
-                                        })
-                                    }}
-                                    textInputProps={{
-                                        onSubmitEditing: () => workAddressRef.current.focus(),
-                                        placeholderTextColor: LS_COLORS.global.placeholder
-                                    }}
-                                    query={{
-                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
-                                        language: 'en',
-                                    }}
-                                />
-                                {/* {
-                                    !addHomeAddressActive
-                                        ?
-                                        <TouchableOpacity
-                                            activeOpacity={0.7}
-                                            onPress={() => { setAddHomeAddressActive(!addHomeAddressActive) }}
-                                            style={{ flexDirection: "row", marginBottom: 15, marginLeft: '12%', alignItems: 'center' }}>
-                                            <Image
-                                                style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                source={require("../../../assets/plus.png")}
-                                            />
-                                            <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {role == 1 ? 'HOME' : 'PERMANENT'} ADDRESS{role == 1 ? '' : "*"}</Text>
-                                        </TouchableOpacity>
-                                        :
-                                        <>
-                                            <TouchableOpacity
-                                                activeOpacity={0.7}
-                                                onPress={() => { setAddHomeAddressActive(!addHomeAddressActive) }}
-                                                style={{ flexDirection: "row", marginBottom: 15, marginLeft: '12%', alignItems: 'center' }}>
-                                                <Image
-                                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                    source={require("../../../assets/plus.png")}
-                                                />
-                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {role == 1 ? 'HOME' : 'PERMANENT'} ADDRESS{role == 1 ? '' : "*"}</Text>
-                                            </TouchableOpacity>
-                                            <View style={{}}>
-                                                <CustomTextInput
-                                                    placeholder="ADDRESS LINE 1"
-                                                    value={homeAddressData.address_line_1}
-                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_1: text }) }}
-                                                    inputRef={homeAddressLine1Ref}
-                                                    returnKeyType={"next"}
-                                                    onSubmitEditing={() => homeAddressLine2Ref.current.focus()}
-                                                />
-                                                <CustomTextInput
-                                                    placeholder="ADDRESS LINE 2"
-                                                    value={homeAddressData.address_line_2}
-                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, address_line_2: text }) }}
-                                                    inputRef={homeAddressLine2Ref}
-                                                    returnKeyType={"next"}
-                                                    onSubmitEditing={() => homeAddressStateDropRef.current.show()}
-                                                />
-                                                <DropDown
-                                                    dropRef={homeAddressStateDropRef}
-                                                    item={dropStateData}
-                                                    value={dropStateValue}
-                                                    onChangeValue={(index, value) => { setDropStateValue(value), startGetCities(value, "home") }}
-                                                    containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                                    dropdownStyle={{ maxHeight: 300 }}
-                                                />
-
-                                                <SearchableDropDown
-                                                    dropRef={homeAddressCityDropRef}
-                                                    onItemSelect={(item) => {
-                                                        setDropCityValue(item.name)
-                                                        homeAddressZipRef.current.focus()
-                                                    }}
-                                                    items={dropCityDataMaster}
-                                                    onTextChange={(text) => setDropCityValue(text)}
-                                                    value={dropCityValue}
-                                                />
-
-                                                <CustomTextInput
-                                                    placeholder="Zip code"
-                                                    value={homeAddressData.zip}
-                                                    onChangeText={(text) => { setHomeAddressData({ ...homeAddressData, zip: text }) }}
-                                                    keyboardType="numeric"
-                                                    returnKeyType={Platform.OS == "ios" ? "done" : "next"}
-                                                    inputRef={homeAddressZipRef}
-                                                    onSubmitEditing={() => {
-                                                        setAddWorkAddressActive(true), setTimeout(() => {
-                                                            workAddressLine1Ref.current.focus()
-                                                        }, 250)
-                                                    }}
-                                                />
-                                            </View>
-                                        </>
-                                } */}
-                            </View>
-                            <View style={{ marginTop: 10, marginBottom: 25 }}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%' }}>
-                                    <Text style={{
-                                        fontFamily: LS_FONTS.PoppinsMedium,
-                                        marginHorizontal: '10%',
-                                        color: LS_COLORS.global.black
-                                    }}>
-                                        {role == 1 ? 'Work' : 'Mailing'} Address{role == 1 ? '' : "*"}
-                                    </Text>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <CheckBox
-                                            style={{}}
-                                            containerStyle={{ width: 25 }}
-                                            wrapperStyle={{}}
-                                            checked={isSameAddress}
-                                            onPress={() => setIsSameAddress(!isSameAddress)}
-                                            checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
-                                            uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
-                                        />
-                                        <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same address</Text>
-                                    </View>
-                                </View>
-
-                                <GooglePlacesAutocomplete
-                                    ref={workAddressRef}
-                                    styles={{
-                                        container: {
-                                            width: '80%',
-                                            backgroundColor: LS_COLORS.global.lightGrey,
-                                            borderRadius: 28,
-                                            alignSelf: 'center',
-                                            fontSize: 14,
-                                            fontFamily: LS_FONTS.PoppinsRegular,
-                                            paddingTop: 5,
-                                            paddingHorizontal: '10%',
-                                            maxHeight: 200
-                                        },
-                                        textInput: {
-                                            backgroundColor: LS_COLORS.global.lightGrey,
-                                            color: LS_COLORS.global.black,
-                                        },
-                                        listView: { paddingVertical: 5 },
-                                        separator: {}
-                                    }}
-                                    placeholder={`${role == 1 ? 'Work' : 'Mailing'} Address${role == 1 ? '' : "*"}`}
-                                    fetchDetails={true}
-                                    onPress={(data, details) => {
-                                        setWorkAddressData({
-                                            ...workAddressData,
-                                            address_line_1: data.description,
-                                            lat: details.geometry.location.lat,
-                                            lon: details.geometry.location.lng
-                                        })
-                                    }}
-                                    textInputProps={{
-                                        editable: !isSameAddress,
-                                        placeholderTextColor: LS_COLORS.global.placeholder
-                                    }}
-                                    query={{
-                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
-                                        language: 'en',
-                                    }}
-                                />
-                                {/* {
-                                    !addWorkAddressActive
-                                        ?
-                                        <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '12%', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <TouchableOpacity
-                                                activeOpacity={0.7}
-                                                onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
-                                                style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <Image
-                                                    style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                    source={require("../../../assets/plus.png")}
-                                                />
-                                                <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {role == 1 ? 'WORK' : 'MAILING'} ADDRESS{role == 1 ? '' : "*"}</Text>
-                                            </TouchableOpacity>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <CheckBox
-                                                    style={{}}
-                                                    containerStyle={{ width: 25 }}
-                                                    wrapperStyle={{}}
-                                                    checked={isSameAddress}
-                                                    onPress={() => setIsSameAddress(!isSameAddress)}
-                                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
-                                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
-                                                />
-                                                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 5 }}>Same address</Text>
-                                            </View>
-                                        </View>
-                                        :
-                                        <>
-                                            <View style={{ flexDirection: "row", marginBottom: 15, marginHorizontal: '12%', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                <TouchableOpacity
-                                                    activeOpacity={0.7}
-                                                    onPress={() => setAddWorkAddressActive(!addWorkAddressActive)}
-                                                    style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Image
-                                                        style={{ height: 24, width: 24, resizeMode: "contain" }}
-                                                        source={require("../../../assets/plus.png")}
-                                                    />
-                                                    <Text style={{ ...styles.text2, marginLeft: 10, }}>ADD {role == 1 ? 'WORK' : 'MAILING'} ADDRESS{role == 1 ? '' : "*"}</Text>
-                                                </TouchableOpacity>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <CheckBox
-                                                        style={{}}
-                                                        containerStyle={{ width: 25 }}
-                                                        wrapperStyle={{}}
-                                                        checked={isSameAddress}
-                                                        onPress={() => setIsSameAddress(!isSameAddress)}
-                                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
-                                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
-                                                    />
-                                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, marginTop: 5 }}>Same address</Text>
-                                                </View>
-                                            </View>
-                                            <CustomTextInput
-                                                placeholder="ADDRESS LINE 1"
-                                                value={workAddressData.address_line_1}
-                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_1: text }) }}
-                                                inputRef={workAddressLine1Ref}
-                                                returnKeyType={"next"}
-                                                onSubmitEditing={() => workAddressLine2Ref.current.focus()}
-                                                editable={!isSameAddress}
-                                            />
-                                            <CustomTextInput
-                                                placeholder="ADDRESS LINE 2"
-                                                value={workAddressData.address_line_2}
-                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, address_line_2: text }) }}
-                                                inputRef={workAddressLine2Ref}
-                                                returnKeyType={"next"}
-                                                onSubmitEditing={() => workAddressStateDropRef.current.show()}
-                                                editable={!isSameAddress}
-                                            />
-                                            <DropDown
-                                                dropRef={workAddressStateDropRef}
-                                                item={dropStateData}
-                                                value={dropStateValueWork}
-                                                onChangeValue={(index, value) => { setDropStateValueWork(value), startGetCities(value, "work") }}
-                                                containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                                dropdownStyle={{ maxHeight: 300 }}
-                                                disabled={isSameAddress}
-                                            />
-                                            <SearchableDropDown
-                                                dropRef={workAddressCityDropRef}
-                                                onItemSelect={(item) => {
-                                                    setDropCityValueWork(item.name)
-                                                    workAddressZipRef.current.focus()
-                                                }}
-                                                items={dropCityDataMasterWork}
-                                                onTextChange={(text) => setDropCityValueWork(text)}
-                                                value={dropCityValueWork}
-                                                editable={!isSameAddress}
-                                            />
-                                            <CustomTextInput
-                                                placeholder="Zip code"
-                                                value={workAddressData.zip}
-                                                onChangeText={(text) => { setWorkAddressData({ ...workAddressData, zip: text }) }}
-                                                keyboardType="numeric"
-                                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
-                                                returnKeyType='done'
-                                                inputRef={workAddressZipRef}
-                                                editable={!isSameAddress}
-                                            />
-                                        </>
-                                } */}
-                            </View>
                         </View>
-                        <View style={styles.buttonContainer}>
+                        {/* terms and consiftions */}
+                        {m_field.filter(x => x.id == 1 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 }}>
+                            <CheckBox
+                                style={{}}
+                                containerStyle={{ width: 25 }}
+                                wrapperStyle={{}}
+                                checked={signUpData.is_accept_termscondition}
+                                onPress={() => setSignUpData({ ...signUpData, is_accept_termscondition: signUpData.is_accept_termscondition ? 0 : 1 })}
+                                checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                            />
+                            <Text numberOfLines={1} onPress={() => setOpenTermsModal(true)} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[0]}</Text>
+                        </View>}
+
+                        {m_field.filter(x => x.id == 2 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 }}>
+                            <CheckBox
+                                style={{}}
+                                containerStyle={{ width: 25 }}
+                                wrapperStyle={{}}
+                                checked={signUpData.is_accept_privatepolicy}
+                                onPress={() => setSignUpData({ ...signUpData, is_accept_privatepolicy: signUpData.is_accept_privatepolicy ? 0 : 1 })}
+                                checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                            />
+                            <Text numberOfLines={1} onPress={() => setOpenPrivacyModal(true)} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[1]}</Text>
+                        </View>}
+                        {m_field.filter(x => x.id == 3 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 }}>
+                            <CheckBox
+                                style={{}}
+                                containerStyle={{ width: 25 }}
+                                wrapperStyle={{}}
+                                checked={signUpData.is_accept_cdd}
+                                onPress={() => setSignUpData({ ...signUpData, is_accept_cdd: signUpData.is_accept_cdd ? 0 : 1 })}
+                                checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                            />
+                            <Text numberOfLines={1} onPress={() => props.navigation.navigate("CovidScreen")} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[2]}</Text>
+                        </View>}
+
+                        <View style={[styles.buttonContainer, { marginTop: 20 }]}>
                             <CustomButton
                                 title="Sign Up"
                                 action={() => {
@@ -923,6 +969,9 @@ const SignUpScreen = (props) => {
                 </ScrollView>
             </KeyboardAvoidingView>
             {loader == true && <Loader />}
+            <PrivacyModal isVisible={openPrivacyModal} setVisible={setOpenPrivacyModal} type={role == 1 ? "customer" : "provider"} />
+            <TermsModal isVisible={openTermsModal} setVisible={setOpenTermsModal} type={role == 1 ? "customer" : "provider"} />
+
         </SafeAreaView>
     )
 }
@@ -936,16 +985,17 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.white,
     },
     textContainer: {
-        marginTop: "20%"
+        marginTop: "5%"
     },
     loginText: {
-        fontSize: 28,
+        fontSize: 20,
         lineHeight: 42,
         textAlign: 'center',
         color: LS_COLORS.global.black,
         fontFamily: LS_FONTS.PoppinsSemiBold,
         width: '90%',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        textTransform: "uppercase"
     },
     text: {
         color: LS_COLORS.global.grey,
@@ -958,7 +1008,21 @@ const styles = StyleSheet.create({
     },
     textInputContainer: {
         marginTop: "10%",
-        width: '100%',
+        width: '90%',
+        alignSelf: "center",
+        backgroundColor: "white",
+        shadowColor: "#000",
+        paddingVertical: 10,
+        borderRadius: 10,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+
+        elevation: 5,
+
     },
     buttonContainer: {
         width: '100%'

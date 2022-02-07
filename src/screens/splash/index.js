@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Dimensions } from 'react-native'
+import { View, StyleSheet, Image, Text } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../constants/colors';
@@ -197,7 +197,7 @@ const Splash = (props) => {
     return (
         <View style={styles.container}>
             <View style={styles.logoContainer}>
-                <Image resizeMode="contain" style={styles.image} source={require('../../assets/splash/logo.png')} />
+                <Image resizeMode="contain" style={styles.image} source={require('../../assets/splash/life.png')} />
             </View>
         </View>
     )

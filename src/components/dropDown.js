@@ -11,7 +11,7 @@ import ModalDropdown from 'react-native-modal-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 
 
-const DropDown = (props) => {
+const DropDown1 = (props) => {
     return (
         <>
             {
@@ -81,7 +81,79 @@ const DropDown = (props) => {
         </>
     )
 }
-export default DropDown
+
+export const DropDown = (props) => {
+    return (
+        <View style={{position:"relative",borderWidth:1,marginBottom:30,marginHorizontal:10,borderColor:LS_COLORS.global.lightTextColor,borderRadius:7}}>
+            <View style={[styles.container,{marginHorizontal:0,marginBottom:0,borderWidth:0}, props.containerStyle]}>
+                <View style={styles.arrow}>
+                    <AntDesign name="down" color={LS_COLORS.global.green} />
+                </View>
+                {props.handleTextValue && <Text style={{
+                    fontSize: 14,
+                    height: 50,
+                    width: "100%",
+                    fontFamily: LS_FONTS.PoppinsRegular,
+                    paddingLeft: 20,
+                    textAlignVertical: "center",
+                    lineHeight: 50,
+                    left:"0%",
+                    position:"absolute",
+                }}>{props.value}</Text>}
+                <ModalDropdown
+                    ref={props.dropRef}
+                    defaultValue={props.value}
+                    isFullWidth={true}
+                    options={props.item}
+                    textStyle={{
+                        fontSize: props.handleTextValue ? 0 : 14,
+                        height: 50,
+                        width: "100%",
+                        opacity: props.handleTextValue ? 0 :1,
+                        fontFamily: LS_FONTS.PoppinsRegular,
+                        paddingLeft: 10,
+                        textAlignVertical: "center",
+                        lineHeight: 50
+                    }}
+                    dropdownTextStyle={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 12,
+                        color: LS_COLORS.global.black
+                    }}
+                    dropdownStyle={[{ borderWidth: 1 }, props.dropdownStyle]}
+                    onSelect={props.onChangeValue}
+                    showsVerticalScrollIndicator={true}
+                    disabled={props.disabled}
+                    renderRow={(item) => {
+                        return (<View style={{
+                            flexDirection: 'row',
+                            width: "100%",
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            height: 40,
+                            paddingHorizontal: '2%',
+                            backgroundColor: LS_COLORS.global.white
+                        }}>
+                            <Text style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
+                            {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}
+                        </View>)
+                    }}
+                />
+            </View>
+            {
+                props.title
+                    ?
+                    <>
+                        <Text style={[styles.title,{fontSize:12,marginTop:0,color:LS_COLORS.global.lightTextColor,marginHorizontal:10,position:"absolute",top:-10,backgroundColor:"white"}]}>{props.title}<Text style={{ color: "red" }}>{props.important && "*"}</Text></Text>
+                    </>
+                    :
+                    null
+            }
+        </View>
+    )
+}
+
+export default DropDown1
 
 
 const styles = StyleSheet.create({

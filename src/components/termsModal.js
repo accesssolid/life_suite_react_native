@@ -26,19 +26,27 @@ const TermsModal = (props) => {
 
     const getTerms = () => {
         let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${access_token}`
+            // Accept: "application/json",
+            // "Content-Type": "application/json",
+            // "Authorization": `Bearer ${access_token}`
         }
-
+        let formdata= new FormData()
+       
+        if(props.type){
+            formdata.append("type",props.type)
+        }else{
+            formdata.append("type","customer")
+        }
         let config = {
             headers: headers,
             endPoint: '/api/termsCondition',
+            data:formdata,
             type: 'post'
         }
-
+        console.log(formdata)
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     setData([response.data.text_data])
                 }
