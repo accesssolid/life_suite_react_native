@@ -425,7 +425,7 @@ const ServicesProvided = (props) => {
     return (
         <>
             <StatusBar translucent={true} backgroundColor="transparent" barStyle="light-content" />
-            <View style={{ width: '100%', height: '25%' }}>
+            <View style={{ width: '100%', height: '14%' }}>
                 <ImageBackground
                     resizeMode="cover"
                     source={{ uri: BASE_URL + subService.image }}
@@ -441,14 +441,16 @@ const ServicesProvided = (props) => {
                                         props.navigation.goBack()
                                     }
                                 }}
+                                titleStyle={{color:"white",fontSize:22}}
+                                title={subService.name}
                                 imageUrl1={require("../../../assets/homeWhite.png")}
                                 action1={() => {
                                     props.navigation.navigate("HomeScreen")
                                 }}
                             />
-                            <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
+                            {/* <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
                                 <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
-                            </View>
+                            </View> */}
                         </SafeAreaView>
                     </View>
                 </ImageBackground>

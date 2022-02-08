@@ -849,24 +849,26 @@ const ServicesProvided = (props) => {
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
-            <View style={{ width: '100%', height: '30%' }}>
+            <View style={{ width: '100%', height: '15%' }}>
                 <ImageBackground
-                    resizeMode="stretch"
+                    resizeMode="cover"
                     source={{ uri: BASE_URL + subService.image }}
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-                            <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop: StatusBar.currentHeight + 10 }}>
+                            {/* <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop: StatusBar.currentHeight + 10 }}> */}
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => onBackPress()}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => props.navigation.navigate("HomeScreen")}
+                                    title={subService.name}
+                                    titleStyle={{color:"white",fontSize:22}}
                                 />
-                            </View>
-                            <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
+                            {/* </View> */}
+                            {/* <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
                                 <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
-                            </View>
+                            </View> */}
                         </SafeAreaView>
                     </View>
                 </ImageBackground>

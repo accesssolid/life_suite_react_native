@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, ImageBackground } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, Alert, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, ImageBackground, Pressable } from 'react-native'
+import ImagePicker from 'react-native-image-crop-picker';
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -26,6 +27,8 @@ import TermsModal from '../../../components/termsModal';
 import PrivacyModal from '../../../components/privacyModal';
 /* Icons */
 import Entypo from 'react-native-vector-icons/Entypo'
+import moment from 'moment';
+import { getTimeZone } from 'react-native-localize';
 
 const getMessage = (name) => {
     switch (name) {
@@ -69,12 +72,44 @@ const getKeyName = (key) => {
             return "Zip code"
     }
 }
+const getNotificationType = (type) => {
+    switch (type) {
+        case 1:
+            return "Email"
+
+        case 2:
+            return "Push Notification"
+
+        case 3:
+            return "Text"
+
+        case 4:
+            return "All"
+    }
+}
+const getNotiPref = (text) => {
+    switch (text) {
+        case "Email":
+            return 1
+
+        case "Push Notification":
+            return 2
+
+        case "Text":
+            return 3
+
+        case "All":
+            return 4
+    }
+}
 const m_filed_text = ["Agree to terms and conditions.", "Agree to privacy policy", "Agree to CDC guidelines."]
 const SignUpScreen = (props) => {
     const dispatch = useDispatch()
     const fnameRef = useRef(null)
+    const mnameRef = useRef(null)
     const lnameRef = useRef(null)
     const prefNameRef = useRef(null)
+    const dobRef = useRef(null)
     const bioRef = useRef(null)
     const emailRef = useRef(null)
     const passRef = useRef(null)
@@ -101,6 +136,7 @@ const SignUpScreen = (props) => {
 
     const homeAddressRef = useRef(null)
     const workAddressRef = useRef(null)
+    const [notificationType, setNotificationType] = useState(getNotificationType(1))
 
     /* State Drop Down */
     const [dropStateValue, setDropStateValue] = useState("State")
@@ -180,7 +216,10 @@ const SignUpScreen = (props) => {
     // for privacy policy checkbox and terms and conditions and cdc
     const [m_field, setMField] = React.useState([])
     // certifications
-    const [certs, setCerts] = React.useState([0])
+    // profile pic
+    const [profile_pic, setProfilePic] = React.useState(null)
+    const [pictures, setPictures] = React.useState([])
+
     const getMandototyFiled = async () => {
         try {
 
@@ -252,9 +291,22 @@ const SignUpScreen = (props) => {
         is_accept_privatepolicy: 0,
         is_accept_cdd: 0,
         is_accept_termscondition: 0,
-        notification_prefrence: 1
+        notification_prefrence: 1,
+        dob: 0,
     })
 
+    const [provider_data, setProviderData] = React.useState({
+        is_same_address: 0,
+        tagline: "",
+        business_name: "",
+        mailing_address: "",
+        experience: 0,
+        phone_is_public: 0,
+        address_is_public: 0,
+        service_is_at_address: 0,
+        certificateTextData: [""],
+        license: ""
+    })
     async function on_press_register() {
         setLoader(true)
 
@@ -291,7 +343,20 @@ const SignUpScreen = (props) => {
             setLoader(false)
             return showToast("Phone number must be of 10 digits")
         }
+        var date = moment(signUpData.dob, 'MM/DD/YYYY', true)
+        if (!date.isValid()) {
+            setLoader(false)
+            return showToast("Invalid date format")
+        }
+        if (moment().diff(date, 'years') <= 18) {
+            setLoader(false)
+            return showToast("Date of birth must be higher than 18 age.")
+        }
+        // if(m_field.filter(x=>x.status=="1").length>1){
+        //     if(signUpData.is_accept_privatepolicy&&signUpData.is_accept_termscondition&&signUpData.is_accept_cdd){
 
+        //     }
+        // }
         const address = [
             {
                 "country": 231,
@@ -336,6 +401,11 @@ const SignUpScreen = (props) => {
                 }
             }
         }
+        function getFormData(object) {
+            const formData = new FormData();
+            Object.keys(object).forEach(key => formData.append(key, object[key]));
+            return formData;
+        }
 
         let user_data = {
             ...signUpData,
@@ -343,17 +413,39 @@ const SignUpScreen = (props) => {
             email: signUpData.email.toLowerCase(),
             address: JSON.stringify(address),
             phone_number: signUpData.phone_number.replace(/[^\d]/g, ""),
-            is_same_address: isSameAddress ? 1 : 0
+            is_same_address: isSameAddress ? 1 : 0,
+            dob: moment(signUpData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"),
+            notification_prefrence: getNotiPref(notificationType),
+            timezone: getTimeZone(),
+            
         }
 
+        if (profile_pic?.path) {
+            user_data.profile = {
+                uri: Platform.OS == "ios" ? profile_pic.path.replace('file:///', '') : profile_pic.path,
+                name: profile_pic.filename ? profile_pic.filename : profile_pic.path.split("/").pop(),
+                type: profile_pic.mime,
+            }
+        }
+
+        if(role!=1){
+            user_data={...user_data,...provider_data,mailing_address:signUpData.email}
+        }
+        let formdata=getFormData(user_data)
+        for(let i of pictures){
+            formdata.append("pictures[]",{
+                uri: Platform.OS == "ios" ? i.path.replace('file:///', '') : i.path,
+                name: i.filename ? i.filename : i.path.split("/").pop(),
+                type: i.mime,
+            })
+        }
         let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "multipart/form-data"
         }
-
+    
         let config = {
             headers: headers,
-            data: JSON.stringify({ ...user_data }),
+            data: formdata,
             endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
             type: 'post'
         }
@@ -376,6 +468,86 @@ const SignUpScreen = (props) => {
 
     const switchRole = () => {
         dispatch(setUserRole({ data: role == 1 ? 2 : 1 }))
+    }
+    const pickImage = () => {
+        Alert.alert(
+            "LifeSuite",
+            "Select picture using ...",
+            [
+                { text: "Cancel", onPress: () => { }, style: "cancel" },
+                {
+                    text: "Camera",
+                    onPress: () => {
+                        ImagePicker.openCamera({
+                            width: 400,
+                            height: 400,
+                            cropping: true
+                        }).then(image => {
+                            console.log(image);
+                            setProfilePic(image)
+                        }).catch(err => {
+                            console.log("Image picker error : ", err)
+                        })
+                    },
+                },
+                {
+                    text: "Gallery", onPress: () => {
+                        ImagePicker.openPicker({
+                            width: 400,
+                            height: 400,
+                            cropping: true
+                        }).then(image => {
+                            console.log(image);
+                            setProfilePic(image)
+                        }).catch(err => {
+                            console.log("Image picker error : ", err)
+                        })
+                    }
+                },
+            ]
+        );
+    }
+
+    const pickImageForGallery = () => {
+        if(pictures.length>=10){
+            return
+        }
+        Alert.alert(
+            "LifeSuite",
+            "Select picture using ...",
+            [
+                { text: "Cancel", onPress: () => { }, style: "cancel" },
+                {
+                    text: "Camera",
+                    onPress: () => {
+                        ImagePicker.openCamera({
+                            width: 400,
+                            height: 400,
+                            cropping: true
+                        }).then(image => {
+                            console.log(image);
+                            setPictures([...pictures, image])
+                        }).catch(err => {
+                            console.log("Image picker error : ", err)
+                        })
+                    },
+                },
+                {
+                    text: "Gallery", onPress: () => {
+                        ImagePicker.openPicker({
+                            width: 400,
+                            height: 400,
+                            cropping: true
+                        }).then(image => {
+                            console.log(image);
+                            setPictures([...pictures, image])
+                        }).catch(err => {
+                            console.log("Image picker error : ", err)
+                        })
+                    }
+                },
+            ]
+        );
     }
 
     const getStates = () => {
@@ -522,11 +694,14 @@ const SignUpScreen = (props) => {
                         <View style={styles.textContainer}>
                             <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
                             <Text style={{ ...styles.loginText }}>Signup</Text>
-                            <View style={{ marginTop: 10 }}>
+                            <Pressable onPress={() => pickImage()} style={{ marginTop: 10, width: 100, alignSelf: "center" }}>
                                 <ImageBackground source={require("../../../assets/signup/wedding.png")} style={{ width: 100, justifyContent: "center", alignItems: "center", alignSelf: "center", height: 100 }}>
-                                    <Image source={require("../../../assets/signup/photo.png")} style={{ width: 36, height: 28 }} />
+                                    {profile_pic?.path ?
+                                        <Image source={{ uri: profile_pic?.path }} style={{ width: 100, height: 100, borderRadius: 50 }} />
+                                        : <Image source={require("../../../assets/signup/photo.png")} style={{ width: 36, height: 28 }} />
+                                    }
                                 </ImageBackground>
-                            </View>
+                            </Pressable>
                             <Text style={styles.text}>Add Profile Picture</Text>
                             {/* <Text style={styles.text}>or</Text>
                             <TouchableOpacity onPress={() => switchRole()} activeOpacity={0.7}>
@@ -545,17 +720,16 @@ const SignUpScreen = (props) => {
                                 }}
                                 inputRef={fnameRef}
                                 returnKeyType="next"
-                                onSubmitEditing={() => lnameRef.current.focus()}
+                                onSubmitEditing={() => mnameRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Middle Name"
                                 title="Middle Name"
-
                                 value={signUpData.middle_name}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, middle_name: text })
                                 }}
-                                inputRef={fnameRef}
+                                inputRef={mnameRef}
                                 returnKeyType="next"
                                 onSubmitEditing={() => lnameRef.current.focus()}
                             />
@@ -580,38 +754,41 @@ const SignUpScreen = (props) => {
                                 }}
                                 inputRef={prefNameRef}
                                 returnKeyType="next"
-                                onSubmitEditing={() => bioRef.current.focus()}
+                                onSubmitEditing={() => dobRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="mm/dd/yyyy"
                                 title="Date of birth"
                                 value={signUpData.dob}
-                                onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, dob: text })
+                                onChangeText={(formatted, extracted) => {
+                                    setSignUpData({ ...signUpData, dob: formatted })
                                 }}
-                                inputRef={prefNameRef}
-                            // returnKeyType="next"
-                            // onSubmitEditing={() => bioRef.current.focus()}
+                                mask={"[00]/[00]/[0000]"}
+                                inputRef={dobRef}
+                                returnKeyType="next"
+                                keyboardType='numeric'
+                                onSubmitEditing={() => phoneRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Phone Number"
                                 title="Phone Number"
                                 required
+                                mask={"+1 ([000]) [000] [0000]"}
                                 value={signUpData.phone_number}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, phone_number: formatPhoneNumber(text) })
                                 }}
                                 keyboardType='numeric'
                                 inputRef={phoneRef}
-                                returnKeyType={Platform.OS == "ios" ? "done" : "next"}
-                                returnKeyLabel="next"
+                                // returnKeyType={Platform.OS == "ios" ? "done" : "next"}
+                                // returnKeyLabel="next"
                                 containerStyle={{ marginBottom: role !== 1 ? 0 : 30 }}
                                 maxLength={12}
-                                onSubmitEditing={() => {
-                                    setAddHomeAddressActive(true), setTimeout(() => {
-                                        homeAddressRef.current.focus()
-                                    }, 250)
-                                }}
+                            // onSubmitEditing={() => {
+                            // setAddHomeAddressActive(true), setTimeout(() => {
+                            //     homeAddressRef.current.focus()
+                            // }, 250)
+                            // }}
                             />
                             {role !== 1 &&
                                 <View style={{ flexDirection: 'row', marginBottom: 30, alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
@@ -620,30 +797,30 @@ const SignUpScreen = (props) => {
                                         style={{}}
                                         containerStyle={{ width: 25 }}
                                         wrapperStyle={{}}
-                                        checked={isSameAddress}
-                                        onPress={() => setIsSameAddress(!isSameAddress)}
+                                        checked={provider_data.phone_is_public}
+                                        onPress={() => setProviderData({ ...provider_data, phone_is_public: provider_data.phone_is_public ? 0 : 1 })}
                                         checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
                                 </View>
                             }
                             {role !== 1 && <CustomTextInput
-                                placeholder="Preferred Name"
+                                placeholder="Taglines"
                                 title="Tag Line (Optional)"
-                                value={signUpData.prefer_name}
+                                value={provider_data.tagline}
                                 onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, prefer_name: text })
+                                    setProviderData({ ...provider_data, tagline: text })
                                 }}
-                                inputRef={prefNameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => bioRef.current.focus()}
+                            // inputRef={prefNameRef}
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => bioRef.current.focus()}
                             />}
                             {role !== 1 && <CustomTextInput
                                 placeholder="Preferred Name"
                                 title="Driver Licence # State ID # State"
-                                value={signUpData.prefer_name}
+                                value={provider_data.license}
                                 onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, prefer_name: text })
+                                    setProviderData({ ...provider_data, license: text })
                                 }}
                                 inputRef={prefNameRef}
                                 returnKeyType="next"
@@ -677,9 +854,9 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, email: text })
                                 }}
                                 inputRef={emailRef}
-                                returnKeyType="next"
+                                // returnKeyType="next"
                                 keyboardType="email-address"
-                                onSubmitEditing={() => passRef.current.focus()}
+                            // onSubmitEditing={() => passRef.current.focus()}
                             />
                             <View style={{ position: "relative", borderWidth: 1, marginBottom: role !== 1 ? 0 : 30, marginHorizontal: 10, borderColor: LS_COLORS.global.lightTextColor, borderRadius: 7 }}>
                                 <Text style={{
@@ -744,8 +921,8 @@ const SignUpScreen = (props) => {
                                         style={{}}
                                         containerStyle={{ width: 25, marginBottom: 0 }}
                                         wrapperStyle={{}}
-                                        checked={isSameAddress}
-                                        onPress={() => setIsSameAddress(!isSameAddress)}
+                                        checked={provider_data.service_is_at_address}
+                                        onPress={() => setProviderData({ ...provider_data, service_is_at_address: provider_data.service_is_at_address ? 0 : 1 })}
                                         checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
@@ -758,8 +935,8 @@ const SignUpScreen = (props) => {
                                         style={{}}
                                         containerStyle={{ width: 25, marginTop: 0 }}
                                         wrapperStyle={{}}
-                                        checked={isSameAddress}
-                                        onPress={() => setIsSameAddress(!isSameAddress)}
+                                        checked={provider_data.address_is_public}
+                                        onPress={() => setProviderData({ ...provider_data, address_is_public: provider_data.address_is_public ? 0 : 1 })}
                                         checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
@@ -838,43 +1015,64 @@ const SignUpScreen = (props) => {
                             </View>
                             {role !== 1 &&
                                 <>
-                                    {certs.map(x => <CustomTextInput
+                                    {provider_data?.certificateTextData?.map((x, i) => <CustomTextInput
                                         // placeholder="Preferred Name"
                                         title="Certifications"
-                                    // value={signUpData.prefer_name}
-                                    // onChangeText={(text) => {
-                                    //     setSignUpData({ ...signUpData, prefer_name: text })
-                                    // }}
+                                        value={x}
+                                        onChangeText={(text) => {
+                                            let v = [...provider_data.certificateTextData]
+                                            v[i] = text
+                                            setProviderData({ ...provider_data, certificateTextData: v })
+                                        }}
                                     // inputRef={prefNameRef}
                                     // returnKeyType="next"
                                     // onSubmitEditing={() => bioRef.current.focus()}
                                     />)}
-                                    <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: "100%", marginBottom: 30 }} resizeMode="contain" />
+                                    <Pressable onPress={() => {
+                                        if (provider_data.certificateTextData.length < 5) {
+                                            setProviderData({ ...provider_data, certificateTextData: [...provider_data.certificateTextData, ""] })
+                                        }
+                                    }}>
+                                        <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: "100%", marginBottom: 30 }} resizeMode="contain" />
+                                    </Pressable>
                                 </>
                             }
                             {role !== 1 &&
                                 <CustomTextInput
                                     // placeholder="Preferred Name"
                                     title="Experience"
-
+                                    keyboardType='numeric'
+                                    value={provider_data.experience}
+                                    onChangeText={t => {
+                                        setProviderData({ ...provider_data, experience: t })
+                                    }}
                                 />}
                             <View style={{}}>
                                 <DropDown
                                     title="Notification type"
                                     item={["Email", "Push Notification", "Text", "All"]}
-                                    value={"Email"}
-                                // onChangeValue={(index, value) => { setNotificationType(value) }}
-                                // containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                // dropdownStyle={{ height: 120 }}
+                                    value={notificationType}
+                                    onChangeValue={(index, value) => { setNotificationType(value) }}
                                 />
-                                {/* } */}
                             </View>
                             {role !== 1 &&
-                                <View style={{ marginBottom: 30 ,marginHorizontal:10}}>
+                                <View style={{ marginBottom: 30, marginHorizontal: 10 }}>
                                     <Text style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
-                                    <View style={{ flexDirection: "row", flexWrap: "wrap" ,marginTop:10}}>
-                                        <View style={{ height: 100,borderRadius:5, width: 100,justifyContent:"center",alignItems:"center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
-                                            <Image resizeMode='contain' source={require("../../../assets/signup/photo.png")} style={{height:70,width:70}} />
+                                    <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 10 }}>
+                                        {pictures.map((x,i) => <View  onTouchEnd={() => {
+                                            Alert.alert("Remove Image","Do you want to remove this image from list?",[
+                                                {text:"no"},
+                                                {text:"yes",onPress:()=>{
+                                                    let p=[...pictures]
+                                                    p.splice(i,1)
+                                                    setPictures(p)
+                                                }}
+                                            ])
+                                        }} style={{ height: 100, borderRadius: 5, width: 100,marginTop:5,marginRight:5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='contain' source={{ uri: x.path }} style={{ height: 70, width: 70 }} />
+                                        </View>)}
+                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height: 100,marginTop:5, borderRadius: 5, width: 100, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='contain' source={require("../../../assets/signup/photo.png")} style={{ height: 70, width: 70 }} />
                                         </View>
                                     </View>
                                 </View>
@@ -904,8 +1102,8 @@ const SignUpScreen = (props) => {
                                 }}
                                 secureTextEntry={!isConfPassVisible}
                                 inputRef={confPassRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => phoneRef.current.focus()}
+                                // returnKeyType="next"
+                                // onSubmitEditing={() => phoneRef.current.focus()}
                                 inlineImageLeft={<Entypo name={!isConfPassVisible ? "eye" : 'eye-with-line'} size={18} />}
                                 onLeftPress={() => setIsConfPassVisible(state => !state)}
                             />

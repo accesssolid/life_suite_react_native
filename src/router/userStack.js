@@ -34,6 +34,8 @@ import AddCard from '../screens/nonAuth/addCard'
 import OrderDetailCustomer from '../screens/nonAuth/orderDetailCustomer';
 import OrderSuspend from '../screens/nonAuth/orderSuspend'
 import FinishPay from '../screens/nonAuth/finishPay';
+import ProviderDetail from '../screens/nonAuth/providerDetail';
+import AddCard1 from '../screens/nonAuth/addCard1';
 const Stack = createStackNavigator();
 
 const UserStack = () => {
@@ -61,9 +63,11 @@ const UserStack = () => {
             <Stack.Screen name="CustomWebView" component={CustomWebView} />
             <Stack.Screen name="CardList" component={CardList} />
             <Stack.Screen name="AddCard" component={AddCard} />
+            <Stack.Screen name="AddCard1" component={AddCard1} />
             <Stack.Screen name="OrderDetailCustomer" component={OrderDetailCustomer} />
             <Stack.Screen name="OrderSuspend" component={OrderSuspend} />
             <Stack.Screen name="FinishPay" component={FinishPay} />
+            <Stack.Screen name="ProviderDetail" component={ProviderDetail} />
         </Stack.Navigator>
     )
 }

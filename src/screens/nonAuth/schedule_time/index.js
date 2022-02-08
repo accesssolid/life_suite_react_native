@@ -297,18 +297,18 @@ const ScheduleTime = (props) => {
                 }
             })
         }
-        if(filterdOrders.length==0){
+        if (filterdOrders.length == 0) {
             return false
         }
-        for(let z of Object.keys(frames)){
-            
-            if(!filterdOrders.includes(z)){
+        for (let z of Object.keys(frames)) {
+
+            if (!filterdOrders.includes(z)) {
                 return true
             }
         }
         return false
     }
-
+    const [currentTab2,setCurrentTab2]=useState(1)
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -365,7 +365,7 @@ const ScheduleTime = (props) => {
 
                                 if (isFrame) {
                                     backgroundColor = LS_COLORS.global.green
-                               
+
                                     textColor = "white"
                                 }
                                 if (isOrderAvailable) {
@@ -374,8 +374,8 @@ const ScheduleTime = (props) => {
                                 }
                                 let isPartiall = isPartiallFunc(date.dateString)
                                 const isSelected = date.dateString == currentDate
-                                if(isSelected){
-                                    isPartiall=false
+                                if (isSelected) {
+                                    isPartiall = false
                                 }
 
                                 if (isPartiall) {
@@ -395,6 +395,17 @@ const ScheduleTime = (props) => {
                             }}
 
                         />
+                        <View style={{ flexDirection: "row",height:50,overflow:"hidden",alignSelf:"center", borderRadius: 40, borderWidth: 1, borderColor: LS_COLORS.global.green, width: "95%" }}>
+                            <Pressable onPress={()=>setCurrentTab2(0)} style={{flex:1,justifyContent:"center",borderTopLeftRadius: 40,borderBottomLeftRadius:40,backgroundColor:currentTab2==0?LS_COLORS.global.green:"white",alignItems:"center"}}>
+                                <Text style={{textAlign:"center",fontSize:12,fontFamily:LS_FONTS.PoppinsRegular,color:currentTab2==0?"white":"black"}}>Show Upcoming Jobs</Text>
+                            </Pressable>
+                            <Pressable onPress={()=>setCurrentTab2(1)} style={{flex:1,justifyContent:"center",alignItems:"center",backgroundColor:currentTab2==1?LS_COLORS.global.green:"white",borderColor:LS_COLORS.global.green,borderLeftWidth:1,borderRightWidth:1}}>
+                                <Text style={{textAlign:"center",fontSize:12,fontFamily:LS_FONTS.PoppinsRegular,color:currentTab2==1?"white":"black"}}>Show Jobs</Text>
+                            </Pressable >
+                            <Pressable onPress={()=>setCurrentTab2(2)} style={{flex:1,justifyContent:"center",borderBottomRightRadius: 40,borderTopRightRadius:40,alignItems:"center",backgroundColor:currentTab2==2?LS_COLORS.global.green:"white"}}>
+                                <Text style={{textAlign:"center",fontSize:12,fontFamily:LS_FONTS.PoppinsRegular,color:currentTab2==2?"white":"black"}}>Show All</Text>
+                            </Pressable>
+                        </View>
                         {
                             currentDate == null ?
                                 Object.keys(orderData).map(x => {
@@ -455,19 +466,19 @@ const ScheduleTime = (props) => {
 export default ScheduleTime;
 
 
-const PartialComponent=({date,setCurrentDate,textColor,backgroundColor})=>{
-    return(
+const PartialComponent = ({ date, setCurrentDate, textColor, backgroundColor }) => {
+    return (
         <ImageBackground source={require("../../../assets/time_frame/circle_1.png")} style={{ width: 40, height: 40 }} resizeMode='cover'>
-        <TouchableOpacity onPress={() => {
-            setCurrentDate(date.dateString)
-        }} style={{ position: "relative", padding: 5, width: 40, height: 40, borderRadius: 20, justifyContent: "center" }}>
+            <TouchableOpacity onPress={() => {
+                setCurrentDate(date.dateString)
+            }} style={{ position: "relative", padding: 5, width: 40, height: 40, borderRadius: 20, justifyContent: "center" }}>
 
-            <Text style={{ textAlign: 'center', fontSize: 14, color: textColor, fontFamily: LS_FONTS.PoppinsRegular }}>
-                {date.day}
-            </Text>
+                <Text style={{ textAlign: 'center', fontSize: 14, color: textColor, fontFamily: LS_FONTS.PoppinsRegular }}>
+                    {date.day}
+                </Text>
 
-        </TouchableOpacity>
-    </ImageBackground>
+            </TouchableOpacity>
+        </ImageBackground>
     )
 }
 

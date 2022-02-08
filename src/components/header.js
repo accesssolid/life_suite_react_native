@@ -12,7 +12,7 @@ const Header = (props) => {
     const dispatch = useDispatch()
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container,props.containerStyle]}>
             <Pressable style={styles.leftView}
                 onPress={props.action}
                 activeOpacity={0.7}>
