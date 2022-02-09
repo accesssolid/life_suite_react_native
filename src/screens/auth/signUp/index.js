@@ -29,6 +29,7 @@ import PrivacyModal from '../../../components/privacyModal';
 import Entypo from 'react-native-vector-icons/Entypo'
 import moment from 'moment';
 import { getTimeZone } from 'react-native-localize';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 const getMessage = (name) => {
     switch (name) {
@@ -346,17 +347,37 @@ const SignUpScreen = (props) => {
         var date = moment(signUpData.dob, 'MM/DD/YYYY', true)
         if (!date.isValid()) {
             setLoader(false)
-            return showToast("Invalid date format")
+            return showToast("Invalid date format(mm/dd/yy)")
         }
         if (moment().diff(date, 'years') <= 18) {
             setLoader(false)
             return showToast("Date of birth must be higher than 18 age.")
         }
-        // if(m_field.filter(x=>x.status=="1").length>1){
-        //     if(signUpData.is_accept_privatepolicy&&signUpData.is_accept_termscondition&&signUpData.is_accept_cdd){
-
-        //     }
-        // }
+        if(m_field.filter(x=>x.status=="1").length>1){
+            let m_length=m_field.filter(x=>x.status=="1").length
+            let count=0
+            if(signUpData.is_accept_privatepolicy){
+                count+=1
+            }
+            if(signUpData.is_accept_termscondition){
+                count+=1
+            }
+            if(signUpData.is_accept_cdd){
+                count+=1
+            }
+            if(count<m_length){
+                setLoader(false)
+                if(!signUpData.is_accept_termscondition){
+                    return  showToast("You must aggree to terms and condtions.")
+                }
+                if(!signUpData.is_accept_privatepolicy){
+                    return  showToast("You must aggree to privacy policy.")
+                }
+                if(!signUpData.is_accept_cdd){
+                    return  showToast("You must aggree to CDC guidelines.")
+                }
+            }
+        }
         const address = [
             {
                 "country": 231,
@@ -417,7 +438,7 @@ const SignUpScreen = (props) => {
             dob: moment(signUpData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"),
             notification_prefrence: getNotiPref(notificationType),
             timezone: getTimeZone(),
-            
+
         }
 
         if (profile_pic?.path) {
@@ -428,24 +449,26 @@ const SignUpScreen = (props) => {
             }
         }
 
-        if(role!=1){
-            user_data={...user_data,...provider_data,mailing_address:signUpData.email}
+        if (role != 1) {
+            user_data = { ...user_data, ...provider_data, certificateTextData: JSON.stringify(provider_data.certificateTextData), mailing_address: signUpData.email }
         }
-        let formdata=getFormData(user_data)
-        for(let i of pictures){
-            formdata.append("pictures[]",{
+        let body = getFormData(user_data)
+        for (let i of pictures) {
+            body.append("pictures[]", {
                 uri: Platform.OS == "ios" ? i.path.replace('file:///', '') : i.path,
                 name: i.filename ? i.filename : i.path.split("/").pop(),
                 type: i.mime,
             })
         }
+        console.log("body", JSON.stringify(user_data))
+
         let headers = {
             "Content-Type": "multipart/form-data"
         }
-    
+
         let config = {
             headers: headers,
-            data: formdata,
+            data: body,
             endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
             type: 'post'
         }
@@ -509,7 +532,7 @@ const SignUpScreen = (props) => {
     }
 
     const pickImageForGallery = () => {
-        if(pictures.length>=10){
+        if (pictures.length >= 10) {
             return
         }
         Alert.alert(
@@ -719,8 +742,8 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, first_name: text })
                                 }}
                                 inputRef={fnameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => mnameRef.current.focus()}
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => mnameRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Middle Name"
@@ -730,8 +753,8 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, middle_name: text })
                                 }}
                                 inputRef={mnameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => lnameRef.current.focus()}
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => lnameRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Last Name"
@@ -742,8 +765,8 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, last_name: text })
                                 }}
                                 inputRef={lnameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => prefNameRef.current.focus()}
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => prefNameRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Preferred Name"
@@ -753,8 +776,8 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, prefer_name: text })
                                 }}
                                 inputRef={prefNameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => dobRef.current.focus()}
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => dobRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="mm/dd/yyyy"
@@ -765,9 +788,9 @@ const SignUpScreen = (props) => {
                                 }}
                                 mask={"[00]/[00]/[0000]"}
                                 inputRef={dobRef}
-                                returnKeyType="next"
+                                // returnKeyType="next"
                                 keyboardType='numeric'
-                                onSubmitEditing={() => phoneRef.current.focus()}
+                            // onSubmitEditing={() => phoneRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Phone Number"
@@ -823,8 +846,8 @@ const SignUpScreen = (props) => {
                                     setProviderData({ ...provider_data, license: text })
                                 }}
                                 inputRef={prefNameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => bioRef.current.focus()}
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => bioRef.current.focus()}
                             />}
                             {role !== 1 && <CustomTextInput
                                 inputRef={bioRef}
@@ -838,7 +861,7 @@ const SignUpScreen = (props) => {
                                 maxLength={255}
                                 numberOfLines={3}
                                 customContainerStyle={{}}
-                                customInputStyle={{ height: 100, paddingTop: '5%', paddingHorizontal: '10%', textAlignVertical: 'top' }}
+                                customInputStyle={{ height: 100, paddingTop: '5%', textAlignVertical: 'top' }}
                                 customImageStyles={{ bottom: '-65%', right: '0%' }}
                                 inlineImageLeft={<Text
                                     style={{ fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black, fontSize: 12 }}>
@@ -1016,7 +1039,6 @@ const SignUpScreen = (props) => {
                             {role !== 1 &&
                                 <>
                                     {provider_data?.certificateTextData?.map((x, i) => <CustomTextInput
-                                        // placeholder="Preferred Name"
                                         title="Certifications"
                                         value={x}
                                         onChangeText={(text) => {
@@ -1024,17 +1046,22 @@ const SignUpScreen = (props) => {
                                             v[i] = text
                                             setProviderData({ ...provider_data, certificateTextData: v })
                                         }}
-                                    // inputRef={prefNameRef}
-                                    // returnKeyType="next"
-                                    // onSubmitEditing={() => bioRef.current.focus()}
                                     />)}
-                                    <Pressable onPress={() => {
-                                        if (provider_data.certificateTextData.length < 5) {
-                                            setProviderData({ ...provider_data, certificateTextData: [...provider_data.certificateTextData, ""] })
-                                        }
-                                    }}>
-                                        <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: "100%", marginBottom: 30 }} resizeMode="contain" />
-                                    </Pressable>
+                                    <View style={{ flexDirection: "row", justifyContent: "center" }}>
+                                        <Pressable onPress={() => {
+                                            if (provider_data.certificateTextData.length < 5) {
+                                                setProviderData({ ...provider_data, certificateTextData: [...provider_data.certificateTextData, ""] })
+                                            }
+                                        }}>
+                                            <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: widthPercentageToDP(40), marginBottom: 30 }} resizeMode="contain" />
+                                        </Pressable>
+                                        <Text onPress={() => {
+                                            let v = [...provider_data.certificateTextData]
+                                            v.pop()
+                                            setProviderData({ ...provider_data, certificateTextData: v })
+
+                                        }} style={{ fontSize: 16, paddingVertical: 4, paddingHorizontal: 5, height: 35, marginLeft: 10, borderWidth: 1, borderColor: "gray", borderRadius: 5, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.lightTextColor }}>Remove</Text>
+                                    </View>
                                 </>
                             }
                             {role !== 1 &&
@@ -1059,19 +1086,21 @@ const SignUpScreen = (props) => {
                                 <View style={{ marginBottom: 30, marginHorizontal: 10 }}>
                                     <Text style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
                                     <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 10 }}>
-                                        {pictures.map((x,i) => <View  onTouchEnd={() => {
-                                            Alert.alert("Remove Image","Do you want to remove this image from list?",[
-                                                {text:"no"},
-                                                {text:"yes",onPress:()=>{
-                                                    let p=[...pictures]
-                                                    p.splice(i,1)
-                                                    setPictures(p)
-                                                }}
+                                        {pictures.map((x, i) => <View onTouchEnd={() => {
+                                            Alert.alert("Remove Image", "Do you want to remove this image from list?", [
+                                                { text: "no" },
+                                                {
+                                                    text: "yes", onPress: () => {
+                                                        let p = [...pictures]
+                                                        p.splice(i, 1)
+                                                        setPictures(p)
+                                                    }
+                                                }
                                             ])
-                                        }} style={{ height: 100, borderRadius: 5, width: 100,marginTop:5,marginRight:5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                        }} style={{ height: 100, borderRadius: 5, width: 100, marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
                                             <Image resizeMode='contain' source={{ uri: x.path }} style={{ height: 70, width: 70 }} />
                                         </View>)}
-                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height: 100,marginTop:5, borderRadius: 5, width: 100, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height: 100, marginTop: 5, borderRadius: 5, width: 100, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
                                             <Image resizeMode='contain' source={require("../../../assets/signup/photo.png")} style={{ height: 70, width: 70 }} />
                                         </View>
                                     </View>
@@ -1087,8 +1116,8 @@ const SignUpScreen = (props) => {
                                 }}
                                 secureTextEntry={!isPassVisible}
                                 inputRef={passRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => confPassRef.current.focus()}
+                                // returnKeyType="next"
+                                // onSubmitEditing={() => confPassRef.current.focus()}
                                 inlineImageLeft={<Entypo name={!isPassVisible ? "eye" : 'eye-with-line'} size={18} />}
                                 onLeftPress={() => setIsPassVisible(state => !state)}
                             />

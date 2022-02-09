@@ -1,8 +1,9 @@
 
 // export const BASE_URL = "http://122.160.70.200/projects/php/lifeSuite/public"
-// export const BASE_URL = "http://18.224.113.59/lifeSuite/public"
+export const BASE_URL = "http://18.224.113.59/lifeSuite/public"
 
-export const BASE_URL = "http://18.224.113.59/lifeSuiteDev/public"
+// export const BASE_URL = "http://18.224.113.59/lifeSuiteDev/public"
+
 
 export const getApi = (config) => {
     // console.log("Request Data =>", '/*', config.endPoint, '*/', "==>", config)

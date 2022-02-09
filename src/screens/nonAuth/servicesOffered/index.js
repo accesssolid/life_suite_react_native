@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Dimensions, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Dimensions, Modal, TouchableOpacity, ScrollView, Alert, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -22,6 +22,7 @@ import ServiceItem from '../../../components/serviceItem';
 import _ from 'lodash';
 import { getMyJobsThunk } from '../../../redux/features/provider';
 const { width } = Dimensions.get("window")
+import CustomInput from '../../../components/textInput'
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -43,6 +44,8 @@ const ServicesProvided = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const [activeIndex, setActiveIndex] = useState(null)
     const [activeItem, setActiveItem] = useState(null)
+    const [newServices, setNewServices] = useState([])
+    const [openModal, setOpenModal] = useState(false)
     const itemRef = useRef(null)
 
     useEffect(() => {
@@ -648,10 +651,30 @@ const ServicesProvided = (props) => {
 
     const filterVariants = () => {
         let data = itemListMaster.filter(item => item.variant_data == selectedVariant)
-        console.log(itemListMaster, data)
+        console.log("Data", JSON.stringify(data))
         setItemList([...data])
     }
 
+    const addNewService = (text) => {
+        let totalNewServicesLength = newServices.length
+        let newService = {
+            "id": "new-" + totalNewServicesLength,
+            "is_product_mandatory": 0,
+            "service_id": "new-" + totalNewServicesLength,
+            "name": text,
+            "list_type": "global",
+            "request_status": "",
+            "added_by_provider": null,
+            "variant_data": selectedVariant,
+            "status": 1,
+            "created_at": "2021-08-12T08:38:23.000000Z",
+            "updated_at": "2021-08-12T08:38:23.000000Z",
+            "variant_data_name": "Car",
+            "products": [
+            ]
+        }
+        setItemList([...itemList, newService])
+    }
     const toggleVariant = (variant) => {
         if (activeItem !== null) {
             showToast("Please save or discard current selection")
@@ -817,26 +840,26 @@ const ServicesProvided = (props) => {
             })
 
             let json_data = {
-                products: [...productsData].map(x=>({item_product_id:x.id,price:x.price})),
+                products: [...productsData].map(x => ({ item_product_id: x.id, price: x.price })),
                 new_products: [...newProductsData],
-                services:[...services]
+                services: [...services]
             }
             console.log(json_data)
-            formdata.append("service_id",subService.id)
-            formdata.append("json_data",JSON.stringify(json_data))
-            const config={
-                headers:headers,
-                data:formdata,
-                type:"post",
-                endPoint:"/api/providerServicesSaveIndividually"
+            formdata.append("service_id", subService.id)
+            formdata.append("json_data", JSON.stringify(json_data))
+            const config = {
+                headers: headers,
+                data: formdata,
+                type: "post",
+                endPoint: "/api/providerServicesSaveIndividually"
             }
             let res = await getApi(config)
-         
-            if(res.status){
-                dispatch(getMyJobsThunk(user.id,access_token))
+
+            if (res.status) {
+                dispatch(getMyJobsThunk(user.id, access_token))
                 showToast(res.message)
-                props.navigation.navigate("HomeScreen")            
-            }else{
+                props.navigation.navigate("HomeScreen")
+            } else {
                 showToast(res.message)
             }
         } catch (err) {
@@ -857,14 +880,14 @@ const ServicesProvided = (props) => {
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
                             {/* <View style={{ height: "22%", justifyContent: 'flex-end', paddingTop: StatusBar.currentHeight + 10 }}> */}
-                                <Header
-                                    imageUrl={require("../../../assets/backWhite.png")}
-                                    action={() => onBackPress()}
-                                    imageUrl1={require("../../../assets/homeWhite.png")}
-                                    action1={() => props.navigation.navigate("HomeScreen")}
-                                    title={subService.name}
-                                    titleStyle={{color:"white",fontSize:22}}
-                                />
+                            <Header
+                                imageUrl={require("../../../assets/backWhite.png")}
+                                action={() => onBackPress()}
+                                imageUrl1={require("../../../assets/homeWhite.png")}
+                                action1={() => props.navigation.navigate("HomeScreen")}
+                                title={subService.name}
+                                titleStyle={{ color: "white", fontSize: 22 }}
+                            />
                             {/* </View> */}
                             {/* <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
                                 <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
@@ -938,17 +961,46 @@ const ServicesProvided = (props) => {
                                 addNewProduct={addNewProduct}
                             />}
                         {activeItem == null && itemList && itemList.length > 0 &&
-                            itemList.map(((item, index) => {
-                                return (
-                                    <ServiceItem
-                                        key={index}
-                                        item={item}
-                                        index={index}
-                                        onCheckPress={() => { onPressItem(index, item) }}
-                                        isSelected={selectedItems.includes(item.id)}
-                                    />
-                                )
-                            }))}
+                            <>
+                                {itemList.map(((item, index) => {
+                                    return (
+                                        <ServiceItem
+                                            key={index}
+                                            item={item}
+                                            index={index}
+                                            onCheckPress={() => { onPressItem(index, item) }}
+                                            isSelected={selectedItems.includes(item.id)}
+                                        />
+                                    )
+                                }))}
+                                {newServices.map((item, index) => {
+                                    return (
+                                        <ServiceItem
+                                            key={index}
+                                            item={item}
+                                            index={index}
+                                            onCheckPress={() => { onPressItem(index, item) }}
+                                            isSelected={selectedItems.includes(item.id)}
+                                        />
+                                    )
+                                })}
+                                <CustomButton title="Add Service"
+                                    action={() => {
+                                        setOpenModal(true)
+                                    }}
+                                    customStyles={{
+                                        height: 40,
+                                        width: "35%",
+                                        borderRadius: 5
+                                    }}
+                                    customTextStyles={{
+                                        fontSize: 13,
+                                        fontFamily: LS_FONTS.PoppinsRegular
+                                    }}
+                                />
+                                {/* <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 14,  alignSelf: "center" }}>Add Service +</Text> */}
+                            </>
+                        }
                     </Content>
                     <View style={{ paddingBottom: '2.5%' }}>
                         {activeItem == null
@@ -963,8 +1015,45 @@ const ServicesProvided = (props) => {
                     </View>
                 </Container>
                 {loading && <Loader />}
+                <CheckServiceNameModal addNewService={addNewService} visible={openModal} setVisible={setOpenModal} />
             </SafeAreaView >
         </>
+    )
+}
+
+const CheckServiceNameModal = ({ visible, setVisible, addNewService }) => {
+    const [service_name, setServiceName] = React.useState("")
+    React.useEffect(() => {
+        if (visible) {
+            setServiceName("")
+        }
+    }, [visible])
+    return (
+        <Modal
+            visible={visible}
+            transparent={true}
+        >
+            <Pressable onPress={() => setVisible(false)} style={{ flex: 1, justifyContent: "center", backgroundColor: "#0005" }}>
+                <Pressable style={{ backgroundColor: "white", padding: 10, borderRadius: 10, marginHorizontal: 15 }}>
+                    <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 16 }}>Enter Service name</Text>
+                    <CustomInput
+                        text="Service Name"
+                        customContainerStyles={{ marginTop: 20 }}
+                        value={service_name}
+                        onChangeText={t => setServiceName(t)}
+                    />
+                    <CustomButton
+                        title="Submit"
+                        action={() => {
+                            addNewService(service_name)
+                            setVisible(false)
+                        }}
+                        customStyles={{ height: 40, width: "35%", borderRadius: 5, marginTop: 20 }}
+                        customTextStyles={{ fontSize: 12 }}
+                    />
+                </Pressable>
+            </Pressable>
+        </Modal>
     )
 }
 

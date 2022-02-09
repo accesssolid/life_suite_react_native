@@ -114,7 +114,7 @@ const LoginScreen = (props) => {
                 }
             })
             .catch(err => {
-
+                console.error(err)
             })
     }
 

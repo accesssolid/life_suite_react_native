@@ -89,7 +89,7 @@ export function CustomTextInput(props) {
                         mask={props.mask}
                     />
                 </View>
-                {props.title && <Text style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }]}>{props.title}{props.required && '*'}</Text>}
+                {props.title && <Text style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" },props.titleStyle]}>{props.title}{props.required && '*'}</Text>}
             </View>
         )
     }

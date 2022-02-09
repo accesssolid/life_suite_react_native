@@ -32,11 +32,11 @@ const TermsModal = (props) => {
         }
         let formdata= new FormData()
        
-        if(props.type){
-            formdata.append("type",props.type)
-        }else{
+        // if(props.type){
+        //     formdata.append("type",props.type)
+        // }else{
             formdata.append("type","customer")
-        }
+        // }
         let config = {
             headers: headers,
             endPoint: '/api/termsCondition',
