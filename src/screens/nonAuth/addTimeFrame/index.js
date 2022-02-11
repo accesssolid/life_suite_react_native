@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getApi } from '../../../api/api';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
-import { setAddServiceMode,clearCleanData } from '../../../redux/features/services';
+import { setAddServiceMode, clearCleanData } from '../../../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
 import { CheckBox, Toast } from 'native-base'
 import { indexOf } from 'lodash';
@@ -48,10 +48,10 @@ const AddTimeFrame = (props) => {
     const [markedDates, setMarkedDates] = useState({})
 
     useEffect(() => {
-        if (!isAddServiceMode){
+        if (!isAddServiceMode) {
             getTimeFrames()
         }
-            
+
     }, [])
 
 
@@ -80,8 +80,16 @@ const AddTimeFrame = (props) => {
             marked = {}
             propOwn = []
         }
-        setMarkedDates({ ...marked })
 
+        if (propOwn.length == 1 || propOwn.length == 2) {
+            let d = moment(date.dateString).format("MM")
+            let f_d = moment(propOwn[0], "YYYY-MM-DD").format("MM")
+            if (d != f_d) {
+                marked = {}
+                propOwn = []
+            }
+        }
+        setMarkedDates({ ...marked })
         let stylesCopy = customDatesStyles.filter(x => x.from_time == "" || x.to_time == "")
         if (stylesCopy.length >= 1 && propOwn.length == 0) {
             let d = [...customDatesStyles]
@@ -151,6 +159,7 @@ const AddTimeFrame = (props) => {
                 var convertedFrom = moment(item.from_time, 'hh:mm A').format('HH:mm')
                 var convertedTo = moment(item.to_time, 'hh:mm A').format('HH:mm')
                 data.push({
+                    "id": item.id,
                     "start_date": moment(item.start_date).format("YYYY-MM-DD"),
                     "end_date": moment(item.end_date).format("YYYY-MM-DD"),
                     "from_time": convertedFrom,
@@ -165,8 +174,15 @@ const AddTimeFrame = (props) => {
         }
         let { json_data, formdata } = serviceData
         json_data = JSON.parse(json_data)
-        json_data['time_frame'] = data
+        json_data['time_frame_add'] = data.filter(x => x.id == "").map(x => {
+            let d = { ...x }
+            delete d.id
+            return d
+        })
+        json_data['time_frame_update'] = data.filter(x => x.id != "")
         formdata.append("json_data", JSON.stringify(json_data));
+        console.log(JSON.stringify(json_data))
+        // return
         let config = {
             headers: headers,
             data: formdata,
@@ -190,7 +206,9 @@ const AddTimeFrame = (props) => {
                 setLoading(false)
                 console.log("error =>", err)
             }
-            )
+            ).finally(() => {
+                setLoading(false)
+            })
     }
 
     const getTimeFrames = () => {
@@ -212,26 +230,26 @@ const AddTimeFrame = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log("response",response)
+                console.log("response", response)
                 if (response.status == true) {
                     setLoading(false)
                     let styles = [];
                     let dates = [];
                     Object.keys(response.data).forEach((ele) => {
-                            let element=response.data[`${ele}`]
-                            dates.push(moment(element.start_time).format("DD/MM/YYYY"))
-                            styles.push({
-                                id: element.id,
-                                start_date: element.start_time,
-                                end_date: element.end_time,
-                                style: { backgroundColor: LS_COLORS.global.green },
-                                textStyle: { color: LS_COLORS.global.white },
-                                containerStyle: [],
-                                allowDisabled: true,
-                                from_time: element.from_time,
-                                to_time: element.to_time
-                            });
-                      
+                        let element = response.data[`${ele}`]
+                        dates.push(moment(element.start_time).format("DD/MM/YYYY"))
+                        styles.push({
+                            id: element.id,
+                            start_date: element.start_time,
+                            end_date: element.end_time,
+                            style: { backgroundColor: LS_COLORS.global.green },
+                            textStyle: { color: LS_COLORS.global.white },
+                            containerStyle: [],
+                            allowDisabled: true,
+                            from_time: element.from_time,
+                            to_time: element.to_time
+                        });
+
                     })
                     setSelectedDates([...dates])
                     console.warn(dates)
@@ -270,7 +288,7 @@ const AddTimeFrame = (props) => {
                     dispatch(clearCleanData())
                     setLoading(false)
                     if (shouldNavigate) {
-                        props.navigation.navigate('HomeScreen',{addJobClear:true})
+                        props.navigation.navigate('HomeScreen', { addJobClear: true })
                     }
                 }
                 else {

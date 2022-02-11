@@ -411,7 +411,8 @@ const AddLicense = (props) => {
             let json_data={
                 products: addServiceData?.json_data?.products?.map(x=>({item_product_id:x.id,price:x.price})),
                 new_products:addServiceData?.json_data?.new_products,
-                services:addServiceData?.json_data?.services
+                services:addServiceData?.json_data?.services,
+                new_services:addServiceData?.json_data?.new_services
             }
             formdata.append("json_data",JSON.stringify(json_data))
             for(let i of images){

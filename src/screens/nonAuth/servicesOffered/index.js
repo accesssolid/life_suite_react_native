@@ -19,7 +19,7 @@ import CustomButton from '../../../components/customButton';
 import services, { setAddServiceData } from '../../../redux/features/services';
 import { showToast } from '../../../components/validators';
 import ServiceItem from '../../../components/serviceItem';
-import _ from 'lodash';
+import _, { remove } from 'lodash';
 import { getMyJobsThunk } from '../../../redux/features/provider';
 const { width } = Dimensions.get("window")
 import CustomInput from '../../../components/textInput'
@@ -45,6 +45,8 @@ const ServicesProvided = (props) => {
     const [activeIndex, setActiveIndex] = useState(null)
     const [activeItem, setActiveItem] = useState(null)
     const [newServices, setNewServices] = useState([])
+    const [newServicesMaster, setNewServicesMaster] = useState([])
+
     const [openModal, setOpenModal] = useState(false)
     const itemRef = useRef(null)
 
@@ -56,7 +58,7 @@ const ServicesProvided = (props) => {
 
     useEffect(() => {
         setInitialServiceData()
-    }, [itemList, itemListMaster])
+    }, [itemList, itemListMaster, newServicesMaster, newServices])
 
     useEffect(() => {
         filterVariants()
@@ -94,6 +96,7 @@ const ServicesProvided = (props) => {
                 if (response.status == true) {
                     setLoading(false)
                     setItemListMaster([...response.data])
+                    console.log("checking", response.data)
                     if (response.variant_data) {
                         setVariants(response.variant_data)
                         setSelectedVariant(response.variant_data[0].id)
@@ -117,11 +120,15 @@ const ServicesProvided = (props) => {
         setSelectedItems([...arr])
     }
 
+    React.useEffect(() => {
+        console.log("Services data", JSON.stringify(servicesData))
+    }, [servicesData])
+
     const setInitialServiceData = () => {
         // #liahs changes
         let servicesData1 = _.cloneDeep(servicesData)
         if (!selectedItems.length > 0) {
-            let newArr = itemListMaster.map((item, index) => {
+            let newArr = itemListMaster.concat(newServicesMaster).map((item, index) => {
                 if (variants.length > 0) {
                     return {
                         "item_id": item.id,
@@ -153,7 +160,7 @@ const ServicesProvided = (props) => {
             let arr = []
             let selected = []
             if (variants.length > 0) {
-                itemListMaster.forEach((item, index) => {
+                itemListMaster.concat(newServicesMaster).forEach((item, index) => {
                     subService?.items?.forEach((ele, ind) => {
                         if (item.id == ele.id && item.variant_data == ele.variant_data) {
                             let hours = toHoursAndMinutes(ele.time_duration, 'hours')
@@ -170,7 +177,7 @@ const ServicesProvided = (props) => {
                     });
                 });
 
-                itemListMaster.forEach(item => {
+                itemListMaster.concat(newServicesMaster).forEach(item => {
                     if (!selected.includes(item.id)) {
                         arr.push({
                             "item_id": item.id,
@@ -182,7 +189,7 @@ const ServicesProvided = (props) => {
                     }
                 })
             } else {
-                itemListMaster.forEach((item, index) => {
+                itemListMaster.concat(newServicesMaster).forEach((item, index) => {
                     subService?.items?.forEach((ele, ind) => {
                         if (item.id == ele.id) {
                             let hours = toHoursAndMinutes(ele.time_duration, 'hours')
@@ -197,7 +204,7 @@ const ServicesProvided = (props) => {
                         }
                     });
                 });
-                itemListMaster.forEach(item => {
+                itemListMaster.concat(newServicesMaster).forEach(item => {
                     if (!selected.includes(item.id)) {
                         arr.push({
                             "item_id": item.id,
@@ -282,11 +289,13 @@ const ServicesProvided = (props) => {
                     products: [],
                     new_products: [],
                     services: [],
+                    new_services: []
                 }
             }
         }))
 
         let services = []
+        let new_services = []
         servicesData.forEach((itemm, index) => {
             if (selectedItems.includes(itemm.item_id)) {
                 var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
@@ -297,7 +306,14 @@ const ServicesProvided = (props) => {
                     "price": Number(itemm.price.replace('$', '')),
                     "time_duration": minutes
                 }
-                services.push(obj)
+                if (String(itemm.item_id).startsWith("new")) {
+                    let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
+                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id)
+                    new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
+                } else {
+                    services.push(obj)
+                }
+
             }
         })
 
@@ -309,13 +325,27 @@ const ServicesProvided = (props) => {
                 json_data: {
                     ...addServiceData.json_data,
                     products: [...productsData],
-                    new_products: [...newProductsData],
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")),
                     services: [...services],
+                    new_services: [...new_services]
                 }
             }
         }))
-
-        verifyNewProducts(services)
+        console.log("JSON DATA", JSON.stringify({
+            data: {
+                ...addServiceData,
+                user_id: user.id,
+                service_id: subService.id,
+                json_data: {
+                    ...addServiceData.json_data,
+                    products: [...productsData],
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")),
+                    services: [...services],
+                    new_services: [...new_services]
+                }
+            }
+        }))
+        verifyNewProducts(services, new_services)
     }
 
     function toHoursAndMinutes(minutes, type) {
@@ -349,8 +379,8 @@ const ServicesProvided = (props) => {
                     }
                 }
             })
-
             setServicesData([...temp, ...otherItems])
+
         } else {
             let temp = [...servicesData]
             let item = temp.filter(item => item.item_id == incomingItem.item_id)[0]
@@ -386,7 +416,7 @@ const ServicesProvided = (props) => {
             : digit
     }
 
-    const verifyNewProducts = (services) => {
+    const verifyNewProducts = (services, new_services = []) => {
         if (addServiceData.json_data.new_products.length > 0) {
             setLoading(true)
             let headers = {
@@ -424,7 +454,7 @@ const ServicesProvided = (props) => {
                     setLoading(false)
                 })
         } else {
-            if (services.length > 0) {
+            if (services.length > 0 || new_services.length > 0) {
                 props.navigation.navigate('AddLicense', { subService: subService })
             } else {
                 showToast("Select Service first")
@@ -651,12 +681,14 @@ const ServicesProvided = (props) => {
 
     const filterVariants = () => {
         let data = itemListMaster.filter(item => item.variant_data == selectedVariant)
+        let data1 = newServicesMaster.filter(item => item.variant_data == selectedVariant)
         console.log("Data", JSON.stringify(data))
+        setNewServices([...data1])
         setItemList([...data])
     }
 
     const addNewService = (text) => {
-        let totalNewServicesLength = newServices.length
+        let totalNewServicesLength = newServicesMaster.length
         let newService = {
             "id": "new-" + totalNewServicesLength,
             "is_product_mandatory": 0,
@@ -673,8 +705,21 @@ const ServicesProvided = (props) => {
             "products": [
             ]
         }
-        setItemList([...itemList, newService])
+        setNewServicesMaster([...newServicesMaster, newService])
+
     }
+
+    const removeNewService = (item) => {
+        let f = newServicesMaster.filter(x => x.id != item.id)
+        setNewServicesMaster(f)
+        let z = newServices.filter(x => x.id != item.id)
+        setNewServices(z)
+    }
+
+    useEffect(() => {
+        let data1 = newServicesMaster.filter(item => item.variant_data == selectedVariant)
+        setNewServices([...data1])
+    }, [newServicesMaster])
     const toggleVariant = (variant) => {
         if (activeItem !== null) {
             showToast("Please save or discard current selection")
@@ -825,6 +870,8 @@ const ServicesProvided = (props) => {
             }
             let formdata = new FormData()
             let services = []
+            let new_services = []
+
             servicesData.forEach((itemm, index) => {
                 if (selectedItems.includes(itemm.item_id)) {
                     var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
@@ -835,14 +882,22 @@ const ServicesProvided = (props) => {
                         "price": Number(itemm.price.replace('$', '')),
                         "time_duration": minutes
                     }
-                    services.push(obj)
+                    if (String(itemm.item_id).startsWith("new")) {
+                        let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
+                        let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id)
+                        new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
+                    } else {
+                        services.push(obj)
+                    }
+
                 }
             })
 
             let json_data = {
                 products: [...productsData].map(x => ({ item_product_id: x.id, price: x.price })),
                 new_products: [...newProductsData],
-                services: [...services]
+                services: [...services],
+                new_services: [...new_services]
             }
             console.log(json_data)
             formdata.append("service_id", subService.id)
@@ -975,13 +1030,18 @@ const ServicesProvided = (props) => {
                                 }))}
                                 {newServices.map((item, index) => {
                                     return (
-                                        <ServiceItem
-                                            key={index}
-                                            item={item}
-                                            index={index}
-                                            onCheckPress={() => { onPressItem(index, item) }}
-                                            isSelected={selectedItems.includes(item.id)}
-                                        />
+                                        <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
+                                            <ServiceItem
+                                                key={index}
+                                                item={item}
+                                                index={index}
+                                                onCheckPress={() => { onPressItem(index, item) }}
+                                                isSelected={selectedItems.includes(item.id)}
+                                            />
+                                            <Text style={{fontFamily:LS_FONTS.PoppinsRegular,color:"red",fontSize:12,paddingHorizontal:10,borderRadius:5,borderWidth:1,borderColor:"red",paddingVertical:5}} onPress={() => {
+                                                removeNewService(item)
+                                            }}>Remove</Text>
+                                        </View>
                                     )
                                 })}
                                 <CustomButton title="Add Service"
@@ -991,7 +1051,8 @@ const ServicesProvided = (props) => {
                                     customStyles={{
                                         height: 40,
                                         width: "35%",
-                                        borderRadius: 5
+                                        borderRadius: 5,
+                                        marginBottom: 15
                                     }}
                                     customTextStyles={{
                                         fontSize: 13,

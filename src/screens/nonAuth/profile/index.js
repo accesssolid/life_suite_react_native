@@ -1327,7 +1327,7 @@ const Profile = (props) => {
                             {user.user_role == role.provider &&
                                 <View>
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 15, color: LS_COLORS.global.placeholder }}>Certificates (upto 5 )</Text>
-                                    {userData?.certificate_data.map((x, i) => <CustomInput
+                                    {userData?.certificate_data?.map((x, i) => <CustomInput
                                         text="Certificates"
                                         value={x?.certificate ? x?.certificate : ""}
                                         onChangeText={(text) => {

@@ -182,6 +182,7 @@ const SelectLocation = (props) => {
                     "services": addServiceData.json_data.services,
                     "products": [...products.filter(item => item.price !== '')],
                     "travel_distance": travel_distance,
+                    "new_services":addServiceData.json_data.new_services,
                     "new_products": [...newProd],
                     "time_frame": []
                 })
@@ -249,6 +250,7 @@ const SelectLocation = (props) => {
                 products: addServiceData?.json_data?.products?.map(x=>({item_product_id:x.id,price:x.price})),
                 new_products:addServiceData?.json_data?.new_products,
                 services:addServiceData?.json_data?.services,
+                new_services:addServiceData?.json_data?.new_services,
                 travel_distance:{
                     travel_distance:travelDistance,
                     address_text:address,
