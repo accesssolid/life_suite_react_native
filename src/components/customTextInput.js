@@ -5,7 +5,7 @@ import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Platform } 
 import LS_COLORS from '../constants/colors';
 import LS_FONTS from '../constants/fonts';
 import { globalStyles } from '../../../utils';
-
+import Entypo from 'react-native-vector-icons/Entypo'
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import TextInputMask from 'react-native-text-input-mask';
@@ -57,6 +57,7 @@ const CustomTextInput1 = props => {
 }
 
 export function CustomTextInput(props) {
+    const [isSecure,setIsSecure]=React.useState(false)
     if (props.mask) {
         return (
             <View style={{ position: "relative", borderWidth: 1, marginBottom: 30, marginHorizontal: 10, borderColor: LS_COLORS.global.lightTextColor, borderRadius: 7, ...props.containerStyle }}>
@@ -78,18 +79,22 @@ export function CustomTextInput(props) {
                         color={LS_COLORS.global.black}
                         autoCapitalize="none"
                         autoCorrect={false}
-                        // placeholder={props.placeholder}
+                        placeholder={props.placeholder}
                         keyboardType={props.keyboardType}
                         returnKeyLabel={props.returnKeyLabel}
                         onSubmitEditing={props.onSubmitEditing}
                         returnKeyType={props.returnKeyType}
                         onChangeText={props.onChangeText}
-  
                         numberOfLines={props.numberOfLines}
                         mask={props.mask}
+                        secureTextEntry={isSecure}
                     />
                 </View>
-                {props.title && <Text style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" },props.titleStyle]}>{props.title}{props.required && '*'}</Text>}
+                {props.title && <Text style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }, props.titleStyle]}>{props.title}{props.required && '*'}</Text>}
+                {props.icon}
+                {props.secureTextEntry&&
+                    <Entypo onPress={()=>setIsSecure(!isSecure)} name={!isSecure ? "eye" : 'eye-with-line'} size={18} />
+                }
             </View>
         )
     }
@@ -113,20 +118,24 @@ export function CustomTextInput(props) {
                     color={LS_COLORS.global.black}
                     autoCapitalize="none"
                     autoCorrect={false}
-                    // placeholder={props.placeholder}
+                    placeholder={props.placeholder}
                     keyboardType={props.keyboardType}
                     returnKeyLabel={props.returnKeyLabel}
                     onSubmitEditing={props.onSubmitEditing}
                     returnKeyType={props.returnKeyType}
                     maxLength={props.maxLength}
                     onChangeText={props.onChangeText}
-                    secureTextEntry={props.secureTextEntry}
+                    secureTextEntry={isSecure}
                     editable={props.editable}
                     multiline={props.multiline}
                     numberOfLines={props.numberOfLines}
                 />
             </View>
             {props.title && <Text style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }]}>{props.title}{props.required && '*'}</Text>}
+            {props.icon}
+                {props.secureTextEntry&&
+                    <Entypo onPress={()=>setIsSecure(!isSecure)} name={isSecure ? "eye" : 'eye-with-line'} size={18} />
+                }
         </View>
     )
 }

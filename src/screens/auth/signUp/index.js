@@ -30,6 +30,8 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import moment from 'moment';
 import { getTimeZone } from 'react-native-localize';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import ModalOTP from '../../../components/ModalOTP';
 
 const getMessage = (name) => {
     switch (name) {
@@ -41,7 +43,8 @@ const getMessage = (name) => {
 
         case "prefer_name":
             return "Prefered name is required"
-
+        case "dob":
+            return "Date of birth is required"
         case "email":
             return "Email is required "
 
@@ -116,6 +119,9 @@ const SignUpScreen = (props) => {
     const passRef = useRef(null)
     const confPassRef = useRef(null)
     const phoneRef = useRef(null)
+    const tagRef=useRef(null)
+    const businessRef=useRef(null)
+    const licenseRef=useRef(null)
 
     const workAddressLine1Ref = useRef(null)
     const workAddressLine2Ref = useRef(null)
@@ -162,6 +168,9 @@ const SignUpScreen = (props) => {
 
     const [openPrivacyModal, setOpenPrivacyModal] = useState(false)
     const [openTermsModal, setOpenTermsModal] = useState(false)
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
+    const [initialDate, setInitialDate] = useState(new Date())
+
     useEffect(() => {
         setLoader(false)
     }, [])
@@ -220,6 +229,11 @@ const SignUpScreen = (props) => {
     // profile pic
     const [profile_pic, setProfilePic] = React.useState(null)
     const [pictures, setPictures] = React.useState([])
+    const [selection, setSelection] = React.useState({ start: 0 })
+    const [selection1, setSelection1] = React.useState({ start: 0 })
+    // starting the value is always 
+    const [isVerfiedPhone,setIsVerifiedPhone]=useState(false)
+    const [otpModal,setOTPModal]=useState(false)
 
     const getMandototyFiled = async () => {
         try {
@@ -279,13 +293,12 @@ const SignUpScreen = (props) => {
     const [signUpData, setSignUpData] = useState({
         first_name: '',
         last_name: '',
-        middle_name: '',
-        prefer_name: '',
-        bio: '',
+
+        dob: 0,
+        phone_number: '',
         email: '',
         password: '',
         password_confirmation: '',
-        phone_number: '',
         address: [],
         device_id: getUniqueId(),
         fcm_token: '#fcm!234',
@@ -293,7 +306,9 @@ const SignUpScreen = (props) => {
         is_accept_cdd: 0,
         is_accept_termscondition: 0,
         notification_prefrence: 1,
-        dob: 0,
+        bio: '',
+        middle_name: '',
+        prefer_name: '',
     })
 
     const [provider_data, setProviderData] = React.useState({
@@ -309,17 +324,27 @@ const SignUpScreen = (props) => {
         license: ""
     })
     async function on_press_register() {
+        
         setLoader(true)
 
+        let required_keys_customer = ['first_name', 'last_name', 'dob', 'phone_number', 'email', 'password', 'password_confirmation']
         let keys = Object.keys(signUpData)
-        for (let index = 0; index < keys.length; index++) {
-            if (typeof signUpData[keys[index]] == 'string' && signUpData[keys[index]].trim() == '' && keys[index] !== 'prefer_name' && keys[index] !== 'bio') {
-                showToast(getMessage(keys[index]), 'danger')
+
+        for (let i of required_keys_customer) {
+            if (signUpData[`${i}`]?.trim() == '' || signUpData[`${i}`] == 0) {
+                showToast(getMessage(i), 'danger')
                 setLoader(false)
                 return false
             }
         }
-
+        if(!isVerfiedPhone){
+            showToast("Please verify your phone number.")
+            setLoader(false)
+            return 
+        }
+        // setLoader(false)
+        // alert("Working")
+        // return
         if (signUpData.bio.trim() == "" && role !== 1) {
             showToast("Bio is required", 'danger')
             setLoader(false)
@@ -351,30 +376,30 @@ const SignUpScreen = (props) => {
         }
         if (moment().diff(date, 'years') <= 18) {
             setLoader(false)
-            return showToast("Date of birth must be higher than 18 age.")
+            return showToast("You must be 18 or over to use this application.")
         }
-        if(m_field.filter(x=>x.status=="1").length>1){
-            let m_length=m_field.filter(x=>x.status=="1").length
-            let count=0
-            if(signUpData.is_accept_privatepolicy){
-                count+=1
+        if (m_field.filter(x => x.status == "1").length > 1) {
+            let m_length = m_field.filter(x => x.status == "1").length
+            let count = 0
+            if (signUpData.is_accept_privatepolicy) {
+                count += 1
             }
-            if(signUpData.is_accept_termscondition){
-                count+=1
+            if (signUpData.is_accept_termscondition) {
+                count += 1
             }
-            if(signUpData.is_accept_cdd){
-                count+=1
+            if (signUpData.is_accept_cdd) {
+                count += 1
             }
-            if(count<m_length){
+            if (count < m_length) {
                 setLoader(false)
-                if(!signUpData.is_accept_termscondition){
-                    return  showToast("You must aggree to terms and condtions.")
+                if (!signUpData.is_accept_termscondition) {
+                    return showToast("You must agree to terms and conditions.")
                 }
-                if(!signUpData.is_accept_privatepolicy){
-                    return  showToast("You must aggree to privacy policy.")
+                if (!signUpData.is_accept_privatepolicy) {
+                    return showToast("You must agree to privacy policy.")
                 }
-                if(!signUpData.is_accept_cdd){
-                    return  showToast("You must aggree to CDC guidelines.")
+                if (!signUpData.is_accept_cdd) {
+                    return showToast("You must agree to CDC guidelines.")
                 }
             }
         }
@@ -478,7 +503,7 @@ const SignUpScreen = (props) => {
                 if (response.status == true) {
                     showToast('User Registered Successfully', 'success')
                     setLoader(false)
-                    props.navigation.navigate('LoginScreen')
+                    props.navigation.replace('LoginScreen')
                 }
                 else {
                     showToast(response.message, 'danger')
@@ -533,6 +558,7 @@ const SignUpScreen = (props) => {
 
     const pickImageForGallery = () => {
         if (pictures.length >= 10) {
+            showToast("You can upload maximum of 10 photos only")
             return
         }
         Alert.alert(
@@ -681,7 +707,11 @@ const SignUpScreen = (props) => {
                 setLoader(false)
             })
     }
-
+    const handleConfirm = (date) => {
+        setInitialDate(date)
+        setSignUpData({ ...signUpData, dob: moment(date).format("MM/DD/YYYY") })
+        setDatePickerVisibility(false)
+    }
 
 
     const startGetCities = (value, type) => {
@@ -706,7 +736,48 @@ const SignUpScreen = (props) => {
         if (phoneNumberLength < 8) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
         if (phoneNumberLength < 13) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 12)}`;
     }
+    React.useEffect(() => {
+        if (provider_data.service_is_at_address) {
+            setProviderData({ ...provider_data, address_is_public: 1 })
+        }
+    }, [provider_data.service_is_at_address])
 
+  
+      const checkISVerified=async()=>{
+        let ph=signUpData?.phone_number?.match(/\d/g).join("")
+        if(ph.length<11){
+            showToast("Phone number must be 10 digits.")
+            return
+        }
+        try{
+            setLoader(true)
+            let headers = {
+                "Content-Type": "multipart/form-data",
+            }
+            let formdata = new FormData()
+            formdata.append("phone_number", "+"+ph)
+
+            let config = {
+                headers: headers,
+                data: formdata,
+                endPoint: '/api/verifyPhoneOtpSend',
+                type: 'post'
+            }
+
+            let response = await getApi(config)
+            if (response.status) {
+                showToast(response.message)
+                setOTPModal(true)
+            }else{
+                showToast(response.message)
+            }
+        }catch(err){
+            showToast("Phone number must be 10 digits.")
+
+        }finally{
+            setLoader(false)
+        }
+    }
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <KeyboardAvoidingView
@@ -742,20 +813,10 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, first_name: text })
                                 }}
                                 inputRef={fnameRef}
-                            // returnKeyType="next"
-                            // onSubmitEditing={() => mnameRef.current.focus()}
+                                returnKeyType="next"
+                                onSubmitEditing={() => lnameRef.current.focus()}
                             />
-                            <CustomTextInput
-                                placeholder="Middle Name"
-                                title="Middle Name"
-                                value={signUpData.middle_name}
-                                onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, middle_name: text })
-                                }}
-                                inputRef={mnameRef}
-                            // returnKeyType="next"
-                            // onSubmitEditing={() => lnameRef.current.focus()}
-                            />
+
                             <CustomTextInput
                                 placeholder="Last Name"
                                 title="Last Name"
@@ -765,8 +826,19 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, last_name: text })
                                 }}
                                 inputRef={lnameRef}
-                            // returnKeyType="next"
-                            // onSubmitEditing={() => prefNameRef.current.focus()}
+                                returnKeyType="next"
+                                onSubmitEditing={() => mnameRef.current.focus()}
+                            />
+                            <CustomTextInput
+                                placeholder="Middle Name"
+                                title="Middle Name"
+                                value={signUpData.middle_name}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, middle_name: text })
+                                }}
+                                inputRef={mnameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={() => prefNameRef.current.focus()}
                             />
                             <CustomTextInput
                                 placeholder="Preferred Name"
@@ -776,83 +848,32 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, prefer_name: text })
                                 }}
                                 inputRef={prefNameRef}
-                            // returnKeyType="next"
-                            // onSubmitEditing={() => dobRef.current.focus()}
-                            />
-                            <CustomTextInput
-                                placeholder="mm/dd/yyyy"
-                                title="Date of birth"
-                                value={signUpData.dob}
-                                onChangeText={(formatted, extracted) => {
-                                    setSignUpData({ ...signUpData, dob: formatted })
+                                returnKeyType="next"
+                                onSubmitEditing={() => {
+                                 if(role!=1){
+                                    tagRef.current.focus()
+                                   
+                                 }else{
+                                    dobRef.current.focus()
+                                 }
+                                    
                                 }}
-                                mask={"[00]/[00]/[0000]"}
-                                inputRef={dobRef}
-                                // returnKeyType="next"
-                                keyboardType='numeric'
-                            // onSubmitEditing={() => phoneRef.current.focus()}
                             />
-                            <CustomTextInput
-                                placeholder="Phone Number"
-                                title="Phone Number"
-                                required
-                                mask={"+1 ([000]) [000] [0000]"}
-                                value={signUpData.phone_number}
-                                onChangeText={(text) => {
-                                    setSignUpData({ ...signUpData, phone_number: formatPhoneNumber(text) })
-                                }}
-                                keyboardType='numeric'
-                                inputRef={phoneRef}
-                                // returnKeyType={Platform.OS == "ios" ? "done" : "next"}
-                                // returnKeyLabel="next"
-                                containerStyle={{ marginBottom: role !== 1 ? 0 : 30 }}
-                                maxLength={12}
-                            // onSubmitEditing={() => {
-                            // setAddHomeAddressActive(true), setTimeout(() => {
-                            //     homeAddressRef.current.focus()
-                            // }, 250)
-                            // }}
-                            />
-                            {role !== 1 &&
-                                <View style={{ flexDirection: 'row', marginBottom: 30, alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
-                                    <CheckBox
-                                        style={{}}
-                                        containerStyle={{ width: 25 }}
-                                        wrapperStyle={{}}
-                                        checked={provider_data.phone_is_public}
-                                        onPress={() => setProviderData({ ...provider_data, phone_is_public: provider_data.phone_is_public ? 0 : 1 })}
-                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
-                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
-                                    />
-                                </View>
-                            }
                             {role !== 1 && <CustomTextInput
                                 placeholder="Taglines"
-                                title="Tag Line (Optional)"
+                                title="Tag Line"
                                 value={provider_data.tagline}
                                 onChangeText={(text) => {
                                     setProviderData({ ...provider_data, tagline: text })
                                 }}
-                            // inputRef={prefNameRef}
-                            // returnKeyType="next"
-                            // onSubmitEditing={() => bioRef.current.focus()}
+                            inputRef={tagRef}
+                            returnKeyType="next"
+                            onSubmitEditing={() => bioRef.current.focus()}
                             />}
-                            {role !== 1 && <CustomTextInput
-                                placeholder="Preferred Name"
-                                title="Driver Licence # State ID # State"
-                                value={provider_data.license}
-                                onChangeText={(text) => {
-                                    setProviderData({ ...provider_data, license: text })
-                                }}
-                                inputRef={prefNameRef}
-                            // returnKeyType="next"
-                            // onSubmitEditing={() => bioRef.current.focus()}
-                            />}
-                            {role !== 1 && <CustomTextInput
+                              {role !== 1 && <CustomTextInput
                                 inputRef={bioRef}
                                 placeholder="Bio..."
-                                title="Bio (Optional)"
+                                title="Bio"
                                 value={signUpData.bio}
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, bio: text })
@@ -869,6 +890,24 @@ const SignUpScreen = (props) => {
                                 </Text>}
                             />}
                             <CustomTextInput
+                                placeholder="mm/dd/yyyy"
+                                title="Date of birth *"
+                                value={signUpData.dob}
+                                onChangeText={(formatted, extracted) => {
+                                    setSignUpData({ ...signUpData, dob: formatted })
+                                }}
+                                mask={"[00]/[00]/[0000]"}
+                                inputRef={dobRef}
+                                returnKeyType="next"
+                                keyboardType='numeric'
+                                customContainerStyle={{ width: "82%" }}
+                                containerStyle={{ flexDirection: "row", alignItems: "center" }}
+                                icon={<Entypo name='calendar' color={LS_COLORS.global.green} size={28} onPress={() => {
+                                    setDatePickerVisibility(true)
+                                }} />}
+                                onSubmitEditing={() => phoneRef.current.focus()}
+                            />
+                              {role!=1&&<CustomTextInput
                                 placeholder="Email"
                                 title="Email"
                                 required
@@ -877,10 +916,103 @@ const SignUpScreen = (props) => {
                                     setSignUpData({ ...signUpData, email: text })
                                 }}
                                 inputRef={emailRef}
-                                // returnKeyType="next"
+                                returnKeyType={"next"}
                                 keyboardType="email-address"
-                            // onSubmitEditing={() => passRef.current.focus()}
+                                onSubmitEditing={() => businessRef.current.focus()}
+                            />}
+                               {role != 1 &&
+                                <CustomTextInput
+                                    placeholder="Business Name"
+                                    title="Business Name"
+                                    value={provider_data.business_name}
+                                    onChangeText={(text) => {
+                                        setProviderData({ ...provider_data, business_name: text })
+                                    }}
+                                   inputRef={businessRef}
+                                   returnKeyType={"next"}
+                                   keyboardType="email-address"
+                                   onSubmitEditing={() => phoneRef.current.focus()}
+                                />
+                            }
+                            <CustomTextInput
+                                placeholder="Phone Number"
+                                title="Phone Number"
+                                required
+                                mask={"+1 ([000]) [000] [0000]"}
+                                value={signUpData.phone_number}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, phone_number: formatPhoneNumber(text) })
+                                }}
+                                keyboardType='numeric'
+                                inputRef={phoneRef}
+                                returnKeyType={"next"}
+                                returnKeyLabel="next"
+                                containerStyle={{ marginBottom: role !== 1 ? 0 : 30 ,flexDirection:"row",alignItems:"center"}}
+                                customContainerStyle={{width:"85%"}}
+                                maxLength={12}
+                                icon={
+                                    <Entypo name="check" color={isVerfiedPhone?'green':"grey"} size={20} />
+                                }
+                                
+                            // onSubmitEditing={() => {
+                            // setAddHomeAddressActive(true), setTimeout(() => {
+                            //     homeAddressRef.current.focus()
+                            // }, 250)
+                            // }}
                             />
+                              {!isVerfiedPhone&&<Text onPress={()=>{
+                                checkISVerified()
+                            }} style={{color:LS_COLORS.global.green,textDecorationLine:"underline",marginTop:-20,marginBottom:20,marginLeft:20}}>Verify Phone Number</Text>}
+                            {role !== 1 &&
+                                <View style={{ flexDirection: 'row', marginBottom: 30, alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
+                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
+                                    <CheckBox
+                                        style={{}}
+                                        containerStyle={{ width: 25 }}
+                                        wrapperStyle={{}}
+                                        checked={provider_data.phone_is_public}
+                                        onPress={() => setProviderData({ ...provider_data, phone_is_public: provider_data.phone_is_public ? 0 : 1 })}
+                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                    />
+                                </View>
+                            }
+
+                           
+                          
+                          {role==1&&<CustomTextInput
+                                placeholder="Email"
+                                title="Email"
+                                required
+                                value={signUpData.email}
+                                onChangeText={(text) => {
+                                    setSignUpData({ ...signUpData, email: text })
+                                }}
+                                inputRef={emailRef}
+                                returnKeyType={"next"}
+                                keyboardType="email-address"
+                                onSubmitEditing={() => homeAddressRef.current.focus()}
+                            />}
+                         
+                            <View style={{}}>
+                                <DropDown
+                                    title="Notification type"
+                                    item={["Email", "Push Notification", "Text", "All"]}
+                                    value={notificationType}
+                                    onChangeValue={(index, value) => { setNotificationType(value) }}
+                                />
+                            </View>
+                            {role !== 1 && <CustomTextInput
+                                placeholder="Driver Licence # State ID"
+                                title="Driver Licence # State ID # State"
+                                value={provider_data.license}
+                                onChangeText={(text) => {
+                                    setProviderData({ ...provider_data, license: text })
+                                }}
+                                // inputRef={prefNameRef}
+                            returnKeyType="next"
+                            onSubmitEditing={() => homeAddressRef.current.focus()}
+                            />}
                             <View style={{ position: "relative", borderWidth: 1, marginBottom: role !== 1 ? 0 : 30, marginHorizontal: 10, borderColor: LS_COLORS.global.lightTextColor, borderRadius: 7 }}>
                                 <Text style={{
                                     fontFamily: LS_FONTS.PoppinsRegular,
@@ -916,7 +1048,7 @@ const SignUpScreen = (props) => {
                                         listView: { paddingVertical: 5 },
                                         separator: {}
                                     }}
-                                    // placeholder={`${role == 1 ? 'Home' : 'Permanent'} address${role == 1 ? '' : "*"}`}
+                                    placeholder={`${role == 1 ? 'Home' : 'Permanent'} address${role == 1 ? '' : "*"}`}
                                     fetchDetails={true}
                                     onPress={(data, details) => {
                                         setHomeAddressData({
@@ -928,7 +1060,11 @@ const SignUpScreen = (props) => {
                                     }}
                                     textInputProps={{
                                         onSubmitEditing: () => workAddressRef.current.focus(),
-                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                        placeholderTextColor: LS_COLORS.global.placeholder,
+                                        selection: selection,
+                                        returnKeyType: "next",
+                                        onBlur: () => { setSelection({ start: 0 }) },
+                                        onFocus: () => { setSelection(null) }
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -959,7 +1095,11 @@ const SignUpScreen = (props) => {
                                         containerStyle={{ width: 25, marginTop: 0 }}
                                         wrapperStyle={{}}
                                         checked={provider_data.address_is_public}
-                                        onPress={() => setProviderData({ ...provider_data, address_is_public: provider_data.address_is_public ? 0 : 1 })}
+                                        onPress={() => {
+                                            if (!provider_data.service_is_at_address) {
+                                                setProviderData({ ...provider_data, address_is_public: provider_data.address_is_public ? 0 : 1 })
+                                            }
+                                        }}
                                         checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
@@ -1003,7 +1143,7 @@ const SignUpScreen = (props) => {
                                         listView: { paddingVertical: 5 },
                                         separator: {}
                                     }}
-                                    // placeholder={`${role == 1 ? 'Work' : 'Mailing'} Address${role == 1 ? '' : "*"}`}
+                                    placeholder={`${role == 1 ? 'Work' : 'Mailing'} Address${role == 1 ? '' : "*"}`}
                                     fetchDetails={true}
                                     onPress={(data, details) => {
                                         setWorkAddressData({
@@ -1015,7 +1155,18 @@ const SignUpScreen = (props) => {
                                     }}
                                     textInputProps={{
                                         editable: !isSameAddress,
-                                        placeholderTextColor: LS_COLORS.global.placeholder
+                                        placeholderTextColor: LS_COLORS.global.placeholder,
+                                        selection: selection1,
+                                        returnKeyType: "next",
+                                        onBlur: () => { setSelection1({ start: 0 }) },
+                                        onFocus: () => { setSelection1(null) },
+                                        onSubmitEditing: () => {
+                                            if(role!=1){
+                                                
+                                            }else{
+                                                passRef.current.focus()
+                                            }
+                                           },
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -1040,27 +1191,34 @@ const SignUpScreen = (props) => {
                                 <>
                                     {provider_data?.certificateTextData?.map((x, i) => <CustomTextInput
                                         title="Certifications"
+                                        placeholder="Certifications"
                                         value={x}
                                         onChangeText={(text) => {
                                             let v = [...provider_data.certificateTextData]
                                             v[i] = text
                                             setProviderData({ ...provider_data, certificateTextData: v })
                                         }}
+
+                                        icon={provider_data.certificateTextData.length > 1 && <Entypo name='cross' size={20} color="red" onPress={() => {
+                                            let v = [...provider_data.certificateTextData]
+                                            v.splice(i, 1)
+                                            setProviderData({ ...provider_data, certificateTextData: v })
+                                        }} style={{ position: "absolute", right: 0 }} />}
                                     />)}
                                     <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                                        <Pressable onPress={() => {
+                                        {provider_data?.certificateTextData.length < 5 && <Pressable onPress={() => {
                                             if (provider_data.certificateTextData.length < 5) {
                                                 setProviderData({ ...provider_data, certificateTextData: [...provider_data.certificateTextData, ""] })
                                             }
                                         }}>
                                             <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: widthPercentageToDP(40), marginBottom: 30 }} resizeMode="contain" />
-                                        </Pressable>
-                                        <Text onPress={() => {
+                                        </Pressable>}
+                                        {/* <Text onPress={() => {
                                             let v = [...provider_data.certificateTextData]
                                             v.pop()
                                             setProviderData({ ...provider_data, certificateTextData: v })
 
-                                        }} style={{ fontSize: 16, paddingVertical: 4, paddingHorizontal: 5, height: 35, marginLeft: 10, borderWidth: 1, borderColor: "gray", borderRadius: 5, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.lightTextColor }}>Remove</Text>
+                                        }} style={{ fontSize: 16, paddingVertical: 4, paddingHorizontal: 5, height: 35, marginLeft: 10, borderWidth: 1, borderColor: "gray", borderRadius: 5, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.lightTextColor }}>Remove</Text> */}
                                     </View>
                                 </>
                             }
@@ -1069,39 +1227,35 @@ const SignUpScreen = (props) => {
                                     // placeholder="Preferred Name"
                                     title="Experience"
                                     keyboardType='numeric'
+                                    // placeholder="Experience"
                                     value={provider_data.experience}
                                     onChangeText={t => {
                                         setProviderData({ ...provider_data, experience: t })
                                     }}
+                                    icon={<Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 13, color: "black", top: 15, left: (provider_data.experience?.length??0) * 10 + 10, position: "absolute" }}>Years</Text>}
                                 />}
-                            <View style={{}}>
-                                <DropDown
-                                    title="Notification type"
-                                    item={["Email", "Push Notification", "Text", "All"]}
-                                    value={notificationType}
-                                    onChangeValue={(index, value) => { setNotificationType(value) }}
-                                />
-                            </View>
+
                             {role !== 1 &&
                                 <View style={{ marginBottom: 30, marginHorizontal: 10 }}>
                                     <Text style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
                                     <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 10 }}>
-                                        {pictures.map((x, i) => <View onTouchEnd={() => {
-                                            Alert.alert("Remove Image", "Do you want to remove this image from list?", [
-                                                { text: "no" },
-                                                {
-                                                    text: "yes", onPress: () => {
-                                                        let p = [...pictures]
-                                                        p.splice(i, 1)
-                                                        setPictures(p)
+                                        {pictures.map((x, i) => <View style={{ height: widthPercentageToDP(25.5), borderRadius: 5, width: widthPercentageToDP(25.5), position: "relative", marginTop: 5, marginRight: 5, backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='contain' source={{ uri: x.path }} style={{ width: widthPercentageToDP(25.5), height: widthPercentageToDP(25.5), borderRadius: 5 }} />
+                                            <Entypo name='cross' onPress={() => {
+                                                Alert.alert("Remove Image", "Do you want to remove this image from list?", [
+                                                    { text: "no" },
+                                                    {
+                                                        text: "yes", onPress: () => {
+                                                            let p = [...pictures]
+                                                            p.splice(i, 1)
+                                                            setPictures(p)
+                                                        }
                                                     }
-                                                }
-                                            ])
-                                        }} style={{ height: 100, borderRadius: 5, width: 100, marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
-                                            <Image resizeMode='contain' source={{ uri: x.path }} style={{ height: 70, width: 70 }} />
+                                                ])
+                                            }} color='red' size={20} style={{ position: "absolute", top: 0, right: 0 }} />
                                         </View>)}
-                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height: 100, marginTop: 5, borderRadius: 5, width: 100, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
-                                            <Image resizeMode='contain' source={require("../../../assets/signup/photo.png")} style={{ height: 70, width: 70 }} />
+                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height: widthPercentageToDP(25.5), marginTop: 5, borderRadius: 5, width: widthPercentageToDP(25.5), justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='contain' source={require("../../../assets/signup/photo.png")} style={{ height: widthPercentageToDP(20), width: widthPercentageToDP(20) }} />
                                         </View>
                                     </View>
                                 </View>
@@ -1114,12 +1268,14 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, password: text })
                                 }}
-                                secureTextEntry={!isPassVisible}
+                                secureTextEntry={true}
                                 inputRef={passRef}
-                                // returnKeyType="next"
-                                // onSubmitEditing={() => confPassRef.current.focus()}
-                                inlineImageLeft={<Entypo name={!isPassVisible ? "eye" : 'eye-with-line'} size={18} />}
-                                onLeftPress={() => setIsPassVisible(state => !state)}
+                                containerStyle={{ flexDirection: "row", alignItems: "center" }}
+                                customContainerStyle={{ width: "85%" }}
+                                returnKeyType={"next"}
+                                onSubmitEditing={() => confPassRef.current.focus()}
+                            // inlineImageLeft={<Entypo name={!isPassVisible ? "eye" : 'eye-with-line'} size={18} />}
+                            // onLeftPress={() => setIsPassVisible(state => !state)}
                             />
                             <CustomTextInput
                                 placeholder="Confirm Password"
@@ -1129,12 +1285,14 @@ const SignUpScreen = (props) => {
                                 onChangeText={(text) => {
                                     setSignUpData({ ...signUpData, password_confirmation: text })
                                 }}
-                                secureTextEntry={!isConfPassVisible}
+                                secureTextEntry={true}
                                 inputRef={confPassRef}
-                                // returnKeyType="next"
-                                // onSubmitEditing={() => phoneRef.current.focus()}
-                                inlineImageLeft={<Entypo name={!isConfPassVisible ? "eye" : 'eye-with-line'} size={18} />}
-                                onLeftPress={() => setIsConfPassVisible(state => !state)}
+                                containerStyle={{ flexDirection: "row", alignItems: "center" }}
+                                customContainerStyle={{ width: "85%" }}
+                            // returnKeyType="next"
+                            // onSubmitEditing={() => phoneRef.current.focus()}
+                            // inlineImageLeft={<Entypo name={!isConfPassVisible ? "eye" : 'eye-with-line'} size={18} />}
+                            // onLeftPress={() => setIsConfPassVisible(state => !state)}
                             />
                         </View>
                         {/* terms and consiftions */}
@@ -1148,7 +1306,15 @@ const SignUpScreen = (props) => {
                                 checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} onPress={() => setOpenTermsModal(true)} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[0]}</Text>
+                            <Text numberOfLines={1} onPress={() => {
+                                props.navigation.navigate("CustomWebView", {
+                                    userType: role == 1 ? "customer" : "provider", type: "terms", title: "Terms and conditions", onAccept: () => {
+                                        setSignUpData({ ...signUpData, is_accept_termscondition: 1 })
+                                    }, notAccept: () => {
+                                        setSignUpData({ ...signUpData, is_accept_termscondition: 0 })
+                                    }
+                                })
+                            }} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[0]}</Text>
                         </View>}
 
                         {m_field.filter(x => x.id == 2 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 }}>
@@ -1161,7 +1327,16 @@ const SignUpScreen = (props) => {
                                 checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} onPress={() => setOpenPrivacyModal(true)} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[1]}</Text>
+                            <Text numberOfLines={1} onPress={() => {
+                                props.navigation.navigate("CustomWebView", {
+                                    userType: role == 1 ? "customer" : "provider", type: "privacy", title: "Privacy Poicy", onAccept: () => {
+                                        setSignUpData({ ...signUpData, is_accept_privatepolicy: 1 })
+                                    }, notAccept: () => {
+                                        setSignUpData({ ...signUpData, is_accept_privatepolicy: 0 })
+                                    }
+                                })
+                                // setOpenPrivacyModal(true)
+                            }} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[1]}</Text>
                         </View>}
                         {m_field.filter(x => x.id == 3 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 }}>
                             <CheckBox
@@ -1173,7 +1348,11 @@ const SignUpScreen = (props) => {
                                 checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} onPress={() => props.navigation.navigate("CovidScreen")} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[2]}</Text>
+                            <Text numberOfLines={1} onPress={() => props.navigation.navigate("CovidScreen", {
+                                onChecked: () => {
+                                    setSignUpData({ ...signUpData, is_accept_cdd: 1 })
+                                }
+                            })} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[2]}</Text>
                         </View>}
 
                         <View style={[styles.buttonContainer, { marginTop: 20 }]}>
@@ -1196,9 +1375,16 @@ const SignUpScreen = (props) => {
                 </ScrollView>
             </KeyboardAvoidingView>
             {loader == true && <Loader />}
-            <PrivacyModal isVisible={openPrivacyModal} setVisible={setOpenPrivacyModal} type={role == 1 ? "customer" : "provider"} />
-            <TermsModal isVisible={openTermsModal} setVisible={setOpenTermsModal} type={role == 1 ? "customer" : "provider"} />
-
+            {/* <PrivacyModal isVisible={openPrivacyModal} setVisible={setOpenPrivacyModal} type={role == 1 ? "customer" : "provider"} />
+            <TermsModal isVisible={openTermsModal} setVisible={setOpenTermsModal} type={role == 1 ? "customer" : "provider"} /> */}
+            <DateTimePickerModal
+                date={initialDate}
+                isVisible={isDatePickerVisible}
+                mode="date"
+                onConfirm={handleConfirm}
+                onCancel={() => setDatePickerVisibility(false)}
+            />
+            <ModalOTP phone_number={"+"+(signUpData?.phone_number?signUpData?.phone_number.match(/\d/g).join(""):"")} setIsVerifiedPhone={setIsVerifiedPhone} visible={otpModal} setVisible={setOTPModal} />
         </SafeAreaView>
     )
 }

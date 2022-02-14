@@ -13,7 +13,7 @@ import TextInputMask from 'react-native-text-input-mask';
 import { CheckBox } from 'react-native-elements';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-
+import Entypo from 'react-native-vector-icons/Entypo'
 /* Components */
 import Header from '../../../components/header';
 import CustomInput from "../../../components/textInput"
@@ -30,6 +30,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getUniqueId, getManufacturer } from 'react-native-device-info';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import moment from 'moment';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import ModalOTP from '../../../components/ModalOTP';
 
 
 
@@ -46,7 +48,9 @@ const getMessage = (name) => {
 
         case "email":
             return "Email is required "
-
+        case "dob":
+            return "Date of birth is required "
+    
         case "password":
             return "Password is required"
 
@@ -191,6 +195,12 @@ const Profile = (props) => {
     const [connectedDetail, setConnectedDetail] = React.useState({})
     const [selection, setSelection] = React.useState({ start: 0 })
     const [pictures, setPictures] = React.useState([])
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
+    const [initialDate, setInitialDate] = useState(new Date())
+    // starting the value is always 
+    const [isVerfiedPhone,setIsVerifiedPhone]=useState(true)
+    const [otpModal,setOTPModal]=useState(false)
+    // 
 
     function logout() {
         setLoader(true)
@@ -425,21 +435,34 @@ const Profile = (props) => {
 
     const saveUser = () => {
         setLoader(true)
-
-        let keys = Object.keys(userData)
-        for (let index = 0; index < keys.length; index++) {
-            if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '' && keys[index] !== 'prefer_name' && keys[index] !== "about") {
-                showToast(getMessage(keys[index]), 'danger')
+        let required_keys_customer = ['first_name', 'last_name', 'dob', 'phone_number', 'email']
+     
+        // let keys = Object.keys(userData)
+        // for (let index = 0; index < keys.length; index++) {
+        //     if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '' && keys[index] !== 'prefer_name'&&keys[index]!=="middle_name"&&keys[index]!=="prefer_name"&& keys[index] !== "about") {
+        //         showToast(getMessage(keys[index]), 'danger')
+        //         setLoader(false)
+        //         return false
+        //     }
+        // }
+        for (let i of required_keys_customer) {
+            if (userData[`${i}`]?.trim() == '' || userData[`${i}`] == 0) {
+                showToast(getMessage(i), 'danger')
                 setLoader(false)
                 return false
             }
         }
 
-        if (user.user_role == role.provider && userData.about.trim() == "") {
-            showToast("Bio is required", 'danger')
+        if(!isVerfiedPhone){
+            showToast("Please verify your phone number.")
             setLoader(false)
-            return false
+            return
         }
+        // if (user.user_role == role.provider && userData.about.trim() == "") {
+        //     showToast("Bio is required", 'danger')
+        //     setLoader(false)
+        //     return false
+        // }
 
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -499,13 +522,16 @@ const Profile = (props) => {
             }
         }
         var date = moment(userData.dob, 'MM/DD/YYYY', true)
-        if (!date.isValid()) {
+        var date1=moment(userData.dob,'YYYY-MM-DD',true)
+        if (date.isValid()||date1.isValid){
+
+        } else{
             setLoader(false)
             return showToast("Invalid date format(mm/dd/yy)")
         }
         if (moment().diff(date, 'years') <= 18) {
             setLoader(false)
-            return showToast("Date of birth must be higher than 18 age.")
+            return showToast("You must be 18 or over to use this application.")
         }
         save(address)
     }
@@ -619,11 +645,17 @@ const Profile = (props) => {
         formdata.append("user_id", userData.id);
         formdata.append("email", userData.email);
         formdata.append("first_name", userData.first_name);
-        formdata.append("middle_name", userData.middle_name ?? "");
-
+        // console.log(userData.middle_name)
+        // setLoader(false)
+        // return
+        formdata.append("middle_name", userData.middle_name==""?"null":userData.middle_name);
         formdata.append("last_name", userData.last_name);
-        formdata.append("dob",moment(userData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"));
-        formdata.append("phone_number", userData.phone_number.replace(/-/g, ""));
+        formdata.append("dob",user?.dob!==userData.dob?moment(userData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"):userData.dob);
+        formdata.append("phone_number", userData.phone_number.match(/\d/g).join(""));
+        // console.log(user?.dob!==userData.dob?moment(userData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"):userData.dob)
+        // console.log("Phone Number",userData.phone_number)
+        // setLoader(false)
+        // return
         if (user.user_role == role.provider) {
             formdata.append("about", userData.about);
             for (let i of pictures) {
@@ -875,6 +907,8 @@ const Profile = (props) => {
             count += userData.pictures_data?.length
         }
         if (count >= 10) {
+            showToast("You can upload maximum of 10 photos only")
+
             return
         }
         Alert.alert(
@@ -902,10 +936,20 @@ const Profile = (props) => {
                         ImagePicker.openPicker({
                             width: 400,
                             height: 400,
-                            cropping: true
+                            multiple: true,
+                            maxFiles: 15
                         }).then(image => {
                             console.log(image);
-                            setPictures([...pictures, image])
+                            if (Array.isArray(image)) {
+                                let images_length=image.length
+                                if(count+images_length>10){
+                                    showToast("You cannot add more than 10 pictures.")
+                                }
+                                setPictures([...pictures, ...image.slice(0,10-count)])
+                            } else {
+                                setPictures([...pictures, image])
+                            }
+
                         }).catch(err => {
                             console.log("Image picker error : ", err)
                         })
@@ -914,6 +958,11 @@ const Profile = (props) => {
             ]
         );
     }
+    React.useEffect(() => {
+        if (userData?.service_is_at_address) {
+            setUserData({ ...userData, address_is_public: 1 })
+        }
+    }, [userData?.service_is_at_address])
 
     const removePicture = async (data) => {
         try {
@@ -941,6 +990,47 @@ const Profile = (props) => {
         } catch (err) {
 
         } finally {
+            setLoader(false)
+        }
+    }
+    const handleConfirm = (date) => {
+        setInitialDate(date)
+        setUserData({ ...userData, dob: moment(date).format("YYYY-MM-DD") })
+        setDatePickerVisibility(false)
+    }
+
+    const checkISVerified=async()=>{
+        let ph=userData?.phone_number?.match(/\d/g).join("")
+        if(ph.length<11){
+            showToast("Phone number must be 10 digits.")
+            return
+        }
+        try{
+            setLoader(true)
+            let headers = {
+                "Content-Type": "multipart/form-data",
+            }
+            let formdata = new FormData()
+            formdata.append("phone_number", "+"+ph)
+
+            let config = {
+                headers: headers,
+                data: formdata,
+                endPoint: '/api/verifyPhoneOtpSend',
+                type: 'post'
+            }
+
+            let response = await getApi(config)
+            if (response.status) {
+                showToast(response.message)
+                setOTPModal(true)
+            }else{
+                showToast(response.message)
+            }
+        }catch(err){
+            showToast("Phone number must be 10 digits.")
+
+        }finally{
             setLoader(false)
         }
     }
@@ -1005,16 +1095,7 @@ const Profile = (props) => {
                                 // onSubmitEditing={() => { lnameRef.current._root.focus() }}
                                 required={true}
                             />
-                            <CustomInput
-                                text="Middle Name"
-                                value={userData.middle_name ?? ""}
-                                onChangeText={(text) => {
-                                    setUserData({ ...userData, middle_name: text })
-                                }}
-                                inpuRef={fnameRef}
-                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
-                                required={true}
-                            />
+                         
                             <CustomInput
                                 text="Last Name"
                                 value={userData.last_name}
@@ -1027,6 +1108,16 @@ const Profile = (props) => {
                                 // returnKeyType="next"
                                 // onSubmitEditing={() => prefNameRef.current._root.focus()}
                                 required={true}
+                            />
+                               <CustomInput
+                                text="Middle Name"
+                                value={userData.middle_name!="null" ?userData.middle_name:""}
+                                onChangeText={(text) => {
+                                    setUserData({ ...userData, middle_name: text })
+                                }}
+                                // inpuRef={fnameRef}
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+                                required={false}
                             />
                             <CustomInput
                                 text="Preferred Name"
@@ -1048,7 +1139,7 @@ const Profile = (props) => {
                             // }}
                             />
                             {user.user_role == role.provider && <CustomInput
-                                text="Tagline(Optional)"
+                                text="Tagline"
                                 value={userData?.tagline === "null" ? "" : userData.tagline}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, tagline: text })
@@ -1057,7 +1148,7 @@ const Profile = (props) => {
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                             />}
                             {user.user_role == role.provider && <CustomInput
-                                required
+                                // required
                                 text="Bio"
                                 value={userData?.about}
                                 onChangeText={(text) => {
@@ -1078,20 +1169,20 @@ const Profile = (props) => {
                             />}
                             <CustomTextInput
                                 title="Date of Birth *"
-                                value={user?.dob !== "null" ?moment(user.dob,"YYYY-MM-DD").format("MMDDYYYY"): ""}
+                                value={user?.dob !== "null" ? moment(user.dob, "YYYY-MM-DD").format("MM/DD/YYYY") : ""}
                                 onChangeText={(formatted, extracted) => {
                                     setUserData({ ...userData, dob: formatted })
                                 }}
                                 containerStyle={{
                                     marginTop: 35,
                                     width: "90%",
+                                    // height: 50,
                                     alignSelf: "center",
                                     borderColor: LS_COLORS.global.textInutBorderColor,
 
                                 }}
                                 customInputStyle={{
                                     color: LS_COLORS.global.black,
-                                    height: 50,
                                     fontFamily: LS_FONTS.PoppinsMedium,
                                     fontSize: 16,
                                     paddingHorizontal: 20
@@ -1104,9 +1195,56 @@ const Profile = (props) => {
                                 mask={"[00]/[00]/[0000]"}
                                 keyboardType='numeric'
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+                                // icon={<Entypo name='calendar' style={{position:"absolute",right:10,top:10}} color={LS_COLORS.global.green} size={28} onPress={() => {
+                                //     setDatePickerVisibility(true)
+                                // }} />}
                             />
+                               <CustomTextInput
+                                title="Phone Number *"
+                                value={user?.phone_number !== "null" ?user?.phone_number:""}
+                                onChangeText={(formatted, extracted) => {
+                                    console.log(user.phone_number,formatted)
+                                    let ph=formatted.match(/\d/g).join("")
+                                    if(user.phone_number!=ph){
+                                        setIsVerifiedPhone(false)
+                                    }else if(user.phone_number==ph){
+                                        setIsVerifiedPhone(true)
+                                    }
+                                    setUserData({ ...userData, phone_number: formatted })
+                                }}
+                                containerStyle={{
+                                    marginTop: 35,
+                                    width: "90%",
+                                    // height: 50,
+                                    alignSelf: "center",
+                                    alignItems:"center",
+                                    flexDirection:"row",
+                                    borderColor: LS_COLORS.global.textInutBorderColor,
+
+                                }}
+                                customInputStyle={{
+                                    color: LS_COLORS.global.black,
+                                    fontFamily: LS_FONTS.PoppinsMedium,
+                                    fontSize: 16,
+                                    width:"90%",
+                                    paddingHorizontal: 20
+                                }}
+                                titleStyle={{
+                                    left: 20,
+                                    color: LS_COLORS.global.grey, fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular,
+                                }}
+                                mask={"+1 ([000]) [000] [0000]"}
+                                keyboardType='numeric'
+                                returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+                                icon={
+                                    <Entypo name="check" color={isVerfiedPhone?'green':"grey"} size={20} />
+                                }
+                            />
+                            {!isVerfiedPhone&&<Text onPress={()=>{
+                                checkISVerified()
+                            }} style={{color:LS_COLORS.global.green,textDecorationLine:"underline",marginLeft:20}}>Verify Phone Number</Text>}
                             <CustomInput
-                                text="Email Address"
+                                text="Email"
                                 value={userData.email}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, email: text })
@@ -1115,8 +1253,19 @@ const Profile = (props) => {
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                 required={true}
                             />
+                             <View style={{ height: 20 }}></View>
+                            <View style={{}}>
+                                <DropDown
+                                    title="Notification type"
+                                    item={["Email", "Push Notification", "Text", "All"]}
+                                    value={notificationType}
+                                    onChangeValue={(index, value) => { setNotificationType(value) }}
+                                    containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
+                                />
+                                {/* } */}
+                            </View>
                             {user.user_role == role.provider && <CustomInput
-                                text="Business Name (Optinal)"
+                                text="Business Name"
                                 value={userData?.business_name == "null" ? "" : userData.business_name}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, business_name: text })
@@ -1124,7 +1273,7 @@ const Profile = (props) => {
                                 inpuRef={prefNameRef}
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                             />}
-                            <CustomInput
+                            {/* <CustomInput
                                 text="Phone Number"
                                 value={formatPhoneNumber(userData.phone_number)}
                                 onChangeText={(text) => {
@@ -1139,7 +1288,8 @@ const Profile = (props) => {
                                     // }, 350)
                                 }}
                                 required={true}
-                            />
+                            /> */}
+                          
                             {user.user_role == role.provider && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
                                 <Text numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
                                 <CheckBox
@@ -1238,7 +1388,11 @@ const Profile = (props) => {
                                         containerStyle={{ width: 25, marginTop: 0 }}
                                         wrapperStyle={{}}
                                         checked={Number(userData?.address_is_public)}
-                                        onPress={() => setUserData({ ...userData, address_is_public: Number(userData.address_is_public) ? 0 : 1 })}
+                                        onPress={() => {
+                                            if(Number(userData?.service_is_at_address)){
+                                                return
+                                            }
+                                            setUserData({ ...userData, address_is_public: Number(userData.address_is_public) ? 0 : 1 })}}
                                         checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
@@ -1312,18 +1466,7 @@ const Profile = (props) => {
                                 />
 
                             </View>
-                            <View style={{ height: 20 }}></View>
-                            <View style={{}}>
-                                <DropDown
-                                    title="Notification type"
-                                    item={["Email", "Push Notification", "Text", "All"]}
-                                    value={notificationType}
-                                    onChangeValue={(index, value) => { setNotificationType(value) }}
-                                    containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 50, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 30, paddingHorizontal: '5%', borderWidth: 0 }}
-                                // dropdownStyle={{ height: 120 }}
-                                />
-                                {/* } */}
-                            </View>
+                           
                             {user.user_role == role.provider &&
                                 <View>
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 15, color: LS_COLORS.global.placeholder }}>Certificates (upto 5 )</Text>
@@ -1335,23 +1478,21 @@ const Profile = (props) => {
                                             v[i].certificate = text
                                             setUserData({ ...userData, certificate_data: v })
                                         }}
+                                        icon={userData?.certificate_data?.length > 1 && <Entypo name='cross' size={20} color="red" onPress={() => {
+                                            let v = [...userData.certificate_data]
+                                            v.splice(i, 1)
+                                            setUserData({ ...userData, certificate_data: v })
+                                        }} style={{ position: "absolute", right: 0 }} />}
                                         returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                     />)}
                                     <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                                        <Pressable style={{ marginTop: 10 }} onPress={() => {
+                                       {userData?.certificate_data?.length < 5 &&<Pressable style={{ marginTop: 10 }} onPress={() => {
                                             if (userData.certificate_data?.length < 5) {
                                                 setUserData({ ...userData, certificate_data: [...userData.certificate_data, { certificate: "" }] })
                                             }
                                         }}>
                                             <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: widthPercentageToDP(40), marginBottom: 30 }} resizeMode="contain" />
-                                        </Pressable>
-                                        <Text onPress={() => {
-                                            let v = [...userData.certificate_data]
-                                            v.pop()
-                                            setUserData({ ...userData, certificate_data: v })
-
-                                        }} style={{ fontSize: 16, paddingVertical: 4, paddingHorizontal: 5, height: 35, marginLeft: 10, marginTop: 10, borderWidth: 1, borderColor: "gray", borderRadius: 5, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.lightTextColor }}>Remove</Text>
-
+                                        </Pressable>}
                                     </View>
                                 </View>
                             }
@@ -1365,13 +1506,16 @@ const Profile = (props) => {
                                     }}
                                     keyboardType="numeric"
                                     returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+                                    icon={<Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15, color: "black", top: 16, left: (userData?.experience?.length??0) * 10 + 30, position: "absolute" }}>Years</Text>}
                                 />
                             }
                             {user.user_role == role.provider &&
                                 <View style={{ marginHorizontal: 10, marginTop: 20 }}>
                                     <Text style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
                                     <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 10 }}>
-                                        {userData.pictures_data?.map(x => (<Pressable onPress={() => {
+                                        {userData.pictures_data?.map(x => (<Pressable  style={{ height:  widthPercentageToDP(25.5), borderRadius: 5, width:  widthPercentageToDP(25.5), marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='cover' source={{ uri: BASE_URL + x.image }} style={{ height:  widthPercentageToDP(25.5), width:  widthPercentageToDP(25.5), borderRadius: 5 }} />
+                                            <Entypo name='cross' onPress={() => {
                                             Alert.alert("Remove Image", "Do you want to remove this image from list?", [
                                                 { text: "no" },
                                                 {
@@ -1380,11 +1524,12 @@ const Profile = (props) => {
                                                     }
                                                 }
                                             ])
-                                        }} style={{ height: 100, borderRadius: 5, width: 100, marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
-                                            <Image resizeMode='contain' source={{ uri: BASE_URL + x.image }} style={{ height: 100, width: 100, borderRadius: 5 }} />
+                                        }} color='red' size={20} style={{ position: "absolute", top: 0, right: 0 }} />
                                         </Pressable>))
                                         }
-                                        {pictures.map((x, i) => <Pressable onPress={() => {
+                                        {pictures.map((x, i) => <Pressable  style={{ height:  widthPercentageToDP(25.5), borderRadius: 5, width:  widthPercentageToDP(25.5), marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='cover' source={{ uri: x.path }} style={{ height: widthPercentageToDP(25.5), width:  widthPercentageToDP(25.5), borderRadius: 5 }} />
+                                            <Entypo name='cross' onPress={() => {
                                             Alert.alert("Remove Image", "Do you want to remove this image from list?", [
                                                 { text: "no" },
                                                 {
@@ -1395,10 +1540,9 @@ const Profile = (props) => {
                                                     }
                                                 }
                                             ])
-                                        }} style={{ height: 100, borderRadius: 5, width: 100, marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
-                                            <Image resizeMode='contain' source={{ uri: x.path }} style={{ height: 100, width: 100, borderRadius: 5 }} />
+                                        }} color='red' size={20} style={{ position: "absolute", top: 0, right: 0 }} />
                                         </Pressable>)}
-                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height: 100, marginTop: 5, borderRadius: 5, width: 100, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height:  widthPercentageToDP(25.5), marginTop: 5, borderRadius: 5, width:  widthPercentageToDP(25.5), justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
                                             <Image resizeMode='contain' source={require("../../../assets/signup/photo.png")} style={{ height: 70, width: 70 }} />
                                         </View>
                                     </View>
@@ -1460,6 +1604,14 @@ const Profile = (props) => {
                 </TouchableOpacity>
             </View>
             {loader && <Loader />}
+            <DateTimePickerModal
+                date={initialDate}
+                isVisible={isDatePickerVisible}
+                mode="date"
+                onConfirm={handleConfirm}
+                onCancel={() => setDatePickerVisibility(false)}
+            />
+            <ModalOTP phone_number={"+"+userData?.phone_number?.match(/\d/g).join("")} setIsVerifiedPhone={setIsVerifiedPhone} visible={otpModal} setVisible={setOTPModal} />
         </SafeAreaView>
     )
 }

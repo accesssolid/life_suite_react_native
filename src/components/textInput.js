@@ -27,7 +27,7 @@ function CustomInput({
     customContainerStyles,
     customInputStyles,
     bottomText,
-    blurOnSubmit
+    blurOnSubmit,icon
 }) {
     return (
         <Item
@@ -82,6 +82,7 @@ function CustomInput({
                 />
             </TouchableOpacity>
             {bottomText && <Text style={{ paddingRight:10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.black, fontSize:12 }}>{bottomText}</Text>}
+            {icon}
         </Item>
     );
 }
