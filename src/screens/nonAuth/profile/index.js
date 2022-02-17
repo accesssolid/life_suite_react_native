@@ -201,6 +201,21 @@ const Profile = (props) => {
     const [isVerfiedPhone,setIsVerifiedPhone]=useState(true)
     const [otpModal,setOTPModal]=useState(false)
     // 
+    const [experience,setExperince]=React.useState("")
+
+    React.useEffect(()=>{
+        if(user.user_role==role.provider){
+            let exp=user.experience
+            if(Number(exp)>0){
+                if(Number(exp)>1){
+                    exp+=" years"
+                }else{
+                    exp+=" year"
+                }
+            }
+            setExperince(exp)
+        }
+    },[user])
 
     function logout() {
         setLoader(true)
@@ -506,20 +521,23 @@ const Profile = (props) => {
             let homekeys = Object.keys(address[0])
             for (let index = 0; index < homekeys.length; index++) {
                 if (homekeys[index] !== 'state' && homekeys[index] !== 'city' && String(address[0][homekeys[index]]).trim() == '' && homekeys[index] !== 'zip_code' && homekeys[index] !== 'address_line_2' && homekeys[index] !== 'lat' && homekeys[index] !== 'long') {
-                    showToast(`${getKeyName(homekeys[index])} is required for ${user.user_role == 2 ? 'home' : 'permanent'} address`, 'danger')
+                    showToast(`${user.user_role == 2 ? 'home' : 'permanent'} address is required`, 'danger')
                     setLoader(false)
                     return false
                 }
             }
 
             let keys = Object.keys(address[1])
-            for (let index = 0; index < keys.length; index++) {
-                if (keys[index] !== 'state' && keys[index] !== 'city' && String(address[0][keys[index]]).trim() == '' && keys[index] !== 'zip_code' && keys[index] !== 'address_line_2' && keys[index] !== 'lat' && keys[index] !== 'long') {
-                    showToast(`${getKeyName(keys[index])} is required for ${user.user_role == 2 ? 'work' : 'mailing'} address`, 'danger')
+            // for (let index = 0; index < keys.length; index++) {
+                // if (keys[index] !== 'state' && keys[index] !== 'city' && String(address[0][keys[index]]).trim() == '' && keys[index] !== 'zip_code' && keys[index] !== 'address_line_2' && keys[index] !== 'lat' && keys[index] !== 'long') {
+                if(workAddressData.address_line_1==""){
+                    showToast(`${user.user_role == 2 ? 'work' : 'mailing'} address is required`, 'danger')
                     setLoader(false)
                     return false
-                }
-            }
+                }   
+                
+            //     }
+            // }
         }
         var date = moment(userData.dob, 'MM/DD/YYYY', true)
         var date1=moment(userData.dob,'YYYY-MM-DD',true)
@@ -985,7 +1003,6 @@ const Profile = (props) => {
             if (response.status) {
                 console.log("Response", response)
                 dispatch(loadauthentication(response.data))
-                setPictures([])
             }
         } catch (err) {
 
@@ -1169,7 +1186,7 @@ const Profile = (props) => {
                             />}
                             <CustomTextInput
                                 title="Date of Birth *"
-                                value={user?.dob !== "null" ? moment(user.dob, "YYYY-MM-DD").format("MM/DD/YYYY") : ""}
+                                value={user?.dob !== "null" ? moment(userData.dob, "YYYY-MM-DD").format("MM/DD/YYYY") : ""}
                                 onChangeText={(formatted, extracted) => {
                                     setUserData({ ...userData, dob: formatted })
                                 }}
@@ -1195,9 +1212,9 @@ const Profile = (props) => {
                                 mask={"[00]/[00]/[0000]"}
                                 keyboardType='numeric'
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
-                                // icon={<Entypo name='calendar' style={{position:"absolute",right:10,top:10}} color={LS_COLORS.global.green} size={28} onPress={() => {
-                                //     setDatePickerVisibility(true)
-                                // }} />}
+                                icon={<Entypo name='calendar' style={{position:"absolute",right:10,top:10}} color={LS_COLORS.global.green} size={28} onPress={() => {
+                                    setDatePickerVisibility(true)
+                                }} />}
                             />
                                <CustomTextInput
                                 title="Phone Number *"
@@ -1243,6 +1260,18 @@ const Profile = (props) => {
                             {!isVerfiedPhone&&<Text onPress={()=>{
                                 checkISVerified()
                             }} style={{color:LS_COLORS.global.green,textDecorationLine:"underline",marginLeft:20}}>Verify Phone Number</Text>}
+                               {user.user_role == role.provider && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
+                                <Text numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
+                                <CheckBox
+                                    style={{}}
+                                    containerStyle={{ width: 25 }}
+                                    wrapperStyle={{}}
+                                    checked={Number(userData?.phone_is_public)}
+                                    onPress={() => setUserData({ ...userData, phone_is_public: Number(userData.phone_is_public) ? 0 : 1 })}
+                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
+                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                                />
+                            </View>}
                             <CustomInput
                                 text="Email"
                                 value={userData.email}
@@ -1290,18 +1319,7 @@ const Profile = (props) => {
                                 required={true}
                             /> */}
                           
-                            {user.user_role == role.provider && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                <Text numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
-                                <CheckBox
-                                    style={{}}
-                                    containerStyle={{ width: 25 }}
-                                    wrapperStyle={{}}
-                                    checked={Number(userData?.phone_is_public)}
-                                    onPress={() => setUserData({ ...userData, phone_is_public: Number(userData.phone_is_public) ? 0 : 1 })}
-                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
-                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
-                                />
-                            </View>}
+                         
                             {user.user_role == role.provider && <CustomInput
                                 text="Driver License #State ID "
                                 value={userData?.license ? (userData.license == "null" ? "" : userData.license) : ""}
@@ -1499,14 +1517,25 @@ const Profile = (props) => {
                             {user.user_role == role.provider &&
                                 <CustomInput
                                     text="Experience"
-                                    value={userData?.experience ? userData?.experience : ""}
-                                    onChangeText={(text) => {
+                                    value={experience}
+                                    onChangeText={(t) => {
+                                        let g = t.replace(/ years| year/g, '')
+                                        if (g != "") {
+                                            if (Number(g) <= 1) {
+                                                g += " year"
+                                            } else {
+                                                g += " years"
+                                            }
 
-                                        setUserData({ ...userData, experience: text })
+                                        }
+                                         setExperince(g)
                                     }}
                                     keyboardType="numeric"
                                     returnKeyType={Platform.OS == "ios" ? "done" : "default"}
-                                    icon={<Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15, color: "black", top: 16, left: (userData?.experience?.length??0) * 10 + 30, position: "absolute" }}>Years</Text>}
+                                    TextInputProps={{
+                                        selection: { start: String(experience).replace(/ years| year/g, '').length }
+                                    }}
+                                    // icon={String(userData.experience).length>0&&<Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15, color: "black", top: 16, left: (userData?.experience?.length??0) * 10 + 30, position: "absolute" }}>Years</Text>}
                                 />
                             }
                             {user.user_role == role.provider &&
@@ -1579,10 +1608,11 @@ const Profile = (props) => {
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11 }}>Connected ({connectedDetail?.email})</Text>
                                         </View> : <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
                                     </TouchableOpacity>
-                                    <Text onPress={() => {
+                                    {isConnectedToAccount&&<Text onPress={() => {
                                         createNewConnect()
                                     }} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: "red" }}>Change</Text>
-                                </View>
+                                }
+                                    </View>
                         }
                     </View>
                 </ScrollView>

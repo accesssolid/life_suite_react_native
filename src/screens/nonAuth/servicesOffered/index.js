@@ -156,7 +156,7 @@ const ServicesProvided = (props) => {
             setServicesData(d)
         }
 
-        if (!isAddServiceMode) {
+        // if (!isAddServiceMode) {
             let arr = []
             let selected = []
             if (variants.length > 0) {
@@ -230,7 +230,7 @@ const ServicesProvided = (props) => {
             const setData = new Set([...selected, ...selectedItems])
             // setData is the ids from selected Items
             setSelectedItems([...setData])
-        }
+        // }
         setInitialProductsData()
 
     }
@@ -364,7 +364,7 @@ const ServicesProvided = (props) => {
             let temp = [...servicesData.filter(item => item.variant_data == selectedVariant)]
             let otherItems = [...servicesData.filter(item => item.variant_data !== selectedVariant)]
             temp.forEach((ele, index) => {
-                if (ele.item_id == incomingItem.item_id) {
+                if (ele.item_id == incomingItem?.item_id) {
                     if (key == "price") {
                         let parsed = conTwoDecDigit(text.replace('$', ''))
                         if (text == '') {
@@ -383,7 +383,7 @@ const ServicesProvided = (props) => {
 
         } else {
             let temp = [...servicesData]
-            let item = temp.filter(item => item.item_id == incomingItem.item_id)[0]
+            let item = temp.filter(item => item.item_id == incomingItem?.item_id)[0]
 
             if (key == "price") {
                 let parsed = conTwoDecDigit(text.replace('$', ''))
@@ -399,7 +399,7 @@ const ServicesProvided = (props) => {
             }
 
             temp.forEach((element, index) => {
-                if (element.item_id == incomingItem.item_id) {
+                if (element.item_id == incomingItem?.item_id) {
                     temp[index] = item
                 }
             });
@@ -706,7 +706,6 @@ const ServicesProvided = (props) => {
             ]
         }
         setNewServicesMaster([...newServicesMaster, newService])
-
     }
 
     const removeNewService = (item) => {

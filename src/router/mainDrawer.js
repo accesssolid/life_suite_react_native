@@ -39,6 +39,8 @@ import { loadNotificaitonsThunk } from '../redux/features/notification'
 import { showToast, storeItem } from '../components/validators';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import firestore from '@react-native-firebase/firestore';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import { logoutAll } from '../redux/features/loginReducer';
 
 const Drawer = createDrawerNavigator();
 
@@ -399,7 +401,41 @@ export default MainDrawer;
 
 const CustomDrawerContent = (props) => {
     const user = useSelector(state => state.authenticate.user)
+    const access_token = useSelector(state => state.authenticate.access_token)
+
     const navigation = useNavigation()
+    const dispatch=useDispatch()
+    const [loader,setLoader]=React.useState(false)
+    function logout() {
+        setLoader(true)
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+        var formdata = new FormData();
+        formdata.append("device_id", getUniqueId());
+
+        let config = {
+            headers: headers,
+            data: formdata,
+            endPoint: user.user_role == role.customer ? '/api/customerLogout' : '/api/providerLogout',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    storeItem('user', null)
+                    storeItem('passcode', null)
+                    navigation.navigate('WelcomeScreen')
+                    dispatch(logoutAll())
+                }
+                else {
+                    setLoader(false)
+                    showToast(response.message, 'danger')
+                }
+            })
+            .catch(err => {
+            })
+    }
     return (
         <DrawerContentScrollView {...props}>
             <View >
@@ -408,6 +444,11 @@ const CustomDrawerContent = (props) => {
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
                 <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
+            </View>
+            <View onTouchEnd={()=>{
+                logout()
+            }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
+                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>Switch to</Text>
             </View>
             <DrawerItemList {...props} />
             {user?.user_role == role.provider &&<DrawerItem

@@ -198,7 +198,7 @@ export default function CardList({ navigation, route }) {
                                         </View>
                                     </View>
                                     <Image style={{ height: 60, width: 60, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type(item.brand)} />
-                                    <AntDesign
+                                    {cards.length>1&&<AntDesign
                                         name="delete"
                                         size={20}
                                         onPress={() => {
@@ -216,13 +216,14 @@ export default function CardList({ navigation, route }) {
                                         }}
                                         color="red"
                                         style={{ position: "absolute", top: 10, right: 10 }}
-                                    />
+                                    />}
                                     <CheckBox
                                         containerStyle={{ width: 25, position: "absolute", top: 30, right: 5 }}
                                         wrapperStyle={{}}
                                         checked={item.default_type}
                                         onPress={() => {
-                                            Alert.alert("Message", "Do you really want to make default this card?", [
+                                        
+                                            Alert.alert("Message", "Do you really want to make this card as primary card?", [
                                                 {
                                                     text: "No"
                                                 },

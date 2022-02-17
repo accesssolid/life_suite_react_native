@@ -47,12 +47,19 @@ export default function CardList({ navigation, route }) {
 
     var cards = creditCardType(cardDetails.number);
 
+    const checkMonthLength=d=>{
+        if(String(d).length==1){
+            return "0"+d
+        }
+        return d
+    }
+
     React.useEffect(() => {
         if (item) {
             if (item.address_line1) {
                 setAddress({ ...address, address_line1: item.address_line1 })
             }
-            setCardDetails({ ...cardDetails, name: item.name, expiry: item.exp_month + "/" + item.exp_year ,number:"**** **** **** "+item.last4})
+            setCardDetails({ ...cardDetails, name: item.name, expiry: checkMonthLength(item.exp_month) + "/" + item.exp_year ,number:"**** **** **** "+item.last4})
         }
     }, [item])
 

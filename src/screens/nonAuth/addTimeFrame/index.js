@@ -46,7 +46,7 @@ const AddTimeFrame = (props) => {
     const [activeIndex, setActiveIndex] = useState(null)
     const [initialDate, setInitialDate] = useState(new Date())
     const [markedDates, setMarkedDates] = useState({})
-
+    const [current_month,setCurrentMonth]=useState(moment().format("YYYY-MM"))
     useEffect(() => {
         if (!isAddServiceMode) {
             getTimeFrames()
@@ -181,6 +181,7 @@ const AddTimeFrame = (props) => {
         })
         json_data['time_frame_update'] = data.filter(x => x.id != "")
         formdata.append("json_data", JSON.stringify(json_data));
+        formdata.append("current_time",moment().format("YYYY-MM-DD HH:mm:ss"))
         console.log(JSON.stringify(json_data))
         // return
         let config = {
@@ -370,7 +371,9 @@ const AddTimeFrame = (props) => {
                             "Authorization": `Bearer ${access_token}`
                         }
                         let data = {
-                            "time_frame_id": frame.id
+                            "time_frame_id": frame.id,
+                            "current_time":moment().format("YYYY-MM-DD HH:mm:ss")
+
                         }
                         let config = {
                             headers: headers,
@@ -453,6 +456,10 @@ const AddTimeFrame = (props) => {
                         showWeekNumbers={false}
                         onPressArrowLeft={subtractMonth => subtractMonth()}
                         onPressArrowRight={addMonth => addMonth()}
+                        onMonthChange={(date)=>{
+                            console.log(date)
+                            setCurrentMonth(moment(date.dateString,"YYYY-MM-DD").format("YYYY-MM"))
+                        }}
                         disableArrowLeft={false}
                         disableArrowRight={false}
                         disableAllTouchEventsForDisabledDays={true}
@@ -468,6 +475,9 @@ const AddTimeFrame = (props) => {
                             const toTime = moment(item.to_time, ["HH.mm a"]).format("hh:mm A");
                             const start_date = moment(item.start_date).format("MM-DD-YYYY")
                             const end_date = moment(item.end_date).format("MM-DD-YYYY")
+                            if( moment(item.start_date).format("YYYY-MM")!=current_month){
+                                return null
+                            }
                             const isSameDate = start_date === end_date
                             const showDateRangeText = isSameDate ? start_date : start_date + " to " + end_date
                             return (

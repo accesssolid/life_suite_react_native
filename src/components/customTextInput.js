@@ -129,6 +129,7 @@ export function CustomTextInput(props) {
                     editable={props.editable}
                     multiline={props.multiline}
                     numberOfLines={props.numberOfLines}
+                    {...props.TextInputProps}
                 />
             </View>
             {props.title && <Text style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }]}>{props.title}{props.required && '*'}</Text>}

@@ -23,8 +23,10 @@ import messaging from '@react-native-firebase/messaging';
 
 /* Icons */
 import Entypo from 'react-native-vector-icons/Entypo'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { CommonActions } from '@react-navigation/native';
 import * as RNLocalize from "react-native-localize";
+
 
 const LoginScreen = (props) => {
     const [fcmToken, setFcmToken] = useState("")
@@ -221,6 +223,7 @@ const LoginScreen = (props) => {
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Root>
                 <Container style={styles.container}>
+                    <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
                     <Content showsVerticalScrollIndicator={false}>
                         <View style={styles.textContainer}>
                             <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>

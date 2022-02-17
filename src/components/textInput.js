@@ -27,7 +27,8 @@ function CustomInput({
     customContainerStyles,
     customInputStyles,
     bottomText,
-    blurOnSubmit,icon
+    blurOnSubmit,icon,
+    TextInputProps
 }) {
     return (
         <Item
@@ -68,7 +69,7 @@ function CustomInput({
                 editable={editable}
                 multiline={multiline}
                 blurOnSubmit={blurOnSubmit}
-                
+                {...TextInputProps}
             />
 
             <TouchableOpacity onPress={action} style={{ right: 10 }}>
