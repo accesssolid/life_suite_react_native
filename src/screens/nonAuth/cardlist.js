@@ -39,7 +39,7 @@ export default function CardList({ navigation, route }) {
                     setCards(response.data)
                 }
                 else {
-
+                    setCards([])
                 }
             })
             .catch(err => {

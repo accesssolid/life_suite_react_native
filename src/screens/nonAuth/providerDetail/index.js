@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, Text, Dimensions, ScrollView, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../../components/header';
@@ -6,8 +6,107 @@ import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
 const { width, height } = Dimensions.get("window")
 import { AirbnbRating } from 'react-native-ratings';
-
+import { useSelector } from 'react-redux';
+import { BASE_URL, getApi } from '../../../api/api';
+import Loader from '../../../components/loader';
+import moment from 'moment';
 export default function ProviderDetail(props) {
+    const { providerId, service } = props.route?.params
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const [loader, setLoader] = React.useState(false)
+    const [provider, setProvider] = React.useState(null)
+    const [pictures, setPictures] = React.useState([])
+    const [ratings,setRatings]=React.useState([])
+    const [average_rating,setAverageRating]=React.useState(0)
+
+    useEffect(() => {
+        getProviderDetail()
+        getRatings()
+    }, [])
+    useEffect(() => {
+        if (provider?.pictures_data?.length > 0) {
+            let new_arr = []
+            while (provider?.pictures_data?.length) new_arr.push(provider?.pictures_data?.splice(0, 3));
+            setPictures(new_arr)
+        }
+    }, [provider])
+    useEffect(()=>{
+        if(ratings.length>0){
+            let ratingCopy=ratings.map(x=>x.rating).filter(x=>x!="null").map(Number)
+           let totalAverage=ratingCopy.reduce((a,b)=>a+b,0)/ratingCopy.length
+            setAverageRating(totalAverage)
+        }
+    },[ratings])
+    const getProviderDetail = async () => {
+        try {
+            setLoader(true)
+            let headers = {
+                "Authorization": `Bearer ${access_token}`
+            }
+            let body = new FormData()
+            body.append("provider_id", providerId)
+
+            let config = {
+                headers: headers,
+                data: body,
+                endPoint: "/api/providerDetail",
+                type: 'post'
+            }
+            let res = await getApi(config)
+            if (res.status) {
+                setProvider(res.data)
+            }
+        } catch (err) {
+            console.warn(err)
+        } finally {
+            setLoader(false)
+        }
+    }
+
+    const getRatings = async () => {
+        try {
+            setLoader(true)
+            let headers = {
+                "Authorization": `Bearer ${access_token}`
+            }
+            let body = new FormData()
+            body.append("provider_id", providerId)
+            body.append("orderBy",'desc')
+            let config = {
+                headers: headers,
+                data: body,
+                endPoint: "/api/providerRating",
+                type: 'post'
+            }
+            let res = await getApi(config)
+            console.log(JSON.stringify(res.data))
+            if (res.status) {
+                setRatings(res.data)
+            }
+        } catch (err) {
+            console.warn(err)
+        } finally {
+            setLoader(false)
+        }
+    }
+    const year=(t)=>{
+        if(Number(t)>1){
+            return " years"
+        }else{
+            return ' year'
+        }
+    }
+
+    function formatPhoneNumber(phoneNumberString) {
+        if(phoneNumberString){
+            var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+            var match = cleaned.match(/^(\d{1})(\d{3})(\d{3})(\d{4})$/);
+            if (match) {
+              return "+"+match[1]+'(' + match[2] + ') ' + match[3] + '-' + match[4];
+            }
+        }
+        return null;
+      }
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <Header
@@ -24,12 +123,12 @@ export default function ProviderDetail(props) {
             />
             <Image
                 resizeMode='cover'
-                source={{ uri: "https://www.pngkit.com/png/detail/911-9115516_avatar-icon-deadpool.png" }}
+                source={{ uri: BASE_URL + provider?.profile_image }}
                 style={{ width: 90, height: 90, borderWidth: 1, borderColor: LS_COLORS.global.green, zIndex: 1000, elevation: 10, top: -45, left: (width / 2) - 45, borderRadius: 45, backgroundColor: "gray" }}
             />
             <View style={{ marginTop: -40 }}>
-                <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: LS_COLORS.global.green }}>Alexi</Text>
-                <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black }}>Mechanism</Text>
+                <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: LS_COLORS.global.green }}>{provider?.first_name}</Text>
+                <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black }}>{service}</Text>
             </View>
             <ScrollView >
                 <View style={{
@@ -48,27 +147,21 @@ export default function ProviderDetail(props) {
                     borderRadius: 10
                 }}>
                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black }}>Personal Information</Text>
-                    <CustomInputViews title="Bio" text={"I am a Proffesional Mechanic having 4 year experaienc lorem ipsum uba hjgh aytuew dbc qiow apx."} />
-                    <CustomInputViews title="Phone Number" text={"+1 (800) 919 1000"} />
-                    <CustomInputViews title="Home Address" text={"123 lake side, LA"} />
-                    <CustomInputViews title="Business Name" text={"Top Class Machines"} />
-                    <CustomInputViews title="Experience" text={"10 year"} />
+                    <CustomInputViews title="Bio" text={provider?.about!="null"?provider?.about:""} />
+                    <CustomInputViews title="Phone Number" text={formatPhoneNumber(provider?.phone_number)} />
+                    <CustomInputViews title="Home Address" text={provider?.address[0]?.address_line_1} />
+                    <CustomInputViews title="Business Name" text={provider?.business_name!=null?provider?.business_name:""} />
+                    <CustomInputViews title="Experience" text={provider?.experience!="null"?provider?.experience+ year(provider?.experience):""} />
                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, marginTop: 30 }}>Certifications</Text>
-                    <CustomInputViews text={"Lorem ipsum dolor sit ama"} />
-                    <CustomInputViews text={"Lorem ipsum dolor sit ama"} />
+                    {provider?.certificate_data.map(x => <CustomInputViews text={x.certificate} />)}
                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, marginTop: 30 }}>Pictures</Text>
-                    {[[1, 2, 3], [3, 2, 1]].map(x => {
+                    {pictures.map(x => {
                         return (
                             <View style={{ flexDirection: "row", marginTop: 10, justifyContent: "space-between" }}>
-                                <Image
+                                {x.map(picture => <Image
+                                    source={{ uri: BASE_URL + picture?.image }}
                                     style={{ width: (width / 3) - 20, borderRadius: 5, aspectRatio: 1, backgroundColor: LS_COLORS.global.grey }}
-                                />
-                                <Image
-                                    style={{ width: (width / 3) - 20, borderRadius: 5, aspectRatio: 1, backgroundColor: LS_COLORS.global.grey }}
-                                />
-                                <Image
-                                    style={{ width: (width / 3) - 20, borderRadius: 5, aspectRatio: 1, backgroundColor: LS_COLORS.global.grey }}
-                                />
+                                />)}
                             </View>
                         )
                     })}
@@ -99,34 +192,34 @@ export default function ProviderDetail(props) {
                     </View>
                     <AirbnbRating
                         count={5}
-                        defaultRating={4}
+                        defaultRating={average_rating}
                         selectedColor={LS_COLORS.global.green}
                         showRating={false}
                         size={20}
                     />
-                    {[{ date: "12/04/2020", msg: "lorem ipsum shj asdgjh ajgsdw guyic hjgdd xnb qw ewgjhgjk.", title: "Jenna Miles" }, { date: "12/04/2020", msg: "lorem ipsum shj asdgjh ajgsdw guyic hjgdd xnb qw ewgjhgjk.", title: "Jenna Miles" }].map(x => {
+                    {ratings.map(x => {
                         return (
-                            <View style={{marginTop:20}}>
+                            <View style={{ marginTop: 20 }}>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: "black" }}>{x.title}</Text>
+                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: "black" }}>{x.customers_first_name} {x.customers_last_name}</Text>
                                         <AirbnbRating
                                             count={5}
-                                            defaultRating={4}
+                                            defaultRating={x?.rating=="null"?Number(x.rating):0}
                                             selectedColor={LS_COLORS.global.green}
                                             showRating={false}
                                             size={14}
                                         />
                                     </View>
-                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.grey }}>{x.date}</Text>
+                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.grey }}>{moment(x.created_at,"YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY")}</Text>
                                 </View>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular,marginTop:10, fontSize: 14, color: LS_COLORS.global.grey }}>{x.msg}</Text>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, fontSize: 14, color: LS_COLORS.global.grey }}>{x.comment}</Text>
                             </View>
                         )
                     })}
                 </View>
             </ScrollView>
-
+            {loader && <Loader />}
         </SafeAreaView>
     )
 }

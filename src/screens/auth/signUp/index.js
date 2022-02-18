@@ -328,12 +328,12 @@ const SignUpScreen = (props) => {
 
         setLoader(true)
 
-        let required_keys_customer = ['first_name', 'last_name', 'dob', 'phone_number', 'email']
+        let required_keys_customer = ['first_name', 'last_name', 'dob', 'phone_number']
         if (role == 2) {
             required_keys_customer = ['first_name', 'last_name', 'dob', 'email', 'phone_number']
         }
         let keys = Object.keys(signUpData)
-
+        
         for (let i of required_keys_customer) {
             console.log(i)
             if (String(signUpData[`${i}`])?.trim() == '' || signUpData[`${i}`] == 0) {
@@ -342,13 +342,19 @@ const SignUpScreen = (props) => {
                 return false
             }
         }
-
+         
         if (!isVerfiedPhone) {
             showToast("Please verify your phone number.")
             setLoader(false)
             return
         }
-
+        if(role!=2){
+            if(signUpData.email.trim()==""){
+                showToast("Email is required")
+                setLoader(false)
+                return
+            }
+        }
         const address = [
             {
                 "country": 231,
@@ -491,7 +497,7 @@ const SignUpScreen = (props) => {
         }
 
         if (role != 1) {
-            user_data = { ...user_data, ...provider_data,experience:String(provider_data.experience).replace(/ years| year/g,""), certificateTextData: JSON.stringify(provider_data.certificateTextData), mailing_address: signUpData.email }
+            user_data = { ...user_data, ...provider_data,experience:String(provider_data.experience).replace(/[^\d.\.]/gi, ''), certificateTextData: JSON.stringify(provider_data.certificateTextData), mailing_address: signUpData.email }
         }
         let body = getFormData(user_data)
         for (let i of pictures) {
@@ -1262,7 +1268,7 @@ const SignUpScreen = (props) => {
                                     value={provider_data.experience}
                                     showValue={provider_data.experience}
                                     onChangeText={t => {
-                                        let g = t.replace(/ years| year/g, '')
+                                        let g = t.replace(/[^\d.\.]/gi, '')
                                         if (g != "") {
                                             if (Number(g) <= 1) {
                                                 g += " year"
@@ -1274,7 +1280,7 @@ const SignUpScreen = (props) => {
                                         setProviderData({ ...provider_data, experience: g })
                                     }}
                                     TextInputProps={{
-                                        selection: { start: String(provider_data.experience).replace(/ years| year/g, '').length }
+                                        selection: { start: String(provider_data.experience).replace(/[^\d.\.]/gi, '').length }
                                     }}
                                 // icon={(String(provider_data.experience).length>0||String(provider_data.experience)!="")&&<Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 13, color: "black", top: 15, left: (provider_data.experience?.length ?? 0) * 10 + 10, position: "absolute" }}>Years</Text>}
                                 />}

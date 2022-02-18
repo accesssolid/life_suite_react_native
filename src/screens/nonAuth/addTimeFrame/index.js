@@ -93,7 +93,7 @@ const AddTimeFrame = (props) => {
         let stylesCopy = customDatesStyles.filter(x => x.from_time == "" || x.to_time == "")
         if (stylesCopy.length >= 1 && propOwn.length == 0) {
             let d = [...customDatesStyles]
-            d.pop()
+            d.splice(0,1)
             setCustomDatesStyles(d)
         }
 
@@ -102,7 +102,7 @@ const AddTimeFrame = (props) => {
             let dates = [...selectedDates]
             let styles = customDatesStyles.filter(x => x.from_time !== "" || x.to_time !== "")
             dates.push(moment(date.dateString).format("DD/MM/YYYY"))
-            styles.push({
+            styles.unshift({
                 id: '',
                 start_date: moment(propOwn[0]).format("YYYY-MM-DD"),
                 end_date: moment(propOwn[1] ?? propOwn[0]).format("YYYY-MM-DD"),

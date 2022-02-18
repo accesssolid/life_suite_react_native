@@ -883,7 +883,10 @@ const ServicesProvided = (props) => {
                     }
                     if (String(itemm.item_id).startsWith("new")) {
                         let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
-                        let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id)
+                        let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).map(x=>({
+                            name:x.name,
+                            price:x.price
+                        }))
                         new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                     } else {
                         services.push(obj)
@@ -891,14 +894,14 @@ const ServicesProvided = (props) => {
 
                 }
             })
-
+            console.log("New SErvices",new_services)
             let json_data = {
                 products: [...productsData].map(x => ({ item_product_id: x.id, price: x.price })),
-                new_products: [...newProductsData],
+                new_products: [...newProductsData].filter(x=>!x.item_id.startsWith("new")),
                 services: [...services],
                 new_services: [...new_services]
             }
-            console.log(json_data)
+            console.log( JSON.stringify(json_data))
             formdata.append("service_id", subService.id)
             formdata.append("json_data", JSON.stringify(json_data))
             const config = {

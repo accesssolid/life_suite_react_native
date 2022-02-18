@@ -37,8 +37,7 @@ const HomeScreen = (props) => {
     const [orders, setOrders] = useState()
     const [scrollEnabled, setScrollEnabled] = React.useState(true)
     useEffect(() => {
-        // props.navigation.navigate("AddCard1")
-        // props.naivgation.navigate("ProviderDetail")
+        
         const backAction = () => {
             return true;
         };

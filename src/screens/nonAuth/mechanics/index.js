@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -23,6 +23,9 @@ import SureModal1 from '../../../components/sureModal1';;
 import TimeFrame, { FilterModal } from '../../../components/timeFrame';
 import _ from 'lodash'
 import moment from 'moment';
+import Geolocation from 'react-native-geolocation-service';
+import RNGooglePlaces from 'react-native-google-places';
+import { useFocusEffect } from '@react-navigation/native';
 
 // #liahs_provider_list
 
@@ -32,6 +35,7 @@ const Mechanics = (props) => {
     const [providers, setProviders] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
+    console.log("USER", user)
     const [price, setPrice] = useState(false)
     const [time, setTime] = useState(false)
     const [open, setOpen] = useState(false)
@@ -42,7 +46,15 @@ const Mechanics = (props) => {
     const [selectedItemsWithProviders, setSelectedItemsWithProviders] = useState([])
     const [selectedProducts, setSelectedProducts] = useState([])
     const [apiData, setApiData] = useState([])
-
+    const [mycords, setMyCords] = useState({
+        latitude: 37.785834,
+        longitude: -122.406417
+    })
+    const [current_address,setCurrentAddress]=useState({
+        country:"USA",
+        city:"",
+        state:""
+    })
     //    #liahs
     const [dupProviders, setDupProviders] = React.useState([])
     const [filterModal, setFilterModal] = React.useState(false)
@@ -136,9 +148,105 @@ const Mechanics = (props) => {
 
     useEffect(() => {
         getProviders()
+        getLocationPermission()
     }, [])
+    const getLocationPermission = async () => {
+        let hasLocationPermission = false
+        if (Platform.OS == "ios") {
+            Geolocation.requestAuthorization('always').then((res) => {
+                if (res == "granted") {
+                    hasLocationPermission = true
+                    getCurrentLocation(hasLocationPermission)
+                } else {
+                    hasLocationPermission = false
+                    getCurrentLocation(hasLocationPermission)
+                }
+            })
+        } else {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        title: "Lifesuite Location Permission",
+                        message:
+                            "Lifesuite needs to access your location ",
+                        buttonNeutral: "Ask Me Later",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK"
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    hasLocationPermission = true
+                    getCurrentLocation(hasLocationPermission)
+                } else {
+                    hasLocationPermission = false
+                    getCurrentLocation(hasLocationPermission)
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+    }
+    const getCurrentLocation = (hasLocationPermission) => {
+        if (hasLocationPermission) {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    console.log(position, "postion")
+                    setMyCords({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    })
+                    getCurrentPlace()
+                },
+                (error) => {
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+            );
+        } else {
+            showToast("Location permission not granted")
+        }
+    }
+    const getCurrentPlace = () => {
+        RNGooglePlaces.getCurrentPlace(['location','address'])
+            .then((results) => {
+               if(results.length>0){
+                   let res=results[0].address?.split(",")
+                   if(res.length==3){
+                       setCurrentAddress({
+                           city:res[0],
+                           state:res[1],
+                           country:res[2]
+                       })
+                   }else{
+                    setCurrentAddress({
+                        city:res[1],
+                        state:res[2],
+                        country:res[3]
+                    })
+                   }
+               }
+            })
+            .catch((error) => console.log(error.message));
+    }
 
-    const getProviders = (rangeData = {}, showRangeResult = false) => {
+    const getMilesBetweenCords = async (toCoordinates, fromCoordinates) => {
+        try {
+            let response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyBtDBhUzqiZRbcFQezVwgfB9I6Wr4TkJkE`)
+            let res = await response.json()
+            if (res?.rows[0]) {
+                let element = res.rows[0].elements[0]
+                if (element?.distance?.value) {
+                    return (element?.distance?.value * 0.000621371)
+                }
+            }
+            return 0
+        } catch (err) {
+            console.err(err)
+        }
+
+    }
+
+    const getProviders = (rangeData = {}, showRangeResult = false, my_location = false) => {
         setLoading(true)
         console.log("RangeData", JSON.stringify(rangeData))
         let headers = {
@@ -153,7 +261,6 @@ const Mechanics = (props) => {
             endPoint: '/api/providerListOrder',
             type: 'post'
         }
-        console.log(JSON.stringify({ ...data, ...rangeData }))
         getApi(config)
             .then((response) => {
                 console.log(response, "response")
@@ -161,6 +268,9 @@ const Mechanics = (props) => {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
                     })
+                    if (my_location) {
+                        proData = proData.filter(x => Number(x.service_is_at_address) == 0)
+                    }
                     setProviders(proData)
                     setLoading(false)
                 }
@@ -199,13 +309,44 @@ const Mechanics = (props) => {
     //     { json_data.provider_id ? arr.push(json_data) : null }
     //     setApiData([...arr])
     // }
+    const [cards,setCards]=React.useState([])
 
+    useFocusEffect(useCallback(()=>{
+        getCards()
+    },[]))
+
+    const getCards = () => {
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let config = {
+            headers: headers,
+            endPoint: '/api/customerSaveCardList',
+            type: 'get'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setCards(response.data)
+                }
+                else {
+                    setCards([])
+                }
+            })
+            .catch(err => {
+              
+            }).finally(() => {
+            })
+    }
 
 
     const placeOrder = (jsonData, continuous_order = 0) => {
+        
         setLoading(true)
         var formdata = new FormData();
-        console.log("Json data",JSON.stringify(jsonData))
+        console.log("Json data", JSON.stringify(jsonData))
         formdata.append("items_data", JSON.stringify(jsonData))
         formdata.append("order_placed_address", data.order_placed_address)
         formdata.append("order_placed_lat", data.order_placed_lat.toString())
@@ -214,7 +355,11 @@ const Mechanics = (props) => {
         formdata.append("order_from_lat", data.order_from_lat.toString())
         formdata.append("order_from_long", data.order_from_long.toString())
         formdata.append("timezone", RNLocalize.getTimeZone())
-        formdata.append("mile_distance",data.mile_distance)
+        formdata.append("mile_distance", data.mile_distance)
+        formdata.append("country",current_address.country)
+        formdata.append("state",current_address.state)
+        formdata.append("city",current_address.city)
+
         if (continuous_order) {
             formdata.append("continuous_order", continuous_order)
         }
@@ -449,6 +594,7 @@ const Mechanics = (props) => {
                             {/* providers changed to dupProviders */}
                             {dupProviders.length > 0 ?
                                 dupProviders.map((item, index) => {
+                                    console.log("item", item)
                                     let country = item?.current_address?.split(",")
                                     let countryName = country && country.length > 0 ? country[country.length - 1] : ""
                                     let x = item.timeDuration / 60
@@ -471,7 +617,10 @@ const Mechanics = (props) => {
 
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <View style={{ width: "75%", flexDirection: 'row' }}>
+                                            <View onTouchEnd={() => {
+                                                // props.navigation.navigate("AddCard1")
+                                                props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService.name })
+                                            }} style={{ width: "75%", flexDirection: 'row' }}>
                                                 <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
                                                     <Image
                                                         style={{ height: '100%', width: '100%' }}
@@ -505,9 +654,9 @@ const Mechanics = (props) => {
                                             </View>}
                                         </View>
                                         {!open ?
-                                            <Text numberOfLines={1} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.about}</Text>
+                                            <Text numberOfLines={1} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
                                             :
-                                            <Text onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.about}</Text>
+                                            <Text onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
                                         }
                                         <View style={{ width: 120, flexDirection: "row", overflow: "hidden", justifyContent: "space-evenly", alignItems: "center" }}>
                                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}> {"Rating"}</Text>
@@ -521,6 +670,9 @@ const Mechanics = (props) => {
                                                 startingValue={parseInt(item.rating ?? 0)}
                                             />
                                         </View>
+                                        {(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Address : {item.current_address}</Text>}
+                                        {Number(item?.service_is_at_address) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text>}
+
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
                                             let x = i.time_duration / 60
@@ -599,6 +751,11 @@ const Mechanics = (props) => {
                             activeOpacity={0.7}
                             onPress={() => {
                                 // props.navigation.navigate("MainDrawer",{screen:"Orders"})
+                                if(cards.length==0){
+                                    showToast("Please add card before requesting service.")
+                                    props.navigation.navigate("AddCard", { type: "add" })
+                                    return
+                                }
                                 let requiredSevices = JSON.parse(data.json_data)?.items
                                 let z = []
                                 for (let p of dupProviders) {
@@ -625,7 +782,7 @@ const Mechanics = (props) => {
             <FilterModal
                 visible={filterModal}
                 setVisible={setFilterModal}
-                getFilteredData={(data) => getProviders(data, true)}
+                getFilteredData={(data, my_location) => getProviders(data, true, my_location)}
             />
         </>
     )

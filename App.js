@@ -107,7 +107,7 @@ const App = () => {
         <StatusBar backgroundColor={LS_COLORS.global.cyan} barStyle="dark-content" />
         <SafeAreaProvider>
         <NavigationContainer linking={linking} onStateChange={(e)=>{
-          console.log("navigation_state",JSON.stringify(e))
+          // console.log("navigation_state",JSON.stringify(e))
         }} >
           <Router />
           </NavigationContainer>

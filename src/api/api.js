@@ -15,7 +15,7 @@ export const getApi = (config) => {
         }).then(async (response) => {
             // console.log("Response",await response.text())
             let json = await response.json()
-            console.log("Response Data =>", '/*', config.endPoint, '*/', "==>", JSON.stringify(json))
+            // console.log("Response Data =>", '/*', config.endPoint, '*/', "==>", JSON.stringify(json))
             resolve(json);
         }).catch((error) => {
             // console.log("API error =>", '/*', config.endPoint, '*/', "==>", error)

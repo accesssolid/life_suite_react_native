@@ -50,7 +50,7 @@ const getMessage = (name) => {
             return "Email is required "
         case "dob":
             return "Date of birth is required "
-    
+
         case "password":
             return "Password is required"
 
@@ -148,7 +148,6 @@ const Profile = (props) => {
     const [addHomeAddressActive, setAddHomeAddressActive] = useState(false)
 
     const user = useSelector(state => state.authenticate.user)
-    console.log("User Data", JSON.stringify(user))
     const access_token = useSelector(state => state.authenticate.access_token)
     const [userData, setUserData] = useState({ ...user })
     const [loader, setLoader] = useState(false)
@@ -194,28 +193,29 @@ const Profile = (props) => {
     // 
     const [connectedDetail, setConnectedDetail] = React.useState({})
     const [selection, setSelection] = React.useState({ start: 0 })
+    const [selection1, setSelection1] = React.useState({ start: 0 })
     const [pictures, setPictures] = React.useState([])
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
     const [initialDate, setInitialDate] = useState(new Date())
     // starting the value is always 
-    const [isVerfiedPhone,setIsVerifiedPhone]=useState(true)
-    const [otpModal,setOTPModal]=useState(false)
+    const [isVerfiedPhone, setIsVerifiedPhone] = useState(true)
+    const [otpModal, setOTPModal] = useState(false)
     // 
-    const [experience,setExperince]=React.useState("")
+    const [experience, setExperince] = React.useState("")
 
-    React.useEffect(()=>{
-        if(user.user_role==role.provider){
-            let exp=user.experience
-            if(Number(exp)>0){
-                if(Number(exp)>1){
-                    exp+=" years"
-                }else{
-                    exp+=" year"
+    React.useEffect(() => {
+        if (user.user_role == role.provider) {
+            let exp = user.experience
+            if (Number(exp) > 0) {
+                if (Number(exp) > 1) {
+                    exp += " years"
+                } else {
+                    exp += " year"
                 }
             }
             setExperince(exp)
         }
-    },[user])
+    }, [user])
 
     function logout() {
         setLoader(true)
@@ -281,7 +281,7 @@ const Profile = (props) => {
     useEffect(() => {
         const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValue)
         if (selectedItem.length > 0 && selectedItem[0].id !== undefined) {
-            setHomeAddressData({ ...homeAddressData, city: selectedItem[0].id })
+            // setHomeAddressData({ ...homeAddressData, city: selectedItem[0].id })
         }
     }, [dropCityValue])
 
@@ -305,7 +305,7 @@ const Profile = (props) => {
         lat: userData?.address[0]?.lat,
         lon: userData?.address[0]?.long
     })
-
+    
     const [workAddressData, setWorkAddressData] = useState({
         address_line_1: userData?.address[1]?.address_line_1,
         address_line_2: userData?.address[1]?.address_line_2,
@@ -315,7 +315,52 @@ const Profile = (props) => {
         lat: userData?.address[1]?.lat,
         lon: userData?.address[1]?.long
     })
-
+    useEffect(()=>{
+        if(userData?.address){
+            if(userData[0]?.type=="home"){
+                setHomeAddressData({
+                    address_line_1: userData?.address[0]?.address_line_1,
+                    address_line_2: userData?.address[0]?.address_line_2,
+                    city: userData?.address[0]?.city,
+                    state: userData?.address[0]?.state,
+                    zip: userData?.address[0]?.zip_code,
+                    lat: userData?.address[0]?.lat,
+                    lon: userData?.address[0]?.long
+                })
+            }else{
+                setWorkAddressData({
+                    address_line_1: userData?.address[0]?.address_line_1,
+                    address_line_2: userData?.address[0]?.address_line_2,
+                    city: userData?.address[0]?.city,
+                    state: userData?.address[0]?.state,
+                    zip: userData?.address[0]?.zip_code,
+                    lat: userData?.address[0]?.lat,
+                    lon: userData?.address[0]?.long
+                })
+            }
+            if(userData[1]?.type=="work"){
+                setWorkAddressData({
+                    address_line_1: userData?.address[1]?.address_line_1,
+                    address_line_2: userData?.address[1]?.address_line_2,
+                    city: userData?.address[1]?.city,
+                    state: userData?.address[1]?.state,
+                    zip: userData?.address[1]?.zip_code,
+                    lat: userData?.address[1]?.lat,
+                    lon: userData?.address[1]?.long
+                })
+            }else{
+                setHomeAddressData({
+                    address_line_1: userData?.address[1]?.address_line_1,
+                    address_line_2: userData?.address[1]?.address_line_2,
+                    city: userData?.address[1]?.city,
+                    state: userData?.address[1]?.state,
+                    zip: userData?.address[1]?.zip_code,
+                    lat: userData?.address[1]?.lat,
+                    lon: userData?.address[1]?.long
+                })
+            }
+        }
+    },[userData])
     useEffect(() => {
         if (isSameAddress) {
             setWorkAddressData({
@@ -451,7 +496,7 @@ const Profile = (props) => {
     const saveUser = () => {
         setLoader(true)
         let required_keys_customer = ['first_name', 'last_name', 'dob', 'phone_number', 'email']
-     
+
         // let keys = Object.keys(userData)
         // for (let index = 0; index < keys.length; index++) {
         //     if (typeof userData[keys[index]] == 'string' && userData[keys[index]].trim() == '' && keys[index] !== 'prefer_name'&&keys[index]!=="middle_name"&&keys[index]!=="prefer_name"&& keys[index] !== "about") {
@@ -468,7 +513,7 @@ const Profile = (props) => {
             }
         }
 
-        if(!isVerfiedPhone){
+        if (!isVerfiedPhone) {
             showToast("Please verify your phone number.")
             setLoader(false)
             return
@@ -516,34 +561,29 @@ const Profile = (props) => {
                 "zip_code": workAddressData.zip,
             }
         ]
-
-        if (userData.user_role == role.provider) {
-            let homekeys = Object.keys(address[0])
-            for (let index = 0; index < homekeys.length; index++) {
-                if (homekeys[index] !== 'state' && homekeys[index] !== 'city' && String(address[0][homekeys[index]]).trim() == '' && homekeys[index] !== 'zip_code' && homekeys[index] !== 'address_line_2' && homekeys[index] !== 'lat' && homekeys[index] !== 'long') {
+        // alert(user.user_role)
+        // return
+        if (user?.user_role == role.provider) {
+            // let homekeys = Object.keys(address[0])
+            // for (let index = 0; index < homekeys.length; index++) {
+                if (homeAddressData.address_line_1=="") {
                     showToast(`${user.user_role == 2 ? 'home' : 'permanent'} address is required`, 'danger')
                     setLoader(false)
                     return false
                 }
-            }
-
-            let keys = Object.keys(address[1])
-            // for (let index = 0; index < keys.length; index++) {
-                // if (keys[index] !== 'state' && keys[index] !== 'city' && String(address[0][keys[index]]).trim() == '' && keys[index] !== 'zip_code' && keys[index] !== 'address_line_2' && keys[index] !== 'lat' && keys[index] !== 'long') {
-                if(workAddressData.address_line_1==""){
-                    showToast(`${user.user_role == 2 ? 'work' : 'mailing'} address is required`, 'danger')
-                    setLoader(false)
-                    return false
-                }   
-                
-            //     }
             // }
+
+            if (workAddressData.address_line_1 == "") {
+                showToast(`${user.user_role == 2 ? 'work' : 'mailing'} address is required`, 'danger')
+                setLoader(false)
+                return false
+            }
         }
         var date = moment(userData.dob, 'MM/DD/YYYY', true)
-        var date1=moment(userData.dob,'YYYY-MM-DD',true)
-        if (date.isValid()||date1.isValid){
+        var date1 = moment(userData.dob, 'YYYY-MM-DD', true)
+        if (date.isValid() || date1.isValid) {
 
-        } else{
+        } else {
             setLoader(false)
             return showToast("Invalid date format(mm/dd/yy)")
         }
@@ -663,17 +703,11 @@ const Profile = (props) => {
         formdata.append("user_id", userData.id);
         formdata.append("email", userData.email);
         formdata.append("first_name", userData.first_name);
-        // console.log(userData.middle_name)
-        // setLoader(false)
-        // return
-        formdata.append("middle_name", userData.middle_name==""?"null":userData.middle_name);
+        formdata.append("middle_name", userData.middle_name == "" ? "null" : userData.middle_name);
         formdata.append("last_name", userData.last_name);
-        formdata.append("dob",user?.dob!==userData.dob?moment(userData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"):userData.dob);
+        formdata.append("dob", user?.dob !== userData.dob ? moment(userData.dob, "MM/DD/YYYY").format("YYYY-MM-DD") : userData.dob);
         formdata.append("phone_number", userData.phone_number.match(/\d/g).join(""));
-        // console.log(user?.dob!==userData.dob?moment(userData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"):userData.dob)
-        // console.log("Phone Number",userData.phone_number)
-        // setLoader(false)
-        // return
+  
         if (user.user_role == role.provider) {
             formdata.append("about", userData.about);
             for (let i of pictures) {
@@ -684,7 +718,7 @@ const Profile = (props) => {
                 })
             }
             formdata.append("business_name", userData.business_name)
-            formdata.append("experience", userData.experience)
+            formdata.append("experience", String(experience).replace(/[^\d.\.]/gi, ""))
             formdata.append("phone_is_public", userData.phone_is_public)
             formdata.append("tagline", userData.tagline)
             formdata.append("address_is_public", userData.address_is_public)
@@ -907,6 +941,10 @@ const Profile = (props) => {
         }
     }
 
+    React.useEffect(()=>{
+        console.log(homeAddressData,workAddressData)
+    },[homeAddressData,workAddressData])
+
     function formatPhoneNumber(value) {
         if (!value) return value;
         const phoneNumber = value.replace(/[^\d]/g, "");
@@ -942,7 +980,7 @@ const Profile = (props) => {
                             height: 400,
                             cropping: true
                         }).then(image => {
-                            console.log(image);
+                            
                             setPictures([...pictures, image])
                         }).catch(err => {
                             console.log("Image picker error : ", err)
@@ -952,18 +990,14 @@ const Profile = (props) => {
                 {
                     text: "Gallery", onPress: () => {
                         ImagePicker.openPicker({
-                            width: 400,
-                            height: 400,
-                            multiple: true,
-                            maxFiles: 15
+                            multiple: true
                         }).then(image => {
-                            console.log(image);
                             if (Array.isArray(image)) {
-                                let images_length=image.length
-                                if(count+images_length>10){
+                                let images_length = image.length
+                                if (count + images_length > 10) {
                                     showToast("You cannot add more than 10 pictures.")
                                 }
-                                setPictures([...pictures, ...image.slice(0,10-count)])
+                                setPictures([...pictures, ...image.slice(0, 10 - count)])
                             } else {
                                 setPictures([...pictures, image])
                             }
@@ -1001,7 +1035,6 @@ const Profile = (props) => {
 
             let response = await getApi(config)
             if (response.status) {
-                console.log("Response", response)
                 dispatch(loadauthentication(response.data))
             }
         } catch (err) {
@@ -1016,19 +1049,19 @@ const Profile = (props) => {
         setDatePickerVisibility(false)
     }
 
-    const checkISVerified=async()=>{
-        let ph=userData?.phone_number?.match(/\d/g).join("")
-        if(ph.length<11){
+    const checkISVerified = async () => {
+        let ph = userData?.phone_number?.match(/\d/g).join("")
+        if (ph.length < 11) {
             showToast("Phone number must be 10 digits.")
             return
         }
-        try{
+        try {
             setLoader(true)
             let headers = {
                 "Content-Type": "multipart/form-data",
             }
             let formdata = new FormData()
-            formdata.append("phone_number", "+"+ph)
+            formdata.append("phone_number", "+" + ph)
 
             let config = {
                 headers: headers,
@@ -1041,13 +1074,13 @@ const Profile = (props) => {
             if (response.status) {
                 showToast(response.message)
                 setOTPModal(true)
-            }else{
+            } else {
                 showToast(response.message)
             }
-        }catch(err){
+        } catch (err) {
             showToast("Phone number must be 10 digits.")
 
-        }finally{
+        } finally {
             setLoader(false)
         }
     }
@@ -1112,7 +1145,7 @@ const Profile = (props) => {
                                 // onSubmitEditing={() => { lnameRef.current._root.focus() }}
                                 required={true}
                             />
-                         
+
                             <CustomInput
                                 text="Last Name"
                                 value={userData.last_name}
@@ -1126,9 +1159,9 @@ const Profile = (props) => {
                                 // onSubmitEditing={() => prefNameRef.current._root.focus()}
                                 required={true}
                             />
-                               <CustomInput
+                            <CustomInput
                                 text="Middle Name"
-                                value={userData.middle_name!="null" ?userData.middle_name:""}
+                                value={userData.middle_name != "null" ? userData?.middle_name : ""}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, middle_name: text })
                                 }}
@@ -1167,7 +1200,7 @@ const Profile = (props) => {
                             {user.user_role == role.provider && <CustomInput
                                 // required
                                 text="Bio"
-                                value={userData?.about}
+                                value={userData?.about == 'null' ? "" : userData?.about}
                                 onChangeText={(text) => {
                                     setUserData({ ...userData, about: text })
                                 }}
@@ -1186,7 +1219,7 @@ const Profile = (props) => {
                             />}
                             <CustomTextInput
                                 title="Date of Birth *"
-                                value={user?.dob !== "null" ? moment(userData.dob, "YYYY-MM-DD").format("MM/DD/YYYY") : ""}
+                                value={user?.dob !== "null" ? moment(userData?.dob, "YYYY-MM-DD").format("MM/DD/YYYY") : ""}
                                 onChangeText={(formatted, extracted) => {
                                     setUserData({ ...userData, dob: formatted })
                                 }}
@@ -1212,19 +1245,18 @@ const Profile = (props) => {
                                 mask={"[00]/[00]/[0000]"}
                                 keyboardType='numeric'
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
-                                icon={<Entypo name='calendar' style={{position:"absolute",right:10,top:10}} color={LS_COLORS.global.green} size={28} onPress={() => {
+                                icon={<Entypo name='calendar' style={{ position: "absolute", right: 10, top: 10 }} color={LS_COLORS.global.green} size={28} onPress={() => {
                                     setDatePickerVisibility(true)
                                 }} />}
                             />
-                               <CustomTextInput
+                            <CustomTextInput
                                 title="Phone Number *"
-                                value={user?.phone_number !== "null" ?user?.phone_number:""}
+                                value={user?.phone_number !== "null" ? user?.phone_number : ""}
                                 onChangeText={(formatted, extracted) => {
-                                    console.log(user.phone_number,formatted)
-                                    let ph=formatted.match(/\d/g).join("")
-                                    if(user.phone_number!=ph){
+                                    let ph = formatted.match(/\d/g).join("")
+                                    if (user.phone_number != ph) {
                                         setIsVerifiedPhone(false)
-                                    }else if(user.phone_number==ph){
+                                    } else if (user.phone_number == ph) {
                                         setIsVerifiedPhone(true)
                                     }
                                     setUserData({ ...userData, phone_number: formatted })
@@ -1234,8 +1266,8 @@ const Profile = (props) => {
                                     width: "90%",
                                     // height: 50,
                                     alignSelf: "center",
-                                    alignItems:"center",
-                                    flexDirection:"row",
+                                    alignItems: "center",
+                                    flexDirection: "row",
                                     borderColor: LS_COLORS.global.textInutBorderColor,
 
                                 }}
@@ -1243,7 +1275,7 @@ const Profile = (props) => {
                                     color: LS_COLORS.global.black,
                                     fontFamily: LS_FONTS.PoppinsMedium,
                                     fontSize: 16,
-                                    width:"90%",
+                                    width: "90%",
                                     paddingHorizontal: 20
                                 }}
                                 titleStyle={{
@@ -1254,13 +1286,13 @@ const Profile = (props) => {
                                 keyboardType='numeric'
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                 icon={
-                                    <Entypo name="check" color={isVerfiedPhone?'green':"grey"} size={20} />
+                                    <Entypo name="check" color={isVerfiedPhone ? 'green' : "grey"} size={20} />
                                 }
                             />
-                            {!isVerfiedPhone&&<Text onPress={()=>{
+                            {!isVerfiedPhone && <Text onPress={() => {
                                 checkISVerified()
-                            }} style={{color:LS_COLORS.global.green,textDecorationLine:"underline",marginLeft:20}}>Verify Phone Number</Text>}
-                               {user.user_role == role.provider && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
+                            }} style={{ color: LS_COLORS.global.green, textDecorationLine: "underline", marginLeft: 20 }}>Verify Phone Number</Text>}
+                            {user.user_role == role.provider && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
                                 <Text numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
                                 <CheckBox
                                     style={{}}
@@ -1282,7 +1314,7 @@ const Profile = (props) => {
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                 required={true}
                             />
-                             <View style={{ height: 20 }}></View>
+                            <View style={{ height: 20 }}></View>
                             <View style={{}}>
                                 <DropDown
                                     title="Notification type"
@@ -1318,8 +1350,8 @@ const Profile = (props) => {
                                 }}
                                 required={true}
                             /> */}
-                          
-                         
+
+
                             {user.user_role == role.provider && <CustomInput
                                 text="Driver License #State ID "
                                 value={userData?.license ? (userData.license == "null" ? "" : userData.license) : ""}
@@ -1374,8 +1406,17 @@ const Profile = (props) => {
                                         onSubmitEditing: () => workAddressRef.current.focus(),
                                         placeholderTextColor: LS_COLORS.global.placeholder,
                                         selection: selection,
+                                        onChangeText:(t)=>{
+                                            console.log(t)
+                                            setHomeAddressData({
+                                                ...homeAddressData,
+                                                address_line_1: t,
+                                              
+                                            })
+                                            setSelection1({start:t?.length})
+                                        },
                                         onBlur: () => { setSelection({ start: 0 }) },
-                                        onFocus: () => { setSelection(null) }
+                                        onFocus: () => { setSelection({start:homeAddressData?.address_line_1?.length}) }
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -1407,10 +1448,11 @@ const Profile = (props) => {
                                         wrapperStyle={{}}
                                         checked={Number(userData?.address_is_public)}
                                         onPress={() => {
-                                            if(Number(userData?.service_is_at_address)){
+                                            if (Number(userData?.service_is_at_address)) {
                                                 return
                                             }
-                                            setUserData({ ...userData, address_is_public: Number(userData.address_is_public) ? 0 : 1 })}}
+                                            setUserData({ ...userData, address_is_public: Number(userData.address_is_public) ? 0 : 1 })
+                                        }}
                                         checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
@@ -1473,9 +1515,16 @@ const Profile = (props) => {
                                     textInputProps={{
                                         editable: !isSameAddress,
                                         placeholderTextColor: LS_COLORS.global.placeholder,
-                                        selection: selection,
-                                        onBlur: () => { setSelection({ start: 0 }) },
-                                        onFocus: () => { setSelection(null) }
+                                        selection: selection1,
+                                        onChangeText:(t)=>{
+                                            setWorkAddressData({
+                                                ...workAddressData,
+                                                address_line_1:t,
+                                            })
+                                            setSelection1({start:t?.length})
+                                        },
+                                        onBlur: () => { setSelection1({ start: 0 }) },
+                                        onFocus: () => { setSelection1({start:workAddressData?.address_line_1?.length}) }
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -1484,13 +1533,13 @@ const Profile = (props) => {
                                 />
 
                             </View>
-                           
+
                             {user.user_role == role.provider &&
                                 <View>
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 15, color: LS_COLORS.global.placeholder }}>Certificates (upto 5 )</Text>
                                     {userData?.certificate_data?.map((x, i) => <CustomInput
                                         text="Certificates"
-                                        value={x?.certificate ? x?.certificate : ""}
+                                        value={x?.certificate != "null" ? x?.certificate : ""}
                                         onChangeText={(text) => {
                                             let v = [...userData.certificate_data]
                                             v[i].certificate = text
@@ -1504,7 +1553,7 @@ const Profile = (props) => {
                                         returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                     />)}
                                     <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                                       {userData?.certificate_data?.length < 5 &&<Pressable style={{ marginTop: 10 }} onPress={() => {
+                                        {userData?.certificate_data?.length < 5 && <Pressable style={{ marginTop: 10 }} onPress={() => {
                                             if (userData.certificate_data?.length < 5) {
                                                 setUserData({ ...userData, certificate_data: [...userData.certificate_data, { certificate: "" }] })
                                             }
@@ -1519,59 +1568,58 @@ const Profile = (props) => {
                                     text="Experience"
                                     value={experience}
                                     onChangeText={(t) => {
-                                        let g = t.replace(/ years| year/g, '')
+                                        let g = t.replace(/[^\d.\.]/gi, '')
                                         if (g != "") {
                                             if (Number(g) <= 1) {
                                                 g += " year"
                                             } else {
                                                 g += " years"
                                             }
-
                                         }
-                                         setExperince(g)
+                                        setExperince(g)
                                     }}
                                     keyboardType="numeric"
                                     returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                     TextInputProps={{
-                                        selection: { start: String(experience).replace(/ years| year/g, '').length }
+                                        selection: { start: String(experience).replace(/[^\d.\.]/gi, '').length }
                                     }}
-                                    // icon={String(userData.experience).length>0&&<Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15, color: "black", top: 16, left: (userData?.experience?.length??0) * 10 + 30, position: "absolute" }}>Years</Text>}
+                                // icon={String(userData.experience).length>0&&<Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15, color: "black", top: 16, left: (userData?.experience?.length??0) * 10 + 30, position: "absolute" }}>Years</Text>}
                                 />
                             }
                             {user.user_role == role.provider &&
                                 <View style={{ marginHorizontal: 10, marginTop: 20 }}>
                                     <Text style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
                                     <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 10 }}>
-                                        {userData.pictures_data?.map(x => (<Pressable  style={{ height:  widthPercentageToDP(25.5), borderRadius: 5, width:  widthPercentageToDP(25.5), marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
-                                            <Image resizeMode='cover' source={{ uri: BASE_URL + x.image }} style={{ height:  widthPercentageToDP(25.5), width:  widthPercentageToDP(25.5), borderRadius: 5 }} />
+                                        {userData.pictures_data?.map(x => (<Pressable style={{ height: widthPercentageToDP(25.5), borderRadius: 5, width: widthPercentageToDP(25.5), marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='cover' source={{ uri: BASE_URL + x.image }} style={{ height: widthPercentageToDP(25.5), width: widthPercentageToDP(25.5), borderRadius: 5 }} />
                                             <Entypo name='cross' onPress={() => {
-                                            Alert.alert("Remove Image", "Do you want to remove this image from list?", [
-                                                { text: "no" },
-                                                {
-                                                    text: "yes", onPress: () => {
-                                                        removePicture(x)
+                                                Alert.alert("Remove Image", "Do you want to remove this image from list?", [
+                                                    { text: "no" },
+                                                    {
+                                                        text: "yes", onPress: () => {
+                                                            removePicture(x)
+                                                        }
                                                     }
-                                                }
-                                            ])
-                                        }} color='red' size={20} style={{ position: "absolute", top: 0, right: 0 }} />
+                                                ])
+                                            }} color='red' size={20} style={{ position: "absolute", top: 0, right: 0 }} />
                                         </Pressable>))
                                         }
-                                        {pictures.map((x, i) => <Pressable  style={{ height:  widthPercentageToDP(25.5), borderRadius: 5, width:  widthPercentageToDP(25.5), marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
-                                            <Image resizeMode='cover' source={{ uri: x.path }} style={{ height: widthPercentageToDP(25.5), width:  widthPercentageToDP(25.5), borderRadius: 5 }} />
+                                        {pictures.map((x, i) => <Pressable style={{ height: widthPercentageToDP(25.5), borderRadius: 5, width: widthPercentageToDP(25.5), marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                            <Image resizeMode='cover' source={{ uri: x.path }} style={{ height: widthPercentageToDP(25.5), width: widthPercentageToDP(25.5), borderRadius: 5 }} />
                                             <Entypo name='cross' onPress={() => {
-                                            Alert.alert("Remove Image", "Do you want to remove this image from list?", [
-                                                { text: "no" },
-                                                {
-                                                    text: "yes", onPress: () => {
-                                                        let p = [...pictures]
-                                                        p.splice(i, 1)
-                                                        setPictures(p)
+                                                Alert.alert("Remove Image", "Do you want to remove this image from list?", [
+                                                    { text: "no" },
+                                                    {
+                                                        text: "yes", onPress: () => {
+                                                            let p = [...pictures]
+                                                            p.splice(i, 1)
+                                                            setPictures(p)
+                                                        }
                                                     }
-                                                }
-                                            ])
-                                        }} color='red' size={20} style={{ position: "absolute", top: 0, right: 0 }} />
+                                                ])
+                                            }} color='red' size={20} style={{ position: "absolute", top: 0, right: 0 }} />
                                         </Pressable>)}
-                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height:  widthPercentageToDP(25.5), marginTop: 5, borderRadius: 5, width:  widthPercentageToDP(25.5), justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
+                                        <View onTouchEnd={() => pickImageForGallery()} style={{ height: widthPercentageToDP(25.5), marginTop: 5, borderRadius: 5, width: widthPercentageToDP(25.5), justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
                                             <Image resizeMode='contain' source={require("../../../assets/signup/photo.png")} style={{ height: 70, width: 70 }} />
                                         </View>
                                     </View>
@@ -1608,11 +1656,11 @@ const Profile = (props) => {
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11 }}>Connected ({connectedDetail?.email})</Text>
                                         </View> : <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
                                     </TouchableOpacity>
-                                    {isConnectedToAccount&&<Text onPress={() => {
+                                    {isConnectedToAccount && <Text onPress={() => {
                                         createNewConnect()
                                     }} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: "red" }}>Change</Text>
-                                }
-                                    </View>
+                                    }
+                                </View>
                         }
                     </View>
                 </ScrollView>
@@ -1641,7 +1689,7 @@ const Profile = (props) => {
                 onConfirm={handleConfirm}
                 onCancel={() => setDatePickerVisibility(false)}
             />
-            <ModalOTP phone_number={"+"+userData?.phone_number?.match(/\d/g).join("")} setIsVerifiedPhone={setIsVerifiedPhone} visible={otpModal} setVisible={setOTPModal} />
+            <ModalOTP phone_number={"+" + userData?.phone_number?.match(/\d/g).join("")} setIsVerifiedPhone={setIsVerifiedPhone} visible={otpModal} setVisible={setOTPModal} />
         </SafeAreaView>
     )
 }

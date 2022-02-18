@@ -240,8 +240,9 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
         "range_start_time": "",
         "range_end_time": ""
     })
+    const [my_location,setMyLocation]=React.useState(false)
     const handleSave = () => {
-        getFilteredData({ ...rating,...time})
+        getFilteredData({ ...rating,...time},my_location)
         setVisible(false)
     }
     return (
@@ -260,7 +261,16 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                     <Pressable>
                         <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Filter</Text>
                         <View style={{ marginTop: "10%" }}>
-                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            <View style={{ flexDirection: "row", alignItems: "center" ,justifyContent:"space-between"}}>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>I want services at my location:</Text>
+                            <CheckBox
+                                    checked={my_location}
+                                    onPress={() => {
+                                        setMyLocation(!my_location)
+                                    }}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                               />
                             </View>
                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>Rating:</Text>
                             {[4, 3, 2, 1].map(x => <TouchableOpacity onPress={() => {
@@ -357,6 +367,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                         "range_start_time": "",
                                         "range_end_time": ""
                                     })
+                                    setMyLocation(false)
                                 }}>
                                 <Text style={styles.saveText}>Clear</Text>
                             </TouchableOpacity>

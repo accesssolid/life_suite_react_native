@@ -58,6 +58,11 @@ const CustomTextInput1 = props => {
 
 export function CustomTextInput(props) {
     const [isSecure,setIsSecure]=React.useState(false)
+    React.useEffect(()=>{
+        if(props.secureTextEntry){
+            setIsSecure(true)
+        }
+    },[props])
     if (props.mask) {
         return (
             <View style={{ position: "relative", borderWidth: 1, marginBottom: 30, marginHorizontal: 10, borderColor: LS_COLORS.global.lightTextColor, borderRadius: 7, ...props.containerStyle }}>
