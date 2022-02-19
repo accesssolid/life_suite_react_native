@@ -35,15 +35,31 @@ const TimeFrame = props => {
         console.log(date, selectedIndex, type)
         if (typeof selectedIndex == "number") {
             let d = _.cloneDeep(jsonData)
+            const start_time = moment(props.starting_time, "YYYY-MM-DD HH:mm:[00]")
+            const end_time = moment(props.ending_time, "YYYY-MM-DD HH:mm:[00]")
+            let dDate = moment(date)
             if (type == "start") {
-                d[selectedIndex].order_start_time = moment(date).format("YYYY-MM-DD HH:mm:[00]")
+                if (dDate.toDate() < start_time.toDate() || dDate.toDate() > end_time.toDate()) {
+                    setTimeout(() => {
+                        showToast(`order start time must be within ${start_time.format("hh:mm a")} &  ${end_time.format("hh:mm a")}`)
+                    }, 500)
+                } else {
+                    d[selectedIndex].order_start_time = moment(date).format("YYYY-MM-DD HH:mm:[00]")
+                }
             } else {
                 if (moment(d[selectedIndex].order_start_time).toDate() < moment(date).toDate()) {
-                    d[selectedIndex].order_end_time = moment(date).format("YYYY-MM-DD HH:mm:[00]")
+                    if (dDate.toDate() > end_time.toDate() || dDate.toDate() < start_time.toDate()) {
+                        setTimeout(() => {
+                            showToast(`order end time must be within ${start_time.format("hh:mm a")} &  ${end_time.format("hh:mm a")}`)
+                        }, 500)
+                    } else {
+                        d[selectedIndex].order_end_time = moment(date).format("YYYY-MM-DD HH:mm:[00]")
+                    }
+
                 } else {
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         showToast("order end time must be greater than start time")
-                    },500)
+                    }, 500)
                 }
             }
             setDatePickerVisibility(false)
@@ -140,7 +156,7 @@ const TimeFrame = props => {
                 }}>
                     <Pressable>
                         <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Select Time Frame</Text>
-                        {jsonData&&jsonData.map((i, index) => {
+                        {jsonData && jsonData.map((i, index) => {
                             console.log(i)
                             let x = i.duration / 60
                             let time_format = ""
@@ -149,17 +165,35 @@ const TimeFrame = props => {
                             } else {
                                 time_format = i.duration + " mins"
                             }
+                            let estimated_price = 0
+                            if (props.provider_prices) {
+                                let obj = props.provider_prices?.find(x => x.id == i.provider_id)
+                                if (obj) {
+                                    estimated_price = obj?.price
+                                }
+                            }
+                            let p_obj=data?.find(x=>x.id==i.provider_id)
+                            let location=props?.location
+                            if(p_obj){
+                                if(p_obj?.service_is_at_address=="1"){
+                                    location=p_obj?.current_address
+                                }
+                            }
                             return <View style={{ marginTop: "10%" }}>
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsMedium }}>{i.provider_name}</Text>
                                 </View>
                                 <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: "black" }}>({i.itemsName.join(", ")})</Text>
                                 <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Time: {time_format}</Text>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Location: {location}</Text>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${estimated_price}</Text>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "100%", marginTop: "5%" }}>
                                     <View style={{ width: "50%", height: 50, }} >
                                         <Text>From</Text>
                                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
-                                            <TouchableOpacity disabled={jsonData.length<=1} style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
+                                            <TouchableOpacity
+                                                 disabled={jsonData.length <= 1} 
+                                                style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
                                                 onPress={() => {
                                                     setType("start")
                                                     setSelectedDate(moment(i.order_start_time).toDate())
@@ -176,7 +210,9 @@ const TimeFrame = props => {
                                     <View style={{ width: "50%", height: 50, justifyContent: 'center' }}>
                                         <Text>To</Text>
                                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
-                                            <TouchableOpacity disabled={jsonData.length<=1} style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
+                                            <TouchableOpacity
+                                                disabled={jsonData.length <= 1} 
+                                                style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
                                                 onPress={() => {
                                                     setType("end")
                                                     setSelectedDate(moment(i.order_end_time).toDate())
@@ -240,9 +276,9 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
         "range_start_time": "",
         "range_end_time": ""
     })
-    const [my_location,setMyLocation]=React.useState(false)
+    const [my_location, setMyLocation] = React.useState(false)
     const handleSave = () => {
-        getFilteredData({ ...rating,...time},my_location)
+        getFilteredData({ ...rating, ...time }, my_location)
         setVisible(false)
     }
     return (
@@ -261,16 +297,16 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                     <Pressable>
                         <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Filter</Text>
                         <View style={{ marginTop: "10%" }}>
-                            <View style={{ flexDirection: "row", alignItems: "center" ,justifyContent:"space-between"}}>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>I want services at my location:</Text>
-                            <CheckBox
+                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>I want services at my location:</Text>
+                                <CheckBox
                                     checked={my_location}
                                     onPress={() => {
                                         setMyLocation(!my_location)
                                     }}
                                     checkedIcon='dot-circle-o'
                                     uncheckedIcon='circle-o'
-                               />
+                                />
                             </View>
                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>Rating:</Text>
                             {[4, 3, 2, 1].map(x => <TouchableOpacity onPress={() => {
@@ -278,7 +314,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                     range_start_rating: "" + x,
                                     range_end_rating: ""
                                 })
-                            }} style={{flexDirection:"row",justifyContent:"space-between"}} ><View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
+                            }} style={{ flexDirection: "row", justifyContent: "space-between" }} ><View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
                                     <Rating
                                         type='custom'
                                         ratingColor='gold'
@@ -291,7 +327,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black }}> & Up</Text>
                                 </View>
                                 <CheckBox
-                                    checked={x==Number(rating.range_start_rating)}
+                                    checked={x == Number(rating.range_start_rating)}
                                     onPress={() => {
                                         setRating({
                                             range_start_rating: "" + x,
@@ -300,8 +336,8 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                     }}
                                     checkedIcon='dot-circle-o'
                                     uncheckedIcon='circle-o'
-                                    // checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
-                                    // uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
+                                // checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
+                                // uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                                 />
                             </TouchableOpacity>)}
                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10 }}>Price : </Text>
@@ -326,7 +362,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                     }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
                                 </View>
                             </View>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10 ,marginBottom:5}}>Time (minute): </Text>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10, marginBottom: 5 }}>Time (minute): </Text>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
                                     <TextInput value={time.range_start_time} onChangeText={t => {
@@ -344,14 +380,14 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                             range_end_time: t
                                         })
                                     }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
-                                   
+
                                 </View>
-                                
+
                             </View>
                         </View>
 
-                        <View style={{ marginTop: '10%' ,flexDirection:"row",justifyContent:"space-between"}}>
-                        <TouchableOpacity
+                        <View style={{ marginTop: '10%', flexDirection: "row", justifyContent: "space-between" }}>
+                            <TouchableOpacity
                                 style={styles.save}
                                 activeOpacity={0.7}
                                 onPress={() => {

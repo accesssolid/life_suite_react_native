@@ -35,7 +35,6 @@ const Mechanics = (props) => {
     const [providers, setProviders] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
-    console.log("USER", user)
     const [price, setPrice] = useState(false)
     const [time, setTime] = useState(false)
     const [open, setOpen] = useState(false)
@@ -60,11 +59,10 @@ const Mechanics = (props) => {
     const [filterModal, setFilterModal] = React.useState(false)
 
     React.useEffect(() => {
-        console.log("data===>", data)
+        console.log("data===>", data.order_from_address)
     }, [data])
 
     React.useEffect(() => {
-        console.log(providers, "Providers")
         let z = []
         for (let i of providers) {
             let changedItems = _.cloneDeep(i.item_list).map(x => {
@@ -191,7 +189,6 @@ const Mechanics = (props) => {
         if (hasLocationPermission) {
             Geolocation.getCurrentPosition(
                 (position) => {
-                    console.log(position, "postion")
                     setMyCords({
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude
@@ -248,7 +245,6 @@ const Mechanics = (props) => {
 
     const getProviders = (rangeData = {}, showRangeResult = false, my_location = false) => {
         setLoading(true)
-        console.log("RangeData", JSON.stringify(rangeData))
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -263,7 +259,6 @@ const Mechanics = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response, "response")
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -346,7 +341,6 @@ const Mechanics = (props) => {
         
         setLoading(true)
         var formdata = new FormData();
-        console.log("Json data", JSON.stringify(jsonData))
         formdata.append("items_data", JSON.stringify(jsonData))
         formdata.append("order_placed_address", data.order_placed_address)
         formdata.append("order_placed_lat", data.order_placed_lat.toString())
@@ -377,7 +371,6 @@ const Mechanics = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response, "Create ORder")
                 if (response.status == true) {
                     setLoading(false)
                     props.navigation.navigate("MainDrawer", { screen: "Orders" })
@@ -397,7 +390,6 @@ const Mechanics = (props) => {
                     setLoading(false)
                 }
             }).catch(err => {
-                console.log(err)
                 setLoading(false)
             })
     }
@@ -488,6 +480,30 @@ const Mechanics = (props) => {
     const checkShowAddress=(d)=>{
         return Boolean(d)
     }
+
+    const [provider_prices,setProviderPrices]=React.useState([])
+     React.useEffect(()=>{
+        console.log("provider_prices",provider_prices)
+     },[provider_prices])
+    React.useEffect(()=>{
+        if(dupProviders.length>0){
+           for(let item of dupProviders){
+            let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
+            let totalProductPrice = 0
+            for (let z of item.item_list) {
+                for (let p of z.products) {
+                    if (p.checked) {
+                        totalProductPrice += Number(p.price)
+                    }
+                }
+            }
+            let totalPrice = totalServicePrice + totalProductPrice
+            let p_p=[...provider_prices].filter(x=>x.id!=item.id)
+            p_p.push({id:item.id,price:totalPrice})
+            setProviderPrices(p_p)
+           }
+        }
+    },[dupProviders])
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -509,6 +525,8 @@ const Mechanics = (props) => {
                     starting_time={data.order_start_time}
                     ending_time={data.order_end_time}
                     orderPreviousData={data}
+                    provider_prices={provider_prices}
+                    location={data?.order_from_address}
                     action={(jsonData) => {
                         placeOrder(jsonData)
                         setOpen2(!open2);
@@ -596,7 +614,6 @@ const Mechanics = (props) => {
                             {/* providers changed to dupProviders */}
                             {dupProviders.length > 0 ?
                                 dupProviders.map((item, index) => {
-                                    console.log("item", item)
                                     let country = item?.current_address?.split(",")
                                     let countryName = country && country.length > 0 ? country[country.length - 1] : ""
                                     let x = item.timeDuration / 60
@@ -616,7 +633,8 @@ const Mechanics = (props) => {
                                         }
                                     }
                                     let totalPrice = totalServicePrice + totalProductPrice
-
+                                   
+                                   
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <View onTouchEnd={() => {
@@ -648,6 +666,7 @@ const Mechanics = (props) => {
                                                     checked={totalPrice > 0}
                                                     onPress={() => {
                                                         onGlobCheckBoxClicked(index)
+                                                      
                                                     }}
                                                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
@@ -694,7 +713,10 @@ const Mechanics = (props) => {
                                                             <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.price}</Text>
                                                             <CheckBox
                                                                 checked={i.checked}
-                                                                onPress={() => onCheckBoxClicked(!i.checked, index, iIndex, null)}
+                                                                onPress={() => {
+                                                                    onCheckBoxClicked(!i.checked, index, iIndex, null)
+                                                                  
+                                                                }}
                                                                 checkedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/checked.png")} />}
                                                                 uncheckedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
                                                             />
@@ -725,7 +747,10 @@ const Mechanics = (props) => {
                                                                     {isPriced && <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + itemData.price}</Text>}
                                                                     <CheckBox
                                                                         checked={itemData.checked}
-                                                                        onPress={() => onCheckBoxClicked(!itemData.checked, index, iIndex, prIndex)}
+                                                                        onPress={() => {
+                                                                            onCheckBoxClicked(!itemData.checked, index, iIndex, prIndex)
+                                                                       
+                                                                        }}
                                                                         checkedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/checked.png")} />}
                                                                         uncheckedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/unchecked.png")} />}
                                                                     />
@@ -767,7 +792,7 @@ const Mechanics = (props) => {
                                         }
                                     }
                                 }
-                                console.log("data===>", requiredSevices, z)
+                               
                                 if (_.isEqual(requiredSevices.sort((a, b) => a - b), z.sort((a, b) => a - b))) {
                                     setOpen2(!open2)
                                 } else {

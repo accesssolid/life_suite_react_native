@@ -144,7 +144,7 @@ export default function ProviderDetail(props) {
                 <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: LS_COLORS.global.green }}>{provider?.first_name}</Text>
                 <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black }}>{provider?.tagline}</Text>
             </View>
-            <ScrollView >
+            <ScrollView style={{paddingBottom:50}}>
                 <View style={{
                     shadowColor: "#000",
                     shadowOffset: {
@@ -176,8 +176,8 @@ export default function ProviderDetail(props) {
                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, marginTop: 30 }}>Pictures</Text>
                     {pictures.map(x => {
                         return (
-                            <View style={{ flexDirection: "row", marginTop: 10, justifyContent: "space-between" }}>
-                                {x.map(picture => <Pressable onPress={() => {
+                            <View style={{ flexDirection: "row", marginTop: 10 }}>
+                                {x.map((picture,index) => <Pressable style={{marginHorizontal:index==1?5:0}} onPress={() => {
                                     setCurrentSelectedImage(picture)
                                     setModalVisible(true)
                                 }}><Image
@@ -201,7 +201,8 @@ export default function ProviderDetail(props) {
                     padding: 10,
                     marginHorizontal: 15,
                     marginTop: 10,
-                    borderRadius: 10
+                    borderRadius: 10,
+                    marginBottom:40
                 }}>
                        <View style={{ width:"50%"}}>
                             <Text style={{ fontSize: 14,  fontFamily: LS_FONTS.PoppinsMedium }}>Filter rating</Text>

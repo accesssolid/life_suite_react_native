@@ -53,8 +53,6 @@ const ServicesProvided = (props) => {
     const getMakeList = () => {
         setLoading(true)
         let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
         const formdata = new FormData()
