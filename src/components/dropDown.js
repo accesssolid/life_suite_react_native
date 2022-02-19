@@ -7,7 +7,7 @@ import { globalStyles } from '../utils';
 import LS_FONTS from '../constants/fonts';
 
 import DropDownPicker from 'react-native-dropdown-picker';
-import ModalDropdown from 'react-native-modal-dropdown';
+import ModalDropdown from 'react-native-modal-dropdown-v2';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 
 

@@ -27,13 +27,41 @@ import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native'
 import { role } from '../../../constants/globals';
 import { loadNotificaitonsThunk } from '../../../redux/features/notification';
+
+const notification_color = [
+    {
+        title: "Requesting",
+        ids: [1],
+        color: "orange"
+    },
+    {
+        title: "Upcoming",
+        ids: [3, 4, 6, 5, 12, 9, 10, 11],
+        color: "#02a4ea"
+    },
+    {
+        title: "InProgress",
+        ids: [7, 15],
+        color: "#fdca0d"
+    },
+    {
+        title: "Completed",
+        ids: [8],
+        color: "#23b14d"
+    },
+    {
+        title: "Cancelled",
+        ids: [2, 14, 16, 13, 17],
+        color: "#ec1c25"
+    }
+]
 const Notification = (props) => {
     const [loading, setLoading] = React.useState(false)
     const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
     const notifications = useSelector(state => state.notification)?.data
-
+    console.log("Notifications", JSON.stringify(notifications))
     // const [notifications, setNotifications] = useState([])
 
     const seenNotification = async (data) => {
@@ -117,6 +145,20 @@ const Notification = (props) => {
     }, []))
 
     const renderData = ({ item }) => {
+        let backgroundColor = "#5CBFBF"
+        let orderType=""
+        if (item.type == "order") {
+            for (let c of notification_color) {
+                if (c.ids.includes(item.service_orders_order_status)) {
+                    backgroundColor = c.color
+                    orderType=c.title
+                    break
+                }
+            }
+        }
+        if (item.is_read != "0") {
+            backgroundColor = "gray"
+        }
         return (
             <Pressable
                 onPress={() => {
@@ -134,19 +176,19 @@ const Notification = (props) => {
                         borderColor: '#4141411A',
                         width: "90%",
                         overflow: "hidden",
-                        height:62
+                        height: 62
                     }}
                     activeOpacity={0.7}
                 >
                     <View style={{ flexDirection: 'row' }}>
-                        <View style={{ width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center", right: 10, backgroundColor: item.is_read == "0" ? "#5CBFBF" : "gray" }}></View>
+                        <View style={{ width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center", right: 10, backgroundColor: backgroundColor }}></View>
                         <View style={{ marginLeft: '5%', alignSelf: 'center', width: "65%" }}>
                             <Text numberOfLines={4} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: '#707070' }}>{item.description}</Text>
                         </View>
-                        <View style={{ width: "20%", justifyContent: "center", alignItems: "flex-end" }}>
+                        <View style={{ width: "20%", justifyContent: "space-evenly", alignItems: "flex-end" }}>
                             <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>
+                            <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{orderType}</Text>
                         </View>
-                     
                     </View>
                 </Card>
             </Pressable>

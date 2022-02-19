@@ -485,7 +485,9 @@ const Mechanics = (props) => {
                 console.log("error", err)
             })
     }
-
+    const checkShowAddress=(d)=>{
+        return Boolean(d)
+    }
     return (
         <>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -670,8 +672,8 @@ const Mechanics = (props) => {
                                                 startingValue={parseInt(item.rating ?? 0)}
                                             />
                                         </View>
-                                        {(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Address : {item.current_address}</Text>}
-                                        {Number(item?.service_is_at_address) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text>}
+                                        {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Address : {item.current_address}</Text>}
+                                        {checkShowAddress(Number(item?.service_is_at_address)) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text>}
 
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
@@ -752,7 +754,7 @@ const Mechanics = (props) => {
                             onPress={() => {
                                 // props.navigation.navigate("MainDrawer",{screen:"Orders"})
                                 if(cards.length==0){
-                                    showToast("Please add card before requesting service.")
+                                    showToast("Please add payment method before requesting any service")
                                     props.navigation.navigate("AddCard", { type: "add" })
                                     return
                                 }

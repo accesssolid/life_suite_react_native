@@ -71,7 +71,7 @@ const ServicesProvided = (props) => {
             .then((response) => {
                 console.log("reponse makelist", response)
                 if (response.status == true) {
-                    setMakeList(response.data)
+                    setMakeList(response.data?.filter(x=>x.status=="1"))
                 }
                 else {
                     setMakeList([])
@@ -155,7 +155,8 @@ const ServicesProvided = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    setModelList(response.data)
+                    console.log("Make LISt",response.data)
+                    setModelList(response.data?.filter(x=>x.status=="1"))
                     // setSelectedModel(response.data)
                 }
                 else {
@@ -457,16 +458,16 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    {(subService.id == 14 && activeItem == null) ? <View style={{}}>
+                    { activeItem == null&&vehicle_types?.length>0&&<View style={{}}>
                         <DropDown
-                            title="Vehicle Type"
+                            title={subService.id == 14?"Vehicle Type":"Variant Type"}
                             item={vehicle_types.map(x => x.name)}
                             value={vehicleType.name}
                             onChangeValue={(index, value) => onChangeVehicleType(vehicle_types[index])}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                             dropdownStyle={{ maxHeight: 300 }}
                         />
-                        <View style={{ flexDirection: 'row', paddingHorizontal: '3.5%' }}>
+                        {subService.id == 14&&<View style={{ flexDirection: 'row', paddingHorizontal: '3.5%' }}>
                             <View style={{ flex: 1 }}>
                                 <DropDown
                                     title="Make"
@@ -506,21 +507,21 @@ const ServicesProvided = (props) => {
                                     dropdownStyle={{ maxHeight: 300 }}
                                 />
                             </View>
-                        </View>
-                    </View> :
-                        <View style={{maxHeight:60}}>
-                        <ScrollView showsHorizontalScrollIndicator={false} horizontal >
-                        {vehicle_types.map(x=>{
-                            let isSelected=vehicleType.id==x.id
-                            return(
-                            <TouchableOpacity onPress={()=>setVehicleType(x)} style={{marginLeft:10,backgroundColor:isSelected?LS_COLORS.global.green:"white",borderColor:LS_COLORS.global.green,padding:5,margin:5,borderWidth:1,borderRadius:10}}>
-                                <Text style={{color:isSelected?"white":"black",fontFamily:LS_FONTS.PoppinsRegular}}>{x.name}</Text>
-                            </TouchableOpacity>
-                            )
-                        })}
-                        </ScrollView>
-                        </View>
-                    }
+                        </View>}
+                    </View> 
+                    // :<View style={{maxHeight:60}}>
+                    //     <ScrollView showsHorizontalScrollIndicator={false} horizontal >
+                    //     {vehicle_types.map(x=>{
+                    //         let isSelected=vehicleType.id==x.id
+                    //         return(
+                    //         <TouchableOpacity onPress={()=>setVehicleType(x)} style={{marginLeft:10,backgroundColor:isSelected?LS_COLORS.global.green:"white",borderColor:LS_COLORS.global.green,padding:5,margin:5,borderWidth:1,borderRadius:10}}>
+                    //             <Text style={{color:isSelected?"white":"black",fontFamily:LS_FONTS.PoppinsRegular}}>{x.name}</Text>
+                    //         </TouchableOpacity>
+                    //         )
+                    //     })}
+                    //     </ScrollView>
+                    //     </View>)
+                        }
                     <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
                     <Container>
                         <Content>

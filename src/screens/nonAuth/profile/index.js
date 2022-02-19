@@ -740,7 +740,8 @@ const Profile = (props) => {
             endPoint: user.user_role == role.customer ? '/api/customer_detail_update' : '/api/provider_detail_update',
             type: 'post'
         }
-
+        console.log(formdata)
+     
         try {
             getApi(config)
                 .then((response) => {
@@ -1011,7 +1012,7 @@ const Profile = (props) => {
         );
     }
     React.useEffect(() => {
-        if (userData?.service_is_at_address) {
+        if (Number(userData?.service_is_at_address)) {
             setUserData({ ...userData, address_is_public: 1 })
         }
     }, [userData?.service_is_at_address])
@@ -1446,7 +1447,7 @@ const Profile = (props) => {
                                         style={{}}
                                         containerStyle={{ width: 25, marginTop: 0 }}
                                         wrapperStyle={{}}
-                                        checked={Number(userData?.address_is_public)}
+                                        checked={Boolean(Number(userData?.address_is_public))}
                                         onPress={() => {
                                             if (Number(userData?.service_is_at_address)) {
                                                 return

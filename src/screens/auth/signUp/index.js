@@ -294,7 +294,6 @@ const SignUpScreen = (props) => {
     const [signUpData, setSignUpData] = useState({
         first_name: '',
         last_name: '',
-
         dob: 0,
         phone_number: '',
         email: '',
@@ -343,11 +342,11 @@ const SignUpScreen = (props) => {
             }
         }
          
-        if (!isVerfiedPhone) {
-            showToast("Please verify your phone number.")
-            setLoader(false)
-            return
-        }
+        // if (!isVerfiedPhone) {
+        //     showToast("Please verify your phone number.")
+        //     setLoader(false)
+        //     return
+        // }
         if(role!=2){
             if(signUpData.email.trim()==""){
                 showToast("Email is required")
@@ -512,7 +511,10 @@ const SignUpScreen = (props) => {
         let headers = {
             "Content-Type": "multipart/form-data"
         }
-
+        // console.log(body)
+        // setLoader(false)
+        // return 
+        
         let config = {
             headers: headers,
             data: body,

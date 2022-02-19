@@ -116,6 +116,9 @@ export default function CardList({ navigation, route }) {
 
     const generateCardToken = async () => {
         try {
+            if(checkCardDetails()){
+                return
+            }
             setLoader(true)
             const card = `card[name]=${cardDetails.name}&card[number]=${cardDetails.number.replace(/ /g, "")}&card[exp_month]=${cardDetails.expiry.split("/")[0]}&card[exp_year]=${cardDetails.expiry.split("/")[1]}&card[cvc]=${cardDetails.cvv}&card[address_line1]=${address.address_line1}&card[address_line2]=${address.address_line2}&card[address_city]=${address.address_city}&card[address_zip]=${address.address_zip}&card[address_state]=${address.address_state}&card[address_country]=${address.address_country}`
             let response = await fetch('https://api.stripe.com/v1/tokens', {
@@ -168,7 +171,7 @@ export default function CardList({ navigation, route }) {
             .then((response) => {
                 console.log("Card Save", response)
                 if (response.status == true) {
-                    showToast("Successfully, card added.")
+                    showToast("Card added successfully")
                     navigation.pop()
                 }
                 else {
@@ -181,8 +184,21 @@ export default function CardList({ navigation, route }) {
                 setLoader(false)
             })
     }
-
+    const checkCardDetails=()=>{
+        let returnValue=false
+        if(cardDetails.number==""||cardDetails.name==""||cardDetails.expiry==""||cardDetails.cvv==""){
+            showToast("Please fill the card details.")
+            returnValue=true
+        }else if(address.address_line1==""){
+            returnValue=true
+            showToast("Home address is not added, please enter address details")
+        }
+        return returnValue
+    }
     const cardUpdate = async () => {
+        if(checkCardDetails()){
+            return
+        }
         setLoader(true)
         let headers = {
             "Authorization": `Bearer ${access_token}`

@@ -448,7 +448,7 @@ const CustomDrawerContent = (props) => {
             <View onTouchEnd={()=>{
                 logout()
             }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
-                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>Switch to</Text>
+                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>Switch to {user?.user_role == role.provider?"Customer":"Provider"}</Text>
             </View>
             <DrawerItemList {...props} />
             {user?.user_role == role.provider &&<DrawerItem
