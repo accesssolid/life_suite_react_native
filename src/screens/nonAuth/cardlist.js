@@ -159,7 +159,9 @@ export default function CardList({ navigation, route }) {
                     action={() => navigation.goBack()}
                     // imageUrl1={require("../../assets/home.png")}
                     // action1={() => props.navigation.navigate("HomeScreen")}
-                    title={'Manage Card'} />
+                    title={'Manage Card'}
+                    containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                    />
                 <FlatList
                     style={{ flex: 1 }}
                     data={cards}

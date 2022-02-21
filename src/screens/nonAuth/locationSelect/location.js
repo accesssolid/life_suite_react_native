@@ -114,7 +114,11 @@ const SelectLocation = (props) => {
 
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+            <StatusBar 
+           // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+            barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="stretch"
@@ -132,6 +136,8 @@ const SelectLocation = (props) => {
                                     action1={() => {
                                         props.navigation.navigate("HomeScreen")
                                     }}
+                                    // containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>

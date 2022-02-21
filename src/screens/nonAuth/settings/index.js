@@ -13,6 +13,7 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 import Header from '../../../components/header';
 import CustomButton from '../../../components/customButton';
 import { getJsonData, storeJsonData } from '../../../asyncStorage/async'
+import LS_COLORS from '../../../constants/colors';
 
 const Settings = (props) => {
     const [passcodeVerification, setPassCodeVerification] = useState(false)
@@ -130,7 +131,6 @@ const Settings = (props) => {
             );
         }, [])
     );
-
     return (
         <>
             <SafeAreaView style={{ flex: 1 }}>
@@ -140,6 +140,8 @@ const Settings = (props) => {
                     imageUrl1={require("../../../assets/home.png")}
                     action1={() => props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})}
                     title="Settings"
+                    containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
                 />
                 <Container>
                     <Content bounces={false} scrollEnabled={true} >

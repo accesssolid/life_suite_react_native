@@ -1093,6 +1093,8 @@ const Profile = (props) => {
                 action={() => props.navigation.goBack()}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => props.navigation.navigate("HomeScreen")}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <TouchableOpacity
                 style={{

@@ -108,7 +108,11 @@ const ChatMembers = (props) => {
 
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+            <StatusBar 
+         // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+            barStyle="light-content" />
             <SafeAreaView style={{ flex: 1, backgroundColor: "#ACF0F2" }} edges={["top"]}>
                 <Header
                     title="All Members"
@@ -116,6 +120,7 @@ const ChatMembers = (props) => {
                     action={() => {
                         props.navigation.goBack()
                     }}
+                    containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
                     {member?.length === 0 ?

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, Alert } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, Alert, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -485,7 +485,9 @@ const Mechanics = (props) => {
      React.useEffect(()=>{
         console.log("provider_prices",provider_prices)
      },[provider_prices])
+
     React.useEffect(()=>{
+        let p_p=[]
         if(dupProviders.length>0){
            for(let item of dupProviders){
             let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
@@ -498,15 +500,18 @@ const Mechanics = (props) => {
                 }
             }
             let totalPrice = totalServicePrice + totalProductPrice
-            let p_p=[...provider_prices].filter(x=>x.id!=item.id)
             p_p.push({id:item.id,price:totalPrice})
-            setProviderPrices(p_p)
            }
         }
+        setProviderPrices(p_p)
     },[dupProviders])
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+            <StatusBar 
+         // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+            barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <SureModal1
                     title="No provider available on selected date or time.Kindly change the time or select different date"
@@ -637,7 +642,7 @@ const Mechanics = (props) => {
                                    
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <View onTouchEnd={() => {
+                                            <Pressable onPress={() => {
                                                 // props.navigation.navigate("AddCard1")
                                                 props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService.name })
                                             }} style={{ width: "75%", flexDirection: 'row' }}>
@@ -652,7 +657,7 @@ const Mechanics = (props) => {
                                                     <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item.first_name}</Text>
                                                     <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>{countryName.trim()}</Text>
                                                 </View>
-                                            </View>
+                                            </Pressable>
                                             <TouchableOpacity onPress={() => { like(item.id, item.is_favourite) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center', position: "absolute", right: 5 }}>
                                                 {item.is_favourite === 1
                                                     ?

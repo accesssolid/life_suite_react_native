@@ -104,7 +104,7 @@ const App = () => {
   return (
     <Root>
       <StoreProvider store={store}>
-        <StatusBar backgroundColor={LS_COLORS.global.cyan} barStyle="dark-content" />
+        <StatusBar backgroundColor={LS_COLORS.global.green} barStyle="dark-content" />
         <SafeAreaProvider>
         <NavigationContainer linking={linking} onStateChange={(e)=>{
           // console.log("navigation_state",JSON.stringify(e))

@@ -449,7 +449,8 @@ const MechanicLocation = (props) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "5%" }}>
+                    <Text style={{marginTop: "5%",marginLeft:24, fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>My available time</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "1%" }}>
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility(true)} >
@@ -492,7 +493,11 @@ const MechanicLocation = (props) => {
 
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+            <StatusBar 
+           // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+            barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="cover"

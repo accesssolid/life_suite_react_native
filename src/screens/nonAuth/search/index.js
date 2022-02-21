@@ -95,6 +95,7 @@ const Search = (props) => {
                 action1={() => {
                     props.navigation.navigate("HomeScreen")
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
             />
             <View style={styles.container}>
                 <CustomTextInput placeholder="Search..." value={search} onChangeText={onChange} />

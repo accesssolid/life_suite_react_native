@@ -34,6 +34,8 @@ export default function UpdateCertificateService({ navigation, route }) {
                 action1={() => {
                     navigation.navigate("HomeScreen")
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <Container style={styles.container}>
                 <FlatList

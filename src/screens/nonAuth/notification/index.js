@@ -187,7 +187,7 @@ const Notification = (props) => {
                         </View>
                         <View style={{ width: "20%", justifyContent: "space-evenly", alignItems: "flex-end" }}>
                             <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>
-                            <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{orderType}</Text>
+                            {/* <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{orderType}</Text> */}
                         </View>
                     </View>
                 </Card>
@@ -196,14 +196,20 @@ const Notification = (props) => {
     }
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
-            <SafeAreaView style={{ flex: 1, backgroundColor: "#ACF0F2" }} edges={["top"]}>
+            <StatusBar 
+    // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+             barStyle="light-content" />
+            <SafeAreaView style={{ flex: 1, backgroundColor: LS_COLORS.global.green }} edges={["top"]}>
                 <Header
                     title="Notification"
                     imageUrl={require("../../../assets/back.png")}
                     action={() => {
                         props.navigation.goBack()
                     }}
+                    containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
                     {

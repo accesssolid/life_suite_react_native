@@ -12,6 +12,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Header from '../../../components/header';
 import CustomButton from '../../../components/customButton';
+import LS_COLORS from '../../../constants/colors';
 
 const SetPassCode = (props) => {
     const [Passcode, setPasscode] = useState('')
@@ -38,7 +39,6 @@ const SetPassCode = (props) => {
             Alert.alert('Passcode length must be greater than 3 digits')
         }
     }
-
     return (
         <>
             <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -47,6 +47,7 @@ const SetPassCode = (props) => {
                     action={() => props.navigation.goBack()}
                     imageUrl1={require("../../../assets/home.png")}
                     action1={() => props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})}
+                    containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
                     title="Set Passcode"
                 />

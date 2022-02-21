@@ -62,6 +62,8 @@ const InProgress = (props) => {
                 action1={() => {
                     props.navigation.navigate("HomeScreen")
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <Container style={styles.container}>
                 <Content

@@ -108,6 +108,8 @@ const SubServices = (props) => {
                  
                     props.navigation.navigate("HomeScreen",{screen:"HomeScreen"})
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <View style={styles.container}>
                 {

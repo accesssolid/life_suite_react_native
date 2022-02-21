@@ -156,7 +156,12 @@ const MapScreen = (props) => {
     
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+            <StatusBar 
+            // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+             barStyle="light-content" 
+             />
             <SafeAreaView style={styles.safeArea}>
                 <Container>
                     <TouchableOpacity

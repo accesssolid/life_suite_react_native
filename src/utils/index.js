@@ -9,7 +9,7 @@ export const showToast = (text) => {
 export const globalStyles = StyleSheet.create({
     safeAreaView: {
         flex: 1,
-        backgroundColor: LS_COLORS.global.cyan
+        backgroundColor: LS_COLORS.global.green
     },
 })
 

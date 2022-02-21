@@ -238,7 +238,9 @@ export default function CardList({ navigation, route }) {
     return (
         <>
             <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-                <Header imageUrl={require("../../assets/back.png")}
+                <Header 
+                    containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                    imageUrl={require("../../assets/back.png")}
                     action={() => navigation.goBack()}
                     // imageUrl1={require("../../assets/home.png")}
                     // action1={() => props.navigation.navigate("HomeScreen")}

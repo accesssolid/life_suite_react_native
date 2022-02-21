@@ -231,6 +231,8 @@ export default function UpdateCertificates({ navigation, route }) {
                 action1={() => {
                     navigation.navigate("HomeScreen")
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <Container style={styles.container}>
                 <Text style={styles.service}>{current_upload_type.text}</Text>

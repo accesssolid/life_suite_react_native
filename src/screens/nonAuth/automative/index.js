@@ -27,6 +27,8 @@ const Automative = (props) => {
                 action1={() => {
                     props.navigation.navigate("HomeScreen")
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>

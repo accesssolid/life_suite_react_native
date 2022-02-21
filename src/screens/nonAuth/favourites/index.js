@@ -176,6 +176,8 @@ const Favourites = (props) => {
                 action1={() => {
                     navigation.navigate("HomeScreen",{screen:"HomeScreen"})
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <Container style={styles.container}>
                 {user.user_role == 2 &&

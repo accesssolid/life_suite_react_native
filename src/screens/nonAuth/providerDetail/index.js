@@ -207,7 +207,7 @@ export default function ProviderDetail(props) {
                        <View style={{ width:"50%"}}>
                             <Text style={{ fontSize: 14,  fontFamily: LS_FONTS.PoppinsMedium }}>Filter rating</Text>
                             <DropDown
-                                item={["None","1 Star", "2 Star", "3 Star", "4 Star", "5 Star"]}
+                                item={["1 Star", "2 Star", "3 Star", "4 Star", "5 Star"]}
                                 value={"Select Rating"}
                                 onChangeValue={(index, value) => { setCurrentRating(index)}}
                                 containerStyle={{borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}

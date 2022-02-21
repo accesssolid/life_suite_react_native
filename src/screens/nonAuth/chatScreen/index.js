@@ -366,8 +366,12 @@ const ChatScreen = (props) => {
 
     return (
         <>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
-            <SafeAreaView style={{ flex: 1, backgroundColor: "#ACF0F2" }} edges={["top"]}>
+            <StatusBar 
+             // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+            barStyle="light-content" />
+            <SafeAreaView style={{ flex: 1, backgroundColor:LS_COLORS.global.green }} edges={["top"]}>
 
                 {/* <RenderAddmodal
                 visible = {visible}

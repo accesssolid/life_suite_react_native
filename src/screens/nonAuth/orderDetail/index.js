@@ -452,7 +452,11 @@ const OrderClientDetail = (props) => {
     }
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
-            <StatusBar translucent backgroundColor={"transparent"} barStyle="light-content" />
+            <StatusBar 
+             // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+             barStyle="light-content" />
             <View style={{ width: '100%', height: '20%', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, overflow: "hidden" }}>
                 <ImageBackground
                     resizeMode="cover"

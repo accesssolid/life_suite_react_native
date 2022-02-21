@@ -48,6 +48,8 @@ const ServiceProfile = (props) => {
                 action1={() => {
                     props.navigation.navigate("HomeScreen")
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <TouchableOpacity
                 style={{ alignSelf: 'center', position: 'absolute', zIndex: 100, top: Platform.OS === 'ios' ? "6%" : "1%" }}

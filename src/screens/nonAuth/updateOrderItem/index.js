@@ -228,7 +228,11 @@ const OrderClientDetail = (props) => {
 
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
-            <StatusBar translucent backgroundColor={"transparent"} barStyle="light-content" />
+            <StatusBar 
+            // translucent 
+            // backgroundColor={"transparent"} 
+            backgroundColor={LS_COLORS.global.green}
+            barStyle="light-content" />
             <HeaderView action={() => {
                 if (productShow) {
                     setProductShow(false)

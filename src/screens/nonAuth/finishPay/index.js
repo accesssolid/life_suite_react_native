@@ -81,6 +81,8 @@ export default function FinishPay({ navigation, route }) {
                 action={() => {
                     navigation.goBack()
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             // imageUrl1={require("../../../assets/home.png")}
             // action1={() => {
             //     navigation.navigate("HomeScreen")

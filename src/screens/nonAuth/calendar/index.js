@@ -44,6 +44,8 @@ const Calendar = (props) => {
                 action={() => {
                     props.navigation.goBack()
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <View
                 style={styles.container}>

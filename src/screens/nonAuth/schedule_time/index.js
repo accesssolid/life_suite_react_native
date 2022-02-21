@@ -317,6 +317,8 @@ const ScheduleTime = (props) => {
                 action={() => {
                     props.navigation.goBack()
                 }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
             />
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20 }}>

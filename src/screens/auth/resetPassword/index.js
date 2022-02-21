@@ -73,7 +73,7 @@ const ResetPassword = (props) => {
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+            <StatusBar backgroundColor={Colors.global.green} barStyle="dark-content" />
             <Container>
                 <Content>
                     <View style={styles.screen}>
