@@ -49,10 +49,10 @@ const Mechanics = (props) => {
         latitude: 37.785834,
         longitude: -122.406417
     })
-    const [current_address,setCurrentAddress]=useState({
-        country:"USA",
-        city:"",
-        state:""
+    const [current_address, setCurrentAddress] = useState({
+        country: "USA",
+        city: "",
+        state: ""
     })
     //    #liahs
     const [dupProviders, setDupProviders] = React.useState([])
@@ -204,24 +204,24 @@ const Mechanics = (props) => {
         }
     }
     const getCurrentPlace = () => {
-        RNGooglePlaces.getCurrentPlace(['location','address'])
+        RNGooglePlaces.getCurrentPlace(['location', 'address'])
             .then((results) => {
-               if(results.length>0){
-                   let res=results[0].address?.split(",")
-                   if(res.length==3){
-                       setCurrentAddress({
-                           city:res[0],
-                           state:res[1],
-                           country:res[2]
-                       })
-                   }else{
-                    setCurrentAddress({
-                        city:res[1],
-                        state:res[2],
-                        country:res[3]
-                    })
-                   }
-               }
+                if (results.length > 0) {
+                    let res = results[0].address?.split(",")
+                    if (res.length == 3) {
+                        setCurrentAddress({
+                            city: res[0],
+                            state: res[1],
+                            country: res[2]
+                        })
+                    } else {
+                        setCurrentAddress({
+                            city: res[1],
+                            state: res[2],
+                            country: res[3]
+                        })
+                    }
+                }
             })
             .catch((error) => console.log(error.message));
     }
@@ -304,11 +304,11 @@ const Mechanics = (props) => {
     //     { json_data.provider_id ? arr.push(json_data) : null }
     //     setApiData([...arr])
     // }
-    const [cards,setCards]=React.useState([])
+    const [cards, setCards] = React.useState([])
 
-    useFocusEffect(useCallback(()=>{
+    useFocusEffect(useCallback(() => {
         getCards()
-    },[]))
+    }, []))
 
     const getCards = () => {
         let headers = {
@@ -331,14 +331,14 @@ const Mechanics = (props) => {
                 }
             })
             .catch(err => {
-              
+
             }).finally(() => {
             })
     }
 
 
     const placeOrder = (jsonData, continuous_order = 0) => {
-        
+
         setLoading(true)
         var formdata = new FormData();
         formdata.append("items_data", JSON.stringify(jsonData))
@@ -350,9 +350,9 @@ const Mechanics = (props) => {
         formdata.append("order_from_long", data.order_from_long.toString())
         formdata.append("timezone", RNLocalize.getTimeZone())
         formdata.append("mile_distance", data.mile_distance)
-        formdata.append("country",current_address.country)
-        formdata.append("state",current_address.state)
-        formdata.append("city",current_address.city)
+        formdata.append("country", current_address.country)
+        formdata.append("state", current_address.state)
+        formdata.append("city", current_address.city)
 
         if (continuous_order) {
             formdata.append("continuous_order", continuous_order)
@@ -477,41 +477,41 @@ const Mechanics = (props) => {
                 console.log("error", err)
             })
     }
-    const checkShowAddress=(d)=>{
+    const checkShowAddress = (d) => {
         return Boolean(d)
     }
 
-    const [provider_prices,setProviderPrices]=React.useState([])
-     React.useEffect(()=>{
-        console.log("provider_prices",provider_prices)
-     },[provider_prices])
+    const [provider_prices, setProviderPrices] = React.useState([])
+    React.useEffect(() => {
+        console.log("provider_prices", provider_prices)
+    }, [provider_prices])
 
-    React.useEffect(()=>{
-        let p_p=[]
-        if(dupProviders.length>0){
-           for(let item of dupProviders){
-            let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
-            let totalProductPrice = 0
-            for (let z of item.item_list) {
-                for (let p of z.products) {
-                    if (p.checked) {
-                        totalProductPrice += Number(p.price)
+    React.useEffect(() => {
+        let p_p = []
+        if (dupProviders.length > 0) {
+            for (let item of dupProviders) {
+                let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
+                let totalProductPrice = 0
+                for (let z of item.item_list) {
+                    for (let p of z.products) {
+                        if (p.checked) {
+                            totalProductPrice += Number(p.price)
+                        }
                     }
                 }
+                let totalPrice = totalServicePrice + totalProductPrice
+                p_p.push({ id: item.id, price: totalPrice })
             }
-            let totalPrice = totalServicePrice + totalProductPrice
-            p_p.push({id:item.id,price:totalPrice})
-           }
         }
         setProviderPrices(p_p)
-    },[dupProviders])
+    }, [dupProviders])
     return (
         <>
-            <StatusBar 
-         // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-            barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <SureModal1
                     title="No provider available on selected date or time.Kindly change the time or select different date"
@@ -638,8 +638,8 @@ const Mechanics = (props) => {
                                         }
                                     }
                                     let totalPrice = totalServicePrice + totalProductPrice
-                                   
-                                   
+
+
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Pressable onPress={() => {
@@ -671,7 +671,7 @@ const Mechanics = (props) => {
                                                     checked={totalPrice > 0}
                                                     onPress={() => {
                                                         onGlobCheckBoxClicked(index)
-                                                      
+
                                                     }}
                                                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
@@ -720,7 +720,7 @@ const Mechanics = (props) => {
                                                                 checked={i.checked}
                                                                 onPress={() => {
                                                                     onCheckBoxClicked(!i.checked, index, iIndex, null)
-                                                                  
+
                                                                 }}
                                                                 checkedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/checked.png")} />}
                                                                 uncheckedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
@@ -754,7 +754,7 @@ const Mechanics = (props) => {
                                                                         checked={itemData.checked}
                                                                         onPress={() => {
                                                                             onCheckBoxClicked(!itemData.checked, index, iIndex, prIndex)
-                                                                       
+
                                                                         }}
                                                                         checkedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/checked.png")} />}
                                                                         uncheckedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/unchecked.png")} />}
@@ -783,7 +783,7 @@ const Mechanics = (props) => {
                             activeOpacity={0.7}
                             onPress={() => {
                                 // props.navigation.navigate("MainDrawer",{screen:"Orders"})
-                                if(cards.length==0){
+                                if (cards.length == 0) {
                                     showToast("Please add payment method before requesting any service")
                                     props.navigation.navigate("AddCard", { type: "add" })
                                     return
@@ -797,11 +797,13 @@ const Mechanics = (props) => {
                                         }
                                     }
                                 }
-                               
-                                if (_.isEqual(requiredSevices.sort((a, b) => a - b), z.sort((a, b) => a - b))) {
+                                //    console.log(z)
+                                // if (_.isEqual(requiredSevices.sort((a, b) => a - b), z.sort((a, b) => a - b))) {
+                                if (z.length > 0) {
                                     setOpen2(!open2)
                                 } else {
-                                    showToast("Please select service provider for all the service listed.")
+                                    showToast("Please select atleast on service from service provider list.")
+                                    // showToast("Please select service provider for all the service listed.")
                                 }
                             }}>
                             <Text style={styles.saveText}>Request</Text>

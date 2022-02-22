@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getApi } from '../../../api/api';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
-import { setAddServiceMode,clearCleanData } from '../../../redux/features/services';
+import { setAddServiceMode, clearCleanData } from '../../../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
 import { CheckBox, Toast } from 'native-base'
 import { indexOf } from 'lodash';
@@ -46,12 +46,13 @@ const AddTimeFrame = (props) => {
     const [activeIndex, setActiveIndex] = useState(null)
     const [initialDate, setInitialDate] = useState(new Date())
     const [markedDates, setMarkedDates] = useState({})
+    const [current_month, setCurrentMonth] = useState(moment().format("YYYY-MM"))
 
     useEffect(() => {
-        if (!isAddServiceMode){
+        if (!isAddServiceMode) {
             getTimeFrames()
         }
-            
+
     }, [])
 
 
@@ -77,12 +78,20 @@ const AddTimeFrame = (props) => {
             marked = {}
             propOwn = []
         }
-        setMarkedDates({ ...marked })
 
+        if (propOwn.length == 1 || propOwn.length == 2) {
+            let d = moment(date.dateString).format("MM")
+            let f_d = moment(propOwn[0], "YYYY-MM-DD").format("MM")
+            if (d != f_d) {
+                marked = {}
+                propOwn = []
+            }
+        }
+        setMarkedDates({ ...marked })
         let stylesCopy = customDatesStyles.filter(x => x.from_time == "" || x.to_time == "")
         if (stylesCopy.length >= 1 && propOwn.length == 0) {
             let d = [...customDatesStyles]
-            d.pop()
+            d.splice(0,1)
             setCustomDatesStyles(d)
         }
 
@@ -91,7 +100,7 @@ const AddTimeFrame = (props) => {
             let dates = [...selectedDates]
             let styles = customDatesStyles.filter(x => x.from_time !== "" || x.to_time !== "")
             dates.push(moment(date.dateString).format("DD/MM/YYYY"))
-            styles.push({
+            styles.unshift({
                 id: '',
                 start_date: moment(propOwn[0]).format("YYYY-MM-DD"),
                 end_date: moment(propOwn[1] ?? propOwn[0]).format("YYYY-MM-DD"),
@@ -107,6 +116,7 @@ const AddTimeFrame = (props) => {
             setCustomDatesStyles([...styles])
         }
     }
+
 
 
 
@@ -148,6 +158,7 @@ const AddTimeFrame = (props) => {
                 var convertedFrom = moment(item.from_time, 'hh:mm A').format('HH:mm')
                 var convertedTo = moment(item.to_time, 'hh:mm A').format('HH:mm')
                 data.push({
+                    "id":item.id,
                     "start_date": moment(item.start_date).format("YYYY-MM-DD"),
                     "end_date": moment(item.end_date).format("YYYY-MM-DD"),
                     "from_time": convertedFrom,
@@ -155,14 +166,23 @@ const AddTimeFrame = (props) => {
                 })
             }
         })
-        const formdata=new FormData()
-        formdata.append("service_id",serviceData.subService?.id)
-        formdata.append("json_data",JSON.stringify(data))
-        // console.log(formdata)
-        const config={
-            headers:headers,
+        let d={}
+        d={
+            add_data:data.filter(x => x.id == "").map(x => {
+                let dx = { ...x }
+                delete dx.id
+                return dx
+            }),
+            update_data:data.filter(x=>x.id!="")
+        }
+        const formdata = new FormData()
+        formdata.append("service_id", serviceData.subService?.id)
+        formdata.append("json_data", JSON.stringify(d))
+        formdata.append("current_time",moment().format("YYYY-MM-DD HH:mm:ss"))
+        const config = {
+            headers: headers,
             data: formdata,
-            endPoint: '/api/addTimeFrames',
+            endPoint: '/api/addTimeFramesNew',
             type: 'post'
         }
         if (data.length == 0) {
@@ -170,20 +190,20 @@ const AddTimeFrame = (props) => {
             return showToast("Invalid time frame data")
         }
         getApi(config)
-        .then((response) => {
-            console.log("response",response)
-            if (response.status == true) {
-                showToast(response.message)
-                props.navigation.goBack()
-            }
-            else {
-                showToast(response.message)
+            .then((response) => {
+                console.log("response", response)
+                if (response.status == true) {
+                    showToast(response.message)
+                    props.navigation.goBack()
+                }
+                else {
+                    showToast(response.message)
+                    setLoading(false)
+                }
+            }).catch(err => {
                 setLoading(false)
-            }
-        }).catch(err => {
-            setLoading(false)
-            console.error(err)
-        })
+                console.error(err)
+            })
     }
 
     const getTimeFrames = () => {
@@ -205,26 +225,26 @@ const AddTimeFrame = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log("response",response)
+                console.log("response", response)
                 if (response.status == true) {
                     setLoading(false)
                     let styles = [];
                     let dates = [];
                     Object.keys(response.data).forEach((ele) => {
-                            let element=response.data[`${ele}`]
-                            dates.push(moment(element.start_time).format("DD/MM/YYYY"))
-                            styles.push({
-                                id: element.id,
-                                start_date: element.start_time,
-                                end_date: element.end_time,
-                                style: { backgroundColor: LS_COLORS.global.green },
-                                textStyle: { color: LS_COLORS.global.white },
-                                containerStyle: [],
-                                allowDisabled: true,
-                                from_time: element.from_time,
-                                to_time: element.to_time
-                            });
-                      
+                        let element = response.data[`${ele}`]
+                        dates.push(moment(element.start_time).format("DD/MM/YYYY"))
+                        styles.push({
+                            id: element.id,
+                            start_date: element.start_time,
+                            end_date: element.end_time,
+                            style: { backgroundColor: LS_COLORS.global.green },
+                            textStyle: { color: LS_COLORS.global.white },
+                            containerStyle: [],
+                            allowDisabled: true,
+                            from_time: element.from_time,
+                            to_time: element.to_time
+                        });
+
                     })
                     setSelectedDates([...dates])
                     console.warn(dates)
@@ -263,7 +283,7 @@ const AddTimeFrame = (props) => {
                     dispatch(clearCleanData())
                     setLoading(false)
                     if (shouldNavigate) {
-                        props.navigation.navigate('HomeScreen',{addJobClear:true})
+                        props.navigation.navigate('HomeScreen', { addJobClear: true })
                     }
                 }
                 else {
@@ -344,7 +364,8 @@ const AddTimeFrame = (props) => {
                             "Authorization": `Bearer ${access_token}`
                         }
                         let data = {
-                            "time_frame_id": frame.id
+                            "time_frame_id": frame.id,
+                            "current_time":moment().format("YYYY-MM-DD HH:mm:ss")
                         }
                         let config = {
                             headers: headers,
@@ -405,39 +426,46 @@ const AddTimeFrame = (props) => {
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
-                title={serviceData?.subService ? serviceData?.subService?.name : "Time Frames"}
+                // title={serviceData?.subService ? serviceData?.subService?.name : "Time Frames"}
+                title={(serviceData?.subService ? serviceData?.subService?.name : "Time Frames") + ` (${moment(current_month, "YYYY-MM").format("MMM")})`}
+
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.goBack()
                 }}
-                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
             <View style={styles.container}>
-                <View style={styles.calendar}>
-                    <Calendar
-                        current={new Date()}
-                        onDayPress={(day) => {
-                            onDateChange(day)
-                        }}
-                        markingType={Object.keys(markedDates).length == 2 ? "period" : 'custom'}
-                        hideArrows={false}
-                        hideExtraDays={true}
-                        disableMonthChange={false}
-                        firstDay={1}
-                        hideDayNames={false}
-                        showWeekNumbers={false}
-                        onPressArrowLeft={subtractMonth => subtractMonth()}
-                        onPressArrowRight={addMonth => addMonth()}
-                        disableArrowLeft={false}
-                        disableArrowRight={false}
-                        disableAllTouchEventsForDisabledDays={true}
-                        enableSwipeMonths={false}
-                        markedDates={getAllMarkedDates(markedDates)}
-                        minDate={new Date()}
-                    />
-                </View>
                 <ScrollView style={{ flex: 1 }}>
+                    <View style={styles.calendar}>
+                        <Calendar
+                            current={new Date()}
+                            onDayPress={(day) => {
+                                onDateChange(day)
+                            }}
+                            markingType={Object.keys(markedDates).length == 2 ? "period" : 'custom'}
+                            hideArrows={false}
+                            hideExtraDays={true}
+                            disableMonthChange={false}
+                            firstDay={1}
+                            hideDayNames={false}
+                            showWeekNumbers={false}
+                            onPressArrowLeft={subtractMonth => subtractMonth()}
+                            onPressArrowRight={addMonth => addMonth()}
+                            disableArrowLeft={false}
+                            disableArrowRight={false}
+                            disableAllTouchEventsForDisabledDays={true}
+                            enableSwipeMonths={false}
+                            onMonthChange={(date) => {
+                                console.log(date)
+                                setCurrentMonth(moment(date.dateString, "YYYY-MM-DD").format("YYYY-MM"))
+                            }}
+                            markedDates={getAllMarkedDates(markedDates)}
+                            minDate={new Date()}
+                        />
+                    </View>
+
                     <View style={{ marginVertical: 5 }}>
                         {customDatesStyles.map((item, index) => {
                             const fromTime = moment(item.from_time, ["HH.mm a"]).format("hh:mm A");
@@ -445,6 +473,9 @@ const AddTimeFrame = (props) => {
                             const start_date = moment(item.start_date).format("MM-DD-YYYY")
                             const end_date = moment(item.end_date).format("MM-DD-YYYY")
                             const isSameDate = start_date === end_date
+                            if (moment(item.start_date).format("YYYY-MM") != current_month) {
+                                return null
+                            }
                             const showDateRangeText = isSameDate ? start_date : start_date + " to " + end_date
                             return (
                                 <View key={index} style={{ paddingHorizontal: '5%', paddingVertical: 5 }}>
@@ -453,7 +484,7 @@ const AddTimeFrame = (props) => {
                                         <View style={{ flex: 1 }}>
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
-                                                <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}  activeOpacity={0.7} onPress={() => setTime("from", index)}>
+                                                <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} onPress={() => setTime("from", index)}>
                                                     <Text>{fromTime === "Invalid date" ? "" : fromTime}</Text>
                                                     <View style={{ height: 11, aspectRatio: 1 }}>
                                                         <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
@@ -464,7 +495,7 @@ const AddTimeFrame = (props) => {
                                         <View style={{ flex: 1 }}>
                                             <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
-                                                <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}  activeOpacity={0.7} onPress={() => fromTime !== "Invalid date" && setTime("to", index)}>
+                                                <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} onPress={() => fromTime !== "Invalid date" && setTime("to", index)}>
                                                     <Text>{toTime === "Invalid date" ? "" : toTime}</Text>
                                                     <View style={{ height: 11, aspectRatio: 1 }}>
                                                         <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
@@ -490,7 +521,7 @@ const AddTimeFrame = (props) => {
                     onConfirm={handleConfirm}
                     onCancel={() => setDatePickerVisibility(false)}
                 />
-                {selectedDates.length > 0  && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginVertical: 10 }} action={() => save()} />}
+                {selectedDates.length > 0 && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginVertical: 10 }} action={() => save()} />}
             </View>
             {loading && <Loader />}
         </SafeAreaView>

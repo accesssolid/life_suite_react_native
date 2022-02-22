@@ -990,7 +990,7 @@ const ServicesProvided = (props) => {
                     </View>}
                     {activeItem !== null && <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: '2%' }}>
                         <View style={{ alignItems: 'center' }}>
-                            <Text style={{ ...styles.priceTime, marginRight: '20%' }}>Time</Text>
+                            <Text style={{ ...styles.priceTime, marginRight: '10%' }}>Estimated Time</Text>
                         </View>
                         <View style={{ marginLeft: '5%' }}>
                             <Text style={styles.priceTime}>Price</Text>

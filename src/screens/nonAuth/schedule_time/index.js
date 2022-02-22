@@ -26,7 +26,7 @@ import { setMyJobs } from '../../../redux/features/provider';
 import { setAddServiceMode, clearCleanData } from '../../../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
 import Cards from '../../../components/cards';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { set } from 'lodash';
 const Moment = require("moment")
 const MomentRange = require("moment-range")
@@ -36,18 +36,13 @@ const window_width = Dimensions.get("window").width
 const ScheduleTime = (props) => {
     const dispatch = useDispatch()
     const { serviceData } = props.route.params
-    const calendarRef = useRef(null)
     const [selectedDates, setSelectedDates] = useState([])
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [customDatesStyles, setCustomDatesStyles] = useState([])
     const [loading, setLoading] = useState(false)
     const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
-    const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
-    const [dateType, setDateType] = useState(null)
-    const [activeIndex, setActiveIndex] = useState(null)
-    const [initialDate, setInitialDate] = useState(new Date())
-    const [currentMonth, setCurrentMonth] = React.useState(moment().format("MM"))
+    const [currentMonth, setCurrentMonth] = React.useState(moment().format("YYYY-MM"))
     const [markedDates, setMarkedDates] = useState({})
     const [currentTab, setCurrentTab] = React.useState(1)
     const [currentDate, setCurrentDate] = React.useState(null)
@@ -56,12 +51,13 @@ const ScheduleTime = (props) => {
     const [timeFrameData, setTimeFrameData] = React.useState([])
     const [currentDateFrames, setCurrentDateFrames] = React.useState({})
 
-    useEffect(() => {
+    useFocusEffect(React.useCallback(()=>{
         if (!isAddServiceMode) {
             getTimeFrames()
         }
         getScheduleRange()
-    }, [])
+    },[]))
+
 
     React.useEffect(() => {
         if (currentDate) {
@@ -70,7 +66,9 @@ const ScheduleTime = (props) => {
                 let start_time = moment(x.start_time, "YYYY-MM-DD HH:mm:[00]")
                 let end_time = moment(x.end_time, "YYYY-MM-DD HH:mm:[00]")
                 let check_date = moment(currentDate, "YYYY-MM-DD")
-                if (start_time >= check_date && check_date <= end_time) {
+                if (start_time.format("YYYY-MM-DD") == check_date.format("YYYY-MM-DD")
+                    // && check_date <= end_time
+                ) {
                     if (newFrames[x.services_name]) {
                         newFrames[x.services_name].push(x)
                     } else {
@@ -94,7 +92,7 @@ const ScheduleTime = (props) => {
             }
 
         } else {
-            let all_ds = Object.keys(g_data).filter(x => moment(x, "MM/DD/YYYY").format("MM") == currentMonth)
+            let all_ds = Object.keys(g_data).filter(x => moment(x, "MM/DD/YYYY").format("YYYY-MM") == currentMonth)
             let z = {}
             for (let f of all_ds) {
                 z[f] = g_data[f]
@@ -264,8 +262,9 @@ const ScheduleTime = (props) => {
         for (let x of timeFrameData) {
             let start_time = moment(x.start_time, "YYYY-MM-DD HH:mm:[00]")
             let end_time = moment(x.end_time, "YYYY-MM-DD HH:mm:[00]")
-            let check_date = moment(date, "YYYY-MM-DD")
-            if (start_time >= check_date && check_date <= end_time) {
+            let check_date = moment(date)
+
+            if (start_time.format("YYYY-MM-DD") == check_date.format("YYYY-MM-DD")) {
                 return true
             }
         }
@@ -278,8 +277,9 @@ const ScheduleTime = (props) => {
         for (let x of timeFrameData) {
             let start_time = moment(x.start_time, "YYYY-MM-DD HH:mm:[00]")
             let end_time = moment(x.end_time, "YYYY-MM-DD HH:mm:[00]")
-            let check_date = moment(date, "YYYY-MM-DD")
-            if (start_time >= check_date && check_date <= end_time) {
+            let check_date = moment(date)
+            if (start_time.format("YYYY-MM-DD") == check_date.format("YYYY-MM-DD") // && check_date <= end_time
+            ) {
                 if (frames[x.services_name]) {
                     frames[x.services_name].push(x)
                 } else {
@@ -308,7 +308,7 @@ const ScheduleTime = (props) => {
         }
         return false
     }
-    const [currentTab2,setCurrentTab2]=useState(1)
+    const [currentTab2, setCurrentTab2] = useState(0)
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -317,7 +317,7 @@ const ScheduleTime = (props) => {
                 action={() => {
                     props.navigation.goBack()
                 }}
-                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
             <View style={styles.container}>
@@ -340,12 +340,12 @@ const ScheduleTime = (props) => {
                             hideDayNames={false}
                             onMonthChange={(e) => {
                                 setCurrentDate(null)
-                                setCurrentMonth(moment(e.dateString, "YYYY-MM-DD").format("MM"))
+                                setCurrentMonth(moment(e.dateString, "YYYY-MM-DD").format("YYYY-MM"))
                             }}
                             renderHeader={(e) => {
                                 return <Text onPress={() => {
                                     setCurrentDate(null);
-                                    setCurrentMonth(moment(new Date(e)).format("MM"))
+                                    setCurrentMonth(moment(new Date(e)).format("YYYY-MM"))
                                 }}
                                     style={{ fontSize: 15, }}>{moment(new Date(e)).format("MMMM YYYY")}</Text>
                             }}
@@ -367,7 +367,6 @@ const ScheduleTime = (props) => {
 
                                 if (isFrame) {
                                     backgroundColor = LS_COLORS.global.green
-
                                     textColor = "white"
                                 }
                                 if (isOrderAvailable) {
@@ -397,44 +396,58 @@ const ScheduleTime = (props) => {
                             }}
 
                         />
-                        <View style={{ flexDirection: "row",height:50,overflow:"hidden",alignSelf:"center", borderRadius: 40, borderWidth: 1, borderColor: LS_COLORS.global.green, width: "95%" }}>
-                            <Pressable onPress={()=>setCurrentTab2(0)} style={{flex:1,justifyContent:"center",borderTopLeftRadius: 40,borderBottomLeftRadius:40,backgroundColor:currentTab2==0?LS_COLORS.global.green:"white",alignItems:"center"}}>
-                                <Text style={{textAlign:"center",fontSize:12,fontFamily:LS_FONTS.PoppinsRegular,color:currentTab2==0?"white":"black"}}>Show Upcoming Jobs</Text>
+                        <View style={{ flexDirection: "row", height: 50, overflow: "hidden", alignSelf: "center", borderRadius: 40, borderWidth: 1, borderColor: LS_COLORS.global.green, width: "95%" }}>
+                            <Pressable onPress={() => setCurrentTab2(0)} style={{ flex: 1, justifyContent: "center", borderTopLeftRadius: 40, borderBottomLeftRadius: 40, backgroundColor: currentTab2 == 0 ? LS_COLORS.global.green : "white", alignItems: "center" }}>
+                                <Text style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 0 ? "white" : "black" }}>Show Upcoming Jobs</Text>
                             </Pressable>
-                            <Pressable onPress={()=>setCurrentTab2(1)} style={{flex:1,justifyContent:"center",alignItems:"center",backgroundColor:currentTab2==1?LS_COLORS.global.green:"white",borderColor:LS_COLORS.global.green,borderLeftWidth:1,borderRightWidth:1}}>
-                                <Text style={{textAlign:"center",fontSize:12,fontFamily:LS_FONTS.PoppinsRegular,color:currentTab2==1?"white":"black"}}>Show Jobs</Text>
+                            <Pressable onPress={() => setCurrentTab2(1)} style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: currentTab2 == 1 ? LS_COLORS.global.green : "white", borderColor: LS_COLORS.global.green, borderLeftWidth: 1, borderRightWidth: 1 }}>
+                                <Text style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 1 ? "white" : "black" }}>Show Jobs</Text>
                             </Pressable >
-                            <Pressable onPress={()=>setCurrentTab2(2)} style={{flex:1,justifyContent:"center",borderBottomRightRadius: 40,borderTopRightRadius:40,alignItems:"center",backgroundColor:currentTab2==2?LS_COLORS.global.green:"white"}}>
-                                <Text style={{textAlign:"center",fontSize:12,fontFamily:LS_FONTS.PoppinsRegular,color:currentTab2==2?"white":"black"}}>Show All</Text>
+                            <Pressable onPress={() => setCurrentTab2(2)} style={{ flex: 1, justifyContent: "center", borderBottomRightRadius: 40, borderTopRightRadius: 40, alignItems: "center", backgroundColor: currentTab2 == 2 ? LS_COLORS.global.green : "white" }}>
+                                <Text style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 2 ? "white" : "black" }}>Show All</Text>
                             </Pressable>
                         </View>
                         {
                             currentDate == null ?
-                                Object.keys(orderData).map(x => {
+                                ((currentTab2 == 0 || currentTab2 == 1) ? Object.keys(orderData).map(x => {
                                     let new_data = {}
                                     for (let order of orderData[x]) {
                                         let s_title = order.sub_services_name ?? order.services_name
                                         if (new_data[s_title]) {
-                                            new_data[s_title]?.push(order)
+                                            if (currentTab2 == 0) {
+                                                if ([3, 4, 6, 5, 12, 9, 10, 11].includes(order.order_status)) {
+                                                    new_data[s_title]?.push(order)
+                                                }
+                                            } else if (currentTab2 == 1) {
+                                                new_data[s_title]?.push(order)
+                                            }
                                         } else {
-                                            new_data[s_title] = [order]
+                                            if (currentTab2 == 0) {
+                                                if ([3, 4, 6, 5, 12, 9, 10, 11].includes(order.order_status)) {
+                                                    new_data[s_title] = [order]
+                                                }
+                                            } else if (currentTab2 == 1) {
+                                                new_data[s_title] = [order]
+                                            }
                                         }
                                     }
+
                                     return (
                                         <>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>
+                                            {Object.keys(new_data).length > 0 && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>}
                                             {Object.keys(new_data)?.map(y => {
-                                                return (<OrderList key={y} data={new_data[y]} title={y} timeFrameData={timeFrameData} />)
+                                                return (<OrderList key={y} data={new_data[y]} headerDate={x} title={y} timeFrameData={timeFrameData} />)
                                             })}
                                         </>
                                     )
-                                })
+                                }) : <ShowAllScheduleWithOrders currentMonth={currentMonth} orderData={orderData} timeFrameData={timeFrameData} />)
                                 :
                                 <View>
                                     {
                                         Object.keys(currentDateFrames)?.map(y => {
                                             let orders = orderData[`${moment(currentDate, "YYYY-MM-DD").format("MM/DD/YYYY")}`]
                                             let filterdOrders = []
+
                                             if (orders) {
                                                 filterdOrders = orders.filter(x => {
                                                     let s_title = x.sub_services_name ?? x.services_name
@@ -443,6 +456,18 @@ const ScheduleTime = (props) => {
                                                     }
                                                     return false
                                                 })
+                                            }
+                                            if (currentTab2 == 0) {
+                                                filterdOrders = filterdOrders.filter(x => [3, 4, 6, 5, 12, 9, 10, 11].includes(x.order_status))
+                                                if (filterdOrders.length == 0) {
+                                                    return null
+                                                }
+                                            } else if (currentTab2 == 1) {
+                                                if (filterdOrders.length == 0) {
+                                                    return null
+                                                }
+                                            } else if (currentTab2 == 2) {
+
                                             }
                                             return (
                                                 <SingleFrameDataShow title={y} frames={currentDateFrames[y]} orderData={filterdOrders} />
@@ -565,10 +590,11 @@ const SingleFrameDataShow = ({ orderData, frames, title }) => {
     )
 }
 
-const OrderList = ({ title, data, timeFrameData }) => {
+const OrderList = ({ title, data, timeFrameData, headerDate }) => {
     const [showOrder, setShowOrders] = React.useState(false)
     const navigation = useNavigation()
-    let frames = timeFrameData.filter(x => x.services_name == title)
+    let frames = timeFrameData.filter(x => x.services_name == title && headerDate == moment(x.start_time, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY"))
+
     return (
         <View style={{ marginHorizontal: 20, }}>
             <Pressable onPress={() => setShowOrders(!showOrder)} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: LS_COLORS.global.divider, borderRadius: 10, marginTop: 7 }}>
@@ -620,6 +646,133 @@ const OrderList = ({ title, data, timeFrameData }) => {
             </>}
         </View>
     )
+}
+
+const ShowAllScheduleWithOrders = ({ timeFrameData, orderData, currentMonth }) => {
+    const [showOrder, setShowOrders] = React.useState(null)
+    const navigation = useNavigation()
+    const [frames, setFrames] = React.useState({})
+    const [f_dates, setF_dates] = React.useState([])
+    console.log(orderData)
+
+    React.useEffect(() => {
+        if (timeFrameData) {
+            let t_f = {}
+            let tfs=timeFrameData.filter(x=>moment(x.start_time, "YYYY-MM-DD HH:mm:[00]").format("YYYY-MM")==currentMonth)
+            for (let i of tfs) {
+                let start = moment(i.start_time, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY")
+                if (t_f[`${start}`]) {
+                    t_f[`${start}`].push(i)
+                } else {
+                    t_f[`${start}`] = [i]
+                }
+            }
+            let clonez = Object.keys(t_f)
+            clonez = clonez.sort((a, b) => moment(a, "MM/DD/YYYY") - moment(b, "MM/DD/YYYY"))
+            setF_dates(clonez)
+            setFrames(t_f)
+
+        }
+    }, [timeFrameData,currentMonth])
+
+    return (
+        <>
+            {
+                f_dates.map((x,headIndex) => {
+                    let framesData = frames[`${x}`]
+                    let f_d = {}
+                    for (let f of framesData) {
+                        if (f_d[`${f.services_name}`]) {
+                            f_d[`${f.services_name}`].push(f)
+                        } else {
+                            f_d[`${f.services_name}`] = [f]
+                        }
+                    }
+
+
+                    return (
+                        <>
+                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>
+                            {Object.keys(f_d).map((title,index) => {
+                                let items = f_d[`${title}`]
+                                let orders = orderData[`${x}`]
+                                let filterdOrders = []
+
+                                if (orders) {
+                                    filterdOrders = orders.filter(x => {
+                                        let s_title = x.sub_services_name ?? x.services_name
+                                        if (s_title == title) {
+                                            return true
+                                        }
+                                        return false
+                                    })
+                                }
+
+                                return (
+                                    <View style={{ marginHorizontal: 20 }}>
+                                        <Pressable onPress={() => {
+                                            if(showOrder==(index+""+headIndex)){
+                                                setShowOrders(null)
+                                            }else{
+                                                setShowOrders(index+""+headIndex)
+                                            }
+                                            
+                                        }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: LS_COLORS.global.divider, borderRadius: 10, marginTop: 7 }}>
+                                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({filterdOrders?.length})</Text>
+                                            {items.map((f, i) => <View key={i + "" + i} style={{ flexDirection: "row", marginBottom: 10 }}>
+                                                <View style={{ flex: 1 }}>
+                                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
+                                                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
+                                                        <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
+                                                            <Text>{moment(f.from_time, "HH:mm").format("hh:mm a")}</Text>
+                                                            <View style={{ height: 11, aspectRatio: 1 }}>
+                                                                <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                                            </View>
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                </View>
+                                                <View style={{ flex: 1 }}>
+                                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
+                                                    <View style={{ flex: 1, flexDirection: 'row', height: 32, backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
+                                                        <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
+                                                            <Text>{moment(f.to_time, "HH:mm").format("hh:mm a")}</Text>
+                                                            <View style={{ height: 11, aspectRatio: 1 }}>
+                                                                <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                                                            </View>
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                </View>
+                                            </View>)}
+                                        </Pressable>
+                                        {(index+""+headIndex)==showOrder && <>
+                                            {filterdOrders?.map(o => {
+                                                return (
+                                                    <Pressable onPress={() => {
+                                                        navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
+                                                    }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
+                                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+                                                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                                                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
+
+                                                        </View>
+                                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+                                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Start Time : {moment(o.order_start_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Est. End Time : {moment(o.order_end_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                                                        </View>
+                                                    </Pressable>
+                                                )
+                                            })}
+
+                                        </>}
+                                    </View>
+                                )
+                            })}
+
+                        </>)
+                })
+            }
+
+        </>)
 }
 
 const styles = StyleSheet.create({

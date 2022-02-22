@@ -366,7 +366,7 @@ export default function CardList({ navigation, route }) {
                                     listView: { paddingVertical: 5 },
                                     separator: {}
                                 }}
-                                placeholder={`Address`}
+                                placeholder={`Billing Address`}
                                 onPress={(data, details) => {
                                     setAddress({ ...address, address_line1: data.description })
                                 }}

@@ -44,7 +44,7 @@ const DelayModal = props => {
                             keyboardType="numeric"
                             placeholder="Minute"
                             placeholderTextColor={LS_COLORS.global.black}
-                            style={{borderWidth:1,borderColor:LS_COLORS.global.green,height:50,paddingHorizontal:10,fontFamily:LS_FONTS.PoppinsRegular,borderRadius:5}}
+                            style={{borderWidth:1,borderColor:LS_COLORS.global.green,color:"black",height:50,paddingHorizontal:10,fontFamily:LS_FONTS.PoppinsRegular,borderRadius:5}}
                         />
                     </View>
                     <View style={{ marginTop: 10 }}>

@@ -1,6 +1,6 @@
 // #liahs updateOrderItems
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, KeyboardAvoidingView, Image, TextInput, TouchableOpacity, Dimensions, Linking, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, KeyboardAvoidingView, Modal, Image, TextInput, TouchableOpacity, Dimensions, Linking, ScrollView, Alert, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -23,11 +23,14 @@ import Loader from '../../../components/loader'
 // placeholder image
 import _ from 'lodash'
 import moment from 'moment';
+import CustomInput from '../../../components/textInput'
+import CustomButton from '../../../components/customButton';
 
 
 
 const OrderClientDetail = (props) => {
     const { subService, item } = props.route.params
+    console.log(subService)
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -45,7 +48,8 @@ const OrderClientDetail = (props) => {
     // for checking if there is data updation or not
     const [selectedItems1, setSelectedItems1] = React.useState([])
     const [selectedProducts1, setSelectedProducts1] = React.useState([])
-
+    // 
+    const [openModal, setOpenModal] = React.useState(false)
     useEffect(() => {
         setOrderId(item.id)
     }, [])
@@ -116,7 +120,7 @@ const OrderClientDetail = (props) => {
     }
 
     const submitOrderUpdateDetail = () => {
-  
+
         if (checkforUpdate()) {
             return
         }
@@ -126,6 +130,21 @@ const OrderClientDetail = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
+        console.log(selectedItems)
+        console.log(otherProducts)
+    
+        let newServices=items.filter(x=>String(x.id).startsWith("new")).map(x=>{
+            return(
+                {
+                    item_name:x.name,
+                    price:x.price,
+                    time_duration:x.time_duration,
+                    variant_data:x.variant_data,
+                    products:otherProducts.filter(p=>String(p.item_id).startsWith("new"))
+                }
+            )
+        })
+       
         let config = {
             headers: headers,
             data: JSON.stringify({
@@ -134,12 +153,13 @@ const OrderClientDetail = (props) => {
                     estimated_reached_time: data.estimated_reached_time,
                     order_start_time: data.order_start_time,
                     order_end_time: moment(data.order_start_time).add(newTimeNeeded, "minutes").format("YYYY-MM-DD HH:mm:[00]"),
-                    items: selectedItems,
+                    items: selectedItems.filter(x=>!String(x).startsWith("new")),
                     products: selectedProducts,
                     requested_start_time: data.requested_start_time,
                     requested_end_time: checkTimeFrameIncrease(),
                     other_options: [],
-                    extra_products: otherProducts
+                    extra_products: otherProducts.filter(x=>!String(x.item_id).startsWith("new")),
+                    new_services:newServices
                 }),
                 order_placed_address: data.order_placed_address,
                 order_placed_lat: data.order_placed_lat,
@@ -156,7 +176,7 @@ const OrderClientDetail = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log("/api/providerOrderUpdate", response)
+
                 if (response.status == true) {
                     showToast(response.message)
                     props.navigation.pop()
@@ -187,7 +207,6 @@ const OrderClientDetail = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log("/api/providerOrderUpdateDetail", JSON.stringify(response))
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)
@@ -226,13 +245,15 @@ const OrderClientDetail = (props) => {
     }, [item])
 
 
+    const addNewService = (data) => {
+        setItems([...items, data])
+    }
+
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
-            <StatusBar 
-            // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-            barStyle="light-content" />
+            <StatusBar
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <HeaderView action={() => {
                 if (productShow) {
                     setProductShow(false)
@@ -261,12 +282,28 @@ const OrderClientDetail = (props) => {
                             otherProducts={otherProducts}
                             selectedItem={selectedItem}
                             productShow={productShow}
+                            setItems={setItems}
                             setProductShow={setProductShow}
                             setSelectedItem={setSelectedItem}
                             setSelectedItems={setSelectedItems}
                             setSelectedProducts={setSelectedProducts}
                             setOtherProducts={setOtherProducts}
                         />
+                      {!productShow&&<CustomButton title="Add Service"
+                            action={() => {
+                                setOpenModal(true)
+                            }}
+                            customStyles={{
+                                height: 40,
+                                width: "35%",
+                                borderRadius: 5,
+                                marginBottom: 15
+                            }}
+                            customTextStyles={{
+                                fontSize: 13,
+                                fontFamily: LS_FONTS.PoppinsRegular
+                            }}
+                        />}
                     </ScrollView>
                     <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginVertical: 5 }}>
                         {selectedItem == null && <TouchableOpacity
@@ -292,6 +329,8 @@ const OrderClientDetail = (props) => {
                 </View>
             </SafeAreaView >
             {loading && <Loader />}
+            <CheckServiceNameModal setLoading={setLoading} items={items} addNewService={addNewService} visible={openModal} setVisible={setOpenModal} />
+
         </View>
     )
 }
@@ -300,7 +339,7 @@ export default OrderClientDetail;
 
 
 
-const ItemsView = ({ items, selectedItem, productShow, setProductShow, setSelectedItem, selectedItems, selectedProducts, otherProducts, setSelectedItems, setSelectedProducts, setOtherProducts }) => {
+const ItemsView = ({ items, selectedItem, setItems, productShow, setProductShow, setSelectedItem, selectedItems, selectedProducts, otherProducts, setSelectedItems, setSelectedProducts, setOtherProducts }) => {
 
     const [showItems, setShowItems] = React.useState([])
 
@@ -317,7 +356,7 @@ const ItemsView = ({ items, selectedItem, productShow, setProductShow, setSelect
             <View style={styles.itemViewContainerStyle}>
                 <View style={styles.itemNameContainerStyle} />
                 <View style={{ flex: 1, flexDirection: "row", paddingHorizontal: 20 }}>
-                    <Text style={[styles.itemTextStyle, { width: "50%" }]}>Time</Text>
+                    <Text style={[styles.itemTextStyle, { width: "50%" }]}>Estimated Time</Text>
                     <Text style={[styles.itemTextStyle, { width: "50%" }]}>Price</Text>
                 </View>
             </View>
@@ -335,6 +374,7 @@ const ItemsView = ({ items, selectedItem, productShow, setProductShow, setSelect
                     setSelectedItem={setSelectedItem}
                     item={x}
                     isSelected={isSelected}
+                    setItems={setItems}
                     productShow={productShow}
                     setProductShow={setProductShow}
                     totalSelectedProductForItem={totalSelectedProductForItem}
@@ -359,12 +399,10 @@ const ItemView = ({
     setSelectedProducts,
     setSelectedItems,
     setSelectedItem,
+    setItems,
     productShow,
     setProductShow,
     setOtherProducts }) => {
-
-
-
     return (
         <>
             <View style={styles.itemViewContainerStyle}>
@@ -378,7 +416,7 @@ const ItemView = ({
                                 if (productShow) {
                                     setSelectedItems(state => state.filter(x => x != item.id))
                                     setOtherProducts(state => state.filter(x => x.item_id != item.id))
-                                    console.log("products", item.products, selectedProducts)
+
                                     if (item?.products) {
                                         item.products.forEach(p => {
                                             setSelectedProducts(state => state.filter(x => p.id != x))
@@ -394,10 +432,31 @@ const ItemView = ({
                     />
                     <Text numberOfLines={1} style={[styles.itemTextStyle]}>{item?.name}</Text>
                 </View>
-                <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
+                {String(item?.id)?.startsWith("new") && productShow ? <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
+                    <TextInput value={item?.time_duration}
+                        onChangeText={t => {
+                            setItems(state => {
+                                let d = _.cloneDeep(state).filter(x => x.id != item.id)
+                                return ([...d, { ...item, time_duration: t }])
+                            })
+                        }}
+                        keyboardType="numeric"
+                        style={[styles.itemTextStyle, { width: "50%", paddingVertical: 4, color: LS_COLORS.global.green, borderRadius: 5, borderWidth: 1, borderColor: LS_COLORS.global.green }]} />
+                    <TextInput
+                        value={item?.price}
+                        onChangeText={t => {
+                            setItems(state => {
+                                let d = _.cloneDeep(state).filter(x => x.id != item.id)
+                                return ([...d, { ...item, price: t }])
+                            })
+                        }}
+                        keyboardType="numeric"
+                        style={[styles.itemTextStyle, { width: "50%", paddingVertical: 4, color: LS_COLORS.global.green, borderRadius: 5, marginLeft: 5, borderWidth: 1, borderColor: LS_COLORS.global.green }]} />
+                </View> : <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
                     <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{convertMinsToHrsMins(Number(item?.time_duration))}</Text>
                     <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${item.price}</Text>
                 </View>
+                }
             </View>
             {/* products */}
             {productShow &&
@@ -584,6 +643,104 @@ const HeaderView = ({ subService, navigation, data, action }) => {
                 </View>
             </ImageBackground>
         </View>
+    )
+}
+
+
+
+const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setLoading }) => {
+    const [service_name, setServiceName] = React.useState("")
+    const access_token = useSelector(state => state.authenticate.access_token)
+    const [service_id, setServiceID] = React.useState(null)
+    const [variant_id, setVariantID] = React.useState(null)
+    React.useEffect(() => {
+        console.log(JSON.stringify(items))
+        if (items[0]) {
+            setServiceID(items[0]?.service_id)
+            setVariantID(items[0]?.variant_data)
+        }
+    }, [items])
+
+    React.useEffect(() => {
+        if (visible) {
+            setServiceName("")
+        }
+    }, [visible])
+
+    const checkName = async () => {
+        try {
+            setLoading(true)
+            let headers = {
+                "Authorization": `Bearer ${access_token}`
+            }
+            let body = new FormData()
+            body.append("service_id", service_id)
+            body.append("name", service_name)
+            let config = {
+                headers: headers,
+                data: body,
+                endPoint: '/api/addProviderItemExist',
+                type: 'post'
+            }
+            let res = await getApi(config)
+            if (res.status) {
+                setVisible(false)
+                addNewService(
+                    {
+                        id: "new-" + Date.now(),
+                        "name": service_name,
+                        "price": 0,
+                        "time_duration": 0,
+                        "variant_data": variant_id,
+                        "is_product_mandatory": "0",
+                        "service_id": 14,
+                        "products": [
+                        ],
+                        "list_type": "global",
+                        "request_status": "",
+                        "added_by_provider": null,
+                        "status": 1,
+                        "created_at": "2021-10-15 20:42:42",
+                        "updated_at": "2021-10-15 20:42:42",
+                    }
+                )
+
+            } else {
+                showToast(res.message)
+            }
+        } catch (err) {
+
+        } finally {
+            setLoading(false)
+
+        }
+    }
+
+    return (
+        <Modal
+            visible={visible}
+            transparent={true}
+        >
+            <Pressable onPress={() => setVisible(false)} style={{ flex: 1, justifyContent: "center", backgroundColor: "#0005" }}>
+                <Pressable style={{ backgroundColor: "white", padding: 10, borderRadius: 10, marginHorizontal: 15 }}>
+                    <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 16 }}>Enter Service name</Text>
+                    <CustomInput
+                        text="Service Name"
+                        customContainerStyles={{ marginTop: 20 }}
+                        value={service_name}
+                        onChangeText={t => setServiceName(t)}
+                    />
+                    <CustomButton
+                        title="Submit"
+                        action={() => {
+                            checkName()
+                        }}
+                        customStyles={{ height: 40, width: "35%", borderRadius: 5, marginTop: 20 }}
+                        customTextStyles={{ fontSize: 12 }}
+                    />
+                </Pressable>
+            </Pressable>
+        </Modal>
     )
 }
 

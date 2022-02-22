@@ -246,8 +246,8 @@ const ChatScreen = (props) => {
                 transparent={true}
                 style={{ flex: 1 }}
             >
-                <View style={{ flex: 1, width: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
-                    <View style={{ height: 250, width: '90%', backgroundColor: "ghostwhite", borderColor: "#ACF0F2", borderWidth: 2, borderRadius: 10, justifyContent: 'space-evenly' }} >
+                <Pressable onPress={() => setVisible(false)} style={{ flex: 1, width: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+                    <Pressable style={{ height: 250, width: '90%', backgroundColor: "ghostwhite", borderColor: "#ACF0F2", borderWidth: 2, borderRadius: 10, justifyContent: 'space-evenly' }} >
                         <Text style={{ textAlign: 'center', fontFamily: LS_FONTS.PoppinsMedium, padding: 10, fontSize: 18 }} >Upload Attachements</Text>
                         <TouchableOpacity onPress={() => {
                             pickImage()
@@ -274,8 +274,8 @@ const ChatScreen = (props) => {
                             <Image source={require('../../../assets/documents.png')} style={{ height: 25, width: 25, resizeMode: 'contain', alignItems: 'center', }} />
                             <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Document</Text>
                         </TouchableOpacity>
-                    </View>
-                </View>
+                    </Pressable>
+                </Pressable>
             </Modal>
         )
     }
@@ -366,16 +366,12 @@ const ChatScreen = (props) => {
 
     return (
         <>
-            <StatusBar 
-             // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-            barStyle="light-content" />
-            <SafeAreaView style={{ flex: 1, backgroundColor:LS_COLORS.global.green }} edges={["top"]}>
-
-                {/* <RenderAddmodal
-                visible = {visible}
-                /> */}
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
+            <SafeAreaView style={{ flex: 1, backgroundColor: LS_COLORS.global.green }} edges={["top"]}>
                 {renderAddmodal()}
                 <ChatHeader
                     title={data.first_name}
@@ -405,6 +401,7 @@ const ChatScreen = (props) => {
                                 if (user.id === itemData.item.sender.id) {
                                     return (
                                         <View>
+
                                             <View
                                                 style={{
                                                     flexDirection: 'row',
@@ -413,12 +410,22 @@ const ChatScreen = (props) => {
                                                     width: '90%',
                                                     alignSelf: 'center'
                                                 }}>
+                                                <Image
+                                                    source={user?.profile_image !== null ? { uri: BASE_URL + user?.profile_image } : require("../../../assets/user.png")}
+                                                    style={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: 200,
+                                                        marginRight: 5
+                                                    }}
+                                                />
                                                 <View
                                                     style={{
                                                         maxHeight: 75,
                                                         maxWidth: '70%',
                                                         backgroundColor: "#F5FEFF",
-                                                        right: '5%',
+                                                        // backgroundColor: "green",
+                                                        marginRight: '3%',
                                                         padding: 20,
                                                         borderRadius: 9,
                                                         justifyContent: 'center',
@@ -471,6 +478,15 @@ const ChatScreen = (props) => {
                                                     width: '90%',
                                                     alignSelf: 'center'
                                                 }}>
+                                                <Image
+                                                    source={data?.profile_image !== null ? { uri: BASE_URL + data?.profile_image } : require("../../../assets/user.png")}
+                                                    style={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: 200,
+                                                        marginRight: 5
+                                                    }}
+                                                />
                                                 <View
                                                     style={{
                                                         maxHeight: 75,
@@ -528,6 +544,15 @@ const ChatScreen = (props) => {
                                             }}
                                                 style={{ marginTop: '3%', borderColor: "#ACF0F2", alignItems: 'center', borderWidth: 1, padding: 10, justifyContent: "space-between", flexDirection: 'row', width: '50%', alignSelf: 'flex-end', marginRight: '5%', borderRadius: 5, overflow: 'hidden' }}>
                                                 <Image
+                                                    source={user?.profile_image !== null ? { uri: BASE_URL + user?.profile_image } : require("../../../assets/user.png")}
+                                                    style={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: 200,
+                                                        marginRight: 5
+                                                    }}
+                                                />
+                                                <Image
                                                     style={styles.file}
                                                     source={require('../../../assets/document.png')}
                                                 />
@@ -573,6 +598,15 @@ const ChatScreen = (props) => {
                                             }}
                                                 style={{ marginTop: '3%', borderColor: "#ACF0F2", alignItems: 'center', borderWidth: 1, padding: 10, justifyContent: "space-between", flexDirection: 'row', width: '50%', alignSelf: 'flex-start', marginLeft: '5%', borderRadius: 5, overflow: 'hidden' }}>
                                                 <Image
+                                                    source={data?.profile_image !== null ? { uri: BASE_URL + data?.profile_image } : require("../../../assets/user.png")}
+                                                    style={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: 200,
+                                                        marginRight: 5
+                                                    }}
+                                                />
+                                                <Image
                                                     style={styles.file}
                                                     source={require('../../../assets/document.png')}
                                                 />
@@ -616,12 +650,22 @@ const ChatScreen = (props) => {
                                 if (user.id === itemData.item.sender.id) {
                                     return (
                                         <View>
-                                            <View style={{ marginTop: '3%', alignSelf: 'flex-end', marginRight: '5%', borderRadius: 20, overflow: 'hidden' }}>
+                                            <View style={{ marginTop: '3%',flexDirection:"row", alignSelf: 'flex-end', marginRight: '5%', borderRadius: 20, overflow: 'hidden' }}>
+                                                <Image
+                                                    source={user?.profile_image !== null ? { uri: BASE_URL + user?.profile_image } : require("../../../assets/user.png")}
+                                                    style={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: 200,
+                                                        marginRight: 5
+                                                    }}
+                                                />
                                                 <FastImage
                                                     source={{ uri: itemData.item.message, priority: FastImage.priority.high, }}
                                                     style={{
                                                         width: 250,
                                                         height: 216,
+                                                        borderRadius:20,
                                                         alignSelf: 'flex-end',
                                                     }}
                                                 />
@@ -651,7 +695,17 @@ const ChatScreen = (props) => {
                                 }
                                 else {
                                     return (
-                                        <View style={{ marginTop: '3%', alignSelf: 'flex-start', marginLeft: '5%', overflow: 'hidden' }}>
+                                        <View style={{ marginTop: '3%', alignSelf: 'flex-start',marginLeft: '5%', overflow: 'hidden' }}>
+                                            <View style={{flexDirection:"row"}}>
+                                            <Image
+                                                    source={data?.profile_image !== null ? { uri: BASE_URL + data?.profile_image } : require("../../../assets/user.png")}
+                                                    style={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: 200,
+                                                        marginRight: 5
+                                                    }}
+                                                />
                                             <FastImage
                                                 source={{ uri: itemData.item.message, priority: FastImage.priority.high, }}
                                                 style={{
@@ -661,6 +715,8 @@ const ChatScreen = (props) => {
                                                     borderRadius: 20
                                                 }}
                                             />
+                                            </View>
+                                             
                                             <View
                                                 style={{
                                                     flexDirection: 'row',
@@ -767,8 +823,8 @@ const ServicesProvidedModal = ({ data, visible, setVisible }) => {
                     <Text style={[{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }]}>Services</Text>
                     {data.map((x, index) => {
                         return (
-                            <View style={{flexDirection:"row",alignItems:"center"}}>
-                                <Text  style={[styles.msgText, { color: "black", fontSize: 12 ,width:15}]}>{index + 1}.</Text>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <Text style={[styles.msgText, { color: "black", fontSize: 12, width: 15 }]}>{index + 1}.</Text>
                                 <Text style={[styles.msgText, { color: "black", fontSize: 12, }]}>{x.name}</Text>
                             </View>
                         )

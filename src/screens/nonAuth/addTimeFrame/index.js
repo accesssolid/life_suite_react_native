@@ -434,7 +434,7 @@ const AddTimeFrame = (props) => {
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
-                title={serviceData?.subService ? serviceData?.subService?.name : "Time Frames"}
+                title={(serviceData?.subService ? serviceData?.subService?.name : "Time Frames")+ ` (${moment(current_month,"YYYY-MM").format("MMM")})`}
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.goBack()
@@ -443,6 +443,7 @@ const AddTimeFrame = (props) => {
 
             />
             <View style={styles.container}>
+            <ScrollView style={{ flex: 1 }}>
                 <View style={styles.calendar}>
                     <Calendar
                         current={new Date()}
@@ -470,7 +471,7 @@ const AddTimeFrame = (props) => {
                         minDate={new Date()}
                     />
                 </View>
-                <ScrollView style={{ flex: 1 }}>
+               
                     <View style={{ marginVertical: 5 }}>
                         {customDatesStyles.map((item, index) => {
                             const fromTime = moment(item.from_time, ["HH.mm a"]).format("hh:mm A");
