@@ -11,6 +11,7 @@ import { showToast } from '../../../utils';
 import { getApi } from '../../../api/api';
 import { useSelector } from 'react-redux';
 import Entypo from 'react-native-vector-icons/Entypo'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const ResetPassword = (props) => {
     const { email, otp } = props.route.params
@@ -76,6 +77,7 @@ const ResetPassword = (props) => {
             <StatusBar backgroundColor={Colors.global.green} barStyle="dark-content" />
             <Container>
                 <Content>
+                <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
                     <View style={styles.screen}>
                         <Text style={{ marginTop: "20%", ...styles.forgot }}>Reset</Text>
                         <Text style={styles.forgot}>Password</Text>

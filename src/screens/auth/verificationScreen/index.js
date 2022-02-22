@@ -10,6 +10,7 @@ import Loader from '../../../components/loader';
 import { showToast } from '../../../utils';
 import { getApi } from '../../../api/api';
 import { useSelector } from 'react-redux';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const VerificationCode = props => {
   const [email, setEmail] = useState('')
@@ -67,8 +68,11 @@ const VerificationCode = props => {
       <StatusBar
         backgroundColor={Colors.global.green}
         barStyle="dark-content" />
+        
       <Container>
         <Content>
+        <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
+
           <View style={styles.screen}>
             <Text style={{ marginTop: "20%", ...styles.forgot }}>Forgot</Text>
             <Text style={styles.forgot}>Password</Text>

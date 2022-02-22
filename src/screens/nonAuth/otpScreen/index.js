@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { getApi } from '../../../api/api';
 import { TouchableOpacity } from 'react-native';
 import LS_COLORS from '../../../constants/colors';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const OtpScreen = props => {
   const [code, setCode] = useState('')
@@ -106,8 +107,11 @@ const OtpScreen = props => {
   return (
     <SafeAreaView style={globalStyles.safeAreaView}>
       <StatusBar backgroundColor={Colors.global.green} barStyle="dark-content" />
+
       <Container>
-        <Content>
+        <Content>         
+        <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
+ 
           <View style={styles.screen}>
             <Text style={{ marginTop: "20%", ...styles.forgot }}>Verification</Text>
             <Text style={{ ...styles.email, marginTop: "25%" }}>Please enter the</Text>

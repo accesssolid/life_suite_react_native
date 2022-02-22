@@ -29,7 +29,8 @@ import RNGooglePlaces from 'react-native-google-places';
 import { Rating } from 'react-native-ratings';
 import { order_types, buttons_customer, buttons_types } from '../../../constants/globals'
 import * as RNLocalize from "react-native-localize";
-
+import Entypo from 'react-native-vector-icons/Entypo'
+import RateAndCommentModal from '../../../components/RateAndComment';
 export default function OrderDetailUpdateCustomer(props) {
     let { item, order_id } = props.route.params
     const [data, setData] = useState(null)
@@ -45,9 +46,10 @@ export default function OrderDetailUpdateCustomer(props) {
     const [virtualdata, setVirtualData] = React.useState({})
     const [reorderModal, setReorderModal] = React.useState(false)
     const [fromAddress, setFromAddress] = useState("")
-    const [itemData,setItemData]=React.useState({})
+    const [itemData, setItemData] = React.useState({})
     const [cancelOrderText, setCancelOrderText] = React.useState("Remaining cancellation requests: 10")
     const [textShowWithRed, settextShowWithRed] = React.useState("")
+    const [rateVisible, setRateVisible] = React.useState(false)
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -58,14 +60,14 @@ export default function OrderDetailUpdateCustomer(props) {
         longitude: -122.4324,
     })
     useEffect(() => {
-        if(item?.id){
+        if (item?.id) {
             setItemData(item)
         }
         if (order_id >= 0) {
             let item1 = { id: order_id }
             setItemData(item1)
         }
-    }, [order_id,item])
+    }, [order_id, item])
 
     React.useEffect(() => {
         console.log("Data", JSON.stringify(data))
@@ -84,8 +86,11 @@ export default function OrderDetailUpdateCustomer(props) {
         }
     }, [data])
 
-    const getOrderDetail = (order_id) => {
-        setLoading(true)
+    const getOrderDetail = (order_id, showLoading = true) => {
+        if (showLoading) {
+            setLoading(true)
+        }
+
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -253,6 +258,79 @@ export default function OrderDetailUpdateCustomer(props) {
 
             })
     }
+    const handleUpdateAddRate = (id, dat) => {
+        if(dat?.rating=="0"||dat?.rating==""||dat?.rating==0){
+            setTimeout(()=>{
+                showToast("Please rate this job.")
+            },200)
+           
+            return
+        }
+        setRateVisible(false)
+        setLoading(true)
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+        const body = new FormData()
+        if (id || id > 0) {
+            body.append("rating_id", id)
+        } else {
+            body.append("order_id", data.id)
+        }
+        body.append("rating", dat.rating)
+        body.append("comment", dat.comment)
+
+        let config = {
+            headers: headers,
+            data: body,
+            endPoint: id || id > 0 ? "/api/customerEditRating" : "/api/customerAddRating",
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    showToast(response.message)
+                } else {
+                    showToast(response.message)
+                }
+            }).catch(err => {
+
+            }).finally(() => {
+                setLoading(false)
+                getOrderDetail(itemData?.id, false)
+            })
+    }
+
+    const handleDeleteRate = (id) => {
+        setLoading(true)
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+        const body = new FormData()
+        body.append("rating_id", id)
+        let config = {
+            headers: headers,
+            data: body,
+            endPoint: "/api/customerRatingDelete",
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                console.log("Response", response)
+                if (response.status == true) {
+                    showToast(response.message)
+                } else {
+                    showToast(response.message)
+                }
+            }).catch(err => {
+
+            }).finally(() => {
+                setLoading(false)
+                getOrderDetail(itemData?.id, false)
+
+            })
+    }
 
     useEffect(() => {
         if (itemData?.id) {
@@ -261,10 +339,10 @@ export default function OrderDetailUpdateCustomer(props) {
     }, [itemData])
 
     useFocusEffect(React.useCallback(() => {
-        if(itemData?.id){
+        if (itemData?.id) {
             getOrderDetail(itemData?.id)
         }
-        
+
         getLocationPermission()
     }, [itemData]))
 
@@ -368,7 +446,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 order_id: data.id,
                 order_start_time: start_time, //"2021-10-07 10:00:00",
                 order_end_time: end_time, // "2021-11-07 12:00:00",
-                "timezone":RNLocalize.getTimeZone()
+                "timezone": RNLocalize.getTimeZone()
 
             }),
             endPoint: "/api/reorderCreate",
@@ -418,14 +496,14 @@ export default function OrderDetailUpdateCustomer(props) {
         // }if(time>5 && time<=10)
         return text
     }
-
+    const [rateType, setRateType] = React.useState("rate")
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
-            <StatusBar 
-          // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-            barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             {/* header start */}
             <View style={{ width: '100%', height: '20%', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, overflow: "hidden" }}>
                 <ImageBackground
@@ -459,7 +537,10 @@ export default function OrderDetailUpdateCustomer(props) {
                     {/* <RenderView Card Main/> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Order Detail</Text>
-                        <CardClientInfo virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        <CardClientInfo handleClickOnEdit={(v, t) => {
+                            setRateType(t)
+                            setRateVisible(true)
+                        }} virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
                         <RenderAddressFromTO
                             fromShow={data?.order_items[0]?.services_location_type == 2}
@@ -571,6 +652,13 @@ export default function OrderDetailUpdateCustomer(props) {
                 }}
                 setVisible={setReorderModal}
             />
+            <RateAndCommentModal
+                visible={rateVisible}
+                setVisible={setRateVisible}
+                data={data?.provider_rating_data}
+                handleAddUpdate={handleUpdateAddRate}
+                handleDelete={handleDeleteRate}
+            />
             {loading && <Loader />}
         </View>
     )
@@ -578,7 +666,7 @@ export default function OrderDetailUpdateCustomer(props) {
 
 
 //items && virtual order items manage screens
-const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextShowWithRed }) => {
+const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
@@ -656,23 +744,23 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
 
     const getTotalVirtualAmount = (dtype, amount, totalAmount) => {
         if (amount && amount !== "" && amount != 0) {
-            let totalAmount1 =  Number(totalAmount)
+            let totalAmount1 = Number(totalAmount)
             if (dtype == "flat") {
                 totalAmount1 = totalAmount - Number(amount)
             } else if (dtype == "per") {
                 totalAmount1 = totalAmount - (amount * totalAmount / 100)
             }
-            let return_value= Number(totalAmount1)+Number(data?.provider_rating_data?.tip ?? 0)
-            if(Number.isNaN(return_value)){
+            let return_value = Number(totalAmount1) + Number(data?.provider_rating_data?.tip ?? 0)
+            if (Number.isNaN(return_value)) {
                 return 0
-            }else{
+            } else {
                 return return_value
             }
         } else {
-            let return_value=Number(totalAmount)+Number(data?.provider_rating_data?.tip ?? 0)
-            if(Number.isNaN(return_value)){
+            let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
+            if (Number.isNaN(return_value)) {
                 return 0
-            }else{
+            } else {
                 return return_value
 
             }
@@ -696,6 +784,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
             return false
         }
     }
+
     return (
         <Card containerStyle={{ borderRadius: 10 }}>
             <View style={{ flexDirection: "row" }}>
@@ -725,7 +814,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 <View >
                     <Text style={[styles.greenTextStyle, { textAlign: "right" }]}>{moment(data?.created_at).fromNow()}</Text>
                     <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
-                    <Text style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" },styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD YYYY")}</Text>
+                    <Text style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }, styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD YYYY")}</Text>
 
                 </View>
             </View>
@@ -747,8 +836,8 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
             </View>}
             {data?.provider_rating_data?.id &&
                 <>
-                    <View style={{ backgroundColor: "white", width: "100%", justifyContent: "space-between", flexDirection: "row", alignItems: "center",marginTop:10 }}>
-                    <Text style={styles.greenTextStyle}>Tip</Text>
+                    <View style={{ backgroundColor: "white", width: "100%", justifyContent: "space-between", flexDirection: "row", alignItems: "center", marginTop: 10 }}>
+                        <Text style={styles.greenTextStyle}>Tip</Text>
                         <Text style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ?? 0}</Text>
                     </View>
                 </>
@@ -769,9 +858,9 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 <Text style={styles.greenTextStyle}>Total Time</Text>
                 <Text style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
             </View>
-            {data?.provider_rating_data?.id &&
+            {data?.order_status == order_types.completed &&
                 <>
-                    <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
+                    <View style={{ backgroundColor: "white", width: "100%", marginTop: 10, flexDirection: "row", alignItems: "center" }}>
                         <Text style={[styles.greenTextStyle]}>Rating: </Text>
                         <Rating
                             readonly={true}
@@ -780,9 +869,21 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                             ratingBackgroundColor="white"
                             ratingColor="#04BFBF"
                             tintColor="white"
-                            startingValue={data?.provider_rating_data?.rating}
+                            startingValue={0}
+                            startingValue={data?.provider_rating_data?.rating ? data?.provider_rating_data?.rating : "0"}
                         />
-
+                        <Entypo
+                            onPress={() => {
+                                handleClickOnEdit("rate", true)
+                            }}
+                            size={20} name='edit' color={LS_COLORS.global.green} />
+                    </View>
+                    <View style={{ backgroundColor: "white", width: "100%", marginTop: 10, flexDirection: "row", alignItems: "center" }}>
+                        <Text style={[styles.greenTextStyle]}>Comment: </Text>
+                        <Text style={{ flex: 1, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkGray, fontSize: 12 }}>{data?.provider_rating_data?.comment}</Text>
+                        <Entypo onPress={() => {
+                            handleClickOnEdit("comment", true)
+                        }} size={20} name='edit' color={LS_COLORS.global.green} />
                     </View>
                 </>
             }
