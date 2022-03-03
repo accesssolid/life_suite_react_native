@@ -173,12 +173,20 @@ const AddTimeFrame = (props) => {
                 delete dx.id
                 return dx
             }),
-            update_data:data.filter(x=>x.id!="")
+            update_data:data.filter(x=>x.id!="").filter(x=>{
+                if(moment(x.start_date+" "+x.from_time,"YYYY-MM-DD HH:mm").toDate()>moment().toDate()){
+                    return true
+                }else{
+                    return false
+                }
+            })
         }
         const formdata = new FormData()
         formdata.append("service_id", serviceData.subService?.id)
         formdata.append("json_data", JSON.stringify(d))
         formdata.append("current_time",moment().format("YYYY-MM-DD HH:mm:ss"))
+        console.log("Formdata", serviceData.subService?.id)
+
         const config = {
             headers: headers,
             data: formdata,
@@ -191,7 +199,6 @@ const AddTimeFrame = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log("response", response)
                 if (response.status == true) {
                     showToast(response.message)
                     props.navigation.goBack()
@@ -427,7 +434,7 @@ const AddTimeFrame = (props) => {
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
                 // title={serviceData?.subService ? serviceData?.subService?.name : "Time Frames"}
-                title={(serviceData?.subService ? serviceData?.subService?.name : "Time Frames") + ` (${moment(current_month, "YYYY-MM").format("MMM")})`}
+                title={(serviceData?.subService ? serviceData?.subService?.name : "Time Frames") + ` (${moment(current_month, "YYYY-MM").format("MMM YYYY")})`}
 
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {

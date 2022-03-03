@@ -27,7 +27,7 @@ const DropDown1 = (props) => {
                 <View style={styles.arrow}>
                     <AntDesign name="down" color={LS_COLORS.global.green} />
                 </View>
-                {props.handleTextValue && <Text style={{
+                {props.handleTextValue && <Text style={[{
                     fontSize: 14,
                     height: 50,
                     width: "100%",
@@ -37,7 +37,7 @@ const DropDown1 = (props) => {
                     lineHeight: 50,
                     left:"0%",
                     position:"absolute",
-                }}>{props.value}</Text>}
+                },props.handleTextValueStyle]}>{props.value}</Text>}
                 <ModalDropdown
                     ref={props.dropRef}
                     defaultValue={props.value}

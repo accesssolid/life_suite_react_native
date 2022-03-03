@@ -4,10 +4,12 @@ import LS_FONTS from '../../../constants/fonts';
 import { globalStyles } from '../../../utils';
 import CustomButton from '../../../components/customButton';
 import { CheckBox } from 'react-native-elements';
+import { getApi } from '../../../api/api';
 
 export default function CovidScreen(props) {
     const [checked, setChecked] = React.useState(false)
     const {onChecked,isChecked} =props.route.params
+    const [text_data,setTextData]=React.useState("")
     React.useEffect(()=>{
         if(isChecked){
             setChecked(isChecked)
@@ -15,6 +17,40 @@ export default function CovidScreen(props) {
             setChecked(false)
         }
     },[isChecked])
+
+    React.useEffect(()=>{
+        getData()
+    },[])
+    
+    const getData= async () => {
+        try {
+
+            let headers = {
+                "Content-Type": "application/json"
+            }
+
+            let config = {
+                headers: headers,
+                data: JSON.stringify({}),
+                endPoint: '/api/cdd',
+                type: 'post'
+            }
+            let res = await getApi(config)
+    
+            if (res.status) {
+                if(res.data?.text_data){
+                    setTextData(res.data?.text_data?.replace(/<\/?[^>]+(>|$)/g, ""))
+                }else{
+                    setTextData("Dont't provide or receive any services if you have COVID-19 or have any related symptoms.")
+
+                }
+                
+            }
+        } catch (err) {
+
+        }
+    }
+
     return (
         <SafeAreaView style={[globalStyles.safeAreaView, { backgroundColor: "white" }]}>
             <ScrollView>
@@ -48,14 +84,13 @@ export default function CovidScreen(props) {
                         onPress={() => setChecked(!checked)}
                         checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
-                        // title=": Dont't provide or receive any services if you have COVID-19 or have any related symptoms."
                         titleProps={{
                             style:{
                                 width:0,marginHorizontal:0
                             }
                         }}
                     />
-                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, flex: 1, fontSize: 15, textAlign: "left", color: "black" }}> : Dont't provide or receive any services if you have COVID-19 or have any related symptoms.</Text>
+                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, flex: 1, fontSize: 15, textAlign: "left", color: "black" }}> : {text_data}</Text>
                 </View>
                 <Text onPress={() => Linking.openURL("https://cdc.gov")} style={{ fontFamily: LS_FONTS.PoppinsLight, fontSize: 14, textDecorationLine: "underline", marginTop: 20, textAlign: "center", color: "blue" }}>
                     View CDC guidelines

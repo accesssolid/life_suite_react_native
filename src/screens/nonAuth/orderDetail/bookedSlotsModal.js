@@ -10,10 +10,11 @@ import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
 
 export default function BookedSlotsModal({ visible,booked, setVisible }) {
-  
+    console.log("Modal",JSON.stringify(booked))
     return (
         <Modal
             visible={visible}
+            // visible={true}
             transparent={true}
         >
             <Pressable
@@ -31,7 +32,7 @@ export default function BookedSlotsModal({ visible,booked, setVisible }) {
                                     <>
                                     <Card.Divider />
                                     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>{x.customers_first_name} {x.customers_last_name}</Text>
+                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>{x.customers_first_name} {x.customers_last_name} ({(x.sub_services_name=='null'||x.sub_services_name==null||x.sub_services_name==undefined)?x.services_name:x.sub_services_name})</Text>
                                         <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>{moment(x.order_start_time).format("hh:mm a")}-{moment(x.order_end_time).format("hh:mm a")}</Text>
                                     </View>
                                     </>

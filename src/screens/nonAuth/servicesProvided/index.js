@@ -469,24 +469,26 @@ const ServicesProvided = (props) => {
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                             dropdownStyle={{ maxHeight: 300 }}
                         />
-                        {subService.id == 14&&<View style={{ flexDirection: 'row', paddingHorizontal: '3.5%' }}>
+                        {subService.id == 14&&<View style={{ flexDirection: 'row', paddingHorizontal:"2.5%"}}>
                             <View style={{ flex: 1 }}>
                                 <DropDown
                                     title="Make"
                                     handleTextValue={true}
+                                    handleTextValueStyle={{paddingLeft:5}}
                                     item={makeList.map(x => x.title) ?? []}
                                     onChangeValue={(index, value) => {
                                         setSelectedMake(makeList[index].id)
                                     }}
                                     value={makeList.find(x => x.id == selectedMake)?.title ?? "Make"}
-                                    containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
+                                    containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
                                     dropdownStyle={{ maxHeight: 300 }}
                                 />
                             </View>
-                            <View style={{ flex: 1 }}>
+                            <View style={{ flex: 0.8 }}>
                                 <DropDown
                                     handleTextValue={true}
                                     title="Model"
+                                    handleTextValueStyle={{paddingLeft:5}}
                                     item={modelList.map(x => x.title) ?? []}
                                     value={modelList.find(x => x.id == selectedModel)?.title ?? "Model"}
                                     onChangeValue={(index, value) => {
@@ -496,10 +498,11 @@ const ServicesProvided = (props) => {
                                     dropdownStyle={{ maxHeight: 300 }}
                                 />
                             </View>
-                            <View style={{ flex: 1 }}>
+                            <View style={{ flex: 0.8 }}>
                                 <DropDown
                                     title="Year"
                                     handleTextValue={true}
+                                    handleTextValueStyle={{paddingLeft:5}}
                                     item={yearList.map(x => "\t" + x.title + "\t") ?? []}
                                     value={yearList.find(x => x.id == selectedYear)?.title ?? "Year"}
                                     onChangeValue={(index, value) => {

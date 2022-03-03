@@ -1410,16 +1410,15 @@ const Profile = (props) => {
                                         placeholderTextColor: LS_COLORS.global.placeholder,
                                         selection: selection,
                                         onChangeText:(t)=>{
-                                            console.log(t)
                                             setHomeAddressData({
                                                 ...homeAddressData,
                                                 address_line_1: t,
                                               
                                             })
-                                            setSelection1({start:t?.length})
+                                            setSelection({start:t?.length})
                                         },
                                         onBlur: () => { setSelection({ start: 0 }) },
-                                        onFocus: () => { setSelection({start:homeAddressData?.address_line_1?.length}) }
+                                        onFocus: () => { setSelection({start:100}) }
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',

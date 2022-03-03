@@ -157,7 +157,6 @@ const TimeFrame = props => {
                     <Pressable>
                         <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Select Time Frame</Text>
                         {jsonData && jsonData.map((i, index) => {
-                            console.log(i)
                             let x = i.duration / 60
                             let time_format = ""
                             if (x > 1) {
@@ -168,12 +167,35 @@ const TimeFrame = props => {
                             let estimated_price = 0
                             if (props.provider_prices) {
                                 let obj = props.provider_prices?.find(x => x.id == i.provider_id)
+                                // _price
+                                let products=i.products
+                                let provider=data?.find(x=>x?.id==i.provider_id)
+                                console.log(products)
+                                console.log(provider?.item_list)
                                 if (obj) {
                                     estimated_price = obj?.price
+                                    if(provider){
+                                        estimated_price=0
+                                        for(let item of provider?.item_list){
+                                            if(item.checked){
+                                                estimated_price+=Number(item.price)
+                                                for(let product of item?.products){
+                                                    if(product.checked){
+                                                        if(product.item_products_name=="Per Mile"){
+                                                            estimated_price+=Number(Number(product.price)*Number(orderPreviousData?.mile_distance))
+                                                        }else{
+                                                            estimated_price+=Number(product.price)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             let p_obj=data?.find(x=>x.id==i.provider_id)
                             let location=props?.location
+                            
                             if(p_obj){
                                 if(p_obj?.service_is_at_address=="1"){
                                     location=p_obj?.current_address
@@ -186,7 +208,7 @@ const TimeFrame = props => {
                                 <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: "black" }}>({i.itemsName.join(", ")})</Text>
                                 <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Time: {time_format}</Text>
                                 <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Location: {location}</Text>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${estimated_price}</Text>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${estimated_price.toFixed(1)}</Text>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "100%", marginTop: "5%" }}>
                                     <View style={{ width: "50%", height: 50, }} >
                                         <Text>From</Text>

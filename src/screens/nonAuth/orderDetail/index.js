@@ -88,7 +88,6 @@ const OrderClientDetail = (props) => {
     }, [order_id])
 
     React.useEffect(() => {
-        console.log("order_data", data)
         if (data) {
             let ds = generate_series(15, data.order_start_time)
             let end_time = moment(data.order_end_time, "YYYY-MM-DD HH:mm").subtract(totalWorkingMinutes, 'minutes')
@@ -113,7 +112,6 @@ const OrderClientDetail = (props) => {
     })
 
     React.useEffect(() => {
-        console.log("Data", JSON.stringify(data))
         if (data?.id) {
             if (data.order_from_lat && data.order_from_long) {
                 setToCoordinates({
@@ -145,7 +143,6 @@ const OrderClientDetail = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response,"Response")
                 if (response.status == true) {
                     if (response.data) {
                         setBooked(response.data)
@@ -379,7 +376,6 @@ const OrderClientDetail = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
                     getOrderDetail(itemdata?.id)
@@ -414,7 +410,6 @@ const OrderClientDetail = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
                     // props.navigation.pop()
@@ -646,7 +641,6 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
     
     useEffect(() => {
         if (showVirtualData) {
-            console.log("virtual_data",virtual_data.order_end_time,data.order_end_time,virtual_data?.requested_end_time,data.requested_end_time)
           
             if (totalTime && totalVirtualTime) {
                 if (totalTime < totalVirtualTime) {
@@ -663,7 +657,6 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
 
     }, [totalVirtualTime, totalTime, showVirtualData])
     useEffect(() => {
-        console.log("virtual_data", virtual_data)
         if (virtual_data?.id) {
             setVirtualOrdersItems(virtual_data.order_items)
         }
@@ -679,7 +672,6 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
     }, [virtualOrdersItems])
 
     useEffect(() => {
-        console.log("items", JSON.stringify(items))
         if (items.length > 0) {
             let t = items.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
@@ -974,7 +966,6 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
 
 const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen, openRatingModal }) => {
     const [buttons, setButtons] = React.useState([])
-    console.log(JSON.stringify(data), "data")
     const navigation = useNavigation()
 
 

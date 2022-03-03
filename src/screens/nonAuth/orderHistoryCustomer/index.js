@@ -36,6 +36,34 @@ const order_types = [
     { id: 7, title: "InProgress" },
     { id: 8, title: "Completed" },
     { id: 2, title: "Cancelled" },
+    { id: undefined, title: "All" },
+]
+const notification_color = [
+    {
+        title: "Requesting",
+        ids: [1],
+        color: "orange"
+    },
+    {
+        title: "Upcoming",
+        ids: [3, 4, 6, 5, 12, 9, 10, 11],
+        color: "#02a4ea"
+    },
+    {
+        title: "InProgress",
+        ids: [7, 15],
+        color: "#fdca0d"
+    },
+    {
+        title: "Completed",
+        ids: [8],
+        color: "#23b14d"
+    },
+    {
+        title: "Cancelled",
+        ids: [2, 14, 16, 13, 17],
+        color: "#ec1c25"
+    }
 ]
 
 const OrderHistory1 = (props) => {
@@ -296,7 +324,13 @@ const OrderHistory1 = (props) => {
                         renderItem={({ item, index }) => {
                             console.log(item)
                             let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
-
+                            let backgroundColor = "#5CBFBF"
+                            for (let c of notification_color) {
+                                if (c.ids.includes(item.order_status)) {
+                                    backgroundColor = c.color
+                                    break
+                                }
+                            }
                             return (
                                 <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
                                     if (done === index) {
@@ -306,6 +340,7 @@ const OrderHistory1 = (props) => {
                                         setDone(index)
                                     }
                                 }} style={{ width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
+                                    <View style={{ width: 6,height:65,position:"absolute", borderRadius: 12,left:0,backgroundColor: backgroundColor }}></View>
                                     {done === index ?
                                         <>
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

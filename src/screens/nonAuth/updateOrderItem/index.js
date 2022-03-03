@@ -132,19 +132,19 @@ const OrderClientDetail = (props) => {
         }
         console.log(selectedItems)
         console.log(otherProducts)
-    
-        let newServices=items.filter(x=>String(x.id).startsWith("new")).map(x=>{
-            return(
+
+        let newServices = items.filter(x => String(x.id).startsWith("new")).map(x => {
+            return (
                 {
-                    item_name:x.name,
-                    price:x.price,
-                    time_duration:x.time_duration,
-                    variant_data:x.variant_data,
-                    products:otherProducts.filter(p=>String(p.item_id).startsWith("new"))
+                    item_name: x.name,
+                    price: x.price,
+                    time_duration: Number(x?.time_duration_h)*60+Number(x?.time_duration_m),
+                    variant_data: x.variant_data,
+                    products: otherProducts.filter(p => String(p.item_id).startsWith("new"))
                 }
             )
         })
-       
+
         let config = {
             headers: headers,
             data: JSON.stringify({
@@ -153,13 +153,13 @@ const OrderClientDetail = (props) => {
                     estimated_reached_time: data.estimated_reached_time,
                     order_start_time: data.order_start_time,
                     order_end_time: moment(data.order_start_time).add(newTimeNeeded, "minutes").format("YYYY-MM-DD HH:mm:[00]"),
-                    items: selectedItems.filter(x=>!String(x).startsWith("new")),
+                    items: selectedItems.filter(x => !String(x).startsWith("new")),
                     products: selectedProducts,
                     requested_start_time: data.requested_start_time,
                     requested_end_time: checkTimeFrameIncrease(),
                     other_options: [],
-                    extra_products: otherProducts.filter(x=>!String(x.item_id).startsWith("new")),
-                    new_services:newServices
+                    extra_products: otherProducts.filter(x => !String(x.item_id).startsWith("new")),
+                    new_services: newServices
                 }),
                 order_placed_address: data.order_placed_address,
                 order_placed_lat: data.order_placed_lat,
@@ -289,7 +289,7 @@ const OrderClientDetail = (props) => {
                             setSelectedProducts={setSelectedProducts}
                             setOtherProducts={setOtherProducts}
                         />
-                      {!productShow&&<CustomButton title="Add Service"
+                        {!productShow && <CustomButton title="Add Service"
                             action={() => {
                                 setOpenModal(true)
                             }}
@@ -356,8 +356,8 @@ const ItemsView = ({ items, selectedItem, setItems, productShow, setProductShow,
             <View style={styles.itemViewContainerStyle}>
                 <View style={styles.itemNameContainerStyle} />
                 <View style={{ flex: 1, flexDirection: "row", paddingHorizontal: 20 }}>
-                    <Text style={[styles.itemTextStyle, { width: "50%" }]}>Estimated Time</Text>
-                    <Text style={[styles.itemTextStyle, { width: "50%" }]}>Price</Text>
+                    <Text style={[styles.itemTextStyle, { width: "55%" }]}>Estimated Time</Text>
+                    <Text style={[styles.itemTextStyle, { width: "45%" }]}>Price</Text>
                 </View>
             </View>
             {showItems.map(x => {
@@ -432,16 +432,29 @@ const ItemView = ({
                     />
                     <Text numberOfLines={1} style={[styles.itemTextStyle]}>{item?.name}</Text>
                 </View>
-                {String(item?.id)?.startsWith("new") && productShow ? <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
-                    <TextInput value={item?.time_duration}
+                {String(item?.id)?.startsWith("new") && productShow ? <View style={{ flexDirection: "row",justifyContent:"space-around", flex: 1, paddingHorizontal: 20 }}>
+                    <View style={{flexDirection:"row",alignItems:"center"}}>
+                    <TextInput value={item?.time_duration_h}
                         onChangeText={t => {
                             setItems(state => {
                                 let d = _.cloneDeep(state).filter(x => x.id != item.id)
-                                return ([...d, { ...item, time_duration: t }])
+                                return ([...d, { ...item, time_duration_h: t }])
                             })
                         }}
+                        placeholder="hh"
                         keyboardType="numeric"
-                        style={[styles.itemTextStyle, { width: "50%", paddingVertical: 4, color: LS_COLORS.global.green, borderRadius: 5, borderWidth: 1, borderColor: LS_COLORS.global.green }]} />
+                        style={[styles.itemTextStyle, { width: 40,height:40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor:LS_COLORS.global.lightGrey }]} />
+                         <TextInput value={item?.time_duration_m}
+                        onChangeText={t => {
+                            setItems(state => {
+                                let d = _.cloneDeep(state).filter(x => x.id != item.id)
+                                return ([...d, { ...item, time_duration_m: t }])
+                            })
+                        }}
+                        placeholder="mm"
+                        keyboardType="numeric"
+                        style={[styles.itemTextStyle, { width: 40,height:40,marginLeft:5,marginRight:10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor:LS_COLORS.global.lightGrey }]} />
+                    </View>
                     <TextInput
                         value={item?.price}
                         onChangeText={t => {
@@ -450,10 +463,11 @@ const ItemView = ({
                                 return ([...d, { ...item, price: t }])
                             })
                         }}
+                        placeholder="$"
                         keyboardType="numeric"
-                        style={[styles.itemTextStyle, { width: "50%", paddingVertical: 4, color: LS_COLORS.global.green, borderRadius: 5, marginLeft: 5, borderWidth: 1, borderColor: LS_COLORS.global.green }]} />
+                        style={[styles.itemTextStyle, { width: 50,height:40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor:LS_COLORS.global.lightGrey }]} />
                 </View> : <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
-                    <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{convertMinsToHrsMins(Number(item?.time_duration))}</Text>
+                    <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{checkNewOrNot(item?.time_duration_h,item?.time_duration_m,item?.time_duration)}</Text>
                     <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${item.price}</Text>
                 </View>
                 }
@@ -607,6 +621,14 @@ const convertMinsToHrsMins = (mins) => {
     return `${h} hr ${m} min`;
 }
 
+const checkNewOrNot=(hour,mins,duration)=>{
+    if(Boolean(Number(hour))||Boolean(Number(mins))){
+        return convertMinsToHrsMins(Number(mins)+Number(hour)*60)
+    }else{
+        return convertMinsToHrsMins(Number(duration))
+    }
+}
+
 const HeaderView = ({ subService, navigation, data, action }) => {
     return (
         <View style={{ width: '100%', height: '20%', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, overflow: "hidden" }}>
@@ -691,6 +713,8 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setL
                         "name": service_name,
                         "price": 0,
                         "time_duration": 0,
+                        time_duration_h:0,
+                        time_duration_m:0,
                         "variant_data": variant_id,
                         "is_product_mandatory": "0",
                         "service_id": 14,

@@ -12,7 +12,7 @@ import Loader from '../../../components/loader';
 import moment from 'moment';
 import { FlatList } from 'react-native-gesture-handler';
 import DropDown from '../../../components/dropDown';
-
+const lodash = require("lodash")
 export default function ProviderDetail(props) {
     const { providerId, service } = props.route?.params
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -20,15 +20,50 @@ export default function ProviderDetail(props) {
     const [provider, setProvider] = React.useState(null)
     const [pictures, setPictures] = React.useState([])
     const [ratings, setRatings] = React.useState([])
+    const [totalRatings,setTotalRatings]=React.useState([])
     const [average_rating, setAverageRating] = React.useState(0)
     const [modalVisible, setModalVisible] = React.useState(false)
     const [currentSelectedImage, setCurrentSelectedImage] = React.useState(0)
-    const [currentRating,setCurrentRating]=React.useState(0)
-
+    const [currentRating, setCurrentRating] = React.useState(0)
+    const [sortBy, setSortBy] = React.useState(0)
     useEffect(() => {
         getProviderDetail()
         getRatings()
     }, [])
+
+    useEffect(() => {
+        let ratingsCopy = [...totalRatings]
+        console.log(sortBy)
+        if (sortBy == 0) {
+            ratingsCopy.sort((a, b) => {
+                let ac = moment(a.created_at, "YYYY-MM-DD HH:mm:ss").toDate()
+                let bc = moment(b.created_at, "YYYY-MM-DD HH:mm:ss").toDate()
+                console.log(ac,bc)
+                if (ac < bc) {
+                    return 1
+                } else if (ac > bc) {
+                    return -1
+                }
+                return 0
+            })
+         
+        } else if (sortBy == 1) {
+            ratingsCopy.sort((a, b) => {
+                let ac = moment(a.created_at, "YYYY-MM-DD HH:mm:ss").toDate()
+                let bc = moment(b.created_at, "YYYY-MM-DD HH:mm:ss").toDate()
+                console.log(ac,bc)
+                if (ac < bc) {
+                    return -1
+                } else if (ac > bc) {
+                    return 1
+                }
+                return 0
+            })
+          
+        }
+        setRatings(ratingsCopy)
+    }, [sortBy,totalRatings])
+
     useEffect(() => {
         if (provider?.pictures_data?.length > 0) {
             let new_arr = []
@@ -43,7 +78,7 @@ export default function ProviderDetail(props) {
             setAverageRating(totalAverage)
         }
     }, [ratings])
-    
+
     const getProviderDetail = async () => {
         try {
             setLoader(true)
@@ -89,6 +124,7 @@ export default function ProviderDetail(props) {
             console.log(JSON.stringify(res.data))
             if (res.status) {
                 setRatings(res.data)
+                setTotalRatings(res.data)
             }
         } catch (err) {
             console.warn(err)
@@ -144,7 +180,7 @@ export default function ProviderDetail(props) {
                 <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: LS_COLORS.global.green }}>{provider?.first_name}</Text>
                 <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black }}>{provider?.tagline}</Text>
             </View>
-            <ScrollView style={{paddingBottom:50}}>
+            <ScrollView style={{ paddingBottom: 50 }}>
                 <View style={{
                     shadowColor: "#000",
                     shadowOffset: {
@@ -177,7 +213,7 @@ export default function ProviderDetail(props) {
                     {pictures.map(x => {
                         return (
                             <View style={{ flexDirection: "row", marginTop: 10 }}>
-                                {x.map((picture,index) => <Pressable style={{marginHorizontal:index==1?5:0}} onPress={() => {
+                                {x.map((picture, index) => <Pressable style={{ marginHorizontal: index == 1 ? 5 : 0 }} onPress={() => {
                                     setCurrentSelectedImage(picture)
                                     setModalVisible(true)
                                 }}><Image
@@ -202,19 +238,34 @@ export default function ProviderDetail(props) {
                     marginHorizontal: 15,
                     marginTop: 10,
                     borderRadius: 10,
-                    marginBottom:40
+                    marginBottom: 40
                 }}>
-                       <View style={{ width:"50%"}}>
-                            <Text style={{ fontSize: 14,  fontFamily: LS_FONTS.PoppinsMedium }}>Filter rating</Text>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={{ width: "48%" }}>
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>Filter rating</Text>
                             <DropDown
                                 item={["1 Star", "2 Star", "3 Star", "4 Star", "5 Star"]}
                                 value={"Select Rating"}
-                                onChangeValue={(index, value) => { setCurrentRating(index)}}
-                                containerStyle={{borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
+                                onChangeValue={(index, value) => { setCurrentRating(index + 1) }}
+                                containerStyle={{ borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
                                 dropdownStyle={{ height: 5 * 40 }}
                             />
 
                         </View>
+                        <View style={{ width: "48%" }}>
+                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>Sort by</Text>
+                            <DropDown
+                                item={["Latest", "Oldest"]}
+                                value={["Latest", "Oldest"][sortBy]}
+                                onChangeValue={(index, value) => {
+                                    setSortBy(index)
+                                }}
+                                containerStyle={{ borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
+                                dropdownStyle={{ height: 2 * 40, width: "48%" }}
+                            />
+
+                        </View>
+                    </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                         <View style={{ width: 50 }}>
 
@@ -231,9 +282,18 @@ export default function ProviderDetail(props) {
                         showRating={false}
                         size={20}
                     />
+                    {(ratings.length == 0 || ratings.filter(rate => {
+                        if (currentRating != 0) {
+                            if (Number(rate.rating) == currentRating) {
+                                return true
+                            }
+                            return false
+                        }
+                        return true
+                    }).length == 0) && <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsRegular, textAlign: "center", marginTop: 20 }}>No rating found</Text>}
                     {ratings.map(x => {
-                        if(currentRating){
-                            if(currentRating!= Number(x.rating)){
+                        if (currentRating) {
+                            if (currentRating != Number(x.rating)) {
                                 return null
                             }
                         }
@@ -295,7 +355,7 @@ const ModalPictureView = ({ pictures, visible, setVisible, currentImage }) => {
             transparent={true}
         >
             <View style={{ flex: 1, backgroundColor: "#0006", justifyContent: "center", alignItems: "center" }}>
-                <View style={{ height: height * 0.9, width: width * 0.9, backgroundColor: "white", borderRadius: 20 }}>
+                <View style={{ height: height * 0.9, width: width * 0.9, backgroundColor: "transparent", borderRadius: 20 }}>
                     <FlatList
                         ref={ref}
                         pagingEnabled
@@ -313,7 +373,7 @@ const ModalPictureView = ({ pictures, visible, setVisible, currentImage }) => {
                                         // key={x.image}
                                         source={{ uri: BASE_URL + item?.image }}
                                         style={{ height: height * 0.9, width: width * 0.9, borderRadius: 20, backgroundColor: "gray" }}
-                                        resizeMode="stretch"
+                                        resizeMode="contain"
                                     />
                                 </Pressable>
                             )

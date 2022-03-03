@@ -179,7 +179,13 @@ const AddTimeFrame = (props) => {
             delete d.id
             return d
         })
-        json_data['time_frame_update'] = data.filter(x => x.id != "")
+        json_data['time_frame_update'] = data.filter(x => x.id != "").filter(x=>{
+            if(moment(x.start_date+" "+x.from_time,"YYYY-MM-DD HH:mm").toDate()>moment().toDate()){
+                return true
+            }else{
+                return false
+            }
+        })
         formdata.append("json_data", JSON.stringify(json_data));
         formdata.append("current_time",moment().format("YYYY-MM-DD HH:mm:ss"))
         console.log(JSON.stringify(json_data))
@@ -434,7 +440,7 @@ const AddTimeFrame = (props) => {
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
-                title={(serviceData?.subService ? serviceData?.subService?.name : "Time Frames")+ ` (${moment(current_month,"YYYY-MM").format("MMM")})`}
+                title={(serviceData?.subService ? serviceData?.subService?.name : "Time Frames")+ ` (${moment(current_month,"YYYY-MM").format("MMM YYYY")})`}
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.goBack()

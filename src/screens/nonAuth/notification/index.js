@@ -150,7 +150,7 @@ const Notification = (props) => {
         if (item.type == "order") {
             for (let c of notification_color) {
                 if (c.ids.includes(item.service_orders_order_status)) {
-                    backgroundColor = c.color
+                    // backgroundColor = c.color
                     orderType=c.title
                     break
                 }

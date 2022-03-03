@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Image, Text, SafeAreaView, ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable } from 'react-native'
+import messaging from '@react-native-firebase/messaging';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -22,6 +24,9 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setAddServiceMode } from '../../../redux/features/services';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
+import { role } from '../../../constants/globals';
+import {getStringData,storeStringData} from '../../../asyncStorage/async'
+import moment from 'moment';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
@@ -36,8 +41,10 @@ const HomeScreen = (props) => {
     const [order, setOrder] = useState([])
     const [orders, setOrders] = useState()
     const [scrollEnabled, setScrollEnabled] = React.useState(true)
+    const [fcmToken, setFcmToken] = useState("")
+
     useEffect(() => {
-        
+        GetToken()
         const backAction = () => {
             return true;
         };
@@ -54,6 +61,21 @@ const HomeScreen = (props) => {
         })
     ), [navigation]);
 
+    const GetToken = async () => {
+        let updateDay="0"
+        try{
+            updateDay=await getStringData("@last_fcm_updated")
+        }catch(err){
+
+        }
+        const authorizationStatus = await messaging().requestPermission();
+        if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+            const token = await messaging().getToken()
+            if(updateDay!=moment().format("DD")){
+                updateFCMToken(token)
+            }
+        }
+    }
     useEffect(() => {
         getServices(true)
         if (user.user_role == 3) {
@@ -64,14 +86,12 @@ const HomeScreen = (props) => {
     useFocusEffect(
         React.useCallback(() => {
             if (user.user_role == 3) {
-                setTimeout(()=>{
+                setTimeout(() => {
                     getLocationPermission()
-                },2000)
+                }, 2000)
             }
         }, [])
     );
-
-  
 
     useFocusEffect(
         useCallback(() => {
@@ -90,8 +110,41 @@ const HomeScreen = (props) => {
         }, [props.route])
     );
 
-    const getServices = (load=true) => {
-        if(load){
+    const updateFCMToken = (token) => {
+
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+
+        let data = new FormData()
+        data.append("device_id", getUniqueId())
+        data.append("fcm_token", token)
+
+        let config = {
+            headers: headers,
+            data: data,
+            endPoint: user.user_role == role.customer ? '/api/customerFcmUpdate' : '/api/providerFcmUpdate',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                  storeStringData("@last_fcm_updated",moment().format("DD"))
+                }
+                else {
+                   
+
+                }
+            }).catch(err => {
+
+            }).finally(() => {
+
+            })
+    }
+
+    const getServices = (load = true) => {
+        if (load) {
             setLoading(true)
         }
         let headers = {
@@ -114,18 +167,18 @@ const HomeScreen = (props) => {
                 if (response.status == true) {
                     dispatch(setServices({ data: [...response.data] }))
                     setItems([...response.data])
-                    
+
                 }
                 else {
                     // showToast(response.message, 'danger')
-                    
+
                 }
             }).catch(err => {
-                
-            }).finally(()=>{
-                setTimeout(()=>{
+
+            }).finally(() => {
+                setTimeout(() => {
                     setLoading(false)
-                },1500)
+                }, 1500)
             })
     }
 
@@ -149,20 +202,20 @@ const HomeScreen = (props) => {
                 .then((response) => {
                     console.log("Response===>>>", response)
                     if (response.status == true) {
-                      
+
                     }
                     else {
                         showToast(response.message, 'danger')
-                      
+
                     }
                 }).catch(err => {
                     console.log("error", err)
-                   
-                }).finally(()=>{
-                    setTimeout(()=>{
+
+                }).finally(() => {
+                    setTimeout(() => {
                         setLoading(false)
-                    },1500)
-                   
+                    }, 1500)
+
                 })
         } catch (err) {
             console.log("Error", err)
@@ -466,30 +519,30 @@ const HomeScreen = (props) => {
                     </ScrollView>
                 }
                 {!loading && <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                    <TouchableOpacity  activeOpacity={0.7} onPress={() => props.navigation.navigate("Orders")} style={styles.orderContainer}>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate("Orders")} style={styles.orderContainer}>
                         <View
-                           
+
                         >
                             <Text style={styles.order}>
                                 MY ORDERS
                             </Text>
                         </View>
                     </TouchableOpacity>
-                    {user.user_role == 3 && <TouchableOpacity   activeOpacity={0.7}  onPress={() => {
+                    {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => {
                         props.navigation.navigate("LocationServiceSelect")
                     }} style={styles.orderContainer}>
                         <View
-                         
-                          >
+
+                        >
                             <Text style={styles.order}>
                                 LOCATION
                             </Text>
                         </View>
                     </TouchableOpacity>}
-                    {user.user_role == 3 && <TouchableOpacity    activeOpacity={0.7}
-                            onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={styles.orderContainer}>
+                    {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7}
+                        onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={styles.orderContainer}>
                         <View
-                         >
+                        >
                             <Text style={styles.order}>
                                 SCHEDULE
                             </Text>

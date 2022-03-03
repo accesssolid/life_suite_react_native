@@ -31,6 +31,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const Mechanics = (props) => {
     const { data, subService, extraData } = props.route.params
+
     const [loading, setLoading] = useState(false)
     const [providers, setProviders] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -59,7 +60,7 @@ const Mechanics = (props) => {
     const [filterModal, setFilterModal] = React.useState(false)
 
     React.useEffect(() => {
-        console.log("data===>", data.order_from_address)
+        console.log("data===>", data)
     }, [data])
 
     React.useEffect(() => {
@@ -482,9 +483,7 @@ const Mechanics = (props) => {
     }
 
     const [provider_prices, setProviderPrices] = React.useState([])
-    React.useEffect(() => {
-        console.log("provider_prices", provider_prices)
-    }, [provider_prices])
+
 
     React.useEffect(() => {
         let p_p = []
@@ -531,7 +530,7 @@ const Mechanics = (props) => {
                     ending_time={data.order_end_time}
                     orderPreviousData={data}
                     provider_prices={provider_prices}
-                    location={data?.order_from_address}
+                    location={data?.order_placed_address}
                     action={(jsonData) => {
                         placeOrder(jsonData)
                         setOpen2(!open2);
@@ -630,10 +629,18 @@ const Mechanics = (props) => {
                                     }
                                     let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
                                     let totalProductPrice = 0
+                                    let showDistanceOrNot=false
                                     for (let z of item.item_list) {
                                         for (let p of z.products) {
+                                            if(p.item_products_name=="Per Mile"){
+                                                showDistanceOrNot=true
+                                            }
                                             if (p.checked) {
-                                                totalProductPrice += Number(p.price)
+                                                let p_price=p.price
+                                                if(p.item_products_name=="Per Mile"){
+                                                    p_price=Number(Number(p.price)*data.mile_distance)?.toFixed(1)
+                                                }
+                                                totalProductPrice += Number(p_price)
                                             }
                                         }
                                     }
@@ -645,7 +652,7 @@ const Mechanics = (props) => {
                                             <Pressable onPress={() => {
                                                 // props.navigation.navigate("AddCard1")
                                                 props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService.name })
-                                            }} style={{ width: "75%", flexDirection: 'row' }}>
+                                            }} style={{ width: "70%", flexDirection: 'row' }}>
                                                 <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
                                                     <Image
                                                         style={{ height: '100%', width: '100%' }}
@@ -666,17 +673,18 @@ const Mechanics = (props) => {
                                                     <Image style={{ height: 18, width: 21 }} source={require('../../../assets/whiteHeart.png')} resizeMode="cover" />
                                                 }
                                             </TouchableOpacity>
-                                            {totalPrice > 0 && <View style={{ flexDirection: "row", marginTop: 20 }}>
+                                            {totalPrice > 0 && <View style={{ flexDirection: "row", marginTop: 20,width:"30%"}}>
                                                 <CheckBox
                                                     checked={totalPrice > 0}
                                                     onPress={() => {
                                                         onGlobCheckBoxClicked(index)
 
                                                     }}
+                                                    containerStyle={{marginHorizontal:0,paddingHorizontal:0}}
                                                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                                                 />
-                                                <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15, right: 15 }}>$ {totalPrice}</Text>
+                                                <Text style={{ fontSize: 16,flex:1, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15}}>${totalPrice}12 </Text>
                                             </View>}
                                         </View>
                                         {!open ?
@@ -697,8 +705,8 @@ const Mechanics = (props) => {
                                             />
                                         </View>
                                         {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Address : {item.current_address}</Text>}
-                                        {checkShowAddress(Number(item?.service_is_at_address)) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text>}
-
+                                        {(checkShowAddress(Number(item?.service_is_at_address))||showDistanceOrNot) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text>}
+                                        {/* <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text> */}
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
                                             let x = i.time_duration / 60
@@ -729,6 +737,11 @@ const Mechanics = (props) => {
                                                     </View>
                                                     {i.products.map((itemData, prIndex) => {
                                                         let productTitle = "(Product)"
+                                                        let price=itemData?.price
+                                                        if(itemData.item_products_name=="Per Mile"){
+                                                            productTitle=`(Product) $${price}/Mile`
+                                                            price=Number(Number(itemData?.price)*data?.mile_distance).toFixed(1)
+                                                        }
                                                         let type = itemData.type
                                                         let isPriced = true
                                                         if (type == "other") {
@@ -749,7 +762,7 @@ const Mechanics = (props) => {
                                                                     </Text>
                                                                 </View>
                                                                 <View style={{ height: 20, flexDirection: "row" }}>
-                                                                    {isPriced && <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + itemData.price}</Text>}
+                                                                    {isPriced && <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + price}</Text>}
                                                                     <CheckBox
                                                                         checked={itemData.checked}
                                                                         onPress={() => {

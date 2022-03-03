@@ -252,6 +252,7 @@ const SignUpScreen = (props) => {
             let res = await getApi(config)
             console.log(res)
             if (res.status) {
+                console.log("RESS",res.data)
                 setMField(res.data)
             }
         } catch (err) {

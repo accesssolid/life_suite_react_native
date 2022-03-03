@@ -443,12 +443,12 @@ const CustomDrawerContent = (props) => {
                 <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.user_role == role.customer ? "Customer" : "Service Provider"}</Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
-                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
+                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 18, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
             </View>
             <View onTouchEnd={()=>{
                 logout()
             }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
-                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>Switch to {user?.user_role == role.provider?"Customer":"Provider"}</Text>
+                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider?"Customer":"Provider"}</Text>
             </View>
             <DrawerItemList {...props} />
             {user?.user_role == role.provider &&<DrawerItem
