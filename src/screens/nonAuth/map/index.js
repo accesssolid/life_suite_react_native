@@ -229,8 +229,7 @@ const MapScreen = (props) => {
                                 action={() => {
                                     // #liahs checked to permaned to true
                                     // setIsPermanetClicked(true)
-                                    setAddress(`${user.address[0].address_line_1}`)
-                                    placesRef.current.setAddressText(`${user.address[0].address_line_1}`)
+                                   
                                     setCoordinates({
                                         ...coordinates,
                                         latitude: Number(user?.address[0]?.lat),
@@ -241,6 +240,8 @@ const MapScreen = (props) => {
                                         latitude: Number(user?.address[0]?.lat),
                                         longitude: Number(user?.address[0]?.long)
                                     })
+                                    setAddress(`${user.address[0].address_line_1}`)
+                                    placesRef.current.setAddressText(`${user.address[0].address_line_1}`)
                                 }}
                             />}
                             {user?.address[1]?.address_line_1 !== '' && <CustomButton
@@ -255,8 +256,7 @@ const MapScreen = (props) => {
                                 action={() => {
                                     // #liahs checked to permaned to true
                                     // setIsPermanetClicked(true)
-                                    setAddress(`${user.address[1].address_line_1}`)
-                                    placesRef.current.setAddressText(`${user.address[1].address_line_1}`)
+                                   
                                     setCoordinates({
                                         ...coordinates,
                                         latitude: Number(user?.address[1]?.lat),
@@ -267,6 +267,8 @@ const MapScreen = (props) => {
                                         latitude: Number(user?.address[1]?.lat),
                                         longitude: Number(user?.address[1]?.long)
                                     })
+                                    setAddress(`${user.address[1].address_line_1}`)
+                                    placesRef.current.setAddressText(`${user.address[1].address_line_1}`)
                                 }}
                             />}
                         </View>

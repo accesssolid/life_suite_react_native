@@ -44,7 +44,6 @@ const HomeScreen = (props) => {
     const [fcmToken, setFcmToken] = useState("")
 
     useEffect(() => {
-        GetToken()
         const backAction = () => {
             return true;
         };
@@ -81,6 +80,11 @@ const HomeScreen = (props) => {
         if (user.user_role == 3) {
             getMyJobs()
         }
+        setTimeout(()=>{
+            GetToken()
+        },15000)
+       
+        
     }, [])
 
     useFocusEffect(

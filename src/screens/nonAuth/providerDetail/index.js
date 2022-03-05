@@ -244,11 +244,18 @@ export default function ProviderDetail(props) {
                         <View style={{ width: "48%" }}>
                             <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium }}>Filter rating</Text>
                             <DropDown
-                                item={["1 Star", "2 Star", "3 Star", "4 Star", "5 Star"]}
+                                item={["1 Star", "2 Star", "3 Star", "4 Star", "5 Star",'All']}
                                 value={"Select Rating"}
-                                onChangeValue={(index, value) => { setCurrentRating(index + 1) }}
+                                onChangeValue={(index, value) => { 
+                                    if(index==5){
+                                        setCurrentRating(0)
+                                    }else{
+                                        setCurrentRating(index + 1)
+                                    }
+                                    
+                                 }}
                                 containerStyle={{ borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
-                                dropdownStyle={{ height: 5 * 40 }}
+                                dropdownStyle={{ height: 6 * 40 }}
                             />
 
                         </View>
@@ -373,7 +380,7 @@ const ModalPictureView = ({ pictures, visible, setVisible, currentImage }) => {
                                         // key={x.image}
                                         source={{ uri: BASE_URL + item?.image }}
                                         style={{ height: height * 0.9, width: width * 0.9, borderRadius: 20, backgroundColor: "gray" }}
-                                        resizeMode="contain"
+                                        resizeMode="cover"
                                     />
                                 </Pressable>
                             )

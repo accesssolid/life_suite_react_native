@@ -30,7 +30,7 @@ import CustomButton from '../../../components/customButton';
 
 const OrderClientDetail = (props) => {
     const { subService, item } = props.route.params
-    console.log(subService)
+   
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -130,15 +130,14 @@ const OrderClientDetail = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-        console.log(selectedItems)
-        console.log(otherProducts)
+      
 
         let newServices = items.filter(x => String(x.id).startsWith("new")).map(x => {
             return (
                 {
                     item_name: x.name,
                     price: x.price,
-                    time_duration: Number(x?.time_duration_h)*60+Number(x?.time_duration_m),
+                    time_duration: Number(x?.time_duration_h) * 60 + Number(x?.time_duration_m),
                     variant_data: x.variant_data,
                     products: otherProducts.filter(p => String(p.item_id).startsWith("new"))
                 }
@@ -256,6 +255,10 @@ const OrderClientDetail = (props) => {
                 barStyle="light-content" />
             <HeaderView action={() => {
                 if (productShow) {
+                    if (otherProducts.filter(x => x.product_name.trim() == "" || x.product_price.trim() == "").length > 0) {
+                        showToast("Don't leave other product name and price empty!")
+                        return
+                    }
                     setProductShow(false)
                     setSelectedItem(null)
                 } else {
@@ -432,42 +435,43 @@ const ItemView = ({
                     />
                     <Text numberOfLines={1} style={[styles.itemTextStyle]}>{item?.name}</Text>
                 </View>
-                {String(item?.id)?.startsWith("new") && productShow ? <View style={{ flexDirection: "row",justifyContent:"space-around", flex: 1, paddingHorizontal: 20 }}>
-                    <View style={{flexDirection:"row",alignItems:"center"}}>
-                    <TextInput value={item?.time_duration_h}
-                        onChangeText={t => {
-                            setItems(state => {
-                                let d = _.cloneDeep(state).filter(x => x.id != item.id)
-                                return ([...d, { ...item, time_duration_h: t }])
-                            })
-                        }}
-                        placeholder="hh"
-                        keyboardType="numeric"
-                        style={[styles.itemTextStyle, { width: 40,height:40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor:LS_COLORS.global.lightGrey }]} />
-                         <TextInput value={item?.time_duration_m}
-                        onChangeText={t => {
-                            setItems(state => {
-                                let d = _.cloneDeep(state).filter(x => x.id != item.id)
-                                return ([...d, { ...item, time_duration_m: t }])
-                            })
-                        }}
-                        placeholder="mm"
-                        keyboardType="numeric"
-                        style={[styles.itemTextStyle, { width: 40,height:40,marginLeft:5,marginRight:10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor:LS_COLORS.global.lightGrey }]} />
+                {String(item?.id)?.startsWith("new") && productShow ? <View style={{ flexDirection: "row", justifyContent: "space-around", flex: 1, paddingHorizontal: 20 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <TextInput value={item?.time_duration_h}
+                            onChangeText={t => {
+                                setItems(state => {
+                                    let d = _.cloneDeep(state).filter(x => x.id != item.id)
+                                    return ([...d, { ...item, time_duration_h: t }])
+                                })
+                            }}
+                            placeholder="hh"
+                            keyboardType="numeric"
+                            style={[styles.itemTextStyle, { width: 40, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
+                        <TextInput value={item?.time_duration_m}
+                            onChangeText={t => {
+                                setItems(state => {
+                                    let d = _.cloneDeep(state).filter(x => x.id != item.id)
+                                    return ([...d, { ...item, time_duration_m: t }])
+                                })
+                            }}
+                            placeholder="mm"
+                            keyboardType="numeric"
+                            style={[styles.itemTextStyle, { width: 40, height: 40, marginLeft: 5, marginRight: 10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                     </View>
                     <TextInput
-                        value={item?.price}
+                        value={"$"+(item?.price==0?"":item?.price)}
                         onChangeText={t => {
+                            let textD=t.replace(/\$/g,"")
                             setItems(state => {
                                 let d = _.cloneDeep(state).filter(x => x.id != item.id)
-                                return ([...d, { ...item, price: t }])
+                                return ([...d, { ...item, price: textD }])
                             })
                         }}
                         placeholder="$"
                         keyboardType="numeric"
-                        style={[styles.itemTextStyle, { width: 50,height:40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor:LS_COLORS.global.lightGrey }]} />
+                        style={[styles.itemTextStyle, { width: 50, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                 </View> : <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
-                    <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{checkNewOrNot(item?.time_duration_h,item?.time_duration_m,item?.time_duration)}</Text>
+                    <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{checkNewOrNot(item?.time_duration_h, item?.time_duration_m, item?.time_duration)}</Text>
                     <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${item.price}</Text>
                 </View>
                 }
@@ -561,7 +565,8 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
         <View key={"S"} style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-evenly', alignItems: 'center' }}>
             <View style={{ marginRight: '2.5%' }}>
                 <TextInput
-                    style={[styles.inputStyle, , { width: 120, height: 40 }]}
+                    // style={[styles.inputStyle, , { width: 120, height: 40 }]}
+                    style={[styles.itemTextStyle, {width: 120, height: 40 , color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]}
                     color="black"
                     placeholder="Product Name"
                     // editable={props.selectedNewProducts.includes(item.temp_id)}
@@ -579,19 +584,20 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
             </View>
             <View style={{ marginRight: '2%' }}>
                 <TextInput
-                    style={[styles.inputStyle, { width: 60, height: 40 }]}
+                    // style={[styles.inputStyle, { width: 60, height: 40 }]}
+                    style={[styles.itemTextStyle, {width: 60, height: 40 , color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]}
                     color="black"
                     placeholder="$000"
-                    // editable={props.selectedNewProducts.includes(item.temp_id)}
                     onChangeText={(text) => {
+                        let d=text.replace(/\$/g,"")
                         setOtherProducts(state => {
                             let data = _.cloneDeep(state)
-                            data[other.index].product_price = text
+                            data[other.index].product_price = d
                             return data
                         })
                     }}
                     keyboardType="numeric"
-                    value={other?.product_price}
+                    value={"$"+other?.product_price}
                     returnKeyType={'done'}
                     placeholderTextColor={LS_COLORS.global.placeholder}
                 />
@@ -621,10 +627,10 @@ const convertMinsToHrsMins = (mins) => {
     return `${h} hr ${m} min`;
 }
 
-const checkNewOrNot=(hour,mins,duration)=>{
-    if(Boolean(Number(hour))||Boolean(Number(mins))){
-        return convertMinsToHrsMins(Number(mins)+Number(hour)*60)
-    }else{
+const checkNewOrNot = (hour, mins, duration) => {
+    if (Boolean(Number(hour)) || Boolean(Number(mins))) {
+        return convertMinsToHrsMins(Number(mins) + Number(hour) * 60)
+    } else {
         return convertMinsToHrsMins(Number(duration))
     }
 }
@@ -676,7 +682,6 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setL
     const [service_id, setServiceID] = React.useState(null)
     const [variant_id, setVariantID] = React.useState(null)
     React.useEffect(() => {
-        console.log(JSON.stringify(items))
         if (items[0]) {
             setServiceID(items[0]?.service_id)
             setVariantID(items[0]?.variant_data)
@@ -713,8 +718,8 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setL
                         "name": service_name,
                         "price": 0,
                         "time_duration": 0,
-                        time_duration_h:0,
-                        time_duration_m:0,
+                        time_duration_h: 0,
+                        time_duration_m: 0,
                         "variant_data": variant_id,
                         "is_product_mandatory": "0",
                         "service_id": 14,

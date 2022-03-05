@@ -1408,7 +1408,7 @@ const Profile = (props) => {
                                     textInputProps={{
                                         onSubmitEditing: () => workAddressRef.current.focus(),
                                         placeholderTextColor: LS_COLORS.global.placeholder,
-                                        selection: selection,
+                                        selection: Platform.OS=="android"?selection:null,
                                         onChangeText:(t)=>{
                                             setHomeAddressData({
                                                 ...homeAddressData,
@@ -1418,7 +1418,7 @@ const Profile = (props) => {
                                             setSelection({start:t?.length})
                                         },
                                         onBlur: () => { setSelection({ start: 0 }) },
-                                        onFocus: () => { setSelection({start:100}) }
+                                        onFocus: () => { setSelection({start:homeAddressData?.address_line_1?.length}) }
                                     }}
                                     query={{
                                         key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
@@ -1517,7 +1517,7 @@ const Profile = (props) => {
                                     textInputProps={{
                                         editable: !isSameAddress,
                                         placeholderTextColor: LS_COLORS.global.placeholder,
-                                        selection: selection1,
+                                        selection:Platform.OS=="android"?selection1:null,
                                         onChangeText:(t)=>{
                                             setWorkAddressData({
                                                 ...workAddressData,

@@ -308,7 +308,7 @@ const ServicesProvided = (props) => {
                 }
                 if (String(itemm.item_id).startsWith("new")) {
                     let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
-                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id)
+                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).filter(x=>x.name!=""&&x.price!=""&&x.price!="$")
                     new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                 } else {
                     services.push(obj)
@@ -324,8 +324,8 @@ const ServicesProvided = (props) => {
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    products: [...productsData],
-                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")),
+                    products: [...productsData].filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
                     services: [...services],
                     new_services: [...new_services]
                 }
@@ -338,8 +338,8 @@ const ServicesProvided = (props) => {
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    products: [...productsData],
-                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")),
+                    products: [...productsData].filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
                     services: [...services],
                     new_services: [...new_services]
                 }
@@ -886,7 +886,7 @@ const ServicesProvided = (props) => {
                         let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).map(x=>({
                             name:x.name,
                             price:x.price
-                        }))
+                        })).filter(x=>x.name!=""&&x.price!=""&&x.price!="$")
                         new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                     } else {
                         services.push(obj)
@@ -894,14 +894,17 @@ const ServicesProvided = (props) => {
 
                 }
             })
-            console.log("New SErvices",new_services)
+            console.log("New SErvices",productsData,newProductsData)
             let json_data = {
-                products: [...productsData].map(x => ({ item_product_id: x.id, price: x.price })),
-                new_products: [...newProductsData].filter(x=>!x.item_id.startsWith("new")),
+                products: [...productsData].filter(x=>x.name!=""&&x.price!=""&&x.price!="$").map(x => ({ item_product_id: x.id, price: x.price })),
+                new_products: [...newProductsData].filter(x=>!String(x?.item_id).startsWith("new")).filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
                 services: [...services],
                 new_services: [...new_services]
             }
             console.log( JSON.stringify(json_data))
+            // setLoading(false)
+            // return 
+
             formdata.append("service_id", subService.id)
             formdata.append("json_data", JSON.stringify(json_data))
             const config = {

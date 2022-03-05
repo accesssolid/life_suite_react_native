@@ -66,14 +66,14 @@ const MainDrawer = (props) => {
         )
     }
 
-    const MessageBadge=()=>{
-        if(unSeen==0){
+    const MessageBadge = () => {
+        if (unSeen == 0) {
             return null
         }
-        return(
+        return (
             <View style={{ height: 20, borderRadius: 20, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
-            <Text style={{ color: LS_COLORS.global.white, marginHorizontal: 5 }}>{unSeen}</Text>
-        </View>
+                <Text style={{ color: LS_COLORS.global.white, marginHorizontal: 5 }}>{unSeen}</Text>
+            </View>
         )
     }
 
@@ -261,9 +261,9 @@ const MainDrawer = (props) => {
                     name="Orders"
                     component={user.user_role == role.customer ? OrderHistory1 : OrderHistory}
                     // component={OrderHistory}
-                    
+
                     options={{
-                        drawerLabel:"My Orders",
+                        drawerLabel: "My Orders",
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/note.png')} style={{ height: 20, width: 20 }} />,
                     }}
                 />
@@ -285,9 +285,7 @@ const MainDrawer = (props) => {
                 <Drawer.Screen
                     name="Favorites"
                     component={Favourites}
-
                     options={{
-
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />,
                     }}
                 />
@@ -404,9 +402,11 @@ const CustomDrawerContent = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
 
     const navigation = useNavigation()
-    const dispatch=useDispatch()
-    const [loader,setLoader]=React.useState(false)
+    const dispatch = useDispatch()
+    const [loader, setLoader] = React.useState(false)
     function logout() {
+        props.navigation.closeDrawer()
+        // return
         setLoader(true)
         let headers = {
             "Authorization": `Bearer ${access_token}`
@@ -445,13 +445,13 @@ const CustomDrawerContent = (props) => {
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
                 <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 18, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
             </View>
-            <View onTouchEnd={()=>{
+            <View onTouchEnd={() => {
                 logout()
             }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
-                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider?"Customer":"Provider"}</Text>
+                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider ? "Customer" : "Provider"}</Text>
             </View>
             <DrawerItemList {...props} />
-            {user?.user_role == role.provider &&<DrawerItem
+            {user?.user_role == role.provider && <DrawerItem
                 style={{ marginTop: -185 }}
                 label="Update Certificate"
                 labelStyle={{
@@ -461,11 +461,11 @@ const CustomDrawerContent = (props) => {
                 }}
                 icon={({ focused, color }) => <Image resizeMode="cover" source={require('../assets/legal.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
-                    navigation.navigate("UpdateCertificateStack",{screen:"UpdateCertificateServiceList"})
+                    navigation.navigate("UpdateCertificateStack", { screen: "UpdateCertificateServiceList" })
                 }}
             />}
             <DrawerItem
-                style={{ marginTop: user?.user_role == role.customer?-185:0 }}
+                style={{ marginTop: user?.user_role == role.customer ? -185 : 0 }}
                 // style={{ marginTop: -155 }}
                 label="Legal"
                 labelStyle={{

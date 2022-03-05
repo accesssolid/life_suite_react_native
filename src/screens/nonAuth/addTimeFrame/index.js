@@ -187,8 +187,10 @@ const AddTimeFrame = (props) => {
             }
         })
         formdata.append("json_data", JSON.stringify(json_data));
+        //hceecking json_data
+   
         formdata.append("current_time",moment().format("YYYY-MM-DD HH:mm:ss"))
-        console.log(JSON.stringify(json_data))
+        // console.log(JSON.stringify(json_data))
         // return
         let config = {
             headers: headers,

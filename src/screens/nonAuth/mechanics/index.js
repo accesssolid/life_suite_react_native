@@ -640,7 +640,7 @@ const Mechanics = (props) => {
                                                 if(p.item_products_name=="Per Mile"){
                                                     p_price=Number(Number(p.price)*data.mile_distance)?.toFixed(1)
                                                 }
-                                                totalProductPrice += Number(p_price)
+                                                totalProductPrice =totalProductPrice+ Number(p_price)
                                             }
                                         }
                                     }
@@ -684,7 +684,7 @@ const Mechanics = (props) => {
                                                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                                                 />
-                                                <Text style={{ fontSize: 16,flex:1, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15}}>${totalPrice}12 </Text>
+                                                <Text style={{ fontSize: 16,flex:1, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15}}>${totalPrice}</Text>
                                             </View>}
                                         </View>
                                         {!open ?

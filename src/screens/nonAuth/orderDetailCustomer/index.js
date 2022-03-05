@@ -814,7 +814,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 <View >
                     <Text style={[styles.greenTextStyle, { textAlign: "right" }]}>{moment(data?.created_at).fromNow()}</Text>
                     <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
-                    <Text style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }, styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD YYYY")}</Text>
+                    <Text style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }, styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
 
                 </View>
             </View>
