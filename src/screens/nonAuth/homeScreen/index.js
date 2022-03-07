@@ -25,7 +25,7 @@ import { setAddServiceMode } from '../../../redux/features/services';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import { role } from '../../../constants/globals';
-import {getStringData,storeStringData} from '../../../asyncStorage/async'
+import { getStringData, storeStringData } from '../../../asyncStorage/async'
 import moment from 'moment';
 
 const HomeScreen = (props) => {
@@ -35,6 +35,7 @@ const HomeScreen = (props) => {
     const services = useSelector(state => state.authenticate.services)
     const myJobs = useSelector(state => state.provider.myJobs)
     const access_token = useSelector(state => state.authenticate.access_token)
+    const switched = useSelector(state => state.switchTo)?.switched
     const [isAddJobActive, setIsAddJobActive] = useState(false)
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState([...services])
@@ -54,37 +55,47 @@ const HomeScreen = (props) => {
         return () => backHandler.remove();
     }, []);
 
-    useEffect(() => (
+    useEffect(() => {
         navigation.addListener('beforeRemove', (e) => {
             e.preventDefault();
+            // return
         })
-    ), [navigation]);
+
+    }, [navigation]);
 
     const GetToken = async () => {
-        let updateDay="0"
-        try{
-            updateDay=await getStringData("@last_fcm_updated")
-        }catch(err){
+        let updateDay = "0"
+        try {
+            updateDay = await getStringData("@last_fcm_updated")
+        } catch (err) {
 
         }
         const authorizationStatus = await messaging().requestPermission();
         if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
             const token = await messaging().getToken()
-            if(updateDay!=moment().format("DD")){
+            if (updateDay != moment().format("DD")) {
                 updateFCMToken(token)
             }
         }
     }
     useEffect(() => {
         getServices(true)
+        if (switched == false) {
+            if (user.user_role == 3) {
+                getMyJobs()
+            }
+        }
+    }, [switched])
+
+    useEffect(() => {
+        getServices(true)
         if (user.user_role == 3) {
             getMyJobs()
         }
-        setTimeout(()=>{
+        setTimeout(() => {
             GetToken()
-        },15000)
-       
-        
+        }, 15000)
+
     }, [])
 
     useFocusEffect(
@@ -134,10 +145,10 @@ const HomeScreen = (props) => {
             .then((response) => {
                 console.log(response)
                 if (response.status == true) {
-                  storeStringData("@last_fcm_updated",moment().format("DD"))
+                    storeStringData("@last_fcm_updated", moment().format("DD"))
                 }
                 else {
-                   
+
 
                 }
             }).catch(err => {

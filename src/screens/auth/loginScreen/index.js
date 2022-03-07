@@ -26,6 +26,7 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { CommonActions } from '@react-navigation/native';
 import * as RNLocalize from "react-native-localize";
+import { changeSwitched } from '../../../redux/features/switchTo';
 
 
 const LoginScreen = (props) => {
@@ -95,6 +96,7 @@ const LoginScreen = (props) => {
                     dispatch(loginReducer(response.data))
                     setEmail("")
                     setPassword("")
+                    dispatch(changeSwitched(false))
                     props.navigation.dispatch(
                         CommonActions.reset({
                             index: 1,
@@ -104,11 +106,6 @@ const LoginScreen = (props) => {
                         })
                     );
                     props.navigation.navigate("MainDrawer")
-                    // if (response.data.user_role == 2) {
-                    //     props.navigation.navigate("UserStack")
-                    // } else {
-                    //     props.navigation.navigate("ProviderStack")
-                    // }
                 }
                 else {
                     setLoader(false)

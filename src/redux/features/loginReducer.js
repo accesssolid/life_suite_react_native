@@ -118,7 +118,7 @@ export const logoutAll = () => {
         dispatch(clearNotificationData())
         dispatch(clearBankModalData())
         try {
-
+            // PushNotification.setApplicationIconBadgeNumber(0)
         } catch (err) {
             console.log(err)
         }

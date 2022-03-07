@@ -22,6 +22,7 @@ import Router from './src/router';
 PushNotification.configure({
   onNotification: function (notification) {
     console.log("NOTIFICATION:", notification);
+    // if(notification.)
     // process the notification
     if(notification.data?.link){
       Linking.openURL(notification.data?.link)
@@ -64,6 +65,7 @@ const App = () => {
   }
 
   useEffect(() => {
+    // PushNotification.setApplicationIconBadgeNumber(10)
     // getToken()
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log(remoteMessage)

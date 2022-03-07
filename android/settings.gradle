@@ -1,4 +1,6 @@
 rootProject.name = 'LifeSuite'
+include ':react-native-app-badge'
+project(':react-native-app-badge').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-app-badge/android')
 include ':react-native-google-places'
 project(':react-native-google-places').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-google-places/android')
 include ':react-native-vector-icons'

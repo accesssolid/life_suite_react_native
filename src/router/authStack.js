@@ -14,6 +14,8 @@ import OtpScreen from '../screens/nonAuth/otpScreen';
 import ResetPassword from '../screens/auth/resetPassword';
 import CovidScreen from '../screens/auth/CovidScreen';
 import CustomWebView from '../screens/auth/signUp/CustomWebView';
+import Welcomescreen from '../screens/auth/welcomeScreen';
+
 const Stack = createStackNavigator();
 
 const AuthStack = () => {

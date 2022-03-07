@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 /* Packages */
 import { createDrawerNavigator, DrawerItemList, DrawerContentScrollView, DrawerItem, useIsDrawerOpen } from '@react-navigation/drawer';
@@ -10,7 +10,7 @@ import { View } from 'native-base';
 import UserStack from './userStack';
 import { useSelector } from 'react-redux';
 import ProviderStack from './providerStack';
-import { Dimensions, Image, Text, TouchableOpacity } from 'react-native';
+import { Dimensions, Image, Platform, Text, TouchableOpacity } from 'react-native';
 import Profile from '../screens/nonAuth/profile';
 import OrderHistory from '../screens/nonAuth/orderHistory';
 import Favourites from '../screens/nonAuth/favourites';
@@ -41,6 +41,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import firestore from '@react-native-firebase/firestore';
 import { getUniqueId, getManufacturer } from 'react-native-device-info';
 import { logoutAll } from '../redux/features/loginReducer';
+import PushNotification from 'react-native-push-notification';
+import ShortcutBadge from 'react-native-app-badge';
+import { changeSwitched } from '../redux/features/switchTo';
 
 const Drawer = createDrawerNavigator();
 
@@ -52,6 +55,7 @@ const MainDrawer = (props) => {
     const [softwareVisible, setSoftwareVisible] = useState(false)
     const navigation = useNavigation()
     const access_token = useSelector(state => state.authenticate.access_token)
+    const authenticate=useSelector(state=>state.authenticate)?.authenticate
     const notifications = useSelector(state => state.notification)?.data
     const dispatch = useDispatch()
     const [unSeen, setUnSeen] = React.useState(0)
@@ -65,6 +69,31 @@ const MainDrawer = (props) => {
         </View>
         )
     }
+    useEffect(()=>{
+        let noti_number=notifications?.filter(x => x.is_read == "0").length
+        let totalNoti=0
+        if(unSeen>0){
+            totalNoti+=Number(unSeen)
+        }
+        if(noti_number>0){
+            totalNoti+=Number(noti_number)
+        }
+        if(!authenticate){
+            totalNoti=0
+        }
+        if(Platform.OS=="android"){
+            ShortcutBadge.getCount().then((count) => {
+                ShortcutBadge.setCount(totalNoti)
+            })
+            
+        }else{
+            PushNotification.setApplicationIconBadgeNumber(totalNoti)
+
+        }
+        // if(ShortcutBadge.supported){
+            
+        // }
+    },[notifications,unSeen,authenticate])
 
     const MessageBadge = () => {
         if (unSeen == 0) {
@@ -406,6 +435,7 @@ const CustomDrawerContent = (props) => {
     const [loader, setLoader] = React.useState(false)
     function logout() {
         props.navigation.closeDrawer()
+        // props.navigation.pop()
         // return
         setLoader(true)
         let headers = {
@@ -427,6 +457,7 @@ const CustomDrawerContent = (props) => {
                     storeItem('passcode', null)
                     navigation.navigate('WelcomeScreen')
                     dispatch(logoutAll())
+                    
                 }
                 else {
                     setLoader(false)
@@ -447,6 +478,7 @@ const CustomDrawerContent = (props) => {
             </View>
             <View onTouchEnd={() => {
                 logout()
+                dispatch(changeSwitched(true))
             }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
                 <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider ? "Customer" : "Provider"}</Text>
             </View>

@@ -6,7 +6,7 @@ import TotalReducer from "./features/total"
 import ChatUsersReducer from './features/chatUser'
 import BankModelReducer from './features/bankModel'
 import NotificationReducer from './features/notification'
-
+import switchTo from './features/switchTo'
 const store = configureStore({
     reducer: {
         authenticate: AuthenticateReducer,
@@ -15,7 +15,8 @@ const store = configureStore({
         total : TotalReducer,
         chat_users:ChatUsersReducer,
         bank_model:BankModelReducer,
-        notification:NotificationReducer
+        notification:NotificationReducer,
+        switchTo
     },
 })
 

@@ -14,18 +14,20 @@ import Header from '../../../components/header';
 import { setUserRole } from '../../../redux/features/loginReducer';
 
 const { width, height } = Dimensions.get("window")
+import { useFocusEffect, useNavigation,CommonActions } from '@react-navigation/native';
 
 const WelcomeScreen = (props) => {
     const dispatch = useDispatch()
-
-    const next = (role,type) => {
+    const navigationState = props.navigation.getState()
+    const navigation=useNavigation()
+    console.log("navigation",navigationState)
+    const next = (role, type) => {
         dispatch(setUserRole({ data: role }))
-        if(type=="login"){
-            props.navigation.navigate('AuthStack',{screen:"LoginScreen"})
-        }else if(type=="register"){
-            props.navigation.navigate('AuthStack',{screen:"SignUpScreen"})
+        if (type == "login") {
+            props.navigation.navigate('AuthStack', { screen: "LoginScreen" })
+        } else if (type == "register") {
+            props.navigation.navigate('AuthStack', { screen: "SignUpScreen" })
         }
-       
     }
 
     return (
@@ -50,18 +52,18 @@ const WelcomeScreen = (props) => {
                     <Text style={{ color: "white", fontSize: 24, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }}>Customer</Text>
                     <Text style={{ color: "white", fontSize: 18, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }}>Find the service you need</Text>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                        <TouchableOpacity 
-                        onPress={()=>{
-                            next(1,"login")
-                        }}
-                        style={{ height: 45, flex: 1, backgroundColor: LS_COLORS.global.green, justifyContent: "center", borderRadius: 6 }}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                next(1, "login")
+                            }}
+                            style={{ height: 45, flex: 1, backgroundColor: LS_COLORS.global.green, justifyContent: "center", borderRadius: 6 }}>
                             <Text style={{ color: "white", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Login</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                        onPress={()=>{
-                            next(1,"register")
-                        }}
-                        style={{ height: 45, flex: 1, backgroundColor: LS_COLORS.global.white, justifyContent: "center", borderRadius: 6, marginLeft: 10 }}>
+                            onPress={() => {
+                                next(1, "register")
+                            }}
+                            style={{ height: 45, flex: 1, backgroundColor: LS_COLORS.global.white, justifyContent: "center", borderRadius: 6, marginLeft: 10 }}>
                             <Text style={{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Sign Up</Text>
                         </TouchableOpacity>
                     </View>
@@ -82,13 +84,13 @@ const WelcomeScreen = (props) => {
                     <Text style={{ color: "white", fontSize: 18, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }}>Utilize your expertise and grow your business</Text>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
                         <TouchableOpacity onPress={() => {
-                            next(2,"login")
+                            next(2, "login")
                         }} style={{ height: 45, flex: 1, backgroundColor: LS_COLORS.global.green, justifyContent: "center", borderRadius: 6 }}>
                             <Text style={{ color: "white", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Login</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => {
-                                next(2,"register")
+                                next(2, "register")
                             }}
                             style={{ height: 45, flex: 1, backgroundColor: LS_COLORS.global.white, justifyContent: "center", borderRadius: 6, marginLeft: 10 }}>
                             <Text style={{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Sign Up</Text>
