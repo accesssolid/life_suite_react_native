@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState={
     title:"Select Account",
     subtitle:"You do not have any active accounts.",
-    buttonTitle:"Add Stripe Money",
+    buttonTitle:"Add Stripe Account",
     type:"provider",
     open:false
 }

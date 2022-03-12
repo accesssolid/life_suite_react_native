@@ -173,7 +173,7 @@ const ChatUsers = (props) => {
                         />
                         <View style={{ backgroundColor: '#ACF0F2', width: '13%', borderRadius: 10, justifyContent: "center", alignItems: "center" }}>
                             <Image
-                                style={{ height: 20, width: 20, resizeMode: 'contain', alignSelf: 'center' }}
+                                style={{ height: 20, width: 20, resizeMode: 'contain', alignSelf: 'center',tintColor:LS_COLORS.global.green }}
                                 source={require("../../../assets/searchs.png")}
                             />
                         </View>

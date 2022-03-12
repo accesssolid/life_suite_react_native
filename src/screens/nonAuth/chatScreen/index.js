@@ -253,7 +253,7 @@ const ChatScreen = (props) => {
                             pickImage()
 
                         }} style={{ flexDirection: 'row', paddingHorizontal: 20, alignItems: "center" }} >
-                            <Image source={require('../../../assets/cameraChat.png')} style={{ height: 25, width: 25, resizeMode: 'contain', alignItems: 'center', }} />
+                            <Image source={require('../../../assets/cameraChat.png')} style={{ height: 25, width: 25, resizeMode: 'contain',tintColor:LS_COLORS.global.green, alignItems: 'center', }} />
                             <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Gallery</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -262,7 +262,7 @@ const ChatScreen = (props) => {
 
                             }}
                             style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }} >
-                            <Image source={require('../../../assets/gallery.png')} style={{ height: 25, width: 25, resizeMode: 'contain', alignItems: 'center', }} />
+                            <Image source={require('../../../assets/gallery.png')} style={{ height: 25, width: 25, resizeMode: 'contain',tintColor:LS_COLORS.global.green, alignItems: 'center', }} />
                             <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Camera</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -271,7 +271,7 @@ const ChatScreen = (props) => {
 
                             }}
                             style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }} >
-                            <Image source={require('../../../assets/documents.png')} style={{ height: 25, width: 25, resizeMode: 'contain', alignItems: 'center', }} />
+                            <Image source={require('../../../assets/documents.png')} style={{ height: 25, width: 25,tintColor:LS_COLORS.global.green, resizeMode: 'contain', alignItems: 'center', }} />
                             <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Document</Text>
                         </TouchableOpacity>
                     </Pressable>
@@ -423,7 +423,8 @@ const ChatScreen = (props) => {
                                                     style={{
                                                         maxHeight: 75,
                                                         maxWidth: '70%',
-                                                        backgroundColor: "#F5FEFF",
+                                                        // backgroundColor: "#F5FEFF",
+                                                       backgroundColor:LS_COLORS.global.green,
                                                         // backgroundColor: "green",
                                                         marginRight: '3%',
                                                         padding: 20,
@@ -491,7 +492,8 @@ const ChatScreen = (props) => {
                                                     style={{
                                                         maxHeight: 75,
                                                         maxWidth: '70%',
-                                                        backgroundColor: "#F5FEFF",
+                                                        // backgroundColor: "#F5FEFF",
+                                                        backgroundColor:LS_COLORS.global.green,
                                                         left: '5%',
                                                         padding: 20,
                                                         borderRadius: 9,
@@ -746,7 +748,7 @@ const ChatScreen = (props) => {
                     <View style={{ height: 40 }}></View>
                     <View style={styles.sendingContainer}>
                         <TouchableOpacity onPress={() => setVisible(true)}>
-                            <Image style={{ height: 30, width: 30 }} source={require('../../../assets/addChat.png')} />
+                            <Image style={{ height: 30, width: 30,tintColor:LS_COLORS.global.green }} source={require('../../../assets/addChat.png')} />
                         </TouchableOpacity>
                         <TextInput
                             style={styles.inputStyle}
@@ -769,7 +771,7 @@ const ChatScreen = (props) => {
                                 handleMessage(messages, 'text')
                             }
                         }} >
-                            <Image style={styles.send} source={require("../../../assets/send.png")} />
+                            <Image style={[styles.send,{tintColor:LS_COLORS.global.green}]} source={require("../../../assets/send.png")} />
                         </TouchableOpacity>
                     </View>
                     {loader && <Loader />}

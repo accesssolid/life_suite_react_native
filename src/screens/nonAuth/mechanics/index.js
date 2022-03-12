@@ -26,7 +26,7 @@ import moment from 'moment';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import { useFocusEffect } from '@react-navigation/native';
-
+import lodash from 'lodash'
 // #liahs_provider_list
 
 const Mechanics = (props) => {
@@ -638,14 +638,16 @@ const Mechanics = (props) => {
                                             if (p.checked) {
                                                 let p_price=p.price
                                                 if(p.item_products_name=="Per Mile"){
-                                                    p_price=Number(Number(p.price)*data.mile_distance)?.toFixed(1)
+                                                    p_price=Number(p.price)*lodash.round(Number(data.mile_distance),2)
                                                 }
-                                                totalProductPrice =totalProductPrice+ Number(p_price)
+                                                totalProductPrice =lodash.round(totalProductPrice,2)+ lodash.round(p_price,2)
+                                              
                                             }
                                         }
                                     }
-                                    let totalPrice = totalServicePrice + totalProductPrice
-
+                                    let totalPrice=0
+                                    totalPrice= Number(totalServicePrice) + Number(totalProductPrice)
+                                   
 
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -665,7 +667,8 @@ const Mechanics = (props) => {
                                                     <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>{countryName.trim()}</Text>
                                                 </View>
                                             </Pressable>
-                                            <TouchableOpacity onPress={() => { like(item.id, item.is_favourite) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center', position: "absolute", right: 5 }}>
+                                            <View style={{width:"30%",paddingTop:10}}>
+                                            <TouchableOpacity onPress={() => { like(item.id, item.is_favourite) }} style={{ height: 20,alignSelf:"center", width: 25, justifyContent: "center", alignItems: 'center'}}>
                                                 {item.is_favourite === 1
                                                     ?
                                                     <Image style={{ height: 18, width: 21 }} source={require('../../../assets/heartGreen.png')} resizeMode="cover" />
@@ -673,7 +676,7 @@ const Mechanics = (props) => {
                                                     <Image style={{ height: 18, width: 21 }} source={require('../../../assets/whiteHeart.png')} resizeMode="cover" />
                                                 }
                                             </TouchableOpacity>
-                                            {totalPrice > 0 && <View style={{ flexDirection: "row", marginTop: 20,width:"30%"}}>
+                                            {totalPrice > 0 && <View style={{ flexDirection: "row",}}>
                                                 <CheckBox
                                                     checked={totalPrice > 0}
                                                     onPress={() => {
@@ -686,6 +689,7 @@ const Mechanics = (props) => {
                                                 />
                                                 <Text style={{ fontSize: 16,flex:1, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15}}>${totalPrice}</Text>
                                             </View>}
+                                            </View>
                                         </View>
                                         {!open ?
                                             <Text numberOfLines={1} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
@@ -705,7 +709,7 @@ const Mechanics = (props) => {
                                             />
                                         </View>
                                         {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Address : {item.current_address}</Text>}
-                                        {(checkShowAddress(Number(item?.service_is_at_address))||showDistanceOrNot) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text>}
+                                        {(checkShowAddress(Number(item?.service_is_at_address))||showDistanceOrNot) && <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {lodash.round(data.mile_distance,2)} miles</Text>}
                                         {/* <Text style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text> */}
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
@@ -740,7 +744,10 @@ const Mechanics = (props) => {
                                                         let price=itemData?.price
                                                         if(itemData.item_products_name=="Per Mile"){
                                                             productTitle=`(Product) $${price}/Mile`
-                                                            price=Number(Number(itemData?.price)*data?.mile_distance).toFixed(1)
+                                                            let m=0
+                                                            m=lodash.round(Number(data?.mile_distance),2)
+                                                            price=lodash.round(lodash.round(Number(itemData?.price),2)*m,2)
+                                                            console.log(price)
                                                         }
                                                         let type = itemData.type
                                                         let isPriced = true

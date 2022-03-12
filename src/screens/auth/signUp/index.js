@@ -17,10 +17,10 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { CustomTextInput } from '../../../components/customTextInput';
 import CustomButton from '../../../components/customButton';
 import Loader from "../../../components/loader"
-import { showToast } from '../../../components/validators';
+import { showToast, storeItem } from '../../../components/validators';
 import { getApi } from '../../../api/api';
 import { DropDown } from '../../../components/dropDown';
-import { setUserRole } from '../../../redux/features/loginReducer';
+import { loginReducer, setAuthToken, setUserRole } from '../../../redux/features/loginReducer';
 import SearchableDropDown from '../../../components/searchableDropDown';
 import { role as roles } from '../../../constants/globals';
 import TermsModal from '../../../components/termsModal';
@@ -33,6 +33,9 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ModalOTP from '../../../components/ModalOTP';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import messaging from '@react-native-firebase/messaging';
+import { changeSwitched } from '../../../redux/features/switchTo';
+import { CommonActions } from '@react-navigation/native';
 
 const getMessage = (name) => {
     switch (name) {
@@ -171,14 +174,23 @@ const SignUpScreen = (props) => {
     const [openTermsModal, setOpenTermsModal] = useState(false)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
     const [initialDate, setInitialDate] = useState(new Date())
+    const [fcmToken, setFcmToken] = useState("")
 
     useEffect(() => {
         setLoader(false)
     }, [])
 
     useEffect(() => {
-        // getStates()
+        GetToken()
     }, [])
+
+    const GetToken = async () => {
+        const authorizationStatus = await messaging().requestPermission();
+        if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+            const token = await messaging().getToken()
+            setFcmToken(token)
+        }
+    }
 
     useEffect(() => {
         const selectedItem = dropCityDataMaster.filter(item => item.name == dropCityValue)
@@ -252,7 +264,7 @@ const SignUpScreen = (props) => {
             let res = await getApi(config)
             console.log(res)
             if (res.status) {
-                console.log("RESS",res.data)
+                console.log("RESS", res.data)
                 setMField(res.data)
             }
         } catch (err) {
@@ -333,7 +345,7 @@ const SignUpScreen = (props) => {
             required_keys_customer = ['first_name', 'last_name', 'dob', 'email', 'phone_number']
         }
         let keys = Object.keys(signUpData)
-        
+
         for (let i of required_keys_customer) {
             console.log(i)
             if (String(signUpData[`${i}`])?.trim() == '' || signUpData[`${i}`] == 0) {
@@ -342,14 +354,13 @@ const SignUpScreen = (props) => {
                 return false
             }
         }
-         
-        // if (!isVerfiedPhone) {
-        //     showToast("Please verify your phone number.")
-        //     setLoader(false)
-        //     return
-        // }
-        if(role!=2){
-            if(signUpData.email.trim()==""){
+        if (!isVerfiedPhone) {
+            showToast("Please verify your phone number.")
+            setLoader(false)
+            return
+        }
+        if (role != 2) {
+            if (signUpData.email.trim() == "") {
                 showToast("Email is required")
                 setLoader(false)
                 return
@@ -497,9 +508,10 @@ const SignUpScreen = (props) => {
         }
 
         if (role != 1) {
-            user_data = { ...user_data, ...provider_data,experience:String(provider_data.experience).replace(/[^\d.\.]/gi, ''), certificateTextData: JSON.stringify(provider_data.certificateTextData), mailing_address: signUpData.email }
+            user_data = { ...user_data, ...provider_data, experience: String(provider_data.experience).replace(/[^\d.\.]/gi, ''), certificateTextData: JSON.stringify(provider_data.certificateTextData), mailing_address: signUpData.email }
         }
         let body = getFormData(user_data)
+        body.append("fcm_token",fcmToken)
         for (let i of pictures) {
             body.append("pictures[]", {
                 uri: Platform.OS == "ios" ? i.path.replace('file:///', '') : i.path,
@@ -515,20 +527,35 @@ const SignUpScreen = (props) => {
         // console.log(body)
         // setLoader(false)
         // return 
-        
+
         let config = {
             headers: headers,
             data: body,
             endPoint: role == 1 ? '/api/customerSignup' : '/api/providerSignup',
             type: 'post'
         }
-
         getApi(config)
-            .then((response) => {
+            .then(async (response) => {
                 if (response.status == true) {
+                    console.log(response.data)
                     showToast('User Registered Successfully', 'success')
                     setLoader(false)
-                    props.navigation.replace('LoginScreen')
+                    await storeItem('user', response.data)
+                    await storeItem('user_bio_data', response.data)
+                    await storeItem('access_token', response.access_token)
+                    dispatch(setAuthToken({ data: response.access_token }))
+                    dispatch(loginReducer(response.data))
+                    dispatch(changeSwitched(false))
+                    props.navigation.dispatch(
+                        CommonActions.reset({
+                            index: 1,
+                            routes: [
+                                { name: "MainDrawer" },
+                            ],
+                        })
+                    );
+                    props.navigation.navigate("MainDrawer")
+                    // props.navigation.replace('LoginScreen')
                 }
                 else {
                     showToast(response.message, 'danger')
@@ -1085,6 +1112,7 @@ const SignUpScreen = (props) => {
                                             // backgroundColor: LS_COLORS.global.white,
                                             color: LS_COLORS.global.black,
 
+
                                         },
                                         listView: { paddingVertical: 5 },
                                         separator: {}
@@ -1100,6 +1128,7 @@ const SignUpScreen = (props) => {
                                         })
                                     }}
                                     textInputProps={{
+                                        style: { height: 50,width:"100%", paddingLeft: 10, color: LS_COLORS.global.black, },
                                         onSubmitEditing: () => workAddressRef.current.focus(),
                                         placeholderTextColor: LS_COLORS.global.placeholder,
                                         selection: selection,
@@ -1179,6 +1208,7 @@ const SignUpScreen = (props) => {
                                         textInput: {
                                             // backgroundColor: LS_COLORS.global.white,
                                             color: LS_COLORS.global.black,
+                                            // height:40
                                         },
                                         listView: { paddingVertical: 5 },
                                         separator: {}
@@ -1246,12 +1276,15 @@ const SignUpScreen = (props) => {
                                         }} style={{ position: "absolute", right: 0 }} />}
                                     />)}
                                     <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                                        {provider_data?.certificateTextData.length < 5 && <Pressable onPress={() => {
-                                            if (provider_data.certificateTextData.length < 5) {
-                                                setProviderData({ ...provider_data, certificateTextData: [...provider_data.certificateTextData, ""] })
-                                            }
-                                        }}>
-                                            <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: widthPercentageToDP(40), marginBottom: 30 }} resizeMode="contain" />
+                                        {provider_data?.certificateTextData.length < 5 && <Pressable
+                                            style={{ marginTop: 10, flexDirection: "row", alignItems: "center", marginBottom: 15, justifyContent: "center" }}
+                                            onPress={() => {
+                                                if (provider_data.certificateTextData.length < 5) {
+                                                    setProviderData({ ...provider_data, certificateTextData: [...provider_data.certificateTextData, ""] })
+                                                }
+                                            }}>
+                                            <Image source={require("../../../assets/signup/add_field1.png")} style={{ height: 30, width: 30 }} resizeMode="contain" />
+                                            <Text style={{ fontSize: 14, color: LS_COLORS.global.black, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 10 }}>Add New Certificate</Text>
                                         </Pressable>}
                                         {/* <Text onPress={() => {
                                             let v = [...provider_data.certificateTextData]

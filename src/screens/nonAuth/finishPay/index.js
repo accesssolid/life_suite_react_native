@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity,Platform } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -11,31 +11,31 @@ import { useSelector } from 'react-redux';
 /* Components */
 import Header from '../../../components/header';
 import DropDown from '../../../components/dropDown';
-import { Rating } from 'react-native-ratings';
+import { Rating, AirbnbRating } from 'react-native-ratings';
 import Loader from '../../../components/loader';
 import { order_types } from '../../../constants/globals';
 const types = ["Flat Amount", "Percentage"]
 
 export default function FinishPay({ navigation, route }) {
     const [type, setType] = React.useState(types[0])
-    const { item} = route.params ?? {}
+    const { item } = route.params ?? {}
     const [flat_amount, setFlatAmount] = React.useState("")
     const [per_amount, setPerAmount] = React.useState("")
-    const [totalPrice,setTotalPrice]=React.useState(0)
+    const [totalPrice, setTotalPrice] = React.useState(0)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [rating, setRating] = React.useState("0")
-    const [reason,setReason]=React.useState("")
-    const [loading,setLoading]=React.useState(false)
-    React.useEffect(()=>{
-        if(item){
-            if(item.order_total_price){
+    const [reason, setReason] = React.useState("")
+    const [loading, setLoading] = React.useState(false)
+    React.useEffect(() => {
+        if (item) {
+            if (item.order_total_price) {
                 setTotalPrice(item.order_total_price)
             }
         }
-    },[item])
+    }, [item])
 
     const submit = () => {
-        if(Number(rating)<=0){
+        if (Number(rating) <= 0) {
             showToast("Please rate this job.")
             return
         }
@@ -49,8 +49,8 @@ export default function FinishPay({ navigation, route }) {
             order_id: item.id,
             order_status: order_types.completed,
             rating_comment: reason,
-            rating:rating,
-            tip:type==types[0]?flat_amount:(Number(per_amount)*Number(totalPrice)/100)
+            rating: rating,
+            tip: type == types[0] ? flat_amount : (Number(per_amount) * Number(totalPrice) / 100)
         }
         console.log(datac)
         let config = {
@@ -81,7 +81,7 @@ export default function FinishPay({ navigation, route }) {
                 action={() => {
                     navigation.goBack()
                 }}
-                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             // imageUrl1={require("../../../assets/home.png")}
             // action1={() => {
@@ -92,16 +92,26 @@ export default function FinishPay({ navigation, route }) {
                 <Content>
                     <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20 }}>
                         <Text style={[styles.textStyle, { fontSize: 14 }]}>Rate this Job</Text>
-                        <Rating
+                        {/* <Rating
                             imageSize={25}
                             type="custom"
                             ratingBackgroundColor="gray"
                             ratingColor="#04BFBF"
                             tintColor="white"
                             onFinishRating={(rating) => {
-                                setRating(rating)
+                               
                             }}
                             startingValue={"0"}
+                        /> */}
+                        <AirbnbRating
+                            defaultRating={0}
+                            count={5}
+                            showRating={false}
+                            selectedColor={LS_COLORS.global.green}
+                            size={18}
+                            onFinishRating={n => {
+                                setRating(String(n))
+                            }}
                         />
                     </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, alignItems: "center", paddingHorizontal: 20 }}>
@@ -112,7 +122,7 @@ export default function FinishPay({ navigation, route }) {
                                 value={type}
                                 onChangeValue={(index, value) => { setType(value) }}
                                 containerStyle={{ width: "60%", borderRadius: 6, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0 }}
-                                dropdownStyle={{ width: "40%", height: 90,marginTop:Platform.OS=="android"?-30:0 }}
+                                dropdownStyle={{ width: "40%", height: 90, marginTop: Platform.OS == "android" ? -30 : 0 }}
                             />
                         </View>
 
@@ -121,21 +131,21 @@ export default function FinishPay({ navigation, route }) {
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{ width: "40%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Tip Amount"} placeholderTextColor="black" style={{ height: 40,color:"black" }} textAlign="center" />
+                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Tip Amount"} placeholderTextColor="black" style={{ height: 40, color: "black" }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
                             <><View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40,color:"black" }} textAlign="center" />
+                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40, color: "black" }} textAlign="center" />
                             </View>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <Text  style={{ height: 40 ,textAlign:"center",textAlignVertical:"center",lineHeight:40}} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
+                                    <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40 }} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>
                                 </View>
                             </>
                         }
                     </View>
-                    <View style={{ width: "90%",alignSelf:"center",marginTop:20, borderRadius: 6, height: 200, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                        <TextInput value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top"  placeholder={"Your Comments"}  placeholderTextColor="gray" style={{ height: 200,padding:10,color:"black"}}/>
+                    <View style={{ width: "90%", alignSelf: "center", marginTop: 20, borderRadius: 6, height: 200, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
+                        <TextInput value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top" placeholder={"Your Comments"} placeholderTextColor="gray" style={{ height: 200, padding: 10, color: "black" }} />
                     </View>
                 </Content>
                 <TouchableOpacity
@@ -147,7 +157,7 @@ export default function FinishPay({ navigation, route }) {
                     <Text style={styles.saveText}>Confirm</Text>
                 </TouchableOpacity>
             </Container>
-            {loading&&<Loader />}
+            {loading && <Loader />}
         </SafeAreaView>
     )
 }

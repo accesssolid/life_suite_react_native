@@ -333,12 +333,13 @@ const OrderHistory1 = (props) => {
                             }
                             return (
                                 <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
-                                    if (done === index) {
-                                        setDone("")
-                                    }
-                                    else {
-                                        setDone(index)
-                                    }
+                                    // if (done === index) {
+                                    //     setDone("")
+                                    // }
+                                    // else {
+                                    //     setDone(index)
+                                    // }
+                                    props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item } })
                                 }} style={{ width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
                                     <View style={{ width: 6,height:65,position:"absolute", borderRadius: 12,left:0,backgroundColor: backgroundColor }}></View>
                                     {done === index ?

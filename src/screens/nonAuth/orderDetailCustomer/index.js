@@ -1,6 +1,6 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, PermissionsAndroid, TouchableOpacity, Dimensions, ScrollView, Image, Linking } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, PermissionsAndroid, TouchableOpacity, Dimensions, ScrollView, Image, Linking, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -673,7 +673,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
     const [totalTime, setTotalTime] = React.useState(0)
     const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
     const [showVirtualData, setShowVirtualData] = React.useState(false)
-    console.log("Data1", data)
+    const navigation=useNavigation()
 
     useEffect(() => {
         if (showVirtualData) {
@@ -788,7 +788,10 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
     return (
         <Card containerStyle={{ borderRadius: 10 }}>
             <View style={{ flexDirection: "row" }}>
-                <View style={{ flex: 1, flexDirection: "row" }}>
+                <Pressable onPress={()=>{
+                    console.log(data)
+                    navigation.navigate("ProviderDetail", { providerId: data.provider_id, service: data?.order_items && (data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name) })
+                }} style={{ flex: 1, flexDirection: "row" }}>
                     <Avatar
                         size="large"
                         rounded
@@ -810,7 +813,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                             />
                         </View>
                     </View>
-                </View>
+                </Pressable>
                 <View >
                     <Text style={[styles.greenTextStyle, { textAlign: "right" }]}>{moment(data?.created_at).fromNow()}</Text>
                     <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
@@ -974,7 +977,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
         <View style={{ marginHorizontal: 20, marginTop: 0 }}>
             {fromShow &&
                 <>
-                    <Text style={[styles.baseTextStyle, { marginBottom: 8 }]}>Requested From</Text>
+                    <Text style={[styles.baseTextStyle, { marginBottom: 8 , marginTop: 16}]}>Requested From</Text>
                     <TouchableOpacity
                         onPress={() => {
                             // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
@@ -1053,7 +1056,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
 const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, openBlockModal, searchAgain, openReorderModal, gotToForReorder }) => {
     const [buttons, setButtons] = React.useState([])
     const navigation = useNavigation()
-
+    // navigation.navigate("FinishPay", { item: data, submit: submit.bind(this) })
 
     React.useEffect(() => {
         if (data && data.order_status) {

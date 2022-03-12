@@ -1,11 +1,11 @@
 import React from 'react'
-import { View, StyleSheet, Image, Text, SafeAreaView, KeyboardAvoidingView, ScrollView, Platform, ImageBackground, Linking } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, Dimensions, ScrollView, Platform, ImageBackground, Linking } from 'react-native'
 import LS_FONTS from '../../../constants/fonts';
 import { globalStyles } from '../../../utils';
 import CustomButton from '../../../components/customButton';
 import { CheckBox } from 'react-native-elements';
 import { getApi } from '../../../api/api';
-
+const {height,width}=Dimensions.get("window")
 export default function CovidScreen(props) {
     const [checked, setChecked] = React.useState(false)
     const {onChecked,isChecked} =props.route.params
@@ -90,20 +90,32 @@ export default function CovidScreen(props) {
                             }
                         }}
                     />
-                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, flex: 1, fontSize: 15, textAlign: "left", color: "black" }}> : {text_data}</Text>
+                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, flex: 1, fontSize: 15, textAlign: "left", color: "black" }}> {text_data}</Text>
                 </View>
                 <Text onPress={() => Linking.openURL("https://cdc.gov")} style={{ fontFamily: LS_FONTS.PoppinsLight, fontSize: 14, textDecorationLine: "underline", marginTop: 20, textAlign: "center", color: "blue" }}>
                     View CDC guidelines
                 </Text>
             </ScrollView>
-            <CustomButton action={() => {
+            <View style={{flexDirection:"row",justifyContent:"space-evenly",paddingBottom:10}}>
+                    <CustomButton action={()=>{
+                       onChecked(1)
+                        props.navigation.goBack()
+                    }} title="I accept" customStyles={{marginBottom:0,borderRadius:5,width:width*0.45}} />
+                    <CustomButton 
+                    action={()=>{
+                        onChecked(0)
+                        props.navigation.goBack()
+                    }}
+                    title="I don't accept" customStyles={{marginBottom:0,borderRadius:5,width:width*0.45}} />
+                </View> 
+            {/* <CustomButton action={() => {
                 if (checked) {
-                    onChecked(1)
+                  
                 }else{
-                    onChecked(0)
+                  
                 }
                 props.navigation.goBack()
-            }} title="Next" customStyles={{ borderRadius: 5, marginBottom: 20, width: "50%" }} />
+            }} title="Next" customStyles={{ borderRadius: 5, marginBottom: 20, width: "50%" }} /> */}
             {/* <Image source={require("../../../assets/covid/text.png")} resizeMode='contain' style={{ width: "90%",backgroundColor:"red", height: "40%", alignSelf: "center" }} /> */}
         </SafeAreaView>
     )

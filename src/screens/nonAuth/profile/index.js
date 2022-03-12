@@ -1289,7 +1289,7 @@ const Profile = (props) => {
                                 keyboardType='numeric'
                                 returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                 icon={
-                                    <Entypo name="check" color={isVerfiedPhone ? 'green' : "grey"} size={20} />
+                                    isVerfiedPhone&&<Entypo name="check" color={isVerfiedPhone ? 'green' : "grey"} size={20} />
                                 }
                             />
                             {!isVerfiedPhone && <Text onPress={() => {
@@ -1555,12 +1555,14 @@ const Profile = (props) => {
                                         returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                     />)}
                                     <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                                        {userData?.certificate_data?.length < 5 && <Pressable style={{ marginTop: 10 }} onPress={() => {
+                                        {userData?.certificate_data?.length < 5 && <Pressable style={{ marginTop: 10,marginBottom:15,flexDirection: "row",alignItems:"center", justifyContent: "center" }} onPress={() => {
                                             if (userData.certificate_data?.length < 5) {
                                                 setUserData({ ...userData, certificate_data: [...userData.certificate_data, { certificate: "" }] })
                                             }
                                         }}>
-                                            <Image source={require("../../../assets/signup/add_field.png")} style={{ height: 30, width: widthPercentageToDP(40), marginBottom: 30 }} resizeMode="contain" />
+
+                                            <Image source={require("../../../assets/signup/add_field1.png")} style={{ height: 30, width:30 }} resizeMode="contain" />
+                                            <Text style={{fontSize:14,color:LS_COLORS.global.black,fontFamily:LS_FONTS.PoppinsRegular,marginLeft:10}}>Add New Certificate</Text>
                                         </Pressable>}
                                     </View>
                                 </View>
@@ -1644,7 +1646,7 @@ const Profile = (props) => {
                                 </View>
                                 :
                                 <View style={{ ...styles.personalContainer, paddingVertical: 20, marginTop: 10, zIndex: -1000 }}>
-                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Account Information</Text>
+                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Stripe Account Information</Text>
                                     <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
                                         activeOpacity={0.7}
                                         onPress={() => {

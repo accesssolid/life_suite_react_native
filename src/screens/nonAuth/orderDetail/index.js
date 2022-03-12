@@ -886,7 +886,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
         <View style={{ marginHorizontal: 20 }}>
             {fromShow &&
                 <>
-                    <Text style={[styles.baseTextStyle, { marginBottom: 8 }]}>From</Text>
+                    <Text style={[styles.baseTextStyle, { marginBottom: 8,marginTop:16 }]}>From</Text>
                     <TouchableOpacity
                         onPress={() => {
                             // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })

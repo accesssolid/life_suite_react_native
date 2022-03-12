@@ -329,7 +329,9 @@ const ServicesProvided = (props) => {
     }
 
     const saveRequest = () => {
-        console.log(activeItem, selectedProducts)
+        console.log(activeItem)
+        console.log(extraData)
+     
         let isSelected = false
 
         activeItem.products.forEach(element => {
@@ -344,7 +346,12 @@ const ServicesProvided = (props) => {
         if (activeItem.is_product_mandatory == "0") {
             isSelected = true
         }
-
+        let extra_product=extraData.find(x=>x?.parent_id==activeItem.id)
+        if(extra_product){
+            if(extra_product?.need_recommendation||String(extra_product?.have_own).trim()!=""||String(extra_product?.other).trim()!=""){
+                isSelected=true
+            }
+        }
         if (isSelected) {
             setActiveItem(null)
         } else {

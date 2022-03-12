@@ -153,7 +153,7 @@ const MainDrawer = (props) => {
                                 data: {
                                     title: "Select Account",
                                     subtitle: "You do not have any active accounts.",
-                                    buttonTitle: "Add Stripe Money",
+                                    buttonTitle: "Add Stripe Account",
                                     type: "provider",
                                     open: true
                                 }
@@ -473,13 +473,13 @@ const CustomDrawerContent = (props) => {
                 <Image source={require('../assets/splash/logo.png')} resizeMode="contain" style={{ height: 100, width: '80%', marginLeft: 10, }} />
                 <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.user_role == role.customer ? "Customer" : "Service Provider"}</Text>
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.green, paddingVertical: 5 }}>
                 <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 18, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
             </View>
             <View onTouchEnd={() => {
                 logout()
                 dispatch(changeSwitched(true))
-            }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.drawer_name, paddingVertical: 5 }}>
+            }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor:  LS_COLORS.global.green, paddingVertical: 5 }}>
                 <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider ? "Customer" : "Provider"}</Text>
             </View>
             <DrawerItemList {...props} />

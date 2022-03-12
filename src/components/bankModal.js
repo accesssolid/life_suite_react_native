@@ -47,7 +47,7 @@ const BankModal = props => {
                     data: {
                       title: "Select Account",
                       subtitle: "You do not have any active accounts.",
-                      buttonTitle: "Add Stripe Money",
+                      buttonTitle: "Add Stripe Account",
                       type:"provider",
                       open: false
                     }
@@ -58,7 +58,7 @@ const BankModal = props => {
                     data: {
                       title: "Select Account",
                       subtitle: "You do not have any active accounts.",
-                      buttonTitle: "Add Stripe Money",
+                      buttonTitle: "Add Stripe Account",
                       type:"provider",
                       open: false
                     }
@@ -76,7 +76,7 @@ const BankModal = props => {
                   data: {
                     title: "Select Account",
                     subtitle: "You do not have any active accounts.",
-                    buttonTitle: "Add Stripe Money",
+                    buttonTitle: "Add Stripe Account",
                     type:"provider",
                     open: false
                   }

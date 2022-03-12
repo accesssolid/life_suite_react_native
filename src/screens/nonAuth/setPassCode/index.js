@@ -59,14 +59,15 @@ const SetPassCode = (props) => {
                             <View style={{ backgroundColor: "#F6F6F6", width: "80%", height: 50 }}>
                                 <TextInput
                                     secureTextEntry={true}
-                                    style={{ flex: 1, paddingHorizontal: 10, textAlign: 'left' }}
+                                    style={{ flex: 1, paddingHorizontal: 10,color:"black", textAlign: 'left' }}
                                     keyboardType={'number-pad'}
                                     keyboardAppearance={'dark'}
                                     returnKeyType={'default'}
                                     enablesReturnKeyAutomatically={true}
                                     value={Passcode}
                                     placeholder={'Enter New Passcode'}
-                                    // placeholderTextColor={AppColors.title_grey}
+                                    
+                                    placeholderTextColor={LS_COLORS.global.grey}
                                     onChangeText={(i) => setPasscode(i)}
                                 />
                             </View>

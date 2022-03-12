@@ -27,6 +27,7 @@ import RNGooglePlaces from 'react-native-google-places';
 import { role } from '../../../constants/globals';
 import { getStringData, storeStringData } from '../../../asyncStorage/async'
 import moment from 'moment';
+import { updateBankModelData } from '../../../redux/features/bankModel';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
@@ -95,9 +96,43 @@ const HomeScreen = (props) => {
         setTimeout(() => {
             GetToken()
         }, 15000)
-
+        setTimeout(() => {
+            getConnectAccountDetail()
+        }, 300);
     }, [])
+    const [allowJobAdd, setAllowedJobAdd] = React.useState(false)
+    const getConnectAccountDetail = async () => {
+        try {
+            let headers = {
+                'Content-Type': 'multipart/form-data',
+                "Authorization": `Bearer ${access_token}`
+            }
+            let config = {
+                headers: headers,
+                data: JSON.stringify({}),
+                endPoint: '/api/isAccountSetupDetail',
+                type: 'post'
+            }
+            let response = await getApi(config)
+            if (response.status == true) {
+                if (response.data) {
+                    if (response.data.email && response.data.details_submitted) {
+                        setAllowedJobAdd(true)
+                    } else {
+                        setAllowedJobAdd(false)
 
+
+                    }
+                }
+            }
+            else {
+                // showToast(response.message, 'danger')
+            }
+            // setAllowedJobAdd(false)
+        } catch (err) {
+            // return false
+        }
+    }
     useFocusEffect(
         React.useCallback(() => {
             if (user.user_role == 3) {
@@ -424,7 +459,11 @@ const HomeScreen = (props) => {
                         null
                     }
                 </View>
-                {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7} onPress={() => setIsAddJobActive(!isAddJobActive)}>
+                {user.user_role == 3 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25, marginBottom: 15, backgroundColor: isAddJobActive ? 'rgba(0,0,0,0.2)' : LS_COLORS.global.white, alignSelf: 'flex-start', padding: 5, borderRadius: 8 }} activeOpacity={0.7}
+                    onPress={() => {
+                        getConnectAccountDetail()
+                        setIsAddJobActive(!isAddJobActive)
+                    }}>
                     <View style={{ height: 30, aspectRatio: 1 }}>
                         {!isAddJobActive && <Image source={require('../../../assets/addgreen.png')} resizeMode="contain" style={{ width: '100%', height: '100%' }} />}
                         {isAddJobActive && <View style={{ height: 30, width: 30, borderRadius: 20, backgroundColor: LS_COLORS.global.green, justifyContent: "center", alignItems: "center" }}>
@@ -449,11 +488,24 @@ const HomeScreen = (props) => {
                                             title2="SERVICES"
                                             imageUrl={{ uri: BASE_URL + item.image }}
                                             action={() => {
-                                                item.itemsData.length > 0
-                                                    ?
-                                                    goToItems(item)
-                                                    :
-                                                    props.navigation.navigate("SubServices", { service: item })
+                                                if (allowJobAdd) {
+                                                    item.itemsData.length > 0
+                                                        ?
+                                                        goToItems(item)
+                                                        :
+                                                        props.navigation.navigate("SubServices", { service: item })
+                                                } else {
+                                                    dispatch(updateBankModelData({
+                                                        data: {
+                                                            title: "Select Account",
+                                                            subtitle: "You do not have any active accounts.",
+                                                            buttonTitle: "Add Stripe Account",
+                                                            type: "provider",
+                                                            open: true
+                                                        }
+                                                    }))
+                                                }
+
                                             }}
                                         />
                                     )

@@ -168,7 +168,7 @@ export default function ProviderDetail(props) {
                 containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
                 imageUrl1={require("../../../assets/homeWhite.png")}
                 action1={() => {
-                    props.navigation.navigate("HomeScreen")
+                    props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})
                 }}
             />
             <Image
@@ -288,7 +288,10 @@ export default function ProviderDetail(props) {
                         selectedColor={LS_COLORS.global.green}
                         showRating={false}
                         size={20}
+                        
+                        isDisabled={true}
                     />
+                    
                     {(ratings.length == 0 || ratings.filter(rate => {
                         if (currentRating != 0) {
                             if (Number(rate.rating) == currentRating) {
@@ -315,6 +318,7 @@ export default function ProviderDetail(props) {
                                             selectedColor={LS_COLORS.global.green}
                                             showRating={false}
                                             size={14}
+                                            isDisabled={true}
                                         />
                                     </View>
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.grey }}>{moment(x.created_at, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY")}</Text>

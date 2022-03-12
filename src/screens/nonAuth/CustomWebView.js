@@ -1,11 +1,14 @@
 import { Container, Form } from 'native-base'
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Platform,SafeAreaView } from 'react-native'
 import { WebView } from 'react-native-webview';
 import { getApi } from '../../api/api';
 import Loader from '../../components/loader';
 import { showToast } from '../../utils';
 import { useSelector } from 'react-redux';
+import Header from '../../components/header';
+import LS_COLORS from '../../constants/colors';
+
 const CustomWebView = ({ navigation, route }) => {
     const { uri, change, connect_account_id } = route.params
     console.log(change)
@@ -91,7 +94,21 @@ const CustomWebView = ({ navigation, route }) => {
 
 
     return (
-        <Container>
+        <SafeAreaView style={{flex:1,paddingTop:Platform.OS=="android"?20:0}}>
+              <Header
+                title={"Connect Stripe"}
+                imageUrl={require("../../assets/back.png")}
+                action={() => {
+                    if (change) {
+                        getNewAccountDetails()
+                    } else {
+                        navigation.goBack()
+                    }
+                    
+                }}
+                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+
+            />
             <WebView
                 onLoadStart={(e) => {
                     setLoader(true)
@@ -99,7 +116,6 @@ const CustomWebView = ({ navigation, route }) => {
                 onLoadEnd={e => {
                     setLoader(false)
                 }}
-                source={{ uri: uri }}
                 source={{ uri: uri }}
                 onShouldStartLoadWithRequest={e => {
                     setLoader(false)
@@ -119,7 +135,7 @@ const CustomWebView = ({ navigation, route }) => {
                 }}
             />
             {loader && <Loader />}
-        </Container>
+        </SafeAreaView>
     )
 }
 

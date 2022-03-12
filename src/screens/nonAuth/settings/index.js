@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     Alert,
     BackHandler,
+    StatusBar,
     Text,
     View,
 } from 'react-native';
@@ -134,6 +135,9 @@ const Settings = (props) => {
     return (
         <>
             <SafeAreaView style={{ flex: 1 }}>
+            <StatusBar
+                backgroundColor={LS_COLORS.global.green}
+                 />
                 <Header
                     imageUrl={require("../../../assets/back.png")}
                     action={() => props.navigation.goBack()}

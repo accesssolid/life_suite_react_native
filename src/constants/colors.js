@@ -4,7 +4,7 @@ const LS_COLORS = {
         black: "#4A4B4D",
         darkBlack: "#000000",
         transparent: "transparent",
-        cyan: '#ACF0F2',
+        cyan: '#1AB8AA',
         green: "#1AB8AA",
         grey: "#8A8A8B",
         lightGrey: '#F2F2F2',
@@ -16,7 +16,7 @@ const LS_COLORS = {
         placeholder: '#8f8f8f',
         frameBg: '#ECECEC',
         danger:"#F92525",
-        "drawer_name":"#baedf1"
+        "drawer_name":"#1AB8AA"
     },
 }
 

@@ -46,7 +46,10 @@ const ServiceItem = React.forwardRef((props, ref) => {
     return (
         <>
             <View key={props.index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', overflow: 'hidden', width: props.showInputs ? '45%' : '90%' }}>
+                <View style={{
+                    flexDirection: 'row', justifyContent: 'flex-start', overflow: 'hidden',
+                    width: props.showInputs ? '45%' : '90%'
+                }}>
                     <CheckBox
                         checked={props.isSelected ?? false}
                         onPress={props.onCheckPress}
@@ -57,54 +60,63 @@ const ServiceItem = React.forwardRef((props, ref) => {
                 </View>
 
                 {props.showInputs && <View style={{ flexDirection: 'row', width: '55%', justifyContent: 'flex-end' }}>
-                    <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
-                        <TextInputMask
-                            onChangeText={(formatted, extracted) => {
-                                props.setText("time_duration_h", extracted, props.index, props.serviceItem)
-                            }}
-                            mask={"[00]"}
-                            color="black"
-                            placeholder="HH"
-                            keyboardType="numeric"
-                            editable={props.isSelected}
-                            style={styles.inputStyle}
-                            value={props.serviceItem?.time_duration_h}
-                            ref={hourRef}
-                            returnKeyType={'done'}
-                            placeholderTextColor={LS_COLORS.global.placeholder}
-                        />
+                    <View>
+                        <Text style={{ textAlign: "center",marginBottom:5, width: 50, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Hour</Text>
+                        <View style={{ ...styles.fromContainer, width: 50, marginRight: 10 }}>
+                            <TextInputMask
+                                onChangeText={(formatted, extracted) => {
+                                    props.setText("time_duration_h", extracted, props.index, props.serviceItem)
+                                }}
+                                mask={"[00]"}
+                                color="black"
+                                placeholder="HH"
+                                keyboardType="numeric"
+                                editable={props.isSelected}
+                                style={styles.inputStyle}
+                                value={props.serviceItem?.time_duration_h}
+                                ref={hourRef}
+                                returnKeyType={'done'}
+                                placeholderTextColor={LS_COLORS.global.placeholder}
+                            />
+                        </View>
                     </View>
-                    <View style={{ ...styles.fromContainer, width: 50, marginRight: '5%' }}>
-                        <TextInputMask
-                            onChangeText={(formatted, extracted) => {
-                                props.setText("time_duration_m", extracted, props.index, props.serviceItem)
-                            }}
-                            mask={"[00]"}
-                            color="black"
-                            placeholder="MM"
-                            keyboardType="numeric"
-                            editable={props.isSelected}
-                            style={styles.inputStyle}
-                            value={props.serviceItem?.time_duration_m}
-                            ref={minRef}
-                            returnKeyType={'done'}
-                            placeholderTextColor={LS_COLORS.global.placeholder}
-                        />
+                    <View>
+                        <Text style={{ textAlign: "center",marginBottom:5, width: 50, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Minutes</Text>
+                        <View style={{ ...styles.fromContainer, width: 50, marginRight: 10 }}>
+                            <TextInputMask
+                                onChangeText={(formatted, extracted) => {
+                                    props.setText("time_duration_m", extracted, props.index, props.serviceItem)
+                                }}
+                                mask={"[00]"}
+                                color="black"
+                                placeholder="MM"
+                                keyboardType="numeric"
+                                editable={props.isSelected}
+                                style={styles.inputStyle}
+                                value={props.serviceItem?.time_duration_m}
+                                ref={minRef}
+                                returnKeyType={'done'}
+                                placeholderTextColor={LS_COLORS.global.placeholder}
+                            />
+                        </View>
                     </View>
-                    <View style={styles.fromContainer}>
-                        <TextInput
-                            style={styles.inputStyle}
-                            color="black"
-                            placeholder="$000"
-                            editable={props.isSelected}
-                            onChangeText={(text) => props.setText("price", text, props.index, props.serviceItem)}
-                            keyboardType="numeric"
-                            value={props.serviceItem?.price}
-                            ref={priceRef}
-                            numberOfLines={1}
-                            returnKeyType={'done'}
-                            placeholderTextColor={LS_COLORS.global.placeholder}
-                        />
+                    <View>
+                    <Text style={{ textAlign: "center",marginBottom:5, width: 50, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}></Text>
+                        <View style={styles.fromContainer}>
+                            <TextInput
+                                style={styles.inputStyle}
+                                color="black"
+                                placeholder="$000"
+                                editable={props.isSelected}
+                                onChangeText={(text) => props.setText("price", text, props.index, props.serviceItem)}
+                                keyboardType="numeric"
+                                value={props.serviceItem?.price}
+                                ref={priceRef}
+                                numberOfLines={1}
+                                returnKeyType={'done'}
+                                placeholderTextColor={LS_COLORS.global.placeholder}
+                            />
+                        </View>
                     </View>
                 </View>}
             </View>

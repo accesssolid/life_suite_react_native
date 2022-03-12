@@ -18,7 +18,7 @@ import _ from 'lodash'
 import { showToast } from '../utils';
 import { Rating } from 'react-native-ratings';
 import { CheckBox } from 'react-native-elements';
-
+import lodash from 'lodash'
 
 const TimeFrame = props => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
@@ -155,7 +155,10 @@ const TimeFrame = props => {
                     padding: 10,
                 }}>
                     <Pressable>
-                        <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Select Time Frame</Text>
+                        {/* <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Select Time Frame</Text> */}
+                        <Text style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Summary</Text>
+                        <Text style={{fontFamily:LS_FONTS.PoppinsRegular,marginTop:5}}>Selected Date: {moment(props.starting_time, "YYYY-MM-DD HH:mm:[00]").format("YYYY-MM-DD")}</Text>
+                        {jsonData.length>1&&<Text style={{textAlign:"center",fontSize:13,fontFamily:LS_FONTS.PoppinsRegular}}>Select time frame for each service provider</Text>}
                         {jsonData && jsonData.map((i, index) => {
                             let x = i.duration / 60
                             let time_format = ""
@@ -168,23 +171,23 @@ const TimeFrame = props => {
                             if (props.provider_prices) {
                                 let obj = props.provider_prices?.find(x => x.id == i.provider_id)
                                 // _price
-                                let products=i.products
-                                let provider=data?.find(x=>x?.id==i.provider_id)
+                                let products = i.products
+                                let provider = data?.find(x => x?.id == i.provider_id)
                                 console.log(products)
                                 console.log(provider?.item_list)
                                 if (obj) {
                                     estimated_price = obj?.price
-                                    if(provider){
-                                        estimated_price=0
-                                        for(let item of provider?.item_list){
-                                            if(item.checked){
-                                                estimated_price+=Number(item.price)
-                                                for(let product of item?.products){
-                                                    if(product.checked){
-                                                        if(product.item_products_name=="Per Mile"){
-                                                            estimated_price+=Number(Number(product.price)*Number(orderPreviousData?.mile_distance))
-                                                        }else{
-                                                            estimated_price+=Number(product.price)
+                                    if (provider) {
+                                        estimated_price = 0
+                                        for (let item of provider?.item_list) {
+                                            if (item.checked) {
+                                                estimated_price += Number(item.price)
+                                                for (let product of item?.products) {
+                                                    if (product.checked) {
+                                                        if (product.item_products_name == "Per Mile") {
+                                                            estimated_price += Number(product.price) * lodash.round(Number(orderPreviousData?.mile_distance),2)
+                                                        } else {
+                                                            estimated_price += Number(product.price)
                                                         }
                                                     }
                                                 }
@@ -193,28 +196,29 @@ const TimeFrame = props => {
                                     }
                                 }
                             }
-                            let p_obj=data?.find(x=>x.id==i.provider_id)
-                            let location=props?.location
-                            
-                            if(p_obj){
-                                if(p_obj?.service_is_at_address=="1"){
-                                    location=p_obj?.current_address
+                            let p_obj = data?.find(x => x.id == i.provider_id)
+                            let location = props?.location
+
+                            if (p_obj) {
+                                if (p_obj?.service_is_at_address == "1") {
+                                    location = p_obj?.current_address
                                 }
                             }
-                            return <View style={{ marginTop: "10%" }}>
+                            return <View style={{ marginTop: "5%" }}>
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                                     <Text style={{ fontFamily: LS_FONTS.PoppinsMedium }}>{i.provider_name}</Text>
                                 </View>
                                 <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: "black" }}>({i.itemsName.join(", ")})</Text>
                                 <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Time: {time_format}</Text>
                                 <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Location: {location}</Text>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${estimated_price.toFixed(1)}</Text>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "100%", marginTop: "5%" }}>
+                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${lodash.round(estimated_price,2)}</Text>
+                                <Text style={{fontFamily:LS_FONTS.PoppinsRegular,fontSize:13, marginTop: "5%"}}>My Available Time</Text>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "100%"}}>
                                     <View style={{ width: "50%", height: 50, }} >
                                         <Text>From</Text>
                                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                                             <TouchableOpacity
-                                                 disabled={jsonData.length <= 1} 
+                                                disabled={jsonData.length <= 1}
                                                 style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
                                                 onPress={() => {
                                                     setType("start")
@@ -233,7 +237,7 @@ const TimeFrame = props => {
                                         <Text>To</Text>
                                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                                             <TouchableOpacity
-                                                disabled={jsonData.length <= 1} 
+                                                disabled={jsonData.length <= 1}
                                                 style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7}
                                                 onPress={() => {
                                                     setType("end")

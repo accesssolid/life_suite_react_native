@@ -157,79 +157,79 @@ const ServicesProvided = (props) => {
         }
 
         // if (!isAddServiceMode) {
-            let arr = []
-            let selected = []
-            if (variants.length > 0) {
-                itemListMaster.concat(newServicesMaster).forEach((item, index) => {
-                    subService?.items?.forEach((ele, ind) => {
-                        if (item.id == ele.id && item.variant_data == ele.variant_data) {
-                            let hours = toHoursAndMinutes(ele.time_duration, 'hours')
-                            let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
-                            arr.push({
-                                "item_id": item.id,
-                                "price": "$" + ele.price,
-                                "time_duration_h": String(hours),
-                                "time_duration_m": String(minutes),
-                                "variant_data": item.variant_data
-                            })
-                            selected.push(ele.id)
-                        }
-                    });
-                });
-
-                itemListMaster.concat(newServicesMaster).forEach(item => {
-                    if (!selected.includes(item.id)) {
+        let arr = []
+        let selected = []
+        if (variants.length > 0) {
+            itemListMaster.concat(newServicesMaster).forEach((item, index) => {
+                subService?.items?.forEach((ele, ind) => {
+                    if (item.id == ele.id && item.variant_data == ele.variant_data) {
+                        let hours = toHoursAndMinutes(ele.time_duration, 'hours')
+                        let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
                         arr.push({
                             "item_id": item.id,
-                            "price": "",
-                            "time_duration_h": "",
-                            "time_duration_m": "",
+                            "price": "$" + ele.price,
+                            "time_duration_h": String(hours),
+                            "time_duration_m": String(minutes),
                             "variant_data": item.variant_data
                         })
+                        selected.push(ele.id)
                     }
-                })
-            } else {
-                itemListMaster.concat(newServicesMaster).forEach((item, index) => {
-                    subService?.items?.forEach((ele, ind) => {
-                        if (item.id == ele.id) {
-                            let hours = toHoursAndMinutes(ele.time_duration, 'hours')
-                            let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
-                            arr.push({
-                                "item_id": item.id,
-                                "price": "$" + ele.price,
-                                "time_duration_h": String(hours),
-                                "time_duration_m": String(minutes),
-                            })
-                            selected.push(ele.id)
-                        }
-                    });
                 });
-                itemListMaster.concat(newServicesMaster).forEach(item => {
-                    if (!selected.includes(item.id)) {
+            });
+
+            itemListMaster.concat(newServicesMaster).forEach(item => {
+                if (!selected.includes(item.id)) {
+                    arr.push({
+                        "item_id": item.id,
+                        "price": "",
+                        "time_duration_h": "",
+                        "time_duration_m": "",
+                        "variant_data": item.variant_data
+                    })
+                }
+            })
+        } else {
+            itemListMaster.concat(newServicesMaster).forEach((item, index) => {
+                subService?.items?.forEach((ele, ind) => {
+                    if (item.id == ele.id) {
+                        let hours = toHoursAndMinutes(ele.time_duration, 'hours')
+                        let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
                         arr.push({
                             "item_id": item.id,
-                            "price": item.price ?? "",
-                            "time_duration_h": "",
-                            "time_duration_m": "",
+                            "price": "$" + ele.price,
+                            "time_duration_h": String(hours),
+                            "time_duration_m": String(minutes),
                         })
+                        selected.push(ele.id)
                     }
-                })
-            }
-            // #liahs get previous added service data and union based on item_id
-            console.log(servicesData1, "DDDDDDDDDDD")
-            let d = arr.map(x => {
-                let data = servicesData1.find(y => y.item_id == x.item_id)
-                if (data) {
-                    return { ...x, ...data }
+                });
+            });
+            itemListMaster.concat(newServicesMaster).forEach(item => {
+                if (!selected.includes(item.id)) {
+                    arr.push({
+                        "item_id": item.id,
+                        "price": item.price ?? "",
+                        "time_duration_h": "",
+                        "time_duration_m": "",
+                    })
                 }
-                return x
             })
-            console.log(d, "D")
-            setServicesData(d)
-            //    selected Save Data from Liahs
-            const setData = new Set([...selected, ...selectedItems])
-            // setData is the ids from selected Items
-            setSelectedItems([...setData])
+        }
+        // #liahs get previous added service data and union based on item_id
+        console.log(servicesData1, "DDDDDDDDDDD")
+        let d = arr.map(x => {
+            let data = servicesData1.find(y => y.item_id == x.item_id)
+            if (data) {
+                return { ...x, ...data }
+            }
+            return x
+        })
+        console.log(d, "D")
+        setServicesData(d)
+        //    selected Save Data from Liahs
+        const setData = new Set([...selected, ...selectedItems])
+        // setData is the ids from selected Items
+        setSelectedItems([...setData])
         // }
         setInitialProductsData()
 
@@ -308,7 +308,7 @@ const ServicesProvided = (props) => {
                 }
                 if (String(itemm.item_id).startsWith("new")) {
                     let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
-                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).filter(x=>x.name!=""&&x.price!=""&&x.price!="$")
+                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).filter(x => x.name != "" && x.price != "" && x.price != "$")
                     new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                 } else {
                     services.push(obj)
@@ -324,8 +324,8 @@ const ServicesProvided = (props) => {
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    products: [...productsData].filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
-                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
+                    products: [...productsData].filter(x => x.name != "" && x.price != "" && x.price != "$"),
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "" && x.price != "" && x.price != "$"),
                     services: [...services],
                     new_services: [...new_services]
                 }
@@ -338,8 +338,8 @@ const ServicesProvided = (props) => {
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    products: [...productsData].filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
-                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
+                    products: [...productsData].filter(x => x.name != "" && x.price != "" && x.price != "$"),
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "" && x.price != "" && x.price != "$"),
                     services: [...services],
                     new_services: [...new_services]
                 }
@@ -619,9 +619,9 @@ const ServicesProvided = (props) => {
     const saveRequest = () => {
         let hasSubProducts = false
         const selectedItemsss = itemListMaster.filter(item => selectedItems.includes(item.id))
-
+        console.log(selectedItemsss)
         selectedItemsss.forEach(element => {
-            if (element.products.length > 0) {
+            if (element.products.length > 0 && String(element?.is_product_mandatory) == "1") {
                 hasSubProducts = true
             }
         });
@@ -634,18 +634,23 @@ const ServicesProvided = (props) => {
         if (variants.length > 0) {
             servicesData.filter(item => item.variant_data == selectedVariant).forEach((itemm, index) => {
                 if (selectedItems.includes(itemm.item_id)) {
-                    if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
+                    if (itemm.price.trim() !== ""
+                        // && itemm.time_duration_h.trim() !== "" 
+                        && itemm.time_duration_m.trim() !== "") {
                         isValidData = true
                     } else {
                         isValidData = false
                     }
                 }
             })
+
         } else {
             servicesData.forEach((itemm, index) => {
                 if (selectedItems.includes(itemm.item_id)) {
                     console.log("itemm =>> ", itemm)
-                    if (itemm.price.trim() !== "" && itemm.time_duration_h.trim() !== "" && itemm.time_duration_m.trim() !== "") {
+                    if (itemm.price.trim() !== ""
+                        // && itemm.time_duration_h.trim() !== "" 
+                        && itemm.time_duration_m.trim() !== "") {
                         isValidData = true
                     } else {
                         isValidData = false
@@ -653,9 +658,16 @@ const ServicesProvided = (props) => {
                 }
             })
         }
-
+        setServicesData(servicesData.map(item => {
+            if (item?.time_duration_h.trim() == "" && selectedItems.includes(item.item_id)) {
+                return ({
+                    ...item,
+                    time_duration_h: "0"
+                })
+            }
+            return item
+        }))
         let selected = getSelectedProducts()
-        console.log("selected =>> ", selected)
         productsData.filter(item => selected.includes(item.id)).forEach(element => {
             if (element.price.trim() == "") {
                 isValidData = false
@@ -663,7 +675,6 @@ const ServicesProvided = (props) => {
         });
 
         let selectedNew = getSelectedNewProducts()
-        console.log("selectedNew =>> ", selectedNew)
 
         newProductsData.filter(item => selectedNew.includes(item.id)).forEach(element => {
             if (element.price.trim() == "" || element.name.trim() == "") {
@@ -883,10 +894,10 @@ const ServicesProvided = (props) => {
                     }
                     if (String(itemm.item_id).startsWith("new")) {
                         let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
-                        let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).map(x=>({
-                            name:x.name,
-                            price:x.price
-                        })).filter(x=>x.name!=""&&x.price!=""&&x.price!="$")
+                        let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).map(x => ({
+                            name: x.name,
+                            price: x.price
+                        })).filter(x => x.name != "" && x.price != "" && x.price != "$")
                         new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                     } else {
                         services.push(obj)
@@ -894,14 +905,14 @@ const ServicesProvided = (props) => {
 
                 }
             })
-            console.log("New SErvices",productsData,newProductsData)
+            console.log("New SErvices", productsData, newProductsData)
             let json_data = {
-                products: [...productsData].filter(x=>x.name!=""&&x.price!=""&&x.price!="$").map(x => ({ item_product_id: x.id, price: x.price })),
-                new_products: [...newProductsData].filter(x=>!String(x?.item_id).startsWith("new")).filter(x=>x.name!=""&&x.price!=""&&x.price!="$"),
+                products: [...productsData].filter(x => x.name != "" && x.price != "" && x.price != "$").map(x => ({ item_product_id: x.id, price: x.price })),
+                new_products: [...newProductsData].filter(x => !String(x?.item_id).startsWith("new")).filter(x => x.name != "" && x.price != "" && x.price != "$"),
                 services: [...services],
                 new_services: [...new_services]
             }
-            console.log( JSON.stringify(json_data))
+            console.log(JSON.stringify(json_data))
             // setLoading(false)
             // return 
 
@@ -931,11 +942,11 @@ const ServicesProvided = (props) => {
 
     return (
         <>
-            <StatusBar 
-             // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-             barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <View style={{ width: '100%', height: '15%' }}>
                 <ImageBackground
                     resizeMode="cover"
@@ -991,12 +1002,15 @@ const ServicesProvided = (props) => {
                             })}
                         </ScrollView>
                     </View>}
-                    {activeItem !== null && <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: '2%' }}>
-                        <View style={{ alignItems: 'center' }}>
-                            <Text style={{ ...styles.priceTime, marginRight: '10%' }}>Estimated Time</Text>
-                        </View>
-                        <View style={{ marginLeft: '5%' }}>
-                            <Text style={styles.priceTime}>Price</Text>
+                    {activeItem !== null && <View style={{ flexDirection: 'row', width: '98%', alignSelf: "center", marginBottom: '2%' }}>
+                        <View style={{ width: "45%" }} />
+                        <View style={{ width: "55%", flexDirection: "row", justifyContent: 'flex-end' }}>
+                            <View style={{ alignItems: 'center', width: 110,marginRight:10, }}>
+                                <Text style={{ ...styles.priceTime, }}>Estimated Time</Text>
+                            </View>
+                            <View style={{width:75,alignItems:"center",marginRight:"10%"}}>
+                                <Text style={styles.priceTime}>Price</Text>
+                            </View>
                         </View>
                     </View>}
                     <Content showsVerticalScrollIndicator={false}>
@@ -1047,7 +1061,7 @@ const ServicesProvided = (props) => {
                                                 onCheckPress={() => { onPressItem(index, item) }}
                                                 isSelected={selectedItems.includes(item.id)}
                                             />
-                                            <Text style={{fontFamily:LS_FONTS.PoppinsRegular,color:"red",fontSize:12,paddingHorizontal:10,borderRadius:5,borderWidth:1,borderColor:"red",paddingVertical:5}} onPress={() => {
+                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
                                                 removeNewService(item)
                                             }}>Remove</Text>
                                         </View>
@@ -1160,7 +1174,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: LS_FONTS.PoppinsMedium,
         color: "black",
-        marginRight: '13%'
     },
     service: {
         fontSize: 18,
