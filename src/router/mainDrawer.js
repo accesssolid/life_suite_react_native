@@ -44,6 +44,9 @@ import { logoutAll } from '../redux/features/loginReducer';
 import PushNotification from 'react-native-push-notification';
 import ShortcutBadge from 'react-native-app-badge';
 import { changeSwitched } from '../redux/features/switchTo';
+import AboutUsModal from '../components/aboutUsModal';
+import FAQ from '../screens/nonAuth/faq';
+import ContactUs from '../screens/nonAuth/contactus';
 
 const Drawer = createDrawerNavigator();
 
@@ -53,6 +56,7 @@ const MainDrawer = (props) => {
     const [privacyVisible, setPrivacyVisible] = useState(false)
     const [copyVisible, setCopyVisible] = useState(false)
     const [softwareVisible, setSoftwareVisible] = useState(false)
+    const [softwareVisible1, setSoftwareVisible1] = useState(false)
     const navigation = useNavigation()
     const access_token = useSelector(state => state.authenticate.access_token)
     const authenticate=useSelector(state=>state.authenticate)?.authenticate
@@ -64,8 +68,8 @@ const MainDrawer = (props) => {
         if (notifications?.filter(x => x.is_read == "0").length == 0) {
             return null
         }
-        return (<View style={{ height: 20, borderRadius: 20, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
-            <Text style={{ color: LS_COLORS.global.white, marginHorizontal: 5 }}>{notifications?.filter(x => x.is_read == "0").length}</Text>
+        return (<View style={{  borderRadius: 200, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
+            <Text maxFontSizeMultiplier={1.5} style={{ color: LS_COLORS.global.white,aspectRatio:1,textAlign:"center", marginHorizontal: 5 }}>{notifications?.filter(x => x.is_read == "0").length}</Text>
         </View>
         )
     }
@@ -100,8 +104,8 @@ const MainDrawer = (props) => {
             return null
         }
         return (
-            <View style={{ height: 20, borderRadius: 20, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
-                <Text style={{ color: LS_COLORS.global.white, marginHorizontal: 5 }}>{unSeen}</Text>
+            <View style={{  borderRadius: 200, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
+                <Text maxFontSizeMultiplier={1.5} style={{ color: LS_COLORS.global.white,aspectRatio:1,textAlign:"center", marginHorizontal: 5 }}>{unSeen}</Text>
             </View>
         )
     }
@@ -259,7 +263,7 @@ const MainDrawer = (props) => {
     return (
         <>
             <Drawer.Navigator
-                drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} setPrivacyVisible={setPrivacyVisible} setCopyVisible={setCopyVisible} setSoftwareVisible={setSoftwareVisible} />}
+                drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} setPrivacyVisible={setPrivacyVisible} setCopyVisible={setCopyVisible} setSoftwareVisible={setSoftwareVisible} setSoftwareVisible1={setSoftwareVisible1} />}
                 drawerStyle={{
                     width: Dimensions.get('screen').width / 1.3
                 }}
@@ -284,16 +288,26 @@ const MainDrawer = (props) => {
                     component={Profile}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/userGreen.png')} style={{ height: 20, width: 20 }} />,
+                        drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 14,
+                            color: LS_COLORS.global.darkBlack,
+                        }} maxFontSizeMultiplier={1.7}>Profile</Text>
+                        </View>,
                     }}
                 />
                 <Drawer.Screen
                     name="Orders"
                     component={user.user_role == role.customer ? OrderHistory1 : OrderHistory}
                     // component={OrderHistory}
-
                     options={{
-                        drawerLabel: "My Orders",
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/note.png')} style={{ height: 20, width: 20 }} />,
+                        drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 14,
+                            color: LS_COLORS.global.darkBlack,
+                        }} maxFontSizeMultiplier={1.7}>My Orders</Text>
+                        </View>,
                     }}
                 />
                 <Drawer.Screen
@@ -306,7 +320,7 @@ const MainDrawer = (props) => {
                             fontFamily: LS_FONTS.PoppinsMedium,
                             fontSize: 14,
                             color: LS_COLORS.global.darkBlack,
-                        }}>Messages</Text>
+                        }} maxFontSizeMultiplier={1.7}>Messages</Text>
                             <MessageBadge />
                         </View>,
                     }}
@@ -316,6 +330,12 @@ const MainDrawer = (props) => {
                     component={Favourites}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />,
+                        drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 14,
+                            color: LS_COLORS.global.darkBlack,
+                        }} maxFontSizeMultiplier={1.7}>Favorites</Text>
+                        </View>,
                     }}
                 />
                 <Drawer.Screen
@@ -326,7 +346,7 @@ const MainDrawer = (props) => {
                             fontFamily: LS_FONTS.PoppinsMedium,
                             fontSize: 14,
                             color: LS_COLORS.global.darkBlack,
-                        }}>Notification</Text>
+                        }} maxFontSizeMultiplier={1.7}>Notification</Text>
                             <GetBadge />
                         </View>,
                         drawerIcon: ({ focused, size, color }) => <FontAwesome name="bell" color={color} size={20} />,
@@ -341,7 +361,7 @@ const MainDrawer = (props) => {
                 />
                 <Drawer.Screen
                     name="Contact Us"
-                    component={Test}
+                    component={ContactUs}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/contactUs.png')} style={{ height: 20, width: 20 }} />,
                     }}
@@ -394,6 +414,14 @@ const MainDrawer = (props) => {
                         drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
                     }}
                 />
+                  <Drawer.Screen
+                    name="FAQ"
+                    component={FAQ}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <View style={{ height: 0 }} />,
+                        drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
+                    }}
+                />
                 <Drawer.Screen
                     name="UpdateCertificateStack"
                     component={UpdateCertificateStack}
@@ -419,6 +447,10 @@ const MainDrawer = (props) => {
                 isVisible={softwareVisible}
                 setVisible={setSoftwareVisible}
             />
+             <AboutUsModal
+                isVisible={softwareVisible1}
+                setVisible={setSoftwareVisible1}
+                />
             <BankModal />
         </>
     )
@@ -429,7 +461,9 @@ export default MainDrawer;
 const CustomDrawerContent = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
-
+    const { state, ...rest } = props;
+    const newState = { ...state} 
+    newState.routes = newState.routes.filter(item => item.name !== 'About Us'&&item.name!="FAQ"&&item.name!="Contact Us")
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const [loader, setLoader] = React.useState(false)
@@ -471,85 +505,154 @@ const CustomDrawerContent = (props) => {
         <DrawerContentScrollView {...props}>
             <View >
                 <Image source={require('../assets/splash/logo.png')} resizeMode="contain" style={{ height: 100, width: '80%', marginLeft: 10, }} />
-                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.user_role == role.customer ? "Customer" : "Service Provider"}</Text>
+                <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.user_role == role.customer ? "Customer" : "Service Provider"}</Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.green, paddingVertical: 5 }}>
-                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 18, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
+                <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold,color:"white", fontSize: 18, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
             </View>
             <View onTouchEnd={() => {
                 logout()
                 dispatch(changeSwitched(true))
             }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor:  LS_COLORS.global.green, paddingVertical: 5 }}>
-                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider ? "Customer" : "Provider"}</Text>
+                <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold,color:"white", fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider ? "Customer" : "Provider"}</Text>
             </View>
-            <DrawerItemList {...props} />
-            {user?.user_role == role.provider && <DrawerItem
-                style={{ marginTop: -185 }}
-                label="Update Certificate"
-                labelStyle={{
-                    fontFamily: LS_FONTS.PoppinsMedium,
-                    fontSize: 14,
-                    color: LS_COLORS.global.darkBlack,
+            <DrawerItemList  state={newState} {...rest} />
+            <DrawerItem
+                style={{ marginTop: -180 }}
+                label={(props)=><Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >About Us
+                </Text>}
+              
+                icon={({ focused, color }) =>  <Image resizeMode="contain" source={require('../assets/aboutUs.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    props.navigation.toggleDrawer()
+                    props.setSoftwareVisible1(true)
                 }}
-                icon={({ focused, color }) => <Image resizeMode="cover" source={require('../assets/legal.png')} style={{ height: 20, width: 20 }} />}
+            />
+            <DrawerItem
+                style={{ marginTop:0 }}
+                label={(props)=><Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >Contact Us
+                </Text>}
+                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/contactUs.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    navigation.navigate("Contact Us")
+                }}
+            />
+            <DrawerItem
+                style={{ marginTop:0 }}
+                label={(props)=><Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >FAQ
+                </Text>}
+                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/faq.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    props.navigation.toggleDrawer()
+                    navigation.navigate("FAQ")
+                }}
+            />
+            {user?.user_role == role.provider && <DrawerItem
+                style={{ marginTop: 0 }}
+                label={(props)=><Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >Update Certificate
+                </Text>}
+                icon={({ focused, color }) => <Image resizeMode="cover" source={require('../assets/certs.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
                     navigation.navigate("UpdateCertificateStack", { screen: "UpdateCertificateServiceList" })
                 }}
             />}
             <DrawerItem
-                style={{ marginTop: user?.user_role == role.customer ? -185 : 0 }}
+                style={{ marginTop: user?.user_role == role.customer ? 0 : 0 }}
                 // style={{ marginTop: -155 }}
-                label="Legal"
-                labelStyle={{
-                    fontFamily: LS_FONTS.PoppinsMedium,
-                    fontSize: 14,
-                    color: LS_COLORS.global.darkBlack,
-                }}
+             
+                label={(props)=><Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >Legal</Text>}
                 icon={({ focused, color }) => <Image resizeMode="cover" source={require('../assets/legal.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => null}
             />
             <View style={{ width: '84%', alignSelf: 'flex-end' }}>
                 <DrawerItem
-                    label="Terms & Conditions"
-                    labelStyle={{
-                        fontFamily: LS_FONTS.PoppinsMedium,
-                        fontSize: 11,
-                        color: LS_COLORS.global.darkBlack,
-                        marginLeft: -20
-                    }}
+                    label={(props)=><Text
+                        style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 11,
+                            color: LS_COLORS.global.darkBlack,
+                            marginLeft:-20
+                        }}
+                        maxFontSizeMultiplier={1.7}
+                    >Terms & Conditions
+                    </Text>}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/termsIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => { props.navigation.toggleDrawer(), props.setTermsVisible(true) }}
                 />
                 <DrawerItem
-                    label="Copyright"
-                    labelStyle={{
-                        fontFamily: LS_FONTS.PoppinsMedium,
-                        fontSize: 11,
-                        color: LS_COLORS.global.darkBlack,
-                        marginLeft: -20
-                    }}
+                    label={(props)=><Text
+                        style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 11,
+                            color: LS_COLORS.global.darkBlack,
+                            marginLeft:-20
+                        }}
+                        maxFontSizeMultiplier={1.7}
+                    >Copyright
+                    </Text>}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/copyIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => { props.navigation.toggleDrawer(), props.setCopyVisible(true) }}
                 />
                 <DrawerItem
-                    label="Privacy Policy"
-                    labelStyle={{
-                        fontFamily: LS_FONTS.PoppinsMedium,
-                        fontSize: 11,
-                        color: LS_COLORS.global.darkBlack,
-                        marginLeft: -20
-                    }}
+                    label={(props)=><Text
+                        style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 11,
+                            color: LS_COLORS.global.darkBlack,
+                            marginLeft:-20
+                        }}
+                        maxFontSizeMultiplier={1.7}
+                    >Privacy Policy
+                    </Text>}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/privacyIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => { props.navigation.toggleDrawer(), props.setPrivacyVisible(true) }}
                 />
                 <DrawerItem
-                    label="Software license"
-                    labelStyle={{
-                        fontFamily: LS_FONTS.PoppinsMedium,
-                        fontSize: 11,
-                        color: LS_COLORS.global.darkBlack,
-                        marginLeft: -20
-                    }}
+                    label={(props)=><Text
+                        style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 11,
+                            color: LS_COLORS.global.darkBlack,
+                            marginLeft:-20
+                        }}
+                        maxFontSizeMultiplier={1.7}
+                    >Software License
+                    </Text>}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/licenceIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => { props.navigation.toggleDrawer(), props.setSoftwareVisible(true) }}
                 />
@@ -565,7 +668,7 @@ const Test = () => {
             <Image
                 source={require('../assets/back.png')} />
         </TouchableOpacity>
-        <Text>WORK IN PROGRESS</Text>
+        <Text maxFontSizeMultiplier={1.7}>WORK IN PROGRESS</Text>
 
     </View>
 }

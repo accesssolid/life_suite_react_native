@@ -92,7 +92,7 @@ const CustomWebView = (props) => {
     return (
         <SafeAreaView style={{flex:1,backgroundColor:"white"}}>
             <View style={styles.container}>
-                <Text style={styles.title}>{title}</Text>
+                <Text maxFontSizeMultiplier={1.7} style={styles.title}>{title}</Text>
                 <WebView
                     showsVerticalScrollIndicator={false}
                     style={{ flex: 1 }}
@@ -106,7 +106,6 @@ const CustomWebView = (props) => {
                             </HTML>`
                     }}
                 />
-               
             </View>
             <View style={{flexDirection:"row",justifyContent:"space-evenly"}}>
                     <CustomButton action={()=>{
@@ -141,7 +140,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 10,
         overflow: 'hidden',
-        height: '90%'
+        // height: '90%'
+        flex:1,
     },
     title: {
         fontFamily: LS_FONTS.PoppinsBold,

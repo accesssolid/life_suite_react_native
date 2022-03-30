@@ -27,17 +27,19 @@ const DropDown1 = (props) => {
                 <View style={styles.arrow}>
                     <AntDesign name="down" color={LS_COLORS.global.green} />
                 </View>
-                {props.handleTextValue && <Text style={[{
+                {props.handleTextValue &&
+                <View style={{ left:"0%",
+                position:"absolute",height:52,justifyContent:"center"}}>
+                <Text  maxFontSizeMultiplier={1.5} style={[{
                     fontSize: 14,
-                    height: 50,
                     width: "100%",
                     fontFamily: LS_FONTS.PoppinsRegular,
                     paddingLeft: 20,
                     textAlignVertical: "center",
-                    lineHeight: 50,
-                    left:"0%",
-                    position:"absolute",
-                },props.handleTextValueStyle]}>{props.value}</Text>}
+                   
+                },props.handleTextValueStyle]}>{props.value}</Text>
+                </View>
+                }
                 <ModalDropdown
                     ref={props.dropRef}
                     defaultValue={props.value}
@@ -72,7 +74,7 @@ const DropDown1 = (props) => {
                             paddingHorizontal: '2%',
                             backgroundColor: LS_COLORS.global.white
                         }}>
-                            <Text style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
                             {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}
                         </View>)
                     }}
@@ -89,14 +91,16 @@ export const DropDown = (props) => {
                 <View style={styles.arrow}>
                     <AntDesign name="down" color={LS_COLORS.global.green} />
                 </View>
-                {props.handleTextValue && <Text style={{
+                {props.handleTextValue && 
+                
+                <Text maxFontSizeMultiplier={1.7} style={{
                     fontSize: 14,
-                    height: 50,
+                    minHeight: 50,
                     width: "100%",
                     fontFamily: LS_FONTS.PoppinsRegular,
                     paddingLeft: 20,
                     textAlignVertical: "center",
-                    lineHeight: 50,
+                    lineHeight: 40,
                     left:"0%",
                     position:"absolute",
                 }}>{props.value}</Text>}
@@ -107,18 +111,19 @@ export const DropDown = (props) => {
                     options={props.item}
                     textStyle={{
                         fontSize: props.handleTextValue ? 0 : 14,
-                        height: 50,
+                        minHeight: 50,
                         width: "100%",
                         opacity: props.handleTextValue ? 0 :1,
                         fontFamily: LS_FONTS.PoppinsRegular,
                         paddingLeft: 10,
                         textAlignVertical: "center",
-                        lineHeight: 50
+                        // lineHeight: 50
+                        paddingVertical:5
                     }}
                     dropdownTextStyle={{
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 12,
-                        color: LS_COLORS.global.black
+                        color: LS_COLORS.global.black,
                     }}
                     dropdownStyle={[{ borderWidth: 1 }, props.dropdownStyle]}
                     onSelect={props.onChangeValue}
@@ -134,7 +139,7 @@ export const DropDown = (props) => {
                             paddingHorizontal: '2%',
                             backgroundColor: LS_COLORS.global.white
                         }}>
-                            <Text style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
                             {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}
                         </View>)
                     }}
@@ -144,7 +149,7 @@ export const DropDown = (props) => {
                 props.title
                     ?
                     <>
-                        <Text style={[styles.title,{fontSize:12,marginTop:0,color:LS_COLORS.global.lightTextColor,marginHorizontal:10,position:"absolute",top:-10,backgroundColor:"white"}]}>{props.title}<Text style={{ color: "red" }}>{props.important && "*"}</Text></Text>
+                        <Text maxFontSizeMultiplier={1.6} style={[styles.title,{fontSize:12,marginTop:0,color:LS_COLORS.global.lightTextColor,marginHorizontal:10,position:"absolute",fontFamily:LS_FONTS.PoppinsRegular,top:-10,backgroundColor:"white"}]}>{props.title}<Text style={{ color: "red" }}>{props.important && "*"}</Text></Text>
                     </>
                     :
                     null
@@ -167,7 +172,7 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 24,
         flexDirection: 'row',
-        height: 52,
+        minHeight: 52,
         borderWidth: 1,
         borderRadius: 6,
         borderColor: LS_FONTS.customTextInputBorder,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native'
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -14,7 +14,7 @@ import TextInputMask from 'react-native-text-input-mask';
 const CustomTextInput1 = props => {
     return (
         <>
-            {props.title && <Text style={styles.title}>{props.title}{props.required && '*'}</Text>}
+            {props.title && <Text maxFontSizeMultiplier={1.7} style={styles.title}>{props.title}{props.required && '*'}</Text>}
             <View style={{ ...styles.screen, ...props.customContainerStyle }}>
                 <TextInput
                     style={{
@@ -28,6 +28,7 @@ const CustomTextInput1 = props => {
                         paddingHorizontal: '14%',
                         ...props.customInputStyle
                     }}
+                    maxFontSizeMultiplier={1.6}
                     value={props.value}
                     ref={props.inputRef}
                     placeholderTextColor={LS_COLORS.global.placeholder}
@@ -71,11 +72,12 @@ export function CustomTextInput(props) {
                         style={{
                             width: '100%',
                             backgroundColor: LS_COLORS.global.white,
-                            borderRadius: 28,
+                            paddingVertical: 10,
+                            marginTop:10,
                             alignSelf: 'center',
                             fontSize: 14,
                             fontFamily: LS_FONTS.PoppinsRegular,
-                            paddingVertical: 15,
+                            paddingVertical: 10,
                             ...props.customInputStyle
                         }}
                         value={props.value}
@@ -93,9 +95,10 @@ export function CustomTextInput(props) {
                         numberOfLines={props.numberOfLines}
                         mask={props.mask}
                         secureTextEntry={isSecure}
+                        maxFontSizeMultiplier={1.7}
                     />
                 </View>
-                {props.title && <Text style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }, props.titleStyle]}>{props.title}{props.required && '*'}</Text>}
+                {props.title && <Text  maxFontSizeMultiplier={1.7} style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }, props.titleStyle]}>{props.title}{props.required && '*'}</Text>}
                 {props.icon}
                 {props.secureTextEntry&&
                     <Entypo onPress={()=>setIsSecure(!isSecure)} name={!isSecure ? "eye" : 'eye-with-line'} size={18} />
@@ -110,11 +113,11 @@ export function CustomTextInput(props) {
                     style={{
                         width: '100%',
                         backgroundColor: LS_COLORS.global.white,
-                        borderRadius: 28,
                         alignSelf: 'center',
                         fontSize: 14,
                         fontFamily: LS_FONTS.PoppinsRegular,
-                        paddingVertical: 15,
+                        paddingVertical: 10,
+                        marginTop:10,
                         ...props.customInputStyle
                     }}
                     value={props.value}
@@ -132,12 +135,13 @@ export function CustomTextInput(props) {
                     onChangeText={props.onChangeText}
                     secureTextEntry={isSecure}
                     editable={props.editable}
+                    maxFontSizeMultiplier={1.7}
                     multiline={props.multiline}
                     numberOfLines={props.numberOfLines}
                     {...props.TextInputProps}
                 />
             </View>
-            {props.title && <Text style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }]}>{props.title}{props.required && '*'}</Text>}
+            {props.title && <Text maxFontSizeMultiplier={1.7} style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }]}>{props.title}{props.required && '*'}</Text>}
             {props.icon}
                 {props.secureTextEntry&&
                     <Entypo onPress={()=>setIsSecure(!isSecure)} name={isSecure ? "eye" : 'eye-with-line'} size={18} />

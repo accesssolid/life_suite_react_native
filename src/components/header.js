@@ -12,17 +12,17 @@ const Header = (props) => {
     const dispatch = useDispatch()
 
     return (
-        <View style={[styles.container,props.containerStyle]}>
+        <View style={[styles.container,props.containerStyle,{alignItems:"center"}]}>
             <Pressable style={styles.leftView}
                 onPress={props.action}
                 activeOpacity={0.7}>
                 <Image
-                    style={{ height: '80%', width: '80%', resizeMode: 'contain' }}
+                    style={[{ height: '80%', width: '80%', resizeMode: 'contain' ,tintColor:"white"},props.imageStyle]}
                     source={props.imageUrl}
                 />
             </Pressable>
             <View style={styles.middleView}>
-                <Text style={[styles.title, props.titleStyle]}>{props.title}</Text>
+                <Text maxFontSizeMultiplier={1.6} style={[styles.title, props.titleStyle,{color:"white"}]}>{props.title}</Text>
             </View>
             <Pressable style={styles.rightView}
                 onPress={()=>{
@@ -35,7 +35,7 @@ const Header = (props) => {
                 }}
                 activeOpacity={0.7}>
                 <Image
-                    style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "black" }, props.imageStyle1]}
+                    style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "white" }, props.imageStyle1]}
                     source={props.imageUrl1}
                 />
             </Pressable>
@@ -50,25 +50,25 @@ export function ChatHeader(props) {
                 onPress={props.action}
                 activeOpacity={0.7}>
                 <Image
-                    style={{ height: '80%', width: '80%', resizeMode: 'contain' }}
+                    style={{ height: '80%', width: '80%', resizeMode: 'contain' ,tintColor:"white"}}
                     source={props.imageUrl}
                 />
             </Pressable>
             <View style={[styles.middleView, { flexDirection: "row" ,justifyContent:"center",alignItems:"center"}]}>
-                <Text style={[styles.title, props.titleStyle]}>{props.title}</Text>
+                <Text  maxFontSizeMultiplier={1.7} style={[styles.title, props.titleStyle,{color:"white"}]}>{props.title}</Text>
                 {props.show_i&&<Pressable onPress={()=>{
                     if(props?.showList){
                         props.showList()
                     }
-                }} style={{ borderWidth: 1, height: 20, borderRadius: 50,marginLeft:5, width: 20, justifyContent: "center", alignItems: "center" }}>
-                    <Text style={[styles.title,{fontSize:12,textTransform:"lowercase"}]}>i</Text>
+                }} style={{ borderWidth: 1,borderColor:"white", height: 20, borderRadius: 50,marginLeft:5, width: 20, justifyContent: "center", alignItems: "center" }}>
+                    <Text maxFontSizeMultiplier={1.7} style={[styles.title,{fontSize:12,textTransform:"lowercase",color:"white"}]}>i</Text>
                 </Pressable>}
             </View>
             <Pressable style={styles.rightView}
                 onPress={props.action1}
                 activeOpacity={0.7}>
                 <Image
-                    style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "black" }, props.imageStyle1]}
+                    style={[{ height: 25, width: 25, resizeMode: 'contain', tintColor: "white" }, props.imageStyle1]}
                     source={props.imageUrl1}
                 />
             </Pressable>

@@ -1087,12 +1087,15 @@ const Profile = (props) => {
     }
 
     return (
-        <SafeAreaView style={{ ...globalStyles.safeAreaView, backgroundColor: LS_COLORS.global.white }}>
+        <SafeAreaView style={{ ...globalStyles.safeAreaView, backgroundColor: LS_COLORS.global.green }}>
+            <View style={{flex:1,backgroundColor:"white"}}>
             <Header
                 imageUrl={require("../../../assets/back.png")}
                 action={() => props.navigation.goBack()}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => props.navigation.navigate("HomeScreen")}
+                imageStyle={{tintColor:"black"}}
+                imageStyle1={{tintColor:"black"}}
                 // containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
             />
@@ -1694,6 +1697,7 @@ const Profile = (props) => {
                 onCancel={() => setDatePickerVisibility(false)}
             />
             <ModalOTP phone_number={"+" + userData?.phone_number?.match(/\d/g).join("")} setIsVerifiedPhone={setIsVerifiedPhone} visible={otpModal} setVisible={setOTPModal} />
+            </View>
         </SafeAreaView>
     )
 }

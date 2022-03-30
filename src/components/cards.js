@@ -23,13 +23,12 @@ const Cards = props => {
                 />
             </View>
             <Pressable style={{ justifyContent: 'space-between', alignItems: 'center', paddingVertical: props.showDelete ? 0 : 10, flexDirection: 'row', }}>
-                <Text style={[styles.text, { ...props.titleStyle }]}>{props.title1}</Text>
+                <Text maxFontSizeMultiplier={1.6} style={[styles.text, { ...props.titleStyle }]}>{props.title1}</Text>
                 {props.showLeft && <TouchableOpacity onPress={props.favorite} activeOpacity={0.7} style={{ height: 15, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', right: 2 }}>
                     <Image source={require('../assets/heartGreen.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                 </TouchableOpacity>}
                 {props.showDelete && <TouchableOpacity onPress={() => {
-
-                    Alert.alert("Remove service", "Do you want to remove this service from your offered services?", [
+                    Alert.alert("Remove service", `Do you want to remove ${props.title1?.toLowerCase()} service from your offered services?`, [
                         { text: "no" },
                         {
                             text: "yes", onPress: () => {

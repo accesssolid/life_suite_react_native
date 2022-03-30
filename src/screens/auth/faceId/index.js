@@ -23,9 +23,9 @@ const FaceId = (props) => {
                         <Image resizeMode="contain" style={styles.image} source={require('../../../assets/faceId.jpg')} />
                     </View>
                     <View>
-                        <Text style={styles.text}>Login with Face ID</Text>
-                        <Text style={styles.text1}>Please put your phone in front</Text>
-                        <Text style={styles.text1}>of your face to log in</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={styles.text}>Login with Face ID</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={styles.text1}>Please put your phone in front</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={styles.text1}>of your face to log in</Text>
                     </View>
                     <View style={styles.login}>
                         <TouchableOpacity 
@@ -34,7 +34,7 @@ const FaceId = (props) => {
                             props.navigation.navigate('LoginScreen')
                         }}
                         >
-                            <Text style={styles.text1}>Login with Password</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={styles.text1}>Login with Password</Text>
 
                         </TouchableOpacity>
                     </View>

@@ -41,7 +41,7 @@ const SetPassCode = (props) => {
     }
     return (
         <>
-            <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: LS_COLORS.global.green }}>
                 <Header
                     imageUrl={require("../../../assets/back.png")}
                     action={() => props.navigation.goBack()}

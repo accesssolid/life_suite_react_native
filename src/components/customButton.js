@@ -13,7 +13,7 @@ const CustomButton = props => {
     return (
         <TouchableOpacity activeOpacity={0.7} onPress={props.action}>
             <View style={{...styles.screen, ...props.customStyles}}>
-                <Text style={{...styles.text, ...props.customTextStyles}}>{props.title}</Text>
+                <Text maxFontSizeMultiplier={1.7} style={{...styles.text, ...props.customTextStyles}}>{props.title}</Text>
             </View>
         </TouchableOpacity>
     )
@@ -21,7 +21,7 @@ const CustomButton = props => {
 
 const styles = StyleSheet.create({
     screen: {
-        height: 56,
+        minHeight: 56,
         width: 311,
         justifyContent: 'center',
         alignItems: 'center',

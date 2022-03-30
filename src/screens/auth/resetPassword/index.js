@@ -74,14 +74,14 @@ const ResetPassword = (props) => {
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <StatusBar backgroundColor={Colors.global.green} barStyle="dark-content" />
+            <StatusBar backgroundColor={Colors.global.green} barStyle="light-content" />
             <Container>
                 <Content>
                 <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
                     <View style={styles.screen}>
-                        <Text style={{ marginTop: "20%", ...styles.forgot }}>Reset</Text>
-                        <Text style={styles.forgot}>Password</Text>
-                        <Text style={{ ...styles.email, marginTop: "25%" }}>Enter new Password</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={{ marginTop: "20%", ...styles.forgot }}>Reset</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={styles.forgot}>Password</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={{ ...styles.email, marginTop: "25%" }}>Enter new Password</Text>
                         <View style={{ marginTop: '5%' }}>
                             <CustomTextInput
                                 placeholder="New Password"

@@ -57,9 +57,7 @@ const SoftwareModal = (props) => {
             hasBackdrop={true}
             isVisible={props.isVisible}>
             <View style={styles.container}>
-                <TouchableOpacity style={{ backgroundColor: "blue" }} activeOpacity={0.7} onPress={() => props.setVisible(false)} style={{ height: 25, aspectRatio: 1, position: 'absolute', top: '1%', right: '3%' }}>
-                    <Image source={require('../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
-                </TouchableOpacity>
+               
                 <Text style={styles.title}>SOFTWARE LICENSE</Text>
                 <WebView
                     showsVerticalScrollIndicator={false}
@@ -74,6 +72,9 @@ const SoftwareModal = (props) => {
                             </HTML>`
                     }}
                 />
+                 <TouchableOpacity style={{ backgroundColor: "blue" }} activeOpacity={0.7} onPress={() => props.setVisible(false)} style={{ height: 25, aspectRatio: 1, position: 'absolute', top: '1%', right: '3%' }}>
+                    <Image source={require('../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                </TouchableOpacity>
             </View>
         </Modal>
     )

@@ -849,8 +849,8 @@ const SignUpScreen = (props) => {
 
                     <View style={{ flex: 1, width: '100%' }}>
                         <View style={styles.textContainer}>
-                            <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
-                            <Text style={{ ...styles.loginText }}>Signup</Text>
+                            <Text  maxFontSizeMultiplier={1.7} style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
+                            <Text  maxFontSizeMultiplier={1.7} style={{ ...styles.loginText }}>Signup</Text>
                             <Pressable onPress={() => pickImage()} style={{ marginTop: 10, width: 100, alignSelf: "center" }}>
                                 <ImageBackground source={require("../../../assets/signup/wedding.png")} style={{ width: 100, justifyContent: "center", alignItems: "center", alignSelf: "center", height: 100 }}>
                                     {profile_pic?.path ?
@@ -859,14 +859,14 @@ const SignUpScreen = (props) => {
                                     }
                                 </ImageBackground>
                             </Pressable>
-                            <Text style={styles.text}>Add Profile Picture</Text>
+                            <Text  maxFontSizeMultiplier={1.7} style={styles.text}>Add Profile Picture</Text>
                             {/* <Text style={styles.text}>or</Text>
                             <TouchableOpacity onPress={() => switchRole()} activeOpacity={0.7}>
                                 <Text style={{ ...styles.text, textDecorationLine: 'underline' }}>Signup as {role == 1 ? "Service Provider" : "Customer"}</Text>
                             </TouchableOpacity> */}
                         </View>
                         <View style={styles.textInputContainer}>
-                            <Text style={[styles.text, { marginTop: 0, marginBottom: 30, alignSelf: "flex-start", marginLeft: 20, textTransform: "uppercase" }]}>Personal Information</Text>
+                            <Text  maxFontSizeMultiplier={1.7} style={[styles.text, { marginTop: 0, marginBottom: 30, alignSelf: "flex-start", marginLeft: 20, textTransform: "uppercase" }]}>Personal Information</Text>
                             <CustomTextInput
                                 placeholder="First Name"
                                 title="First Name"
@@ -948,6 +948,7 @@ const SignUpScreen = (props) => {
                                 customInputStyle={{ height: 100, paddingTop: '5%', textAlignVertical: 'top' }}
                                 customImageStyles={{ bottom: '-65%', right: '0%' }}
                                 inlineImageLeft={<Text
+                                    maxFontSizeMultiplier={1.7}
                                     style={{ fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black, fontSize: 12 }}>
                                     {signUpData.bio.length}/255
                                 </Text>}
@@ -1028,12 +1029,12 @@ const SignUpScreen = (props) => {
                             // }, 250)
                             // }}
                             />
-                            {!isVerfiedPhone && <Text onPress={() => {
+                            {!isVerfiedPhone && <Text maxFontSizeMultiplier={1.7} onPress={() => {
                                 checkISVerified()
-                            }} style={{ color: LS_COLORS.global.green, textDecorationLine: "underline", marginTop: -20, marginBottom: 20, marginLeft: 20 }}>Verify Phone Number</Text>}
+                            }} style={{ color: LS_COLORS.global.green, textDecorationLine: "underline", marginTop: 0, marginBottom: 20, marginLeft: 20 }}>Verify Phone Number</Text>}
                             {role !== 1 &&
                                 <View style={{ flexDirection: 'row', marginBottom: 30, alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
+                                    <Text maxFontSizeMultiplier={1.7}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
                                     <CheckBox
                                         style={{}}
                                         containerStyle={{ width: 25 }}
@@ -1068,11 +1069,12 @@ const SignUpScreen = (props) => {
                                     item={["Email", "Push Notification", "Text", "All"]}
                                     value={notificationType}
                                     onChangeValue={(index, value) => { setNotificationType(value) }}
-                                />
+                                    handleTextValue={true}
+                               />
                             </View>
                             {role !== 1 && <CustomTextInput
                                 placeholder="Driver Licence # State ID"
-                                title="Driver Licence # State ID # State"
+                                title="Driver Licence # State ID"
                                 value={provider_data.license}
                                 onChangeText={(text) => {
                                     setProviderData({ ...provider_data, license: text })
@@ -1082,7 +1084,7 @@ const SignUpScreen = (props) => {
                                 onSubmitEditing={() => homeAddressRef.current.focus()}
                             />}
                             <View style={{ position: "relative", borderWidth: 1, marginBottom: role !== 1 ? 0 : 30, marginHorizontal: 10, borderColor: LS_COLORS.global.lightTextColor, borderRadius: 7 }}>
-                                <Text style={{
+                                <Text  maxFontSizeMultiplier={1.6} style={{
                                     fontFamily: LS_FONTS.PoppinsRegular,
                                     marginHorizontal: 20,
                                     marginBottom: 5,
@@ -1104,7 +1106,7 @@ const SignUpScreen = (props) => {
                                             // alignSelf: 'center',
                                             fontSize: 14,
                                             fontFamily: LS_FONTS.PoppinsRegular,
-                                            paddingTop: 5,
+                                            paddingTop: 10,
                                             // paddingHorizontal: '10%',
                                             maxHeight: 200
                                         },
@@ -1131,6 +1133,7 @@ const SignUpScreen = (props) => {
                                         style: { height: 50,width:"100%", paddingLeft: 10, color: LS_COLORS.global.black, },
                                         onSubmitEditing: () => workAddressRef.current.focus(),
                                         placeholderTextColor: LS_COLORS.global.placeholder,
+                                        maxFontSizeMultiplier:1.7,
                                         selection: selection,
                                         returnKeyType: "next",
                                         onBlur: () => { setSelection({ start: 0 }) },
@@ -1145,7 +1148,7 @@ const SignUpScreen = (props) => {
                             </View>
                             {role !== 1 &&
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Provide service only at my address</Text>
+                                    <Text  maxFontSizeMultiplier={1.7} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Provide service only at my address</Text>
                                     <CheckBox
                                         style={{}}
                                         containerStyle={{ width: 25, marginBottom: 0 }}
@@ -1159,7 +1162,7 @@ const SignUpScreen = (props) => {
                             }
                             {role !== 1 &&
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 30, marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make address public</Text>
+                                    <Text  maxFontSizeMultiplier={1.7} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make address public</Text>
                                     <CheckBox
                                         style={{}}
                                         containerStyle={{ width: 25, marginTop: 0 }}
@@ -1176,7 +1179,7 @@ const SignUpScreen = (props) => {
                                 </View>
                             }
                             <View style={{ position: "relative", borderWidth: 1, marginBottom: 0, marginHorizontal: 10, borderColor: LS_COLORS.global.lightTextColor, borderRadius: 7 }}>
-                                <Text style={{
+                                <Text  maxFontSizeMultiplier={1.6} style={{
                                     fontFamily: LS_FONTS.PoppinsRegular,
                                     marginHorizontal: 20,
                                     marginBottom: 5,
@@ -1201,7 +1204,7 @@ const SignUpScreen = (props) => {
                                             // alignSelf: 'center',
                                             fontSize: 14,
                                             fontFamily: LS_FONTS.PoppinsRegular,
-                                            paddingTop: 5,
+                                            paddingTop: 10,
                                             // paddingHorizontal: '10%',
                                             maxHeight: 200
                                         },
@@ -1209,6 +1212,7 @@ const SignUpScreen = (props) => {
                                             // backgroundColor: LS_COLORS.global.white,
                                             color: LS_COLORS.global.black,
                                             // height:40
+                                            
                                         },
                                         listView: { paddingVertical: 5 },
                                         separator: {}
@@ -1228,6 +1232,7 @@ const SignUpScreen = (props) => {
                                         placeholderTextColor: LS_COLORS.global.placeholder,
                                         selection: selection1,
                                         returnKeyType: "next",
+                                        maxFontSizeMultiplier:1.7,
                                         onBlur: () => { setSelection1({ start: 0 }) },
                                         onFocus: () => { setSelection1(null) },
                                         onSubmitEditing: () => {
@@ -1246,7 +1251,7 @@ const SignUpScreen = (props) => {
 
                             </View>
                             <View style={{ flexDirection: 'row', marginBottom: 30, alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Same as above</Text>
+                                <Text  maxFontSizeMultiplier={1.7} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Same as above</Text>
                                 <CheckBox
                                     style={{}}
                                     containerStyle={{ width: 25 }}
@@ -1284,7 +1289,7 @@ const SignUpScreen = (props) => {
                                                 }
                                             }}>
                                             <Image source={require("../../../assets/signup/add_field1.png")} style={{ height: 30, width: 30 }} resizeMode="contain" />
-                                            <Text style={{ fontSize: 14, color: LS_COLORS.global.black, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 10 }}>Add New Certificate</Text>
+                                            <Text   maxFontSizeMultiplier={1.7} style={{ fontSize: 14, color: LS_COLORS.global.black, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 10 }}>Add New Certificate</Text>
                                         </Pressable>}
                                         {/* <Text onPress={() => {
                                             let v = [...provider_data.certificateTextData]
@@ -1323,7 +1328,7 @@ const SignUpScreen = (props) => {
 
                             {role !== 1 &&
                                 <View style={{ marginBottom: 30, marginHorizontal: 10 }}>
-                                    <Text style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
+                                    <Text  maxFontSizeMultiplier={1.7} style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
                                     <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 10 }}>
                                         {pictures.map((x, i) => <View style={{ height: widthPercentageToDP(25.5), borderRadius: 5, width: widthPercentageToDP(25.5), position: "relative", marginTop: 5, marginRight: 5, backgroundColor: LS_COLORS.global.textInutBorderColor }}>
                                             <Image resizeMode='cover' source={{ uri: x.path }} style={{ width: widthPercentageToDP(25.5), height: widthPercentageToDP(25.5), borderRadius: 5 }} />
@@ -1382,17 +1387,17 @@ const SignUpScreen = (props) => {
                             />
                         </View>
                         {/* terms and consiftions */}
-                        {m_field.filter(x => x.id == 1 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 }}>
+                        {m_field.filter(x => x.id == 1 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center',width:"90%",alignSelf:"center"}}>
                             <CheckBox
                                 style={{}}
-                                containerStyle={{ width: 25 }}
+                                containerStyle={{ width: 25,marginLeft:0 }}
                                 wrapperStyle={{}}
                                 checked={signUpData.is_accept_termscondition}
                                 onPress={() => setSignUpData({ ...signUpData, is_accept_termscondition: signUpData.is_accept_termscondition ? 0 : 1 })}
                                 checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} onPress={() => {
+                            <Text  maxFontSizeMultiplier={1.7}  onPress={() => {
                                 props.navigation.navigate("CustomWebView", {
                                     userType: role == 1 ? "customer" : "provider", type: "terms", title: "Terms and conditions", onAccept: () => {
                                         setSignUpData({ ...signUpData, is_accept_termscondition: 1 })
@@ -1400,20 +1405,20 @@ const SignUpScreen = (props) => {
                                         setSignUpData({ ...signUpData, is_accept_termscondition: 0 })
                                     }
                                 })
-                            }} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[0]}</Text>
+                            }} style={{ fontSize: 12,flex:1, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[0]}</Text>
                         </View>}
 
-                        {m_field.filter(x => x.id == 2 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 }}>
+                        {m_field.filter(x => x.id == 2 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center' ,width:"90%",alignSelf:"center"}}>
                             <CheckBox
                                 style={{}}
-                                containerStyle={{ width: 25 }}
+                                containerStyle={{ width: 25,marginLeft:0 }}
                                 wrapperStyle={{}}
                                 checked={signUpData.is_accept_privatepolicy}
                                 onPress={() => setSignUpData({ ...signUpData, is_accept_privatepolicy: signUpData.is_accept_privatepolicy ? 0 : 1 })}
                                 checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} onPress={() => {
+                            <Text  maxFontSizeMultiplier={1.7} onPress={() => {
                                 props.navigation.navigate("CustomWebView", {
                                     userType: role == 1 ? "customer" : "provider", type: "privacy", title: "Privacy Poicy", onAccept: () => {
                                         setSignUpData({ ...signUpData, is_accept_privatepolicy: 1 })
@@ -1422,24 +1427,24 @@ const SignUpScreen = (props) => {
                                     }
                                 })
                                 // setOpenPrivacyModal(true)
-                            }} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[1]}</Text>
+                            }} style={{ fontSize: 12,flex:1, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[1]}</Text>
                         </View>}
-                        {m_field.filter(x => x.id == 3 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10 }}>
+                        {m_field.filter(x => x.id == 3 && x.status == "1").length > 0 && <View style={{ flexDirection: 'row', alignItems: 'center',width:"90%",alignSelf:"center"}}>
                             <CheckBox
                                 style={{}}
-                                containerStyle={{ width: 25 }}
+                                containerStyle={{ width: 25,marginLeft:0 }}
                                 wrapperStyle={{}}
                                 checked={signUpData.is_accept_cdd}
                                 onPress={() => setSignUpData({ ...signUpData, is_accept_cdd: signUpData.is_accept_cdd ? 0 : 1 })}
                                 checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} onPress={() => props.navigation.navigate("CovidScreen", {
+                            <Text  maxFontSizeMultiplier={1.7}  onPress={() => props.navigation.navigate("CovidScreen", {
                                 isChecked: signUpData.is_accept_cdd,
                                 onChecked: (v) => {
                                     setSignUpData({ ...signUpData, is_accept_cdd: v })
                                 }
-                            })} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[2]}</Text>
+                            })} style={{ fontSize: 12,flex:1, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[2]}</Text>
                         </View>}
 
                         <View style={[styles.buttonContainer, { marginTop: 20 }]}>
@@ -1450,13 +1455,15 @@ const SignUpScreen = (props) => {
                                 }}
                             />
                         </View>
-                        <View style={styles.alreadyContainer}>
-                            <Text style={styles.already}>Already have an account ?</Text>
-                            <TouchableOpacity onPress={() => {
-                                props.navigation.navigate("LoginScreen")
-                            }}>
-                                <Text style={styles.already1}> Login</Text>
-                            </TouchableOpacity>
+                        <View style={[styles.alreadyContainer]}>
+                            <Text  maxFontSizeMultiplier={1.7} style={styles.already}>Already have an account ?
+                            {/* <TouchableOpacity onPress={() => {
+                                
+                            }}> */}
+                                <Text onPress={()=>props.navigation.navigate("LoginScreen")}  maxFontSizeMultiplier={1.7} style={[styles.already1]}> Login</Text>
+                            {/* </TouchableOpacity> */}
+                            </Text>
+                          
                         </View>
                     </View>
                 </ScrollView>

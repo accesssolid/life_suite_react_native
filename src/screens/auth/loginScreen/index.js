@@ -223,9 +223,9 @@ const LoginScreen = (props) => {
                     <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
                     <Content showsVerticalScrollIndicator={false}>
                         <View style={styles.textContainer}>
-                            <Text style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
-                            <Text style={{ ...styles.loginText, fontSize: 24 }}>Login</Text>
-                            <Text style={styles.text}>Add your details to Login</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={{ ...styles.loginText, fontSize: 24 }}>Login</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={styles.text}>Add your details to Login</Text>
                         </View>
                         <View style={{ marginTop: "10%" }} />
                         <CustomTextInput
@@ -264,22 +264,19 @@ const LoginScreen = (props) => {
                                 props.navigation.navigate("VerificationCode")
                             }}
                             style={styles.forgotContainer}>
-                            <Text style={styles.forgot}>Forgot Password?</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={styles.forgot}>Forgot Password?</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             activeOpacity={0.7}
                             onPress={() => switchRole()}
                             style={styles.forgotContainer}>
-                            <Text style={{ ...styles.forgot, alignSelf: 'center', textDecorationLine: 'underline' }}>Login as {role == 1 ? "Service Provider" : "Customer"}</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={{ ...styles.forgot, alignSelf: 'center', textDecorationLine: 'underline' }}>Login as {role == 1 ? "Service Provider" : "Customer"}</Text>
                         </TouchableOpacity>
 
                         <View style={styles.alreadyContainer}>
-                            <Text style={styles.already}>Don't have account ?</Text>
-                            <TouchableOpacity onPress={() => {
+                            <Text maxFontSizeMultiplier={1.7} style={[styles.already,{textAlign:"center"}]}>Don't have account ?<Text maxFontSizeMultiplier={1.7} style={styles.already1} onPress={() => {
                                 props.navigation.navigate("SignUpScreen")
-                            }}>
-                                <Text style={styles.already1}> Sign Up</Text>
-                            </TouchableOpacity>
+                            }}> Sign Up</Text></Text>
                         </View>
                         {/* <View style={styles.facecontainer}>
                             {

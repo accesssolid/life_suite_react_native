@@ -23,13 +23,13 @@ const TouchId = (props) => {
                         {/* <Image resizeMode="contain" style={styles.image} source={require('../../../assets/fingerPrint.png')} /> */}
                     </View>
                     <View>
-                        <Text style={styles.text}>Login with Touch ID</Text>
-                        <Text style={styles.text1}>Please put your finger on the</Text>
-                        <Text style={styles.text1}>home button as login</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={styles.text}>Login with Touch ID</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={styles.text1}>Please put your finger on the</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={styles.text1}>home button as login</Text>
                     </View>
                     <View style={styles.login}>
                         <TouchableOpacity >
-                            <Text style={styles.text1}>Login with Password</Text>
+                            <Text maxFontSizeMultiplier={1.7} style={styles.text1}>Login with Password</Text>
 
                         </TouchableOpacity>
                     </View>

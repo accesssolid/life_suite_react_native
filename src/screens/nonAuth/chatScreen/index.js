@@ -37,7 +37,7 @@ const ChatScreen = (props) => {
     const data = props.route.params.item
     const user = useSelector(state => state.authenticate?.user)
     const access_token = useSelector(state => state.authenticate?.access_token)
-
+    console.log("User",user)
     const [messages, setMessages] = useState("");
     const flatlistRef = useRef();
     const [visible, setVisible] = useState(false)
@@ -311,6 +311,39 @@ const ChatScreen = (props) => {
         });
     };
 
+    const handleNotificationMessage=async(id,title,message)=>{
+        let headers = {
+            "Authorization": `Bearer ${access_token}`
+        }
+        const formdata=new FormData()
+        formdata.append("notification_title",title)
+        formdata.append("notification_message",message)
+        if(user?.user_role==role.customer){
+            formdata.append("provider_id",id)
+        }else{
+            formdata.append("customer_id",id)
+        }
+        let config = {
+            headers: headers,
+            endPoint: user?.user_role==role.customer?'/api/sendProviderChatNotification':'/api/sendCustomerChatNotification',
+            type: 'post',
+            data: formdata
+        }
+        console.log(config)
+            getApi(config)
+                .then((response) => {
+                    alert(JSON.stringify(response))
+                    if (response.status == true) {
+                        
+                    }
+                    else {
+
+                    }
+                }).catch(err => {
+                })
+        
+    }
+
     async function handleMessage(text, type) {
         const text1 = text
         const array1 = [user.id.toString(), data.id.toString()].sort()
@@ -331,6 +364,7 @@ const ChatScreen = (props) => {
             type: type,
             show: false
         }
+        handleNotificationMessage( data.id,user?.first_name,type == 'text' ? text1 : 'Image')
         if (text1.trim() !== '') {
             firestore()
                 .collection(`Chats`)
@@ -432,7 +466,7 @@ const ChatScreen = (props) => {
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
                                                     }}>
-                                                    <Text style={{ fontSize: 12, color: "black", fontFamily: LS_FONTS.PoppinsRegular, }}>
+                                                    <Text style={{ fontSize: 12, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
                                                         {itemData.item.message}
                                                     </Text>
                                                 </View>
@@ -500,7 +534,7 @@ const ChatScreen = (props) => {
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
                                                     }}>
-                                                    <Text style={{ fontSize: 12, color: "black", fontFamily: LS_FONTS.PoppinsRegular, }}>
+                                                    <Text style={{ fontSize: 12, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
                                                         {itemData.item.message}
                                                     </Text>
                                                 </View>

@@ -23,7 +23,7 @@ const UserCards = props => {
                 />
             </View>
             <View style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 10 }}>
-                <Text style={styles.text}>{props.title1}</Text>
+                <Text maxFontSizeMultiplier={1.6} style={styles.text}>{props.title1}</Text>
             </View>
         </View>
     )

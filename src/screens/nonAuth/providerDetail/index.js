@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { View, Text, Dimensions, ScrollView, Image, Modal, Pressable } from 'react-native'
+import { View, Text, Dimensions, ScrollView, Image, Modal, Pressable, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../../components/header';
 import LS_COLORS from '../../../constants/colors';
@@ -198,7 +198,11 @@ export default function ProviderDetail(props) {
                 }}>
                     <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black }}>Personal Information</Text>
                     {checkToShowInput(provider?.about) && <CustomInputViews title="Bio" text={provider?.about != "null" ? provider?.about : ""} />}
-                    {Boolean(Number(provider?.phone_is_public)) && <CustomInputViews title="Phone Number" text={formatPhoneNumber(provider?.phone_number)} />}
+                    {Boolean(Number(provider?.phone_is_public)) && <Pressable
+                    onPress={()=>{
+                        Linking.openURL("tel:"+formatPhoneNumber(provider?.phone_number))
+                    }}
+                    ><CustomInputViews title="Phone Number" text={formatPhoneNumber(provider?.phone_number)} /></Pressable>}
                     {Boolean(Number(provider?.address_is_public)) && <CustomInputViews title="Address" text={provider?.address[0]?.address_line_1} />}
                     {checkToShowInput(provider?.business_name) && <CustomInputViews title="Business Name" text={provider?.business_name != null ? provider?.business_name : ""} />}
                     {checkToShowInput(provider?.experience) && <CustomInputViews title="Experience" text={provider?.experience != "null" ? provider?.experience + year(provider?.experience) : ""} />}

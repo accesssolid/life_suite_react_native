@@ -106,17 +106,17 @@ const OtpScreen = props => {
 
   return (
     <SafeAreaView style={globalStyles.safeAreaView}>
-      <StatusBar backgroundColor={Colors.global.green} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.global.green} barStyle="light-content" />
 
       <Container>
         <Content>         
         <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
  
           <View style={styles.screen}>
-            <Text style={{ marginTop: "20%", ...styles.forgot }}>Verification</Text>
-            <Text style={{ ...styles.email, marginTop: "25%" }}>Please enter the</Text>
-            <Text style={styles.email}>4-digit Verification code</Text>
-            <Text style={styles.email}>sent to your mail.</Text>
+            <Text maxFontSizeMultiplier={1.7} style={{ marginTop: "20%", ...styles.forgot }}>Verification</Text>
+            <Text maxFontSizeMultiplier={1.7} style={{ ...styles.email, marginTop: "25%" }}>Please enter the</Text>
+            <Text maxFontSizeMultiplier={1.7} style={styles.email}>4-digit Verification code</Text>
+            <Text maxFontSizeMultiplier={1.7} style={styles.email}>sent to your mail.</Text>
             <View style={{ marginTop: '8%' }}>
               <OTPInputView
                 code={code}
@@ -128,11 +128,9 @@ const OtpScreen = props => {
                 onCodeChanged={code => setCode(code)}             
               />
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 40, alignSelf: 'center' }}>
-              <Text style={{ fontFamily: Fonts.PoppinsMedium, color: Colors.white }}>Didn't receive the code? </Text>
-              <TouchableOpacity activeOpacity={0.7} onPress={() => resendCode()}>
-                <Text style={{ fontFamily: Fonts.PoppinsMedium, color: '#FDABC0' }}>Resend</Text>
-              </TouchableOpacity>
+            <View style={{ flexDirection: 'row', marginTop: 40, alignSelf: 'center' ,width:"90%"}}>
+              <Text maxFontSizeMultiplier={1.7} style={{textAlign:"center", fontFamily: Fonts.PoppinsMedium, color: Colors.white }}>Didn't receive the code? <Text maxFontSizeMultiplier={1.7} onPress={() => resendCode()} style={{ fontFamily: Fonts.PoppinsMedium, color: '#FDABC0' }}>Resend</Text></Text>
+           
             </View>
             <View style={{ marginTop: '10%' }}>
               <CustomButton

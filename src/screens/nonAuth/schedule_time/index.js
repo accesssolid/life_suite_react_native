@@ -330,7 +330,7 @@ const ScheduleTime = (props) => {
 
                     }} />
                 </View>
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView >
                     {currentTab == 1 ? <View style={styles.calendar}>
                         <Calendar
                             hideArrows={false}

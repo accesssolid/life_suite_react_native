@@ -46,6 +46,7 @@ const HomeScreen = (props) => {
     const [fcmToken, setFcmToken] = useState("")
 
     useEffect(() => {
+        // props.navigation.navigate("ProviderDetail", { providerId: 59, service: "eMas" })
         const backAction = () => {
             return true;
         };
@@ -306,6 +307,7 @@ const HomeScreen = (props) => {
     }
 
     const deleteMyJob = (service_id) => {
+        
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -464,13 +466,13 @@ const HomeScreen = (props) => {
                         getConnectAccountDetail()
                         setIsAddJobActive(!isAddJobActive)
                     }}>
-                    <View style={{ height: 30, aspectRatio: 1 }}>
+                    <View style={{ height: 30, aspectRatio: 1 ,justifyContent:"center",alignItems:"center"}}>
                         {!isAddJobActive && <Image source={require('../../../assets/addgreen.png')} resizeMode="contain" style={{ width: '100%', height: '100%' }} />}
                         {isAddJobActive && <View style={{ height: 30, width: 30, borderRadius: 20, backgroundColor: LS_COLORS.global.green, justifyContent: "center", alignItems: "center" }}>
                             <View style={{ height: 2, width: 18, backgroundColor: "white" }} />
                         </View>}
                     </View>
-                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 18, letterSpacing: 0.36, color: LS_COLORS.global.black, marginLeft: 11 }}>ADD JOB</Text>
+                    <Text maxFontSizeMultiplier={1.6} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 18, letterSpacing: 0.36, color: LS_COLORS.global.black, marginLeft: 11 }}>ADD SERVICE</Text>
                 </TouchableOpacity>}
                 {user.user_role == 3
                     ?
@@ -539,7 +541,7 @@ const HomeScreen = (props) => {
                             />
                             :
                             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>}
+                                {!loading && <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>}
                             </View>
                     :
                     <ScrollView scrollEnabled={scrollEnabled} showsVerticalScrollIndicator={false}>
@@ -586,31 +588,31 @@ const HomeScreen = (props) => {
                     </ScrollView>
                 }
                 {!loading && <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                    <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate("Orders")} style={styles.orderContainer}>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate("Orders")} style={[styles.orderContainer,{paddingHorizontal:2,minWidth:111}]}>
                         <View
 
                         >
-                            <Text style={styles.order}>
+                            <Text maxFontSizeMultiplier={1.45} style={[styles.order]}>
                                 MY ORDERS
                             </Text>
                         </View>
                     </TouchableOpacity>
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => {
                         props.navigation.navigate("LocationServiceSelect")
-                    }} style={styles.orderContainer}>
+                    }} style={[styles.orderContainer,{paddingHorizontal:2,marginHorizontal:2,minWidth:111}]}>
                         <View
 
                         >
-                            <Text style={styles.order}>
+                            <Text maxFontSizeMultiplier={1.45} style={styles.order}>
                                 LOCATION
                             </Text>
                         </View>
                     </TouchableOpacity>}
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7}
-                        onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={styles.orderContainer}>
+                        onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={[styles.orderContainer,{paddingHorizontal:2,minWidth:111}]}>
                         <View
                         >
-                            <Text style={styles.order}>
+                            <Text maxFontSizeMultiplier={1.45} style={styles.order}>
                                 SCHEDULE
                             </Text>
                         </View>
@@ -660,7 +662,8 @@ const styles = StyleSheet.create({
         width: 111,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,
-        alignSelf: 'center', width: '30%'
+        alignSelf: 'center', 
+        width: '30%'
     },
     order: {
         textAlign: "center",

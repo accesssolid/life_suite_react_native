@@ -134,7 +134,7 @@ const Settings = (props) => {
     );
     return (
         <>
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={{ flex: 1 ,backgroundColor:LS_COLORS.global.green}}>
             <StatusBar
                 backgroundColor={LS_COLORS.global.green}
                  />

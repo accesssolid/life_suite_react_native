@@ -46,7 +46,7 @@ const AddTimeFrame = (props) => {
     const [activeIndex, setActiveIndex] = useState(null)
     const [initialDate, setInitialDate] = useState(new Date())
     const [markedDates, setMarkedDates] = useState({})
-    const [current_month,setCurrentMonth]=useState(moment().format("YYYY-MM"))
+    const [current_month, setCurrentMonth] = useState(moment().format("YYYY-MM"))
     useEffect(() => {
         if (!isAddServiceMode) {
             getTimeFrames()
@@ -93,7 +93,7 @@ const AddTimeFrame = (props) => {
         let stylesCopy = customDatesStyles.filter(x => x.from_time == "" || x.to_time == "")
         if (stylesCopy.length >= 1 && propOwn.length == 0) {
             let d = [...customDatesStyles]
-            d.splice(0,1)
+            d.splice(0, 1)
             setCustomDatesStyles(d)
         }
 
@@ -144,9 +144,10 @@ const AddTimeFrame = (props) => {
         }
 
     }
-
+    const [pressed, setPressed] = React.useState(false)
     const save = () => {
-        // setLoading(true)
+        setPressed(true)
+        setLoading(true)
         let headers = {
             Accept: "application/json",
             'Content-Type': 'multipart/form-data',
@@ -179,19 +180,21 @@ const AddTimeFrame = (props) => {
             delete d.id
             return d
         })
-        json_data['time_frame_update'] = data.filter(x => x.id != "").filter(x=>{
-            if(moment(x.start_date+" "+x.from_time,"YYYY-MM-DD HH:mm").toDate()>moment().toDate()){
+        json_data['time_frame_update'] = data.filter(x => x.id != "").filter(x => {
+            if (moment(x.start_date + " " + x.from_time, "YYYY-MM-DD HH:mm").toDate() > moment().toDate()) {
                 return true
-            }else{
+            } else {
                 return false
             }
         })
         formdata.append("json_data", JSON.stringify(json_data));
         //hceecking json_data
-   
-        formdata.append("current_time",moment().format("YYYY-MM-DD HH:mm:ss"))
+
+        formdata.append("current_time", moment().format("YYYY-MM-DD HH:mm:ss"))
         // console.log(JSON.stringify(json_data))
+        // setLoading(false)
         // return
+
         let config = {
             headers: headers,
             data: formdata,
@@ -307,7 +310,9 @@ const AddTimeFrame = (props) => {
             }).catch(err => {
                 setLoading(false)
             }
-            )
+            ).finally(() => {
+                setPressed(false)
+            })
     }
 
 
@@ -380,7 +385,7 @@ const AddTimeFrame = (props) => {
                         }
                         let data = {
                             "time_frame_id": frame.id,
-                            "current_time":moment().format("YYYY-MM-DD HH:mm:ss")
+                            "current_time": moment().format("YYYY-MM-DD HH:mm:ss")
 
                         }
                         let config = {
@@ -442,51 +447,51 @@ const AddTimeFrame = (props) => {
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
-                title={(serviceData?.subService ? serviceData?.subService?.name : "Time Frames")+ ` (${moment(current_month,"YYYY-MM").format("MMM YYYY")})`}
+                title={(serviceData?.subService ? serviceData?.subService?.name : "Time Frames") + ` (${moment(current_month, "YYYY-MM").format("MMM YYYY")})`}
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
                     props.navigation.goBack()
                 }}
-                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
             <View style={styles.container}>
-            <ScrollView style={{ flex: 1 }}>
-                <View style={styles.calendar}>
-                    <Calendar
-                        current={new Date()}
-                        onDayPress={(day) => {
-                            onDateChange(day)
-                        }}
-                        markingType={Object.keys(markedDates).length == 2 ? "period" : 'custom'}
-                        hideArrows={false}
-                        hideExtraDays={true}
-                        disableMonthChange={false}
-                        firstDay={1}
-                        hideDayNames={false}
-                        showWeekNumbers={false}
-                        onPressArrowLeft={subtractMonth => subtractMonth()}
-                        onPressArrowRight={addMonth => addMonth()}
-                        onMonthChange={(date)=>{
-                            console.log(date)
-                            setCurrentMonth(moment(date.dateString,"YYYY-MM-DD").format("YYYY-MM"))
-                        }}
-                        disableArrowLeft={false}
-                        disableArrowRight={false}
-                        disableAllTouchEventsForDisabledDays={true}
-                        enableSwipeMonths={false}
-                        markedDates={getAllMarkedDates(markedDates)}
-                        minDate={new Date()}
-                    />
-                </View>
-               
+                <ScrollView style={{ flex: 1 }}>
+                    <View style={styles.calendar}>
+                        <Calendar
+                            current={new Date()}
+                            onDayPress={(day) => {
+                                onDateChange(day)
+                            }}
+                            markingType={Object.keys(markedDates).length == 2 ? "period" : 'custom'}
+                            hideArrows={false}
+                            hideExtraDays={true}
+                            disableMonthChange={false}
+                            firstDay={1}
+                            hideDayNames={false}
+                            showWeekNumbers={false}
+                            onPressArrowLeft={subtractMonth => subtractMonth()}
+                            onPressArrowRight={addMonth => addMonth()}
+                            onMonthChange={(date) => {
+                                console.log(date)
+                                setCurrentMonth(moment(date.dateString, "YYYY-MM-DD").format("YYYY-MM"))
+                            }}
+                            disableArrowLeft={false}
+                            disableArrowRight={false}
+                            disableAllTouchEventsForDisabledDays={true}
+                            enableSwipeMonths={false}
+                            markedDates={getAllMarkedDates(markedDates)}
+                            minDate={new Date()}
+                        />
+                    </View>
+
                     <View style={{ marginVertical: 5 }}>
                         {customDatesStyles.map((item, index) => {
                             const fromTime = moment(item.from_time, ["HH.mm a"]).format("hh:mm A");
                             const toTime = moment(item.to_time, ["HH.mm a"]).format("hh:mm A");
                             const start_date = moment(item.start_date).format("MM-DD-YYYY")
                             const end_date = moment(item.end_date).format("MM-DD-YYYY")
-                            if( moment(item.start_date).format("YYYY-MM")!=current_month){
+                            if (moment(item.start_date).format("YYYY-MM") != current_month) {
                                 return null
                             }
                             const isSameDate = start_date === end_date
@@ -535,7 +540,12 @@ const AddTimeFrame = (props) => {
                     onConfirm={handleConfirm}
                     onCancel={() => setDatePickerVisibility(false)}
                 />
-                {selectedDates.length > 0 && serviceData.formdata && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginVertical: 10 }} action={() => save()} />}
+                {selectedDates.length > 0 && serviceData.formdata && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginVertical: 10 }} action={() => {
+                    if (!pressed) {
+                        save()
+                    }
+
+                }} />}
             </View>
             {loading && <Loader />}
         </SafeAreaView>

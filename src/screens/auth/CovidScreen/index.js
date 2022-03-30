@@ -72,7 +72,7 @@ export default function CovidScreen(props) {
                 }} >
                     <Image source={require("../../../assets/covid/head_image.png")} style={{ width: "100%", height: "100%" }} resizeMode='contain' />
                 </View>
-                <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 20, fontSize: 18, textAlign: "center", color: "black" }}>
+                <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 20, fontSize: 18, textAlign: "center", color: "black" }}>
                     Health safety commitments
                 </Text>
                 <View style={{ flexDirection: "row",marginTop:20 ,marginHorizontal:"5%"}}>
@@ -90,9 +90,9 @@ export default function CovidScreen(props) {
                             }
                         }}
                     />
-                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, flex: 1, fontSize: 15, textAlign: "left", color: "black" }}> {text_data}</Text>
+                    <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsRegular, flex: 1, fontSize: 15, textAlign: "left", color: "black" }}> {text_data}</Text>
                 </View>
-                <Text onPress={() => Linking.openURL("https://cdc.gov")} style={{ fontFamily: LS_FONTS.PoppinsLight, fontSize: 14, textDecorationLine: "underline", marginTop: 20, textAlign: "center", color: "blue" }}>
+                <Text maxFontSizeMultiplier={1.7} onPress={() => Linking.openURL("https://cdc.gov")} style={{ fontFamily: LS_FONTS.PoppinsLight, fontSize: 14, textDecorationLine: "underline", marginTop: 20, textAlign: "center", color: "blue" }}>
                     View CDC guidelines
                 </Text>
             </ScrollView>

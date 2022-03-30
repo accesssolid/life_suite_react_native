@@ -67,18 +67,18 @@ const VerificationCode = props => {
     <SafeAreaView style={globalStyles.safeAreaView}>
       <StatusBar
         backgroundColor={Colors.global.green}
-        barStyle="dark-content" />
+        barStyle="light-content" />
         
       <Container>
         <Content>
         <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
 
           <View style={styles.screen}>
-            <Text style={{ marginTop: "20%", ...styles.forgot }}>Forgot</Text>
-            <Text style={styles.forgot}>Password</Text>
-            <Text style={{ ...styles.email, marginTop: "25%" }}>We will email</Text>
-            <Text style={styles.email}>you instructions</Text>
-            <View style={{ marginTop: '5%' }}>
+            <Text maxFontSizeMultiplier={1.7} style={{ marginTop: "20%", ...styles.forgot }}>Forgot</Text>
+            <Text maxFontSizeMultiplier={1.7} style={styles.forgot}>Password</Text>
+            <Text maxFontSizeMultiplier={1.7} style={{ ...styles.email, marginTop: "25%" }}>We will email</Text>
+            <Text maxFontSizeMultiplier={1.7} style={styles.email}>you instructions</Text>
+            <View  style={{ marginTop: '5%' }}>
               <CustomTextInput
                 placeholder="Enter your email"
                 value={email}
