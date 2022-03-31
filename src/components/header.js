@@ -22,7 +22,7 @@ const Header = (props) => {
                 />
             </Pressable>
             <View style={styles.middleView}>
-                <Text maxFontSizeMultiplier={1.6} style={[styles.title, props.titleStyle,{color:"white"}]}>{props.title}</Text>
+                <Text maxFontSizeMultiplier={1.4} style={[styles.title, props.titleStyle,{color:"white"}]}>{props.title}</Text>
             </View>
             <Pressable style={styles.rightView}
                 onPress={()=>{

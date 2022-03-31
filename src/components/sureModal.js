@@ -29,21 +29,21 @@ const SureModal = props => {
             borderRadius: 10,
             padding: 20,
           }}>
-          <Text style={styles.sure}>Are You Sure?</Text>
+          <Text maxFontSizeMultiplier={1.5} style={styles.sure}>Are You Sure?</Text>
           <View style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
           <View style={{ marginTop: '10%' }}>
             <TouchableOpacity
               style={styles.save}
               activeOpacity={0.7}
               onPress={props.action}>
-              <Text style={styles.saveText}>Yes</Text>
+              <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Yes</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.save1}
               activeOpacity={0.7}
               onPress = {props.action1}
             >
-              <Text style={styles.saveText1}>No</Text>
+              <Text maxFontSizeMultiplier={1.5} style={styles.saveText1}>No</Text>
             </TouchableOpacity>
           </View>
         </View>

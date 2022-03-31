@@ -106,14 +106,14 @@ const FAQComponent = ({ faq }) => {
             elevation: 6,
         }}>
             <View style={{flexDirection:"row"}}>
-                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 ,flex:1}}>{faq.question}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 ,flex:1}}>{faq.question}</Text>
                 <Image source={require("../../assets/Images1/whitedropdown.png")}  resizeMode="contain" style={{tintColor:LS_COLORS.global.green,height:15,width:15}}/>
                
             </View>
             {show&&
                 <View style={{marginTop:10}}>
-                    <Text style={{fontFamily:LS_FONTS.PoppinsRegular,fontSize:14,color:LS_COLORS.global.black}}>{faq?.answer}</Text>
-                    <Text onPress={()=>{
+                    <Text maxFontSizeMultiplier={1.5} style={{fontFamily:LS_FONTS.PoppinsRegular,fontSize:14,color:LS_COLORS.global.black}}>{faq?.answer}</Text>
+                    <Text maxFontSizeMultiplier={1.5} onPress={()=>{
                         Linking.openURL(faq?.youtube_link).then(x=>{
                             console.log(x)
                         }).catch(err=>{

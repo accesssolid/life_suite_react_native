@@ -34,14 +34,15 @@ const DelayModal = props => {
                         padding: 20,
                     }}>
                         <ScrollView>
-                    <Text style={styles.sure}>Delay Order</Text>
+                    <Text  maxFontSizeMultiplier={1.5} style={styles.sure}>Delay Order</Text>
                     <View style={{ height: 2, width: 84, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
-                    <Text style={{ ...styles.subtext, marginTop: "10%" }}>Enter delay time (In minutes)</Text>
+                    <Text  maxFontSizeMultiplier={1.5} style={{ ...styles.subtext, marginTop: "10%" }}>Enter delay time (In minutes)</Text>
                     <View style={{marginTop:10}}>
                         <TextInput 
                             value={delayTime}
                             onChangeText={t=>setDelayTime(t)}
                             keyboardType="numeric"
+                            maxFontSizeMultiplier={1.5}
                             placeholder="Minute"
                             placeholderTextColor={LS_COLORS.global.black}
                             style={{borderWidth:1,borderColor:LS_COLORS.global.green,color:"black",height:50,paddingHorizontal:10,fontFamily:LS_FONTS.PoppinsRegular,borderRadius:5}}
@@ -57,7 +58,7 @@ const DelayModal = props => {
                                  }
                             }}
                         >
-                            <Text style={styles.saveText}>Submit</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Submit</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.save, { marginTop: 20 }]}
@@ -66,7 +67,7 @@ const DelayModal = props => {
                                 props.pressHandler()
                             }}
                         >
-                            <Text style={styles.saveText}>Cancel</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
                     </ScrollView>

@@ -301,9 +301,10 @@ const OrderHistory1 = (props) => {
                         customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
                     />
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
-                        <Text style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>Filter by</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>Filter by</Text>
                         <View style={{ flex: 0.8, alignSelf: "flex-end", marginRight: 20, alignItems: "flex-end" }}>
                             <DropDown
+                                handleTextValue={true}
                                 item={order_types.map(x => x.title)}
                                 value={selected.title}
                                 onChangeValue={(index, value) => { setselected(order_types[index]) }}
@@ -342,211 +343,23 @@ const OrderHistory1 = (props) => {
                                     props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item } })
                                 }} style={{ width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
                                     <View style={{ width: 6,height:65,position:"absolute", borderRadius: 12,left:0,backgroundColor: backgroundColor }}></View>
-                                    {done === index ?
-                                        <>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                <View>
-                                                    <Image
-                                                        style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 100 }}
-                                                        source={user.user_role === 3 ? item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image : item?.providers_profile_image ? { uri: BASE_URL + item?.providers_profile_image } : placeholder_image}
-                                                    />
-                                                </View>
-                                                <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
-                                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
-                                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
-                                                </View>
-                                                <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
-                                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
-                                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
-                                                </View>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: '5%', width: "95%", alignSelf: "center" }}>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>Duration</Text>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green, textAlign: 'right' }}>{item.time_duration}</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: '5%', width: "95%", alignSelf: "center" }}>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>Start Time</Text>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green, textAlign: 'right' }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: '5%', width: "95%", alignSelf: "center" }}>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>End Time</Text>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green, textAlign: 'right' }}>{moment(item.order_end_time).format("MMMM DD [at] hh:mm A")}</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: '5%', width: "95%", alignSelf: "center" }}>
-                                                <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center' }}>
-                                                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green, marginRight: 5 }}>Rating</Text>
-                                                    <Rating
-                                                        readonly={true}
-                                                        imageSize={10}
-                                                        type="custom"
-                                                        ratingBackgroundColor="white"
-                                                        ratingColor="#04BFBF"
-                                                        tintColor="white"
-                                                        startingValue={parseInt(item.providers_rating ?? 0)}
-                                                    />
-                                                </View>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green, textAlign: 'right' }}></Text>
-                                            </View>
-                                            {item.order_items?.map((i) => {
-                                                return (
-                                                    <View style={{ width: '95%', alignSelf: "center" }}>
-                                                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                            <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>{i.service_items_name + "  (Service Charge)"}</Text>
-                                                            <View style={{ height: 20, flexDirection: "row" }}>
-                                                                <Text style={styles.baseTextStyle}>{"$" + i.price}</Text>
-                                                            </View>
-                                                        </View>
-                                                        {i.product.map((itemData, index) => {
-                                                            return (
-                                                                <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                                                    <View style={{}} >
-                                                                        <Text style={{ marginLeft: 20 }}>
-                                                                            <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
-                                                                        </Text>
-                                                                    </View>
-                                                                    <View style={{ height: 20, flexDirection: "row" }}>
-                                                                        <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
-                                                                    </View>
-                                                                </View>
-                                                            )
-                                                        })
-                                                        }
-                                                        {i.other_data.map((itemData, index) => {
-                                                            let other = itemData.other
-                                                            let have_own = itemData.have_own
-                                                            let need_recommendation = itemData.need_recommendation
-
-                                                            return (
-                                                                <>
-                                                                    {other && other.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                                                        <View style={{}} >
-                                                                            <Text style={{ marginLeft: 20 }}>
-                                                                                <Text style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
-                                                                            </Text>
-                                                                        </View>
-                                                                    </View>
-                                                                    }
-                                                                    {have_own && have_own.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                                                        <View style={{}} >
-                                                                            <Text style={{ marginLeft: 20 }}>
-                                                                                <Text style={styles.baseTextStyle}>{have_own + "(Have Own Product)"}</Text>
-                                                                            </Text>
-                                                                        </View>
-                                                                    </View>}
-                                                                    {need_recommendation && need_recommendation == "true" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                                                        <View style={{}} >
-                                                                            <Text style={{ marginLeft: 20 }}>
-                                                                                <Text style={styles.baseTextStyle}>Need Recommendation</Text>
-                                                                            </Text>
-                                                                        </View>
-                                                                    </View>}
-                                                                </>
-                                                            )
-                                                        })
-                                                        }
-                                                    </View>
-                                                )
-                                            })
-
-                                            }
-                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: '5%', width: "95%", alignSelf: "center" }}>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}></Text>
-                                                <Text style={styles.baseTextStyle}>{"Total Price :  $" + item?.order_total_price}</Text>
-                                            </View>
-                                            {item.order_status == 1 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
-                                                <TouchableOpacity
-                                                    style={styles.save}
-                                                    activeOpacity={0.7}
-                                                    onPress={() => {
-                                                        setProviderId(item.provider_id)
-                                                        setOpen1(!open1)
-                                                    }}>
-                                                    <Text style={styles.saveText}>Block</Text>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity
-                                                    style={styles.save}
-                                                    activeOpacity={0.7}
-                                                    onPress={() => {
-                                                        setOrderId(item.id)
-                                                        setOpen(!open)
-                                                    }}>
-                                                    <Text style={styles.saveText}>Cancel Order</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                                :
-                                                null
-                                            }
-                                            {item.order_status == 3 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
-                                                <TouchableOpacity
-                                                    style={styles.save}
-                                                    activeOpacity={0.7}
-                                                    onPress={() => {
-
-                                                        props.navigation.navigate("ChatScreen", {
-                                                            item: {
-                                                                id: item.provider_id,
-                                                                email: item.providers_email,
-                                                                first_name: item.providers_first_name,
-                                                                last_name: item.providers_last_name,
-                                                                phone_number: item.providers_phone_number,
-                                                                profile_image: item.providers_profile_image
-                                                            }
-                                                        })
-                                                    }}>
-                                                    <Text style={styles.saveText}>Chat</Text>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity
-                                                    style={styles.save}
-                                                    activeOpacity={0.7}
-                                                    onPress={() => {
-                                                        setOrderId(item.id)
-                                                        setOpen(!open)
-                                                    }}>
-                                                    <Text style={styles.saveText}>Cancel Order</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                                :
-                                                null
-                                            }
-                                            {item.order_status == 8 || item.order_status == 2 ? <View style={{ flexDirection: 'row', width: '90%', justifyContent: "space-between", alignSelf: "center", marginTop: '3%' }}>
-                                                <TouchableOpacity
-                                                    style={styles.save}
-                                                    activeOpacity={0.7}
-                                                    onPress={() => {
-
-                                                    }}>
-                                                    <Text style={styles.saveText}>Reorder</Text>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity
-                                                    style={styles.save}
-                                                    activeOpacity={0.7}
-                                                    onPress={() => {
-
-                                                    }}>
-                                                    <Text style={styles.saveText}>Block</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                                :
-                                                null
-                                            }
-                                        </>
-                                        : <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <View>
-                                                <Image
-                                                    style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 100 }}
-                                                    source={user.user_role === 3 ? item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image : item?.providers_profile_image ? { uri: BASE_URL + item?.providers_profile_image } : placeholder_image}
-                                                />
-                                            </View>
-                                            <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
-                                                <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
-                                            </View>
-                                        </View>
-                                    }
+                                    <View style={{ flexDirection: 'row', alignItems: "center", justifyContent: 'space-between' }}>
+                                    <View>
+                                        <Image
+                                            style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 100 }}
+                                            source={user.user_role === 3 ? item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image : item?.providers_profile_image ? { uri: BASE_URL + item?.providers_profile_image } : placeholder_image}
+                                        />
+                                    </View>
+                                    <View style={{ justifyContent: 'center', paddingLeft: 10 }}>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
+                                    </View>
+                                    <View style={{ justifyContent: 'center', alignItems: 'flex-end', flex: 1 }}>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, textAlign: "right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
+                                    </View>
+                                </View>
+                                  
                                 </TouchableOpacity>
                             )
                         }}

@@ -1,0 +1,89 @@
+diff --git a/node_modules/react-native-calendar-picker/CalendarPicker/Controls.js b/node_modules/react-native-calendar-picker/CalendarPicker/Controls.js
+index 66468d6..4beacf6 100644
+--- a/node_modules/react-native-calendar-picker/CalendarPicker/Controls.js
++++ b/node_modules/react-native-calendar-picker/CalendarPicker/Controls.js
+@@ -25,7 +25,7 @@ export default function Controls(props) {
+     >
+       <View style={{opacity: disabled ? 0 : 1}}>
+         { component ||
+-          <Text style={[textStyles]}>
++          <Text  maxFontSizeMultiplier={1.4} style={[textStyles]}>
+             { label }
+           </Text>
+         }
+diff --git a/node_modules/react-native-calendar-picker/CalendarPicker/Day.js b/node_modules/react-native-calendar-picker/CalendarPicker/Day.js
+index 5331603..1596665 100644
+--- a/node_modules/react-native-calendar-picker/CalendarPicker/Day.js
++++ b/node_modules/react-native-calendar-picker/CalendarPicker/Day.js
+@@ -185,7 +185,7 @@ export default function Day(props) {
+       return (
+         <View style={[styles.dayWrapper, custom.containerStyle]}>
+           <View style={[custom.style, computedSelectedDayStyle, selectedDayStyle ]}>
+-            <Text style={[styles.dayLabel, textStyle,
++            <Text maxFontSizeMultiplier={1.4} style={[styles.dayLabel, textStyle,
+               styles.disabledText, disabledDatesTextStyle,
+               styles.selectedDisabledText, selectedDisabledDatesTextStyle,
+               overrideOutOfRangeTextStyle
+@@ -202,7 +202,7 @@ export default function Day(props) {
+             disabled={!enableDateChange}
+             style={[custom.style, computedSelectedDayStyle, selectedDayStyle ]}
+             onPress={() => onPressDay({year, month, day}) }>
+-            <Text style={[styles.dayLabel, textStyle, custom.textStyle, selectedDayTextStyle]}>
++            <Text  maxFontSizeMultiplier={1.4} style={[styles.dayLabel, textStyle, custom.textStyle, selectedDayTextStyle]}>
+               { day }
+             </Text>
+           </TouchableOpacity>
+@@ -221,7 +221,7 @@ export default function Day(props) {
+     return (
+       <View style={[styles.dayWrapper, custom.containerStyle]}>
+         <View style={[styles.dayButton, custom.style]}>
+-          <Text style={[textStyle, styles.disabledText, disabledDatesTextStyle, custom.textStyle]}>
++          <Text  maxFontSizeMultiplier={1.4} style={[textStyle, styles.disabledText, disabledDatesTextStyle, custom.textStyle]}>
+             { day }
+           </Text>
+         </View>
+diff --git a/node_modules/react-native-calendar-picker/CalendarPicker/HeaderControls.js b/node_modules/react-native-calendar-picker/CalendarPicker/HeaderControls.js
+index 611bc82..34f9974 100644
+--- a/node_modules/react-native-calendar-picker/CalendarPicker/HeaderControls.js
++++ b/node_modules/react-native-calendar-picker/CalendarPicker/HeaderControls.js
+@@ -59,12 +59,12 @@ export default function HeaderControls(props) {
+       />
+       <View style={[styles.monthYearHeaderWrapper,monthYearHeaderWrapperStyle]}>
+         <TouchableOpacity onPress={onPressMonth}>
+-          <Text style={[styles.monthHeaderMainText, textStyle, monthTitleStyle]} {...accessibilityProps}>
++          <Text  maxFontSizeMultiplier={1.4} style={[styles.monthHeaderMainText, textStyle, monthTitleStyle]} {...accessibilityProps}>
+             { monthName }
+           </Text>
+         </TouchableOpacity>
+         <TouchableOpacity onPress={onPressYear}>
+-          <Text style={[styles.yearHeaderMainText, textStyle, yearTitleStyle]}>
++          <Text   maxFontSizeMultiplier={1.4} style={[styles.yearHeaderMainText, textStyle, yearTitleStyle]}>
+             { year }
+           </Text>
+         </TouchableOpacity>
+diff --git a/node_modules/react-native-calendar-picker/CalendarPicker/MonthsHeader.js b/node_modules/react-native-calendar-picker/CalendarPicker/MonthsHeader.js
+index 8941d12..3e626f8 100644
+--- a/node_modules/react-native-calendar-picker/CalendarPicker/MonthsHeader.js
++++ b/node_modules/react-native-calendar-picker/CalendarPicker/MonthsHeader.js
+@@ -22,7 +22,7 @@ export default function MonthsHeader(props) {
+ 
+   return (
+     <View style={styles.headerWrapper}>
+-      <Text style={[styles.monthsHeaderText, textStyle]}>
++      <Text  maxFontSizeMultiplier={1.4} style={[styles.monthsHeaderText, textStyle]}>
+         { title }
+       </Text>
+     </View>
+diff --git a/node_modules/react-native-calendar-picker/CalendarPicker/Weekdays.js b/node_modules/react-native-calendar-picker/CalendarPicker/Weekdays.js
+index 1745121..f8330bd 100644
+--- a/node_modules/react-native-calendar-picker/CalendarPicker/Weekdays.js
++++ b/node_modules/react-native-calendar-picker/CalendarPicker/Weekdays.js
+@@ -37,7 +37,7 @@ export default function Weekdays(props) {
+         }
+         return (
+           <View style={customDayOfWeekStyles.style} key={key}>
+-            <Text style={dayOfWeekTextStyle}>
++            <Text   maxFontSizeMultiplier={1.4} style={dayOfWeekTextStyle}>
+               {day}
+             </Text>
+           </View>

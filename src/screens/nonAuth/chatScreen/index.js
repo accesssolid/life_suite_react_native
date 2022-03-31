@@ -248,13 +248,13 @@ const ChatScreen = (props) => {
             >
                 <Pressable onPress={() => setVisible(false)} style={{ flex: 1, width: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                     <Pressable style={{ height: 250, width: '90%', backgroundColor: "ghostwhite", borderColor: "#ACF0F2", borderWidth: 2, borderRadius: 10, justifyContent: 'space-evenly' }} >
-                        <Text style={{ textAlign: 'center', fontFamily: LS_FONTS.PoppinsMedium, padding: 10, fontSize: 18 }} >Upload Attachements</Text>
+                        <Text maxFontSizeMultiplier={1.5}  style={{ textAlign: 'center', fontFamily: LS_FONTS.PoppinsMedium, padding: 10, fontSize: 18 }} >Upload Attachements</Text>
                         <TouchableOpacity onPress={() => {
                             pickImage()
 
                         }} style={{ flexDirection: 'row', paddingHorizontal: 20, alignItems: "center" }} >
                             <Image source={require('../../../assets/cameraChat.png')} style={{ height: 25, width: 25, resizeMode: 'contain',tintColor:LS_COLORS.global.green, alignItems: 'center', }} />
-                            <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Gallery</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Gallery</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => {
@@ -263,7 +263,7 @@ const ChatScreen = (props) => {
                             }}
                             style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }} >
                             <Image source={require('../../../assets/gallery.png')} style={{ height: 25, width: 25, resizeMode: 'contain',tintColor:LS_COLORS.global.green, alignItems: 'center', }} />
-                            <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Camera</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Camera</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => {
@@ -272,7 +272,7 @@ const ChatScreen = (props) => {
                             }}
                             style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }} >
                             <Image source={require('../../../assets/documents.png')} style={{ height: 25, width: 25,tintColor:LS_COLORS.global.green, resizeMode: 'contain', alignItems: 'center', }} />
-                            <Text style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Document</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Document</Text>
                         </TouchableOpacity>
                     </Pressable>
                 </Pressable>
@@ -466,7 +466,7 @@ const ChatScreen = (props) => {
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
                                                     }}>
-                                                    <Text style={{ fontSize: 12, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
+                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
                                                         {itemData.item.message}
                                                     </Text>
                                                 </View>
@@ -479,6 +479,7 @@ const ChatScreen = (props) => {
                                                     marginRight: '5%'
                                                 }}>
                                                 <Text
+                                                maxFontSizeMultiplier={1.5} 
                                                     style={{
                                                         right: 5,
                                                         alignSelf: 'center',
@@ -534,7 +535,7 @@ const ChatScreen = (props) => {
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
                                                     }}>
-                                                    <Text style={{ fontSize: 12, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
+                                                    <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
                                                         {itemData.item.message}
                                                     </Text>
                                                 </View>
@@ -556,6 +557,7 @@ const ChatScreen = (props) => {
                                                     }}
                                                 />
                                                 <Text
+                                                 maxFontSizeMultiplier={1.5} 
                                                     style={{
                                                         left: 5,
                                                         alignSelf: 'center',
@@ -593,6 +595,7 @@ const ChatScreen = (props) => {
                                                     source={require('../../../assets/document.png')}
                                                 />
                                                 <Text
+                                                 maxFontSizeMultiplier={1.5} 
                                                     numberOfLines={1}
                                                     style={{
                                                         width: '90%',
@@ -611,6 +614,7 @@ const ChatScreen = (props) => {
                                                     marginRight: '5%'
                                                 }}>
                                                 <Text
+                                                 maxFontSizeMultiplier={1.5} 
                                                     style={{
                                                         marginRight: '5%',
                                                         alignSelf: 'center',
@@ -647,6 +651,7 @@ const ChatScreen = (props) => {
                                                     source={require('../../../assets/document.png')}
                                                 />
                                                 <Text
+                                                 maxFontSizeMultiplier={1.5} 
                                                     numberOfLines={1}
                                                     style={{
                                                         width: '90%',
@@ -665,6 +670,7 @@ const ChatScreen = (props) => {
                                                     marginLeft: '5%'
                                                 }}>
                                                 <Text
+                                                 maxFontSizeMultiplier={1.5} 
                                                     style={{
                                                         left: 5,
                                                         alignSelf: 'center',
@@ -714,6 +720,7 @@ const ChatScreen = (props) => {
                                                     marginRight: '5%'
                                                 }}>
                                                 <Text
+                                                 maxFontSizeMultiplier={1.5} 
                                                     style={{
                                                         marginRight: '5%',
                                                         alignSelf: 'center',
@@ -761,6 +768,7 @@ const ChatScreen = (props) => {
                                                     marginRight: '5%'
                                                 }}>
                                                 <Text
+                                                   maxFontSizeMultiplier={1.5} 
                                                     style={{
                                                         left: 5,
                                                         alignSelf: 'center',
@@ -787,11 +795,10 @@ const ChatScreen = (props) => {
                         <TextInput
                             style={styles.inputStyle}
                             placeholder="Type your message"
-                            placeholderTextColor="black"
                             autoCapitalize={'none'}
                             color="#9A9CA4"
                             placeholderTextColor="#9A9CA4"
-
+                            maxFontSizeMultiplier={1.5} 
                             autoCorrect={false}
                             onChangeText={(text) => setMessages(text)}
                             value={messages}
@@ -838,8 +845,8 @@ const MenuModal = ({ visible, setVisible, role, navigation, user1 }) => {
                             navigation.navigate("OrderHistoryCustomer", { user1: user1 })
                         }
                     }}
-                    style={{ height: 30, justifyContent: "center", borderColor: LS_COLORS.global.green, alignItems: "center", width: 100, backgroundColor: "white", borderRadius: 2, borderWidth: 1, marginRight: 5 }}>
-                    <Text style={[styles.msgText, { color: "black", fontSize: 14 }]}>Order History</Text>
+                    style={{ height: 30, justifyContent: "center", borderColor: LS_COLORS.global.green, alignItems: "center", paddingHorizontal:10, backgroundColor: "white", borderRadius: 2, borderWidth: 1, marginRight: 5 }}>
+                    <Text maxFontSizeMultiplier={1.5}  style={[styles.msgText, { color: "black", fontSize: 14 }]}>Order History</Text>
                 </Pressable>
             </Pressable>
         </Modal>
@@ -856,12 +863,12 @@ const ServicesProvidedModal = ({ data, visible, setVisible }) => {
         >
             <Pressable onPress={() => setVisible(false)} style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0005" }}>
                 <Pressable style={{ padding: 10, borderRadius: 10, justifyContent: "center", width: "95%", backgroundColor: "white" }}>
-                    <Text style={[{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }]}>Services</Text>
+                    <Text maxFontSizeMultiplier={1.5}  style={[{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }]}>Services</Text>
                     {data.map((x, index) => {
                         return (
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <Text style={[styles.msgText, { color: "black", fontSize: 12, width: 15 }]}>{index + 1}.</Text>
-                                <Text style={[styles.msgText, { color: "black", fontSize: 12, }]}>{x.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={[styles.msgText, { color: "black", fontSize: 12, width: 25 }]}>{index + 1}.</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={[styles.msgText, { color: "black", fontSize: 12, }]}>{x.name}</Text>
                             </View>
                         )
                     })}

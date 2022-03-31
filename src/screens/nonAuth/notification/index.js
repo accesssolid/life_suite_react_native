@@ -183,11 +183,11 @@ const Notification = (props) => {
                     <View style={{ flexDirection: 'row' }}>
                         <View style={{ width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center", right: 10, backgroundColor: backgroundColor }}></View>
                         <View style={{ marginLeft: '5%', alignSelf: 'center', width: "65%" }}>
-                            <Text numberOfLines={4} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: '#707070' }}>{item.description}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: '#707070' }}>{item.description}</Text>
                         </View>
                         <View style={{ width: "20%", justifyContent: "space-evenly", alignItems: "flex-end" }}>
-                            <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>
-                            {/* <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{orderType}</Text> */}
+                            <Text maxFontSizeMultiplier={1.5} style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular,textAlign:"right", fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>
+                            {/* <Text maxFontSizeMultiplier={1.5} style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{orderType}</Text> */}
                         </View>
                     </View>
                 </Card>
@@ -215,7 +215,7 @@ const Notification = (props) => {
                     {
                         notifications?.length === 0 ?
                             <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: "center", marginTop: 10 }}>
-                                <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No notification found</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No notification found</Text>
                             </View>
                             : <FlatList
                                 data={notifications}

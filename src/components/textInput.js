@@ -44,7 +44,7 @@ function CustomInput({
                 ...customContainerStyles
             }}>
             <View style={{ position: 'absolute', top: -11, left: 20, paddingHorizontal: 5, backgroundColor: LS_COLORS.global.white }}>
-                <Text style={{ color: LS_COLORS.global.grey, fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular, }}>
+                <Text maxFontSizeMultiplier={1.3} style={{ color: LS_COLORS.global.grey, fontSize: 16, fontFamily: LS_FONTS.PoppinsRegular, }}>
                     {text}{required == true && '*'}
                 </Text>
             </View>
@@ -69,6 +69,7 @@ function CustomInput({
                 editable={editable}
                 multiline={multiline}
                 blurOnSubmit={blurOnSubmit}
+                maxFontSizeMultiplier={1.5}
                 {...TextInputProps}
             />
 
@@ -82,7 +83,7 @@ function CustomInput({
                     source={imageUrl}
                 />
             </TouchableOpacity>
-            {bottomText && <Text style={{ paddingRight:10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.black, fontSize:12 }}>{bottomText}</Text>}
+            {bottomText && <Text maxFontSizeMultiplier={1.5} style={{ paddingRight:10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.black, fontSize:12 }}>{bottomText}</Text>}
             {icon}
         </Item>
     );

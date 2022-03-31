@@ -101,7 +101,7 @@ export default function ModalOTP({ visible, setVisible, setIsVerifiedPhone, phon
             <View style={{ flex: 1, backgroundColor: "#0008", justifyContent: "center", paddingHorizontal: "10%" }}>
                 {!loader ? <View style={{ padding: 10, backgroundColor: "white", borderRadius: 10, paddingHorizontal: "10%", paddingVertical: "5%" }}>
 
-                    <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 18, marginVertical: 20, textAlign: "center" }}>A 4 digit OTP is sent to your Mobile Number.</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 18, marginVertical: 20, textAlign: "center" }}>A 4 digit OTP is sent to your Mobile Number.</Text>
 
                     <View style={{ zIndex: 10000 }}>
                         <OTPInputView
@@ -113,13 +113,12 @@ export default function ModalOTP({ visible, setVisible, setIsVerifiedPhone, phon
                             codeInputFieldStyle={styles.input}
                             placeholderTextColor="black"
                             keyboardType="number-pad"
-
                             onCodeChanged={code => setCode(code)}
                         />
                     </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 30 }}>
-                        <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Don't receive a code?</Text>
-                        <Text onPress={() => checkISVerified()} style={{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsSemiBold }}>Resend</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={{ color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Don't receive a code?</Text>
+                        <Text maxFontSizeMultiplier={1.5} onPress={() => checkISVerified()} style={{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsSemiBold }}>Resend</Text>
                     </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginTop: 30 }}>
 

@@ -33,10 +33,10 @@ const RatingModal = ({ visible, data, setVisible, title, onPressYes }) => {
                         borderRadius: 10,
                         padding: 20,
                     }}>
-                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, alignSelf: "center", marginTop: "4%", color: 'black' }}>Feedback</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, alignSelf: "center", marginTop: "4%", color: 'black' }}>Feedback</Text>
                     <View style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                        <Text style={[styles.saveText, { color: "black" }]}>Rating:  </Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>Rating:  </Text>
                         <Rating
                             readonly={true}
                             imageSize={20}
@@ -48,17 +48,17 @@ const RatingModal = ({ visible, data, setVisible, title, onPressYes }) => {
                         />
                     </View>
                     {data?.tip&&<View style={{ flexDirection: "row", marginVertical: 10, alignItems: "center", justifyContent: "space-between" }} >
-                        <Text style={[styles.saveText, { color: "black" }]}>Tip:  </Text>
-                        <Text style={[styles.saveText, { color:LS_COLORS.global.green, fontSize: 14 }]}>${data?.tip ?? "0"}</Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>Tip:  </Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={[styles.saveText, { color:LS_COLORS.global.green, fontSize: 14 }]}>${data?.tip ?? "0"}</Text>
                     </View>}
                     {data?.comment&&<View style={{}} >
-                        <Text style={[styles.saveText, { color: "black", textAlign: "justify" }]}>Comment:  </Text>
-                        <Text style={[styles.saveText, { color: "gray", fontSize: 14, textAlign: "justify" }]}>{data?.comment}</Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black", textAlign: "justify" }]}>Comment:  </Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "gray", fontSize: 14, textAlign: "justify" }]}>{data?.comment}</Text>
                     </View>}
                     <View style={{ flexDirection: "row", width: "100%" }}>
                     </View>
                     <TouchableOpacity onPress={() => setVisible(false)} style={styles.save1}>
-                        <Text style={styles.saveText1}>Done</Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={styles.saveText1}>Done</Text>
                     </TouchableOpacity>
                 </View>
             </Pressable>

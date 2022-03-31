@@ -153,7 +153,7 @@ const Settings = (props) => {
                             <View style={{ width: '90%', alignSelf: 'center', flex: 1 }}>
                                 <View style={{ flexDirection: 'row', width: '100%', marginVertical: 10 }}>
                                     <View style={{ flex: 1, justifyContent: 'center' }}>
-                                        <Text style={{}}>Passcode Authentication</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{}}>Passcode Authentication</Text>
                                     </View>
                                     <View style={{ justifyContent: 'center' }}>
                                         <Switch
@@ -164,7 +164,7 @@ const Settings = (props) => {
                                 </View>
                                 <View style={{ flexDirection: 'row', width: '100%', marginTop: 10 }}>
                                     <View style={{ flex: 1, justifyContent: 'center' }}>
-                                        <Text style={{}}>Biometrics Authentication</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{}}>Biometrics Authentication</Text>
                                     </View>
                                     <View style={{ justifyContent: 'center' }}>
                                         <Switch

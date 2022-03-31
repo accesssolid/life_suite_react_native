@@ -237,7 +237,7 @@ export default function CardList({ navigation, route }) {
 
     return (
         <>
-            <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: LS_COLORS.global.cyan }}>
                 <Header 
                     containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
                     imageUrl={require("../../assets/back.png")}
@@ -245,8 +245,9 @@ export default function CardList({ navigation, route }) {
                     // imageUrl1={require("../../assets/home.png")}
                     // action1={() => props.navigation.navigate("HomeScreen")}
                     title={type=="edit"?"Edit Card":'Add Card'} />
-                <Container>
-                    <Content>
+                    <View style={{flex:1,backgroundColor:"white"}}>
+                        <Container style={{backgroundColor:"white"}}>
+                    <Content  style={{backgroundColor:"white"}}>
                         <View style={{ alignItems: "center" }}>
                             <View style={{ position: "relative" }}>
                                 <CardView
@@ -273,7 +274,7 @@ export default function CardList({ navigation, route }) {
                                     keyboardType="numeric"
                                     ref={cardNumberRef}
                                     returnKeyType="next"
-
+                                    maxFontSizeMultiplier={1.5}
                                     onSubmitEditing={() => cardNameRef.current.focus()}
                                 />
                                 {cardDetails.number.length == 0 ? null : (
@@ -304,9 +305,10 @@ export default function CardList({ navigation, route }) {
                                 keyboardType="numeric"
                                 ref={cardDateRef}
                                 returnKeyType="done"
+                                maxFontSizeMultiplier={1.5}
                             />
 
-                            {type == "add" && <TextInputMask
+                            {type == "add" && <TextInputMask maxFontSizeMultiplier={1.5}
                                 style={styles.inputMaskStyle}
                                 placeholder={'CVV'}
                                 placeholderTextColor={"gray"}
@@ -319,7 +321,7 @@ export default function CardList({ navigation, route }) {
                                 returnKeyType="done"
                             />}
                             {/* <Text style={[styles.saveText, { color: "gray", fontSize: 16, textAlign: "left", width: "80%", marginTop: 10 }]}>Address : (Optional)</Text> */}
-                            {/* <TextInputMask
+                            {/* <TextInputMask maxFontSizeMultiplier={1.5}
                                 style={styles.inputMaskStyle}
                                 placeholder={'Address'}
                                 placeholderTextColor={"gray"}
@@ -341,7 +343,7 @@ export default function CardList({ navigation, route }) {
                                     checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/checked.png")} />}
                                     uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
                                 />
-                                <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same as home address</Text>
+                                <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same as home address</Text>
                             </View>
                             <GooglePlacesAutocomplete
                                 styles={{
@@ -376,6 +378,7 @@ export default function CardList({ navigation, route }) {
                                     selection:selection,
                                     onBlur:()=>{setShowSelection({start:0})},
                                     onFocus:()=>{setShowSelection(null)},
+                                    maxFontSizeMultiplier:1.5,
                                     onChangeText: (t) => {
                                         if (isSameAddress) {
                                             return
@@ -388,7 +391,7 @@ export default function CardList({ navigation, route }) {
                                     language: 'en',
                                 }}
                             />
-                            {/* <TextInputMask
+                            {/* <TextInputMask maxFontSizeMultiplier={1.5}
                                 style={styles.inputMaskStyle}
                                 placeholder={'Address 2'}
                                 placeholderTextColor={"gray"}
@@ -397,7 +400,7 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_line2: formatted })
                                 }}
                             />
-                            <TextInputMask
+                            <TextInputMask maxFontSizeMultiplier={1.5}
                                 style={styles.inputMaskStyle}
                                 placeholder={'City'}
                                 placeholderTextColor={"gray"}
@@ -406,7 +409,7 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_city: formatted })
                                 }}
                             />
-                            <TextInputMask
+                            <TextInputMask maxFontSizeMultiplier={1.5}
                                 style={styles.inputMaskStyle}
                                 placeholder={'State'}
                                 placeholderTextColor={"gray"}
@@ -415,7 +418,7 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_state: formatted })
                                 }}
                             />
-                            <TextInputMask
+                            <TextInputMask maxFontSizeMultiplier={1.5}
                                 style={styles.inputMaskStyle}
                                 placeholder={'ZipCode'}
                                 placeholderTextColor={"gray"}
@@ -424,7 +427,7 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_zip: formatted })
                                 }}
                             />
-                              <TextInputMask
+                              <TextInputMask maxFontSizeMultiplier={1.5}
                                 style={styles.inputMaskStyle}
                                 placeholder={'Country'}
                                 placeholderTextColor={"gray"}
@@ -448,8 +451,9 @@ export default function CardList({ navigation, route }) {
 
                     }}
                 >
-                    <Text style={styles.saveText}>Save</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Save</Text>
                 </TouchableOpacity>
+                </View>
             </SafeAreaView>
             {loader && <Loader />}
         </>

@@ -391,13 +391,13 @@ const MechanicLocation = (props) => {
                         <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Other Location</Text>
                     </View> */}
                     <View style={{ marginTop: 20 }}>
-                        {subService.location_type == 2 && <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>}
+                        {subService.location_type == 2 && <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>}
                         {subService.location_type == 2 && <TouchableOpacity
                             onPress={() => {
                                 props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })
                             }}
                             style={styles.fromContainer}>
-                            <Text style={{ flex: 1, }} numberOfLines={1}>
+                            <Text maxFontSizeMultiplier={1.5} style={{ flex: 1, }} numberOfLines={1}>
                                 {fromAddress == "" ? "Select Address" : fromAddress}
                             </Text>
                             <TouchableOpacity
@@ -410,11 +410,11 @@ const MechanicLocation = (props) => {
                                 />
                             </TouchableOpacity>
                         </TouchableOpacity>}
-                        {(subService.location_type == 1 || subService.location_type == 2) && <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>}
+                        {(subService.location_type == 1 || subService.location_type == 2) && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>}
                         {(subService.location_type == 1 || subService.location_type == 2) && <TouchableOpacity
                             onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                             style={styles.fromContainer}>
-                            <Text style={{ flex: 1, }} numberOfLines={1}>{toAddress == "" ? "Select Address" : toAddress}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ flex: 1, }} numberOfLines={1}>{toAddress == "" ? "Select Address" : toAddress}</Text>
                             <TouchableOpacity
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                                 style={{ height: '100%', aspectRatio: 1, justifyContent: 'center', alignItems: "flex-end", paddingHorizontal: 10 }}
@@ -425,9 +425,10 @@ const MechanicLocation = (props) => {
                                 />
                             </TouchableOpacity>
                         </TouchableOpacity>}
-                        <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>Add Date</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>Add Date</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
+                             maxFontSizeMultiplier={1.5}
                                 style={styles.inputStyle}
                                 color="black"
                                 value={date != "" ? moment(date).format("MM-DD-YYYY") : "Select Date"}
@@ -449,18 +450,18 @@ const MechanicLocation = (props) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <Text style={{marginTop: "5%",marginLeft:24, fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>My available time</Text>
+                    <Text  maxFontSizeMultiplier={1.5} style={{marginTop: "5%",marginLeft:24, fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>My available time</Text>
                     <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "1%" }}>
                         <View style={{ flex: 1, alignItems: 'center' }}>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility(true)} >
-                                <Text>{moment(startTime).format('hh:mm A')}</Text>
+                                <Text  maxFontSizeMultiplier={1.5}>{moment(startTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={{ flex: 1, alignItems: 'center' }} >
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility1(true)} >
-                                <Text>{moment(endTime).format('hh:mm A')}</Text>
+                                <Text  maxFontSizeMultiplier={1.5}>{moment(endTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -485,7 +486,7 @@ const MechanicLocation = (props) => {
                     style={styles.save}
                     activeOpacity={0.7}
                     onPress={() => submit()}>
-                    <Text style={styles.saveText}>Submit</Text>
+                    <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Submit</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -518,7 +519,7 @@ const MechanicLocation = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                                <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
                             </View>
                         </SafeAreaView>
                     </View>

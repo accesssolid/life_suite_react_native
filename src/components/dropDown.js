@@ -18,7 +18,7 @@ const DropDown1 = (props) => {
                 props.title
                     ?
                     <>
-                        <Text style={styles.title}>{props.title}<Text style={{ color: "red" }}>{props.important && "*"}</Text></Text>
+                        <Text maxFontSizeMultiplier={1.5} style={styles.title}>{props.title}<Text style={{ color: "red" }}>{props.important && "*"}</Text></Text>
                     </>
                     :
                     null
@@ -37,7 +37,7 @@ const DropDown1 = (props) => {
                     paddingLeft: 20,
                     textAlignVertical: "center",
                    
-                },props.handleTextValueStyle]}>{props.value}</Text>
+                },props.handleTextValueStyle]} {...props.textValueProps}>{props.value}</Text>
                 </View>
                 }
                 <ModalDropdown

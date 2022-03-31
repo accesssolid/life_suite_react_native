@@ -23,7 +23,7 @@ const SmallCards = props => {
                 />
             </View>
             <View style={{height:"25%" ,justifyContent: 'space-between', alignItems: 'center',paddingHorizontal:3, flexDirection: 'row',alignContent:'center' }}>
-                <Text style={[styles.text,{flex:1}]} numberOfLines={2}>{props.title1}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.text,{flex:1}]} >{props.title1}</Text>
                 <TouchableOpacity style = {{height:50,width:23,justifyContent:"center",alignItems:"center"}} onPress={props.favorite}>
                     {props.favStatus == 1 ?
                         <Image

@@ -469,6 +469,7 @@ const ServicesProvided = (props) => {
                 <View style={styles.container}>
                     { activeItem == null&&vehicle_types?.length>0&&<View style={{}}>
                         <DropDown
+                           handleTextValue={true}
                             title={subService.id == 14?"Vehicle Type":"Variant Type"}
                             item={vehicle_types.map(x => x.name)}
                             value={vehicleType.name}
@@ -489,6 +490,9 @@ const ServicesProvided = (props) => {
                                     value={makeList.find(x => x.id == selectedMake)?.title ?? "Make"}
                                     containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
                                     dropdownStyle={{ maxHeight: 300 }}
+                                    textValueProps={{
+                                        maxFontSizeMultiplier:1.3
+                                    }}
                                 />
                             </View>
                             <View style={{ flex: 0.8 }}>
@@ -503,6 +507,9 @@ const ServicesProvided = (props) => {
                                     }}
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                                     dropdownStyle={{ maxHeight: 300 }}
+                                    textValueProps={{
+                                        maxFontSizeMultiplier:1.3
+                                    }}
                                 />
                             </View>
                             <View style={{ flex: 0.8 }}>
@@ -517,6 +524,9 @@ const ServicesProvided = (props) => {
                                     }}
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                                     dropdownStyle={{ maxHeight: 300 }}
+                                    textValueProps={{
+                                        maxFontSizeMultiplier:1.3
+                                    }}
                                 />
                             </View>
                         </View>}
@@ -534,7 +544,7 @@ const ServicesProvided = (props) => {
                     //     </ScrollView>
                     //     </View>)
                         }
-                    <Text style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
+                    <Text maxFontSizeMultiplier={1.4} style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
                     <Container>
                         <Content>
                             {
@@ -575,7 +585,7 @@ const ServicesProvided = (props) => {
                                         </>
                                         :
                                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                            {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
+                                            {!loading && <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
                                         </View>
                             }
                         </Content>
@@ -595,7 +605,7 @@ const ServicesProvided = (props) => {
                                     :
                                     showToast("Select service first")
                         }}>
-                        <Text style={styles.saveText}>{activeItem !== null ? 'Save Request' : 'Next'}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>{activeItem !== null ? 'Save Request' : 'Next'}</Text>
                     </TouchableOpacity>
                     <View style={{ height: 10 }}></View>
 

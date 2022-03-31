@@ -68,9 +68,9 @@ const ReorderModal = ({ visible, setVisible, title, onPressYes }) => {
                         borderRadius: 10,
                         padding: 20,
                     }}>
-                    <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, alignSelf: "center", marginTop: "4%", color: 'black' }}>{title}</Text>
+                    <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, alignSelf: "center", marginTop: "4%", color: 'black' }}>{title}</Text>
                     <View style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
-                    <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Select Date</Text>
+                    <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Select Date</Text>
 
                         <TouchableOpacity
                             style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }}
@@ -78,11 +78,11 @@ const ReorderModal = ({ visible, setVisible, title, onPressYes }) => {
                             onPress={() => {
                                 setDatePickerVisibility2(true)
                             }} >
-                            <Text style={{color:"black"}}>{moment(date).format('MM-DD-YYYY')}</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{color:"black"}}>{moment(date).format('MM-DD-YYYY')}</Text>
                         </TouchableOpacity>
                     <View style={{ flexDirection: 'row', justifyContent: "space-around" ,marginTop:10}}>
                         <View style={{ flex: 1, alignItems: 'center' }}>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
                             <TouchableOpacity
                                 style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }}
                                 activeOpacity={0.7}
@@ -90,11 +90,11 @@ const ReorderModal = ({ visible, setVisible, title, onPressYes }) => {
                                     setDatePickerVisibility(true)
                                     setDatePickerVisibility1(false)
                                 }} >
-                                <Text>{moment(startTime).format('hh:mm A')}</Text>
+                                <Text  maxFontSizeMultiplier={1.5}>{moment(startTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={{ flex: 1, alignItems: 'center' }} >
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>
                             <TouchableOpacity
                                 style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }}
                                 activeOpacity={0.7}
@@ -102,7 +102,7 @@ const ReorderModal = ({ visible, setVisible, title, onPressYes }) => {
                                     setDatePickerVisibility1(true)
                                     setDatePickerVisibility(false)
                                 }} >
-                                <Text>{moment(endTime).format('hh:mm A')}</Text>
+                                <Text  maxFontSizeMultiplier={1.5}>{moment(endTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -135,7 +135,7 @@ const ReorderModal = ({ visible, setVisible, title, onPressYes }) => {
                             onPress={() => {
                                 setVisible(false)
                             }}>
-                            <Text style={styles.saveText}>Cancel</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.save, { marginLeft: 10 }]}
@@ -146,7 +146,7 @@ const ReorderModal = ({ visible, setVisible, title, onPressYes }) => {
                                     setVisible(false)
                                 }
                             }}>
-                            <Text style={styles.saveText}>Submit</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Submit</Text>
                         </TouchableOpacity>
                     </View>
                 </Pressable>

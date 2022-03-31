@@ -139,7 +139,7 @@ const SubServices = (props) => {
                         />
                         :
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            {!loading && <Text style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
+                            {!loading && <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
                         </View>
                 }
             </View>

@@ -1124,9 +1124,9 @@ const Profile = (props) => {
                 behavior={Platform.OS === "ios" ? "padding" : null}
                 style={styles.container}>
                 <View style={{ marginTop: '15%', }}>
-                    <Text style={styles.text}>{user.user_role == role.provider ? "Service Provider Profile" : "Customer Profile"}</Text>
-                    <Text style={styles.text1}>{userData.first_name}</Text>
-                    <Text style={styles.text2}>Profile ID : {userData.id}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.text}>{user.user_role == role.provider ? "Service Provider Profile" : "Customer Profile"}</Text>
+                    <Text maxFontSizeMultiplier={1.5}  style={styles.text1}>{userData.first_name}</Text>
+                    <Text maxFontSizeMultiplier={1.5}  style={styles.text2}>Profile ID : {userData.id}</Text>
                 </View>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
@@ -1137,7 +1137,7 @@ const Profile = (props) => {
                     <View style={{ marginBottom: '5%' }}>
 
                         <View style={styles.personalContainer}>
-                            <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>PERSONAL INFORMATION</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>PERSONAL INFORMATION</Text>
                             <CustomInput
                                 text="First Name"
                                 value={userData.first_name}
@@ -1295,11 +1295,11 @@ const Profile = (props) => {
                                     isVerfiedPhone&&<Entypo name="check" color={isVerfiedPhone ? 'green' : "grey"} size={20} />
                                 }
                             />
-                            {!isVerfiedPhone && <Text onPress={() => {
+                            {!isVerfiedPhone && <Text  maxFontSizeMultiplier={1.5}  onPress={() => {
                                 checkISVerified()
                             }} style={{ color: LS_COLORS.global.green, textDecorationLine: "underline", marginLeft: 20 }}>Verify Phone Number</Text>}
                             {user.user_role == role.provider && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                <Text numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
+                                <Text maxFontSizeMultiplier={1.5}  numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
                                 <CheckBox
                                     style={{}}
                                     containerStyle={{ width: 25 }}
@@ -1323,6 +1323,7 @@ const Profile = (props) => {
                             <View style={{ height: 20 }}></View>
                             <View style={{}}>
                                 <DropDown
+                                    handleTextValue={true}
                                     title="Notification type"
                                     item={["Email", "Push Notification", "Text", "All"]}
                                     value={notificationType}
@@ -1369,7 +1370,7 @@ const Profile = (props) => {
                             />}
                             <View style={{ marginTop: 25 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%', marginBottom: 10 }}>
-                                    <Text style={{
+                                    <Text maxFontSizeMultiplier={1.5}  style={{
                                         fontFamily: LS_FONTS.PoppinsMedium,
                                         marginHorizontal: '10%',
                                         color: LS_COLORS.global.black
@@ -1420,6 +1421,7 @@ const Profile = (props) => {
                                             })
                                             setSelection({start:t?.length})
                                         },
+                                        maxFontSizeMultiplier:1.5,
                                         onBlur: () => { setSelection({ start: 0 }) },
                                         onFocus: () => { setSelection({start:homeAddressData?.address_line_1?.length}) }
                                     }}
@@ -1432,7 +1434,7 @@ const Profile = (props) => {
                             </View>
                             {user.user_role == role.provider &&
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Provide service only at my address</Text>
+                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Provide service only at my address</Text>
                                     <CheckBox
                                         style={{}}
                                         containerStyle={{ width: 25, marginBottom: 0 }}
@@ -1446,7 +1448,7 @@ const Profile = (props) => {
                             }
                             {user.user_role == role.provider &&
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 30, marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make address public</Text>
+                                    <Text maxFontSizeMultiplier={1.5}  numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make address public</Text>
                                     <CheckBox
                                         style={{}}
                                         containerStyle={{ width: 25, marginTop: 0 }}
@@ -1465,14 +1467,14 @@ const Profile = (props) => {
                             }
                             <View style={{ marginTop: 10 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%' }}>
-                                    <Text style={{
+                                    <Text maxFontSizeMultiplier={1.2}  style={{
                                         fontFamily: LS_FONTS.PoppinsMedium,
                                         marginHorizontal: '10%',
-                                        color: LS_COLORS.global.black
+                                        color: LS_COLORS.global.black,
                                     }}>
                                         {user.user_role == role.customer ? 'Work' : 'Mailing'} Address{user.user_role == role.customer ? '' : "*"}
                                     </Text>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <View style={{ flexDirection: 'row',justifyContent:"flex-end", alignItems: 'center',flex:1}}>
                                         <CheckBox
                                             style={{}}
                                             containerStyle={{ width: 25 }}
@@ -1482,7 +1484,7 @@ const Profile = (props) => {
                                             checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                             uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                         />
-                                        <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same address</Text>
+                                        <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same address</Text>
                                     </View>
                                 </View>
                                 <GooglePlacesAutocomplete
@@ -1528,6 +1530,7 @@ const Profile = (props) => {
                                             })
                                             setSelection1({start:t?.length})
                                         },
+                                        maxFontSizeMultiplier:1.5,
                                         onBlur: () => { setSelection1({ start: 0 }) },
                                         onFocus: () => { setSelection1({start:workAddressData?.address_line_1?.length}) }
                                     }}
@@ -1541,7 +1544,7 @@ const Profile = (props) => {
 
                             {user.user_role == role.provider &&
                                 <View>
-                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 15, color: LS_COLORS.global.placeholder }}>Certificates (upto 5 )</Text>
+                                    <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 15, color: LS_COLORS.global.placeholder }}>Certificates (upto 5 )</Text>
                                     {userData?.certificate_data?.map((x, i) => <CustomInput
                                         text="Certificates"
                                         value={x?.certificate != "null" ? x?.certificate : ""}
@@ -1565,7 +1568,7 @@ const Profile = (props) => {
                                         }}>
 
                                             <Image source={require("../../../assets/signup/add_field1.png")} style={{ height: 30, width:30 }} resizeMode="contain" />
-                                            <Text style={{fontSize:14,color:LS_COLORS.global.black,fontFamily:LS_FONTS.PoppinsRegular,marginLeft:10}}>Add New Certificate</Text>
+                                            <Text maxFontSizeMultiplier={1.5}  style={{fontSize:14,color:LS_COLORS.global.black,fontFamily:LS_FONTS.PoppinsRegular,marginLeft:10}}>Add New Certificate</Text>
                                         </Pressable>}
                                     </View>
                                 </View>
@@ -1595,7 +1598,7 @@ const Profile = (props) => {
                             }
                             {user.user_role == role.provider &&
                                 <View style={{ marginHorizontal: 10, marginTop: 20 }}>
-                                    <Text style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
+                                    <Text  maxFontSizeMultiplier={1.5} style={{ textAlign: "center", color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Add Pictures (Upto 10 Pictures)</Text>
                                     <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 10 }}>
                                         {userData.pictures_data?.map(x => (<Pressable style={{ height: widthPercentageToDP(25.5), borderRadius: 5, width: widthPercentageToDP(25.5), marginTop: 5, marginRight: 5, justifyContent: "center", alignItems: "center", backgroundColor: LS_COLORS.global.textInutBorderColor }}>
                                             <Image resizeMode='cover' source={{ uri: BASE_URL + x.image }} style={{ height: widthPercentageToDP(25.5), width: widthPercentageToDP(25.5), borderRadius: 5 }} />
@@ -1638,18 +1641,18 @@ const Profile = (props) => {
                             user.user_role == role.customer
                                 ?
                                 <View style={{ ...styles.personalContainer, marginTop: 20, zIndex: -1000 }}>
-                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", fontSize: 14, marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION </Text>
+                                    <Text maxFontSizeMultiplier={1.5}  style={{ ...styles.text2, alignSelf: "flex-start", fontSize: 14, marginTop: 20, marginLeft: 10 }}>BILLING INFORMATION </Text>
                                     <TouchableOpacity onPress={() => {
                                         props.navigation.navigate("UserStack", { screen: "CardList" })
                                     }}>
-                                        <Text style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>Manage Cards</Text>
+                                        <Text maxFontSizeMultiplier={1.5}  style={{ ...styles.text2, alignSelf: "flex-start", marginTop: 20, marginLeft: 10 }}>Manage Cards</Text>
                                     </TouchableOpacity>
 
                                     <View style={{ height: 50 }} />
                                 </View>
                                 :
                                 <View style={{ ...styles.personalContainer, paddingVertical: 20, marginTop: 10, zIndex: -1000 }}>
-                                    <Text style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Stripe Account Information</Text>
+                                    <Text maxFontSizeMultiplier={1.5}  style={{ ...styles.text2, alignSelf: "flex-start", marginLeft: 10 }}>Stripe Account Information</Text>
                                     <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '5%', marginTop: '2%', borderWidth: 0.5, width: '90%', alignSelf: 'center', alignItems: 'center', paddingVertical: 5, borderRadius: 8, borderColor: LS_COLORS.global.grey }}
                                         activeOpacity={0.7}
                                         onPress={() => {
@@ -1660,10 +1663,10 @@ const Profile = (props) => {
                                             }
                                         }}>
                                         {isConnectedToAccount ? <View>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11 }}>Connected ({connectedDetail?.email})</Text>
-                                        </View> : <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
+                                            <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11 }}>Connected ({connectedDetail?.email})</Text>
+                                        </View> : <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
                                     </TouchableOpacity>
-                                    {isConnectedToAccount && <Text onPress={() => {
+                                    {isConnectedToAccount && <Text maxFontSizeMultiplier={1.5}  onPress={() => {
                                         createNewConnect()
                                     }} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: "red" }}>Change</Text>
                                     }
@@ -1675,17 +1678,17 @@ const Profile = (props) => {
             <View style={{ flexDirection: 'row', backgroundColor: LS_COLORS.global.transparent, paddingVertical: 5, justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: '5%' }}>
                 <TouchableOpacity activeOpacity={0.7} onPress={() => saveUser()} style={{ alignItems: "center" }}>
                     <Image source={require('../../../assets/save.png')} style={{ height: 30, aspectRatio: 1 }} resizeMode="contain" />
-                    <Text>Save</Text>
+                    <Text maxFontSizeMultiplier={1.5} >Save</Text>
                 </TouchableOpacity>
                 <TouchableOpacity activeOpacity={0.7} onPress={() => {
                     props.navigation.navigate("UserStack", { screen: 'Settings' })
                 }} style={{ alignItems: "center" }}>
                     <Image source={require('../../../assets/gear.png')} style={{ height: 30, aspectRatio: 1 }} resizeMode="contain" />
-                    <Text>Settings</Text>
+                    <Text maxFontSizeMultiplier={1.5} >Settings</Text>
                 </TouchableOpacity>
                 <TouchableOpacity activeOpacity={0.7} onPress={() => logout()} style={{ alignItems: "center" }}>
                     <Image source={require('../../../assets/logout.png')} style={{ height: 30, aspectRatio: 1 }} resizeMode="contain" />
-                    <Text>Logout</Text>
+                    <Text maxFontSizeMultiplier={1.5} >Logout</Text>
                 </TouchableOpacity>
             </View>
             {loader && <Loader />}

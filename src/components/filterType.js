@@ -29,28 +29,28 @@ const FilterType = props => {
                         borderRadius: 10,
                         padding: 10,
                     }}>
-                    <Text style={styles.sure}>{props.title}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.sure}>{props.title}</Text>
                     <View style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
                    
                         <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={props.action}>
-                            <Text style={styles.saveText}>{props.type1}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>{props.type1}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={props.action1}
                         >
-                            <Text style={styles.saveText}>{props.type2}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>{props.type2}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={props.action2}
                         >
-                            <Text style={styles.saveText}>{props.type3}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>{props.type3}</Text>
                         </TouchableOpacity>
                 </View>
             </Pressable>

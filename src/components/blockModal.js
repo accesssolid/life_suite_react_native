@@ -32,7 +32,7 @@ const BlockModal = ({visible,setVisible,title,onPressYes}) => {
                         borderRadius: 10,
                         padding: 20,
                     }}>
-                            <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, alignSelf: "center", marginTop: "4%", color: 'black' }}>{title}</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, alignSelf: "center", marginTop: "4%", color: 'black' }}>{title}</Text>
                             <View style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
                             <View style={{flexDirection:"row",width:"100%"}}>
                             <TouchableOpacity
@@ -41,7 +41,7 @@ const BlockModal = ({visible,setVisible,title,onPressYes}) => {
                                 onPress={() => {
                                     setVisible(false)
                                 }}>
-                                <Text style={styles.saveText}>No</Text>
+                                <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>No</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.save,{marginLeft:10}]}
@@ -50,7 +50,7 @@ const BlockModal = ({visible,setVisible,title,onPressYes}) => {
                                     onPressYes()
                                     setVisible(false)
                                 }}>
-                                <Text style={styles.saveText}>Yes</Text>
+                                <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Yes</Text>
                             </TouchableOpacity>
                             </View>
                 </View>

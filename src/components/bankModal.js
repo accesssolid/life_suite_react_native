@@ -33,9 +33,9 @@ const BankModal = props => {
             borderRadius: 10,
             padding: 20,
           }}>
-          <Text style={styles.sure}>{bankData?.title}</Text>
+          <Text maxFontSizeMultiplier={1.5} style={styles.sure}>{bankData?.title}</Text>
           <View style={{ height: 2, width: 84, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
-          <Text style={{ ...styles.subtext, marginTop: "10%" }}>{bankData?.subtitle}</Text>
+          <Text maxFontSizeMultiplier={1.5} style={{ ...styles.subtext, marginTop: "10%" }}>{bankData?.subtitle}</Text>
           <View style={{ marginTop: '10%' }}>
             <TouchableOpacity
               style={styles.save}
@@ -66,7 +66,7 @@ const BankModal = props => {
                 }
               }}
             >
-              <Text style={styles.saveText}>{bankData?.buttonTitle}</Text>
+              <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>{bankData?.buttonTitle}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.save, { marginTop: 20 }]}
@@ -83,7 +83,7 @@ const BankModal = props => {
                 }))
               }}
             >
-              <Text style={styles.saveText}>Cancel</Text>
+              <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>

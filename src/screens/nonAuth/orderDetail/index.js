@@ -475,7 +475,7 @@ const OrderClientDetail = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
                             </View>
                         </SafeAreaView>
                     </View>
@@ -485,9 +485,9 @@ const OrderClientDetail = (props) => {
                 <View style={styles.container}>
                     {/* <RenderView /> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
-                        <Text style={[styles.client_info_text]}>Client Info</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text]}>Client Info</Text>
                         <CardClientInfo settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        {getReasonForCancellationText() && <Text style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
+                        {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
                         <RenderAddressFromTO
                             fromShow={data?.order_items[0]?.services_location_type == 2}
                             toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
@@ -499,24 +499,24 @@ const OrderClientDetail = (props) => {
                             }}
                         />
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
-                            <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>User Requested Time Frame </Text>
-                            <Text style={styles.baseTextStyle}>{moment(data?.requested_start_time).format("hh:mm a")} - {moment(data?.requested_end_time).format("hh:mm a")}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium ,flex:1}]}>User Requested Time Frame </Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{moment(data?.requested_start_time).format("hh:mm a")} - {moment(data?.requested_end_time).format("hh:mm a")}</Text>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                            <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order Start Time</Text>
-                            <Text style={styles.baseTextStyle}>{moment(data?.order_start_time).format("hh:mm a")}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order Start Time</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{moment(data?.order_start_time).format("hh:mm a")}</Text>
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                            <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order End Time </Text>
-                            <Text style={styles.baseTextStyle}>{moment(data?.order_end_time).format("hh:mm a")}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order End Time </Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{moment(data?.order_end_time).format("hh:mm a")}</Text>
                         </View>
                         {/* only show if order status is pending i.e 1 */}
                         {(data?.order_status == 1) &&
                             <>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                                     <View>
-                                        <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Available Start Time</Text>
-                                        <Text onPress={() => setBookedModal(true)} style={[styles.baseTextStyle, { color: "skyblue" }]}>(View Booked Slots)</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsSemiBold }]}>Available Start Time</Text>
+                                        <Text maxFontSizeMultiplier={1.5} onPress={() => setBookedModal(true)} style={[styles.baseTextStyle, { color: "skyblue" }]}>(View Booked Slots)</Text>
                                     </View>
                                     <View>
                                         <DropDown
@@ -532,7 +532,7 @@ const OrderClientDetail = (props) => {
                                 </View>
                             </>
                         }
-                        {textShowWithRed !== "" && <Text style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>}
+                        {textShowWithRed !== "" && <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>}
                     </ScrollView>
                     <GetButtons
                         data={data}
@@ -759,47 +759,47 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                         source={user.user_role === 3 ? data?.customers_profile_image ? { uri: BASE_URL + data?.customers_profile_image } : placeholder_image : data?.providers_profile_image ? { uri: BASE_URL + data?.providers_profile_image } : placeholder_image}
                     />
                     <View style={{ marginLeft: 10, justifyContent: "center" }}>
-                        <Text style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
-                        <Text style={[styles.baseTextStyle]}>{country}</Text>
+                        <Text maxFontSizeMultiplier={1.5}  style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle]}>{country}</Text>
                     </View>
                 </View>
-                <View >
-                    <Text style={[styles.greenTextStyle, { textAlign: "right" }]}>Created on: {moment(data?.order_start_time).fromNow()}</Text>
-                    <Text style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
-                    <Text style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" },styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
+                <View  style={{flex:1}}>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}>Created on: {moment(data?.order_start_time).fromNow()}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}># {data?.id}</Text></Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" },styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
                 </View>
             </View>
             {/* request data */}
-            {showVirtualData && <Text style={[styles.client_info_text, { textAlign: "left", fontSize: 14, marginTop: 10 }]}>User Requested Order</Text>}
+            {showVirtualData && <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left", fontSize: 14, marginTop: 10 }]}>User Requested Order</Text>}
             {items?.map((i) => {
                 return (<OrderItemsDetail i={i} />)
             })}
             {/* New Request products and Service */}
             {showVirtualData && virtualOrdersItems.length > 0 && <View style={{ marginVertical: 20 }}>
-                <Text style={[styles.client_info_text, { textAlign: "left", fontSize: 14 }]}>Provider Updated Order</Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left", fontSize: 14 }]}>Provider Updated Order</Text>
                 {virtualOrdersItems?.map((i) => {
                     return (<OrderItemsDetail i={i} />)
                 })}
             </View>}
             {checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text style={styles.greenTextStyle}>Discount</Text>
-                <Text style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price)}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Discount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price)}</Text>
             </View>}
             {data?.provider_rating_data?.id &&
                 <>
                     <View style={{ backgroundColor: "white", width: "100%", justifyContent: "space-between", flexDirection: "row", alignItems: "center",marginTop:10 }}>
-                    <Text style={styles.greenTextStyle}>Tip</Text>
-                        <Text style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ?? 0}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Tip</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ?? 0}</Text>
                     </View>
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text style={styles.greenTextStyle}>Total Amount</Text>
-                <Text style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text style={styles.greenTextStyle}>Total Time</Text>
-                <Text style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
             </View>
            
         </Card>
@@ -810,21 +810,21 @@ const OrderItemsDetail = ({ i }) => {
     return (
         <>
             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                <Text style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} numberOfLines={1}>{i.service_items_name + "  (Service Charge)"}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} >{i.service_items_name + "  (Service Charge)"}</Text>
                 <View style={{ height: 20, flexDirection: "row" }}>
-                    <Text style={styles.baseTextStyle}>{"$" + i.price}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + i.price}</Text>
                 </View>
             </View>
             {i.product.map((itemData, index) => {
                 return (
                     <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row',marginTop:10}}>
                         <View style={{}} >
-                            <Text style={{ marginLeft: 20 }}>
-                                <Text style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
+                                <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
                         </View>
                     </View>
                 )
@@ -834,12 +834,12 @@ const OrderItemsDetail = ({ i }) => {
                 return (
                     <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
                         <View style={{}} >
-                            <Text style={{ marginLeft: 20 }}>
-                                <Text style={styles.baseTextStyle}>{itemData.product_name + "(Other Product)"}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
+                                <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{itemData.product_name + "(Other Product)"}</Text>
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text style={styles.baseTextStyle}>{"$" + itemData.product_price}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + itemData.product_price}</Text>
                         </View>
                     </View>
                 )
@@ -853,23 +853,23 @@ const OrderItemsDetail = ({ i }) => {
                     <>
                         {other && other.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
                             <View style={{}} >
-                                <Text style={{ marginLeft: 20 }}>
-                                    <Text style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
+                                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{other + "(Other Product)"}</Text>
                                 </Text>
                             </View>
                         </View>
                         }
                         {have_own && have_own.trim() != "" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
                             <View style={{}} >
-                                <Text style={{ marginLeft: 20 }}>
-                                    <Text style={styles.baseTextStyle}>{have_own + "(Have Own Product)"}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
+                                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{have_own + "(Have Own Product)"}</Text>
                                 </Text>
                             </View>
                         </View>}
                         {need_recommendation && need_recommendation == "true" && <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
                             <View style={{}} >
-                                <Text style={{ marginLeft: 20 }}>
-                                    <Text style={styles.baseTextStyle}>Need Recommendation</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
+                                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>Need Recommendation</Text>
                                 </Text>
                             </View>
                         </View>}
@@ -887,7 +887,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
         <View style={{ marginHorizontal: 20 }}>
             {fromShow &&
                 <>
-                    <Text style={[styles.baseTextStyle, { marginBottom: 8,marginTop:16 }]}>From</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginBottom: 8,marginTop:16 }]}>From</Text>
                     <TouchableOpacity
                         onPress={() => {
                             // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
@@ -900,7 +900,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
                             }
                         }}
                         style={styles.fromContainer}>
-                        <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.from}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.from}</Text>
                         <TouchableOpacity
                             onPress={() => {
                                 // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })
@@ -924,7 +924,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
             }
             {toShow &&
                 <>
-                    <Text style={[styles.baseTextStyle, { marginTop: 16, marginBottom: 8 }]}>To</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginTop: 16, marginBottom: 8 }]}>To</Text>
                     <TouchableOpacity
                         onPress={() => {
                             if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {
@@ -937,7 +937,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
                             // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.toCoordinates })
                         }}
                         style={styles.fromContainer}>
-                        <Text style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.to}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{addresses?.to}</Text>
                         <TouchableOpacity
                             onPress={() => {
                                 if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {
@@ -1068,7 +1068,7 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayMo
                     <TouchableOpacity
                         onPress={() => pressHandler(x.type)}
                         style={[styles.save, { marginTop: 0, marginBottom: 10 }]}>
-                        <Text style={styles.saveText}>{title}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>{title}</Text>
                     </TouchableOpacity>
                 )
             })}

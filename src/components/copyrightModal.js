@@ -50,7 +50,7 @@ const CopyRightModal = (props) => {
             isVisible={props.isVisible}>
             <View style={styles.container}>
            
-                <Text style={styles.title}>COPYRIGHT</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.title}>COPYRIGHT</Text>
                 <WebView
                     showsVerticalScrollIndicator={false}
                     style={{ flex: 1 }}

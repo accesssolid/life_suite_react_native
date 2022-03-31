@@ -55,7 +55,7 @@ const AboutUsModal = (props) => {
             isVisible={props.isVisible}>
             <View style={styles.container}>
              
-                <Text style={styles.title}>ABOUT US</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.title}>ABOUT US</Text>
                 <WebView
                     showsVerticalScrollIndicator={false}
                     style={{ flex: 1,marginTop:20 }}

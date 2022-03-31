@@ -322,10 +322,14 @@ const ScheduleTime = (props) => {
             />
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20 }}>
-                    <CustomButton title={"View Calendar"} customTextStyles={{ fontSize: 12 }} customStyles={{ width: window_width * 0.35, height: 45, marginVertical: 10 }} action={() => {
+                    <CustomButton title={"View Calendar"}  textProps={{
+                        maxFontSizeMultiplier:1.3
+                    }} customTextStyles={{ fontSize: 12 }} customStyles={{ width: window_width * 0.4, height: 45, marginVertical: 10 }} action={() => {
                         setCurrentTab(1)
                     }} />
-                    <CustomButton title={"Add Time Frame"} customTextStyles={{ fontSize: 12 }} customStyles={{ width: window_width * 0.35, height: 45, marginVertical: 10 }} action={() => {
+                    <CustomButton title={"Add Time Frame"} textProps={{
+                        maxFontSizeMultiplier:1.3
+                    }} customTextStyles={{ fontSize: 12 }} customStyles={{ width: window_width * 0.4, height: 45, marginVertical: 10 }} action={() => {
                         setCurrentTab(2)
 
                     }} />
@@ -343,7 +347,7 @@ const ScheduleTime = (props) => {
                                 setCurrentMonth(moment(e.dateString, "YYYY-MM-DD").format("YYYY-MM"))
                             }}
                             renderHeader={(e) => {
-                                return <Text onPress={() => {
+                                return <Text maxFontSizeMultiplier={1.4}  onPress={() => {
                                     setCurrentDate(null);
                                     setCurrentMonth(moment(new Date(e)).format("YYYY-MM"))
                                 }}
@@ -388,7 +392,7 @@ const ScheduleTime = (props) => {
                                     <TouchableOpacity onPress={() => {
                                         setCurrentDate(date.dateString)
                                     }} style={{ position: "relative", padding: 5, width: 40, height: 40, borderRadius: 20, justifyContent: "center", backgroundColor: isSelected ? "#0007" : backgroundColor }}>
-                                        <Text style={{ textAlign: 'center', fontSize: 14, color: textColor, fontFamily: LS_FONTS.PoppinsRegular }}>
+                                        <Text maxFontSizeMultiplier={1.2}  style={{ textAlign: 'center', fontSize: 14, color: textColor, fontFamily: LS_FONTS.PoppinsRegular }}>
                                             {date.day}
                                         </Text>
                                     </TouchableOpacity>
@@ -396,15 +400,15 @@ const ScheduleTime = (props) => {
                             }}
 
                         />
-                        <View style={{ flexDirection: "row", height: 50, overflow: "hidden", alignSelf: "center", borderRadius: 40, borderWidth: 1, borderColor: LS_COLORS.global.green, width: "95%" }}>
+                        <View style={{ flexDirection: "row", minHeight: 50, overflow: "hidden", alignSelf: "center", borderRadius: 40, borderWidth: 1, borderColor: LS_COLORS.global.green, width: "95%" }}>
                             <Pressable onPress={() => setCurrentTab2(0)} style={{ flex: 1, justifyContent: "center", borderTopLeftRadius: 40, borderBottomLeftRadius: 40, backgroundColor: currentTab2 == 0 ? LS_COLORS.global.green : "white", alignItems: "center" }}>
-                                <Text style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 0 ? "white" : "black" }}>Show Upcoming Jobs</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 0 ? "white" : "black"}}>Show Upcoming Jobs</Text>
                             </Pressable>
                             <Pressable onPress={() => setCurrentTab2(1)} style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: currentTab2 == 1 ? LS_COLORS.global.green : "white", borderColor: LS_COLORS.global.green, borderLeftWidth: 1, borderRightWidth: 1 }}>
-                                <Text style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 1 ? "white" : "black" }}>Show Jobs</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 1 ? "white" : "black" }}>Show Jobs</Text>
                             </Pressable >
                             <Pressable onPress={() => setCurrentTab2(2)} style={{ flex: 1, justifyContent: "center", borderBottomRightRadius: 40, borderTopRightRadius: 40, alignItems: "center", backgroundColor: currentTab2 == 2 ? LS_COLORS.global.green : "white" }}>
-                                <Text style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 2 ? "white" : "black" }}>Show All</Text>
+                                <Text maxFontSizeMultiplier={1.5}   style={{ textAlign: "center", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: currentTab2 == 2 ? "white" : "black" }}>Show All</Text>
                             </Pressable>
                         </View>
                         {
@@ -434,7 +438,7 @@ const ScheduleTime = (props) => {
 
                                     return (
                                         <>
-                                            {Object.keys(new_data).length > 0 && <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>}
+                                            {Object.keys(new_data).length > 0 && <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>}
                                             {Object.keys(new_data)?.map(y => {
                                                 return (<OrderList key={y} data={new_data[y]} headerDate={x} title={y} timeFrameData={timeFrameData} />)
                                             })}
@@ -500,7 +504,7 @@ const PartialComponent = ({ date, setCurrentDate, textColor, backgroundColor }) 
                 setCurrentDate(date.dateString)
             }} style={{ position: "relative", padding: 5, width: 40, height: 40, borderRadius: 20, justifyContent: "center" }}>
 
-                <Text style={{ textAlign: 'center', fontSize: 14, color: textColor, fontFamily: LS_FONTS.PoppinsRegular }}>
+                <Text maxFontSizeMultiplier={1.5}  style={{ textAlign: 'center', fontSize: 14, color: textColor, fontFamily: LS_FONTS.PoppinsRegular }}>
                     {date.day}
                 </Text>
 
@@ -543,13 +547,13 @@ const SingleFrameDataShow = ({ orderData, frames, title }) => {
     return (
         <>
             <Pressable onPress={() => setShowOrders(!showOrder)} style={{ paddingVertical: 13, paddingHorizontal: 10, marginHorizontal: 10, borderWidth: 1, borderColor: LS_COLORS.global.divider, borderRadius: 10, marginTop: 7 }}>
-                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({orderData?.length ?? 0})</Text>
+                <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({orderData?.length ?? 0})</Text>
                 {frames.map((f, i) => <View key={i + "" + i} style={{ flexDirection: "row", marginBottom: 10 }}>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
+                        <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
                             <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                <Text>{moment(f.from_time, "HH:mm").format("hh:mm a")}</Text>
+                                <Text maxFontSizeMultiplier={1.5} >{moment(f.from_time, "HH:mm").format("hh:mm a")}</Text>
                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                 </View>
@@ -557,10 +561,10 @@ const SingleFrameDataShow = ({ orderData, frames, title }) => {
                         </View>
                     </View>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
+                        <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                         <View style={{ flex: 1, flexDirection: 'row', height: 32, backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                             <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                <Text>{moment(f.to_time, "HH:mm").format("hh:mm a")}</Text>
+                                <Text maxFontSizeMultiplier={1.5} >{moment(f.to_time, "HH:mm").format("hh:mm a")}</Text>
                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                 </View>
@@ -575,13 +579,13 @@ const SingleFrameDataShow = ({ orderData, frames, title }) => {
                         navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
                     }} style={{ paddingVertical: 13, paddingHorizontal: 10, marginHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
-                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
 
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Start Time : {moment(o.order_start_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Est. End Time : {moment(o.order_end_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Start Time : {moment(o.order_start_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular,flex:1 ,textAlign:"right"}}>Est. End Time : {moment(o.order_end_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
                         </View>
                     </Pressable>
                 )
@@ -598,13 +602,13 @@ const OrderList = ({ title, data, timeFrameData, headerDate }) => {
     return (
         <View style={{ marginHorizontal: 20, }}>
             <Pressable onPress={() => setShowOrders(!showOrder)} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: LS_COLORS.global.divider, borderRadius: 10, marginTop: 7 }}>
-                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({data?.length ?? 0})</Text>
+                <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({data?.length ?? 0})</Text>
                 {frames.map((f, i) => <View key={i + "" + i} style={{ flexDirection: "row", marginBottom: 10 }}>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
+                        <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
                             <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                <Text>{moment(f.from_time, "HH:mm").format("hh:mm a")}</Text>
+                                <Text maxFontSizeMultiplier={1.5} >{moment(f.from_time, "HH:mm").format("hh:mm a")}</Text>
                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                 </View>
@@ -612,10 +616,10 @@ const OrderList = ({ title, data, timeFrameData, headerDate }) => {
                         </View>
                     </View>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
+                        <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                         <View style={{ flex: 1, flexDirection: 'row', height: 32, backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                             <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                <Text>{moment(f.to_time, "HH:mm").format("hh:mm a")}</Text>
+                                <Text maxFontSizeMultiplier={1.5} >{moment(f.to_time, "HH:mm").format("hh:mm a")}</Text>
                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                     <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                 </View>
@@ -631,13 +635,13 @@ const OrderList = ({ title, data, timeFrameData, headerDate }) => {
                             navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
                         }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
-                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
 
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Start Time : {moment(o.order_start_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Est. End Time : {moment(o.order_end_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular ,flex:1}}>Start Time : {moment(o.order_start_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular,flex:1 ,textAlign:"right"}}>Est. End Time : {moment(o.order_end_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
                             </View>
                         </Pressable>
                     )
@@ -692,7 +696,7 @@ const ShowAllScheduleWithOrders = ({ timeFrameData, orderData, currentMonth }) =
 
                     return (
                         <>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, marginHorizontal: 20, marginTop: 20 }}>{x}</Text>
                             {Object.keys(f_d).map((title,index) => {
                                 let items = f_d[`${title}`]
                                 let orders = orderData[`${x}`]
@@ -718,13 +722,13 @@ const ShowAllScheduleWithOrders = ({ timeFrameData, orderData, currentMonth }) =
                                             }
                                             
                                         }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: LS_COLORS.global.divider, borderRadius: 10, marginTop: 7 }}>
-                                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({filterdOrders?.length})</Text>
+                                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsBold }}>{title} ({filterdOrders?.length})</Text>
                                             {items.map((f, i) => <View key={i + "" + i} style={{ flexDirection: "row", marginBottom: 10 }}>
                                                 <View style={{ flex: 1 }}>
-                                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
+                                                    <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                                                     <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
                                                         <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                                            <Text>{moment(f.from_time, "HH:mm").format("hh:mm a")}</Text>
+                                                            <Text maxFontSizeMultiplier={1.5} >{moment(f.from_time, "HH:mm").format("hh:mm a")}</Text>
                                                             <View style={{ height: 11, aspectRatio: 1 }}>
                                                                 <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                             </View>
@@ -732,10 +736,10 @@ const ShowAllScheduleWithOrders = ({ timeFrameData, orderData, currentMonth }) =
                                                     </View>
                                                 </View>
                                                 <View style={{ flex: 1 }}>
-                                                    <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
+                                                    <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                                                     <View style={{ flex: 1, flexDirection: 'row', height: 32, backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                                                         <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} activeOpacity={0.7} >
-                                                            <Text>{moment(f.to_time, "HH:mm").format("hh:mm a")}</Text>
+                                                            <Text maxFontSizeMultiplier={1.5} >{moment(f.to_time, "HH:mm").format("hh:mm a")}</Text>
                                                             <View style={{ height: 11, aspectRatio: 1 }}>
                                                                 <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                             </View>
@@ -751,13 +755,13 @@ const ShowAllScheduleWithOrders = ({ timeFrameData, orderData, currentMonth }) =
                                                         navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
                                                     }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
                                                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                                                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
-                                                            <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
+                                                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                                                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
 
                                                         </View>
                                                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Start Time : {moment(o.order_start_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
-                                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Est. End Time : {moment(o.order_end_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                                                            <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular,flex:1 }}>Start Time : {moment(o.order_start_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
+                                                            <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsRegular,flex:1 ,textAlign:"right"}}>Est. End Time : {moment(o.order_end_time, "YYYY-MM-DD HH:mm").format("hh:mm a")}</Text>
                                                         </View>
                                                     </Pressable>
                                                 )

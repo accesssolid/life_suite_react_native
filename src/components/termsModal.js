@@ -67,7 +67,7 @@ const TermsModal = (props) => {
             isVisible={props.isVisible}>
             <View style={styles.container}>
              
-                <Text style={styles.title}>TERMS & CONDITIONS</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.title}>TERMS & CONDITIONS</Text>
                 <WebView
                     showsVerticalScrollIndicator={false}
                     style={{flex:1}}

@@ -489,7 +489,7 @@ const AddLicense = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
                             </View>
                         </SafeAreaView>
                     </View>
@@ -498,14 +498,14 @@ const AddLicense = (props) => {
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
                     <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                        <Text style={styles.service}>{upload_type.text}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={styles.service}>{upload_type.text}</Text>
                         {showSelector && <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green, marginHorizontal: 20, marginBottom: 10 }}>
                             <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
                             </TouchableOpacity>
                             <View style={{ width: 1, backgroundColor: LS_COLORS.global.green }} />
                             <TouchableOpacity onPress={() => setSelected(1)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 1 ? LS_COLORS.global.green : "white" }}>
-                                <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 1 ? "white" : "black" }}>Upload License</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 1 ? "white" : "black" }}>Upload License</Text>
                             </TouchableOpacity>
                         </View>}
                         {upload_type.id == 2 && images.map((item, index) => {

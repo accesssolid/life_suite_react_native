@@ -37,9 +37,9 @@ const CancelModal = props => {
                     }}>
                     {/* <Container style={{ flex: 1, backgroundColor: 'white' }}> */}
                         {/* <Content> */}
-                            <Text style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.title}</Text>
-                            <Text style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.subCancelText}</Text>
-                            <View style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
+                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.title}</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.subCancelText}</Text>
+                            <View  maxFontSizeMultiplier={1.5} style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
                             <Card style={{ marginTop:20 }}>
                                 <TextInput
                                     multiline={true}
@@ -48,6 +48,7 @@ const CancelModal = props => {
                                     value={props.value}
                                     onChangeText={props.onChangeText}
                                     placeholderTextColor={"black"}
+                                    maxFontSizeMultiplier={1.5}
                                 />
                             </Card>
                             <View style={{flexDirection:"row",width:"100%"}}>
@@ -57,7 +58,7 @@ const CancelModal = props => {
                                 onPress={() => {
                                     props.action1()
                                 }}>
-                                <Text style={styles.saveText}>Cancel</Text>
+                                <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.save,{marginLeft:10}]}
@@ -65,7 +66,7 @@ const CancelModal = props => {
                                 onPress={() => {
                                     props.action()
                                 }}>
-                                <Text style={styles.saveText}>Submit</Text>
+                                <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Submit</Text>
                             </TouchableOpacity>
                             </View>
                         {/* </Content> */}

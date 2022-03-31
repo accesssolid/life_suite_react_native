@@ -96,7 +96,7 @@ const ChatMembers = (props) => {
                         }}
                     />
                     <View style={{ marginLeft: '8%', alignSelf: 'center', width: "55%" }}>
-                        <Text style={{ fontSize: 15, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>{itemData.item.first_name}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 15, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>{itemData.item.first_name}</Text>
                     </View>
                     <View style={{ width: "20%", justifyContent: "flex-start", alignItems: "flex-end" }}>
 
@@ -125,7 +125,7 @@ const ChatMembers = (props) => {
                 <View style={{ flex: 1, backgroundColor: "white" }}>
                     {member?.length === 0 ?
                         <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: "center" }}>
-                            <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No Members Found</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No Members Found</Text>
                         </View>
                         : <FlatList
                             data={member}

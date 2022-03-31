@@ -205,7 +205,7 @@ const MapScreen = (props) => {
                         textInputProps={{
                             onFocus: () => setFocused(true),
                             onblur: () => setFocused(false),
-
+                            maxFontSizeMultiplier:1.4,
                             blurOnSubmit: true,
                             onSubmitEditing: () => setFocused(false),
                         }}

@@ -337,7 +337,7 @@ const SelectLocation = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
                             </View>
                         </SafeAreaView>
                     </View>
@@ -381,12 +381,12 @@ const SelectLocation = (props) => {
                                 }}
                                 activeOpacity={0.7}
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: coordinates })}>
-                                <Text numberOfLines={1} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, }}>{address}</Text>
+                                <Text maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, }}>{address}</Text>
                                 <View style={{ aspectRatio: 1, position: 'absolute', right: '5%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                                     <Image source={require('../../../assets/location.png')} resizeMode="contain" style={{ height: '70%', width: '100%', backgroundColor: LS_COLORS.global.lightGrey }} />
                                 </View>
                             </TouchableOpacity>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsMedium }}>Travel Distance to provide service(Miles)</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium }}>Travel Distance to provide service(Miles)</Text>
                             <CustomTextInput
                                 placeholder="Travel Distance"
                                 value={travelDistance}

@@ -66,7 +66,7 @@ const ServiceItemUser = (props) => {
                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                 />
-                <Text style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{props.item.name}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{props.item.name}</Text>
             </View>
             {props.activeMode && <View style={{ flex: 1 }}>
                 <ScrollView removeClippedSubviews={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
@@ -79,7 +79,7 @@ const ServiceItemUser = (props) => {
                                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                                 />
-                                <Text style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{product.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{product.name}</Text>
                             </View>
                         )
                     })}
@@ -92,7 +92,7 @@ const ServiceItemUser = (props) => {
                                 checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Other</Text>
+                            <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Other</Text>
                         </View>
                     </View>
                     <View style={{ flexDirection: 'row', width: '90%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center', }}>
@@ -104,6 +104,7 @@ const ServiceItemUser = (props) => {
                                 color="black"
                                 placeholder="other products"
                                 placeholderTextColor={LS_COLORS.global.placeholder}
+                                maxFontSizeMultiplier={1.5}
                             />
                         </View>
                     </View>
@@ -115,7 +116,7 @@ const ServiceItemUser = (props) => {
                                 checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>I have my own</Text>
+                            <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>I have my own</Text>
                         </View>
                     </View>
                     <View style={{ flexDirection: 'row', width: '90%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center', }}>
@@ -127,6 +128,7 @@ const ServiceItemUser = (props) => {
                                 color="black"
                                 placeholder="your products"
                                 placeholderTextColor={LS_COLORS.global.placeholder}
+                                maxFontSizeMultiplier={1.5}
                             />
                         </View>
                     </View>
@@ -138,7 +140,7 @@ const ServiceItemUser = (props) => {
                                 checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Need recommendation</Text>
+                            <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Need recommendation</Text>
                         </View>
                     </View>
                 </ScrollView>

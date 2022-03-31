@@ -191,7 +191,7 @@ const Favourites = (props) => {
                             borderWidth: 1,
                             borderColor: LS_COLORS.global.cyan
                         }}>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service</Text>
+                            <Text maxFontSizeMultiplier={1.4} style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service</Text>
                         </TouchableOpacity>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => setActivetab(1)} style={{
                             backgroundColor: activeTab === 1 ? LS_COLORS.global.cyan : LS_COLORS.global.transparent,
@@ -202,7 +202,7 @@ const Favourites = (props) => {
                             borderWidth: 1,
                             borderColor: LS_COLORS.global.cyan
                         }}>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service Provider</Text>
+                            <Text maxFontSizeMultiplier={1.4} style={{ fontFamily: LS_FONTS.PoppinsBold, fontSize: 12, color: LS_COLORS.global.darkBlack }}>Service Provider</Text>
                         </TouchableOpacity>
                     </View>}
 
@@ -229,7 +229,7 @@ const Favourites = (props) => {
                         keyExtractor={(item, index) => index}
                         ListEmptyComponent={() => {
                             return (<View style={{ flex: 1, width: '100%', height: Dimensions.get('screen').height / 1.25, alignItems: 'center', justifyContent: 'center' }}>
-                                <Text>No Favourites</Text>
+                                <Text maxFontSizeMultiplier={1.4}>No Favourites</Text>
                             </View>)
 
                         }}
@@ -243,12 +243,12 @@ const Favourites = (props) => {
                                         <Image source={item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
                                     </View>
                                     <View style={{ flex: 1, paddingLeft: 10, justifyContent: 'center' }}>
-                                        <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
-                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>{item.last_name}</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>{item.last_name}</Text>
                                     </View>
                                     <View>
-                                        {/* <Text>Price: $25/hr</Text> */}
-                                        <Text>Rating: {parseInt(item.rating)}</Text>
+                                        {/* <Text maxFontSizeMultiplier={1.5}>Price: $25/hr</Text> */}
+                                        <Text maxFontSizeMultiplier={1.5}>Rating: {parseInt(item.rating)}</Text>
                                     </View>
                                     <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: 50, justifyContent: 'center', alignItems: "center", marginLeft: 10 }}>
                                         <Image source={require('../../../assets/heartGreen.png')} style={{ height: 25, width: 25 }} resizeMode="contain" />

@@ -22,8 +22,8 @@ const MediumCards = props => {
             />
             </View>
             <View style={{height:68,justifyContent:'center',alignItems:'center'}}>
-                <Text style={styles.text}>{props.title1}</Text>
-                <Text style={styles.text}>{props.title2}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.text}>{props.title1}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.text}>{props.title2}</Text>
             </View>
         </TouchableOpacity>
     )

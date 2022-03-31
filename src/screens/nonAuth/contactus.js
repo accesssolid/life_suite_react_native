@@ -92,12 +92,12 @@ export default function ContactUs({ navigation, route }) {
                             <View style={{ alignItems: "center" }}>
                                 <View style={{ marginTop: 20 }} />
                                 <Image source={require("./contact.png")} resizeMode="contain" style={{width:"80%",height:"40%"}} />
-                                <Text style={{
+                                <Text maxFontSizeMultiplier={1.5} style={{
                                          color: LS_COLORS.global.black,
                                          marginTop:10,
                                          fontFamily: LS_FONTS.PoppinsMedium,
                                 }}>Fill the form below in case of any query.</Text>
-                                <TextInputMask
+                                <TextInputMask maxFontSizeMultiplier={1.5}
                                     style={styles.inputMaskStyle}
                                     placeholder={'Name*'}
                                     placeholderTextColor={"gray"}
@@ -107,9 +107,10 @@ export default function ContactUs({ navigation, route }) {
                                     value={data.name}
                                     ref={cardNameRef}
                                     returnKeyType="next"
+                                    maxFontSizeMultiplier={1.5}
                                     onSubmitEditing={() => cardDateRef.current.focus()}
                                 />
-                               <TextInputMask
+                               <TextInputMask maxFontSizeMultiplier={1.5}
                                     style={styles.inputMaskStyle}
                                     placeholder={'Email*'}
                                     placeholderTextColor={"gray"}
@@ -129,6 +130,7 @@ export default function ContactUs({ navigation, route }) {
                                     onChangeText={(t) => {
                                         setData({ ...data, message: t })
                                     }}
+                                    maxFontSizeMultiplier={1.5}
                                 />
                             </View>
                         </Content>
@@ -140,7 +142,7 @@ export default function ContactUs({ navigation, route }) {
                         submit()
                     }}
                 >
-                    <Text style={styles.saveText}>Send</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Send</Text>
                 </TouchableOpacity>
                 </View>
               

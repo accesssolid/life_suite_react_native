@@ -973,7 +973,7 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
-                    <Text style={styles.service}>SERVICES</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.service}>SERVICES</Text>
                     {variants.length > 0 && <View style={{ height: 70 }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 10, marginHorizontal: 15, height: 70 }}>
                             {variants.map((item, index) => {
@@ -994,7 +994,7 @@ const ServicesProvided = (props) => {
                                             fontSize: 14,
                                             textTransform: 'uppercase',
                                             color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
-                                        }}>
+                                        }} maxFontSizeMultiplier={1.5} >
                                             {item.name}
                                         </Text>
                                     </TouchableOpacity>
@@ -1006,10 +1006,10 @@ const ServicesProvided = (props) => {
                         <View style={{ width: "45%" }} />
                         <View style={{ width: "55%", flexDirection: "row", justifyContent: 'flex-end' }}>
                             <View style={{ alignItems: 'center', width: 110,marginRight:10, }}>
-                                <Text style={{ ...styles.priceTime, }}>Estimated Time</Text>
+                                <Text  maxFontSizeMultiplier={1.5} style={{ ...styles.priceTime, }}>Estimated Time</Text>
                             </View>
                             <View style={{width:75,alignItems:"center",marginRight:"10%"}}>
-                                <Text style={styles.priceTime}>Price</Text>
+                                <Text  maxFontSizeMultiplier={1.5} style={styles.priceTime}>Price</Text>
                             </View>
                         </View>
                     </View>}
@@ -1061,7 +1061,7 @@ const ServicesProvided = (props) => {
                                                 onCheckPress={() => { onPressItem(index, item) }}
                                                 isSelected={selectedItems.includes(item.id)}
                                             />
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
+                                            <Text  maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
                                                 removeNewService(item)
                                             }}>Remove</Text>
                                         </View>
@@ -1119,7 +1119,7 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService }) => {
         >
             <Pressable onPress={() => setVisible(false)} style={{ flex: 1, justifyContent: "center", backgroundColor: "#0005" }}>
                 <Pressable style={{ backgroundColor: "white", padding: 10, borderRadius: 10, marginHorizontal: 15 }}>
-                    <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 16 }}>Enter Service name</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 16 }}>Enter Service name</Text>
                     <CustomInput
                         text="Service Name"
                         customContainerStyles={{ marginTop: 20 }}
@@ -1132,7 +1132,7 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService }) => {
                             addNewService(service_name)
                             setVisible(false)
                         }}
-                        customStyles={{ height: 40, width: "35%", borderRadius: 5, marginTop: 20 }}
+                        customStyles={{  width: "35%", borderRadius: 5, marginTop: 20 }}
                         customTextStyles={{ fontSize: 12 }}
                     />
                 </Pressable>

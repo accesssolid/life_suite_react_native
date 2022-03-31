@@ -498,13 +498,13 @@ const AddTimeFrame = (props) => {
                             const showDateRangeText = isSameDate ? start_date : start_date + " to " + end_date
                             return (
                                 <View key={index} style={{ paddingHorizontal: '5%', paddingVertical: 5 }}>
-                                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{showDateRangeText}</Text>
+                                    <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack }}>{showDateRangeText}</Text>
                                     <View style={{ flexDirection: 'row', marginTop: 5, height: 60, alignItems: 'center' }}>
                                         <View style={{ flex: 1 }}>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>From</Text>
                                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5, justifyContent: 'center' }}>
                                                 <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} disabled={serviceData.formdata == undefined} activeOpacity={0.7} onPress={() => setTime("from", index)}>
-                                                    <Text>{fromTime === "Invalid date" ? "" : fromTime}</Text>
+                                                    <Text maxFontSizeMultiplier={1.5}>{fromTime === "Invalid date" ? "" : fromTime}</Text>
                                                     <View style={{ height: 11, aspectRatio: 1 }}>
                                                         <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                     </View>
@@ -512,10 +512,10 @@ const AddTimeFrame = (props) => {
                                             </View>
                                         </View>
                                         <View style={{ flex: 1 }}>
-                                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
+                                            <Text  maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.darkBlack }}>To</Text>
                                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: LS_COLORS.global.frameBg, alignItems: 'center', width: '90%', marginTop: 5 }}>
                                                 <TouchableOpacity style={{ width: '100%', paddingHorizontal: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} disabled={serviceData.formdata == undefined} activeOpacity={0.7} onPress={() => fromTime !== "Invalid date" && setTime("to", index)}>
-                                                    <Text>{toTime === "Invalid date" ? "" : toTime}</Text>
+                                                    <Text maxFontSizeMultiplier={1.5}>{toTime === "Invalid date" ? "" : toTime}</Text>
                                                     <View style={{ height: 11, aspectRatio: 1 }}>
                                                         <Image source={require('../../../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                     </View>
@@ -540,7 +540,7 @@ const AddTimeFrame = (props) => {
                     onConfirm={handleConfirm}
                     onCancel={() => setDatePickerVisibility(false)}
                 />
-                {selectedDates.length > 0 && serviceData.formdata && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%', height: 45, marginVertical: 10 }} action={() => {
+                {selectedDates.length > 0 && serviceData.formdata && <CustomButton title={"SAVE"} customTextStyles={{}} customStyles={{ width: '50%',marginVertical: 10 }} action={() => {
                     if (!pressed) {
                         save()
                     }

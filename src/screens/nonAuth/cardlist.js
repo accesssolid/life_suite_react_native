@@ -154,7 +154,7 @@ export default function CardList({ navigation, route }) {
 
     return (
         <>
-            <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: LS_COLORS.global.cyan }}>
                 <Header imageUrl={require("../../assets/back.png")}
                     action={() => navigation.goBack()}
                     // imageUrl1={require("../../assets/home.png")}
@@ -162,11 +162,12 @@ export default function CardList({ navigation, route }) {
                     title={'Manage Card'}
                     containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
                     />
+                    <View style={{flex:1,backgroundColor:"white"}}>
                 <FlatList
                     style={{ flex: 1 }}
                     data={cards}
                     ListHeaderComponent={loader && <ActivityIndicator color={LS_COLORS.global.green} />}
-                    ListEmptyComponent={<View style={[styles.saveText, { justifyContent: "center", alignItems: "center", marginTop: 20 }]}><Text style={[styles.saveText, { color: "gray" }]}>No Cards</Text></View>}
+                    ListEmptyComponent={<View style={[styles.saveText, { justifyContent: "center", alignItems: "center", marginTop: 20 }]}><Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "gray" }]}>No Cards</Text></View>}
                     renderItem={({ item }) => {
                         return (
                             <TouchableOpacity activeOpacity={0.5} key={item.id} style={{ height: 200, marginTop: 20, position: "relative" }} onPress={() => {
@@ -186,17 +187,17 @@ export default function CardList({ navigation, route }) {
                                     resizeMode="cover"
                                 >
                                     <View>
-                                        <Text style={[styles.saveText, { color: "black",textAlign:"center" ,fontSize:18,letterSpacing:3}]}>**** **** **** {item.last4}</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black",textAlign:"center" ,fontSize:18,letterSpacing:3}]}>**** **** **** {item.last4}</Text>
                                     </View>
                                     <View style={{ marginHorizontal: 15, flexDirection: "row", marginBottom: 20, justifyContent: "space-between" }}>
                                         <View style={{ justifyContent: "flex-end" }}>
-                                            {/* <Text style={[styles.saveText, { color: "black" }]}>{item.brand}</Text> */}
+                                            {/* <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>{item.brand}</Text> */}
 
-                                            <Text style={[styles.saveText, { color: "black", fontSize: 15,textTransform:"uppercase" }]}>{item.name}</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black", fontSize: 15,textTransform:"uppercase" }]}>{item.name}</Text>
                                         </View>
                                         <View>
-                                            <Text style={[styles.saveText, { color: "black" }]}>Expiry Date</Text>
-                                            <Text style={[styles.saveText, { color: "black" }]}>{item.exp_month}/{item.exp_year}</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>Expiry Date</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>{item.exp_month}/{item.exp_year}</Text>
                                         </View>
                                     </View>
                                     <Image style={{ height: 60, width: 60, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type(item.brand)} />
@@ -252,8 +253,9 @@ export default function CardList({ navigation, route }) {
                         navigation.navigate("AddCard", { type: "add" })
                     }}
                 >
-                    <Text style={styles.saveText}>Add Card</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Add Card</Text>
                 </TouchableOpacity>
+                </View>
             </SafeAreaView>
         </>
     )

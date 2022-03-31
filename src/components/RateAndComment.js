@@ -48,9 +48,9 @@ export default function RateAndCommentModal({ data, visible, setVisible, handleA
         >
             <View style={{ flex: 1, backgroundColor: "#0005", justifyContent: "center" }}>
                 <View style={{ paddingVertical: 10, backgroundColor: "white", marginHorizontal: 20, borderRadius: 20 }}>
-                    <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginVertical: 10 }}>{id ? "Update" : "Add"} Rate and Comment</Text>
+                    <Text  maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginVertical: 10 }}>{id ? "Update" : "Add"} Rate and Comment</Text>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20 }}>
-                        <Text style={[styles.textStyle, { fontSize: 14 }]}>Rate: </Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={[styles.textStyle, { fontSize: 14 }]}>Rate: </Text>
                         <Rating
                             imageSize={25}
                             type="custom"
@@ -64,20 +64,20 @@ export default function RateAndCommentModal({ data, visible, setVisible, handleA
                         />
                     </View>
                     <View style={{ width: "90%", alignSelf: "center", marginTop: 20, borderRadius: 6, height: 150, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                        <TextInput value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top" placeholder={"Your Comments"} placeholderTextColor="gray" style={{ height: 200, padding: 10, color: "black" }} />
+                        <TextInput  maxFontSizeMultiplier={1.5} value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top" placeholder={"Your Comments"} placeholderTextColor="gray" style={{ height: 200, padding: 10, color: "black" }} />
                     </View>
                     <View style={{ flexDirection: "row", marginTop: 10, justifyContent: "center" }}>
                         <TouchableOpacity onPress={() => {
                             setVisible(false)
                         }} style={{ backgroundColor: LS_COLORS.global.green, borderRadius: 5, padding: 10 }}>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white" }}>Cancel</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white" }}>Cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => {
                                 handleAddUpdate(id, { rating, comment: reason })
                             }}
                             style={{ backgroundColor: LS_COLORS.global.green, borderRadius: 5, marginLeft: 20, padding: 10 }}>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white" }}>{id ? "Update" : "Add"}</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white" }}>{id ? "Update" : "Add"}</Text>
                         </TouchableOpacity>
                     </View>
                     {(id || id > 0) && <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "center" }}>
@@ -87,7 +87,7 @@ export default function RateAndCommentModal({ data, visible, setVisible, handleA
                                 handleDelete(id)
                             }}
                             style={{ backgroundColor: LS_COLORS.global.danger, borderRadius: 5, padding: 10 }}>
-                            <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white" }}>Delete</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white" }}>Delete</Text>
                         </TouchableOpacity>
                     </View>}
                 </View>

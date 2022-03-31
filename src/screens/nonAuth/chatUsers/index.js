@@ -98,6 +98,7 @@ const ChatUsers = (props) => {
                     padding: 10,
                     marginTop: 15,
                     alignSelf: 'center',
+                    alignItems:"center",
                     borderWidth: 1,
                     borderRadius: 10,
                     borderColor: '#4141411A',
@@ -106,7 +107,7 @@ const ChatUsers = (props) => {
                 activeOpacity={0.7}
                 onPress={() => { props.navigation.navigate("ChatScreen", { item: otherUser }) }}
             >
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: 'row',alignItems:"center" }}>
                     <Image
                         source={otherUser.profile_image !== null ? { uri: BASE_URL + otherUser.profile_image } : require("../../../assets/user.png")}
                         style={{
@@ -117,15 +118,15 @@ const ChatUsers = (props) => {
                         }}
                     />
                     <View style={{ marginLeft: '8%', alignSelf: 'center', width: "55%" }}>
-                        <Text style={{ fontSize: 15, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>{otherUser.first_name}</Text>
-                        <Text numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>{itemData.item._data.lastMessage}</Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 15, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>{otherUser.first_name}</Text>
+                        <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>{itemData.item._data.lastMessage}</Text>
                     </View>
                     <View style={{ width: "20%", justifyContent: "flex-start", alignItems: "flex-end" }}>
                         {readcount ?
                             <View style={{ height: 25, width: 25, borderRadius: 30, justifyContent: 'center', alignItems: 'center', backgroundColor: LS_COLORS.global.green, alignSelf: "flex-end" }}>
-                                <Text style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: 'white', alignSelf: 'center' }}>{readcount}</Text>
+                                <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: 'white', alignSelf: 'center' }}>{readcount}</Text>
                             </View> : null}
-                        <Text style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular }}>{moment(itemData?.item?._data?.lastMessageTime).format('hh:mm A')}</Text>
+                        <Text  maxFontSizeMultiplier={1.5} style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular }}>{moment(itemData?.item?._data?.lastMessageTime).format('hh:mm A')}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -168,8 +169,10 @@ const ChatUsers = (props) => {
                             onChangeText={(text) => {
                                 setSearch(text)
                             }}
+                            maxFontSizeMultiplier={1.5}
                             placeholder="Search"
                             value={search}
+                            
                         />
                         <View style={{ backgroundColor: '#ACF0F2', width: '13%', borderRadius: 10, justifyContent: "center", alignItems: "center" }}>
                             <Image
@@ -180,7 +183,7 @@ const ChatUsers = (props) => {
                     </View>
                     {allChats?.length === 0 ?
                         <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: "center", marginTop: 10 }}>
-                            <Text style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No Chats Found</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ color: "black", fontFamily: LS_FONTS.PoppinsBold }}>No Chats Found</Text>
                         </View>
                         : <FlatList
                             data={allChats
