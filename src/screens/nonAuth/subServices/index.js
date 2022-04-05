@@ -20,13 +20,20 @@ const SubServices = (props) => {
     const { service } = props.route.params
     const dispatch = useDispatch()
     const user = useSelector(state => state.authenticate.user)
+    const userType = useSelector(state => state.authenticate.type)
+
     const [subServices, setSubServices] = useState([])
     const [loading, setLoading] = useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
 
     useEffect(() => {
-        getSubServices()
-    }, [])
+        if(userType=="guest"){
+            getGuestSubServices()
+        }else{
+            getSubServices()
+        }
+        
+    }, [userType])
 
     const getSubServices = () => {
         setLoading(true)
@@ -62,6 +69,38 @@ const SubServices = (props) => {
             })
     }
     
+    const getGuestSubServices = () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        }
+
+        let user_data = {
+            "service_parent_id": service.id
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint:'/api/guestCustomerSubServicesList' ,
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setLoading(false)
+                    setSubServices([...response.data])
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
+
     const like = (id) => {
         let headers = {
             Accept: "application/json",

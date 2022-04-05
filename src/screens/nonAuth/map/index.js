@@ -279,6 +279,7 @@ const MapScreen = (props) => {
                                 latitudeDelta: 0.0922,
                                 longitudeDelta: 0.0421,
                             }}
+                            
                             // camera={{ ...coordinates,
                             //     latitudeDelta: 0.0922,
                             //     longitudeDelta: 0.0421,
@@ -291,11 +292,13 @@ const MapScreen = (props) => {
                                 reverseGeocode(reg.latitude, reg.longitude)
                             }}
                             style={styles.map}
-                            region={{
-                                ...coordinates,
-                                latitudeDelta: 0.0922,
-                                longitudeDelta: 0.0421,
-                            }}
+                            // region={{
+                            //     ...coordinates,
+                            //     latitudeDelta: 0.0922,
+                            //     longitudeDelta: 0.0421,
+                            // }}
+                            zoomControlEnabled={true}
+                            zoomEnabled={true}
                         >
                             {/* <Marker
                                 pinColor={"black"}
@@ -309,7 +312,7 @@ const MapScreen = (props) => {
                         <TouchableOpacity onPress={()=>{
                             onZoomInPress()
                         }}>
-                            <Text>+</Text>
+                            {/* <Text>+</Text> */}
                             </TouchableOpacity>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => {
                             // setIsPermanetClicked(true)

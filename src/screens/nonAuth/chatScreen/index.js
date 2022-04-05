@@ -332,7 +332,7 @@ const ChatScreen = (props) => {
         console.log(config)
             getApi(config)
                 .then((response) => {
-                    alert(JSON.stringify(response))
+                    // alert(JSON.stringify(response))
                     if (response.status == true) {
                         
                     }

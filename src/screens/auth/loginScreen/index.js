@@ -18,7 +18,7 @@ import { retrieveItem, showToast, storeItem } from '../../../components/validato
 import ReactNativeBiometrics from 'react-native-biometrics'
 import Loader from "../../../components/loader"
 import { getApi } from "../../../api/api"
-import { loginReducer, setAuthToken, setUserRole } from '../../../redux/features/loginReducer';
+import { loginReducer, setAuthToken, setUserRole, setUserType } from '../../../redux/features/loginReducer';
 import messaging from '@react-native-firebase/messaging';
 
 /* Icons */
@@ -96,6 +96,7 @@ const LoginScreen = (props) => {
                     dispatch(loginReducer(response.data))
                     setEmail("")
                     setPassword("")
+                    dispatch(setUserType("user"))
                     dispatch(changeSwitched(false))
                     props.navigation.dispatch(
                         CommonActions.reset({

@@ -47,11 +47,14 @@ import { changeSwitched } from '../redux/features/switchTo';
 import AboutUsModal from '../components/aboutUsModal';
 import FAQ from '../screens/nonAuth/faq';
 import ContactUs from '../screens/nonAuth/contactus';
+import SignUpModal from '../components/signupModal';
+import { updateSignupModal } from '../redux/features/signupModal';
 
 const Drawer = createDrawerNavigator();
 
 const MainDrawer = (props) => {
     const user = useSelector(state => state.authenticate.user)
+    const userType = useSelector(state => state.authenticate.type)
     const [termsVisible, setTermsVisible] = useState(false)
     const [privacyVisible, setPrivacyVisible] = useState(false)
     const [copyVisible, setCopyVisible] = useState(false)
@@ -59,79 +62,66 @@ const MainDrawer = (props) => {
     const [softwareVisible1, setSoftwareVisible1] = useState(false)
     const navigation = useNavigation()
     const access_token = useSelector(state => state.authenticate.access_token)
-    const authenticate=useSelector(state=>state.authenticate)?.authenticate
+    const authenticate = useSelector(state => state.authenticate)?.authenticate
     const notifications = useSelector(state => state.notification)?.data
     const dispatch = useDispatch()
     const [unSeen, setUnSeen] = React.useState(0)
     // get badge component
-    const GetBadge = () => {
-        if (notifications?.filter(x => x.is_read == "0").length == 0) {
-            return null
-        }
-        return (<View style={{  borderRadius: 200, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
-            <Text maxFontSizeMultiplier={1.5} style={{ color: LS_COLORS.global.white,aspectRatio:1,textAlign:"center", marginHorizontal: 5 }}>{notifications?.filter(x => x.is_read == "0").length}</Text>
-        </View>
-        )
-    }
-    useEffect(()=>{
-        let noti_number=notifications?.filter(x => x.is_read == "0").length
-        let totalNoti=0
-        if(unSeen>0){
-            totalNoti+=Number(unSeen)
-        }
-        if(noti_number>0){
-            totalNoti+=Number(noti_number)
-        }
-        if(!authenticate){
-            totalNoti=0
-        }
-        if(Platform.OS=="android"){
-            ShortcutBadge.getCount().then((count) => {
-                ShortcutBadge.setCount(totalNoti)
-            })
-            
-        }else{
-            PushNotification.setApplicationIconBadgeNumber(totalNoti)
 
+    useEffect(() => {
+        if (userType !== "guest") {
+            let noti_number = notifications?.filter(x => x.is_read == "0").length
+            let totalNoti = 0
+            if (unSeen > 0) {
+                totalNoti += Number(unSeen)
+            }
+            if (noti_number > 0) {
+                totalNoti += Number(noti_number)
+            }
+            if (!authenticate) {
+                totalNoti = 0
+            }
+            if (Platform.OS == "android") {
+                ShortcutBadge.getCount().then((count) => {
+                    ShortcutBadge.setCount(totalNoti)
+                })
+
+            } else {
+                PushNotification.setApplicationIconBadgeNumber(totalNoti)
+
+            }
         }
         // if(ShortcutBadge.supported){
-            
-        // }
-    },[notifications,unSeen,authenticate])
 
-    const MessageBadge = () => {
-        if (unSeen == 0) {
-            return null
-        }
-        return (
-            <View style={{  borderRadius: 200, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
-                <Text maxFontSizeMultiplier={1.5} style={{ color: LS_COLORS.global.white,aspectRatio:1,textAlign:"center", marginHorizontal: 5 }}>{unSeen}</Text>
-            </View>
-        )
-    }
+        // }
+    }, [notifications, unSeen, authenticate, userType])
+
+
 
     React.useEffect(() => {
-        dispatch(loadNotificaitonsThunk())
-        let unsubscribe = firestore()
-            .collection('Chats')
-            .onSnapshot(querySnapshot => {
-                let data1 = []
-                data1 = querySnapshot._docs.filter((i) => {
-                    let u1 = i._data.participants.user1
-                    let u2 = i._data.participants.user2
-                    if (u1.id == user.id.toString() || u2.id == user.id.toString()) {
-                        if (u1.id == user.id.toString()) {
-                            return i._data.readOffSet.user1.read > 0
+        if (userType !== "guest") {
+            dispatch(loadNotificaitonsThunk())
+            let unsubscribe = firestore()
+                .collection('Chats')
+                .onSnapshot(querySnapshot => {
+                    let data1 = []
+                    data1 = querySnapshot._docs.filter((i) => {
+                        let u1 = i._data.participants.user1
+                        let u2 = i._data.participants.user2
+                        if (u1.id == user?.id?.toString() || u2.id == user?.id?.toString()) {
+                            if (u1.id == user?.id?.toString()) {
+                                return i._data.readOffSet.user1.read > 0
+                            } else {
+                                return i._data.readOffSet.user2.read > 0
+                            }
                         } else {
-                            return i._data.readOffSet.user2.read > 0
+                            return false
                         }
-                    } else {
-                        return false
-                    }
-                })
-                setUnSeen(data1.length)
-            });
-        return () => unsubscribe();
+                    })
+                    setUnSeen(data1.length)
+                });
+            return () => unsubscribe();
+        }
     }, [props])
 
     const getConnectAccountDetail = () => {
@@ -251,19 +241,21 @@ const MainDrawer = (props) => {
             })
     }
     React.useEffect(() => {
-        if (user.user_role == role.customer) {
-            getCards()
-        } else if (user.user_role == role.provider) {
-            getConnectAccountDetail()
+        if (userType !== "guest") {
+            if (user.user_role == role.customer) {
+                getCards()
+            } else if (user.user_role == role.provider) {
+                getConnectAccountDetail()
+            }
+            // notification thunk dispatch
+            dispatch(loadNotificaitonsThunk())
         }
-        // notification thunk dispatch
-        dispatch(loadNotificaitonsThunk())
     }, [])
 
     return (
         <>
             <Drawer.Navigator
-                drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} setPrivacyVisible={setPrivacyVisible} setCopyVisible={setCopyVisible} setSoftwareVisible={setSoftwareVisible} setSoftwareVisible1={setSoftwareVisible1} />}
+                drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} setPrivacyVisible={setPrivacyVisible} setCopyVisible={setCopyVisible} setSoftwareVisible={setSoftwareVisible} unSeen={unSeen} notifications={notifications} setSoftwareVisible1={setSoftwareVisible1} />}
                 drawerStyle={{
                     width: Dimensions.get('screen').width / 1.3
                 }}
@@ -314,16 +306,16 @@ const MainDrawer = (props) => {
                     name="Messages"
                     component={ChatUsers}
 
-                    options={{
-                        drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/message.png')} style={{ height: 20, width: 20 }} />,
-                        drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
-                            fontFamily: LS_FONTS.PoppinsMedium,
-                            fontSize: 14,
-                            color: LS_COLORS.global.darkBlack,
-                        }} maxFontSizeMultiplier={1.7}>Messages</Text>
-                            <MessageBadge />
-                        </View>,
-                    }}
+                // options={{
+                //     drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/message.png')} style={{ height: 20, width: 20 }} />,
+                //     drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
+                //         fontFamily: LS_FONTS.PoppinsMedium,
+                //         fontSize: 14,
+                //         color: LS_COLORS.global.darkBlack,
+                //     }} maxFontSizeMultiplier={1.7}>Messages</Text>
+                //         {/* <MessageBadge /> */}
+                //     </View>
+                // }}
                 />
                 <Drawer.Screen
                     name="Favorites"
@@ -341,16 +333,16 @@ const MainDrawer = (props) => {
                 <Drawer.Screen
                     name="Notification"
                     component={Notification}
-                    options={{
-                        drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
-                            fontFamily: LS_FONTS.PoppinsMedium,
-                            fontSize: 14,
-                            color: LS_COLORS.global.darkBlack,
-                        }} maxFontSizeMultiplier={1.7}>Notification</Text>
-                            <GetBadge />
-                        </View>,
-                        drawerIcon: ({ focused, size, color }) => <FontAwesome name="bell" color={color} size={20} />,
-                    }}
+                // options={{
+                //     drawerLabel: ({ focused, color }) => <View style={{ flexDirection: "row" }}><Text style={{
+                //         fontFamily: LS_FONTS.PoppinsMedium,
+                //         fontSize: 14,
+                //         color: LS_COLORS.global.darkBlack,
+                //     }} maxFontSizeMultiplier={1.7}>Notification</Text>
+                //         {/* <GetBadge /> */}
+                //     </View>,
+                //     drawerIcon: ({ focused, size, color }) => <FontAwesome name="bell" color={color} size={20} />,
+                // }}
                 />
                 <Drawer.Screen
                     name="About Us"
@@ -414,7 +406,7 @@ const MainDrawer = (props) => {
                         drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
                     }}
                 />
-                  <Drawer.Screen
+                <Drawer.Screen
                     name="FAQ"
                     component={FAQ}
                     options={{
@@ -447,11 +439,12 @@ const MainDrawer = (props) => {
                 isVisible={softwareVisible}
                 setVisible={setSoftwareVisible}
             />
-             <AboutUsModal
+            <AboutUsModal
                 isVisible={softwareVisible1}
                 setVisible={setSoftwareVisible1}
-                />
+            />
             <BankModal />
+            <SignUpModal />
         </>
     )
 }
@@ -460,10 +453,13 @@ export default MainDrawer;
 
 const CustomDrawerContent = (props) => {
     const user = useSelector(state => state.authenticate.user)
+    const userType = useSelector(state => state.authenticate.type)
+
     const access_token = useSelector(state => state.authenticate.access_token)
     const { state, ...rest } = props;
-    const newState = { ...state} 
-    newState.routes = newState.routes.filter(item => item.name !== 'About Us'&&item.name!="FAQ"&&item.name!="Contact Us")
+    const newState = { ...state }
+    newState.routes = newState.routes.filter(item => item.name !== 'About Us' && item.name != "FAQ" && item.name != "Contact Us")
+
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const [loader, setLoader] = React.useState(false)
@@ -491,7 +487,6 @@ const CustomDrawerContent = (props) => {
                     storeItem('passcode', null)
                     navigation.navigate('WelcomeScreen')
                     dispatch(logoutAll())
-                    
                 }
                 else {
                     setLoader(false)
@@ -501,6 +496,26 @@ const CustomDrawerContent = (props) => {
             .catch(err => {
             })
     }
+    const MessageBadge = () => {
+        if (props?.unSeen == 0) {
+            return null
+        }
+        return (
+            <View style={{ borderRadius: 200, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
+                <Text maxFontSizeMultiplier={1.5} style={{ color: LS_COLORS.global.white, aspectRatio: 1, textAlign: "center", marginHorizontal: 5 }}>{props?.unSeen}</Text>
+            </View>
+        )
+    }
+
+    const GetBadge = () => {
+        if (props?.notifications?.filter(x => x.is_read == "0").length == 0) {
+            return null
+        }
+        return (<View style={{ borderRadius: 200, backgroundColor: "red", marginLeft: 10, justifyContent: "center" }} >
+            <Text maxFontSizeMultiplier={1.5} style={{ color: LS_COLORS.global.white, aspectRatio: 1, textAlign: "center", marginHorizontal: 5 }}>{props?.notifications?.filter(x => x.is_read == "0")?.length}</Text>
+        </View>
+        )
+    }
     return (
         <DrawerContentScrollView {...props}>
             <View >
@@ -508,18 +523,152 @@ const CustomDrawerContent = (props) => {
                 <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginLeft: 10 }}>{user?.user_role == role.customer ? "Customer" : "Service Provider"}</Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.green, paddingVertical: 5 }}>
-                <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold,color:"white", fontSize: 18, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
+                <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, color: "white", fontSize: 18, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
             </View>
             <View onTouchEnd={() => {
+                if(userType=="guest"){
+                    props.navigation.toggleDrawer()
+                    dispatch(updateSignupModal(true))
+                    return
+                }
                 logout()
                 dispatch(changeSwitched(true))
-            }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor:  LS_COLORS.global.green, paddingVertical: 5 }}>
-                <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold,color:"white", fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider ? "Customer" : "Provider"}</Text>
+            }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.green, paddingVertical: 5 }}>
+                <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, color: "white", fontSize: 14, marginLeft: 10 }}>Switch to {user?.user_role == role.provider ? "Customer" : "Provider"}</Text>
             </View>
-            <DrawerItemList  state={newState} {...rest} />
+            {/* <DrawerItemList state={newState} {...rest} /> */}
+
             <DrawerItem
-                style={{ marginTop: -180 }}
-                label={(props)=><Text
+                style={{ marginTop: 0 }}
+                label={(props) => <Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >Profile
+                </Text>}
+                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/userGreen.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    props.navigation.toggleDrawer()
+                    if(userType=="guest"){
+                        dispatch(updateSignupModal(true))
+                    }else{
+                        navigation.navigate("Profile")
+                    }
+                  
+                }}
+            />
+            <DrawerItem
+                style={{ marginTop: 0 }}
+
+                label={(props) => <Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >My Orders
+                </Text>}
+
+                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/note.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    props.navigation.toggleDrawer()
+                    if(userType=="guest"){
+                        dispatch(updateSignupModal(true))
+
+                    }else{
+                        navigation.navigate("Orders")
+                    }
+                    
+                }}
+            />
+            <DrawerItem
+                style={{ marginTop: 0 }}
+
+                label={(props) =>
+                    <View style={{ flexDirection: "row" }}><Text
+                        style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 14,
+                            color: LS_COLORS.global.darkBlack,
+                        }}
+                        maxFontSizeMultiplier={1.7}
+                    >Messages
+                    </Text>
+                    {userType!="guest"&&<MessageBadge />}
+                    </View>
+                }
+                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/message.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    props.navigation.toggleDrawer()
+                    if(userType=="guest"){
+                        dispatch(updateSignupModal(true))
+
+                    }else{
+                        navigation.navigate("Messages")
+                    }
+                    
+                }}
+            />
+            <DrawerItem
+                style={{ marginTop: 0 }}
+
+                label={(props) => <Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >Favorites
+                </Text>}
+
+                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    props.navigation.toggleDrawer()
+                    if(userType=="guest"){
+                        dispatch(updateSignupModal(true))
+
+                    }else{
+                        navigation.navigate("Favorites")
+                    }
+                    
+                    
+                }}
+            />
+
+            <DrawerItem
+                style={{ marginTop: 0 }}
+
+                label={(props) => <View style={{ flexDirection: "row" }}><Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >Notification</Text>
+                    {userType!="guest"&&<GetBadge />}
+                </View>}
+                icon={({ focused, color }) => <FontAwesome name="bell" color={LS_COLORS.global.green} size={20} />}
+                onPress={() => {
+                    props.navigation.toggleDrawer()
+                    
+                    if(userType=="guest"){
+                        dispatch(updateSignupModal(true))
+
+                    }else{
+                        navigation.navigate("Notification")
+                    }
+                }}
+            />
+
+            <DrawerItem
+                style={{ marginTop: 0 }}
+                label={(props) => <Text
                     style={{
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 14,
@@ -528,16 +677,16 @@ const CustomDrawerContent = (props) => {
                     maxFontSizeMultiplier={1.7}
                 >About Us
                 </Text>}
-              
-                icon={({ focused, color }) =>  <Image resizeMode="contain" source={require('../assets/aboutUs.png')} style={{ height: 20, width: 20 }} />}
+
+                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/aboutUs.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
                     props.navigation.toggleDrawer()
                     props.setSoftwareVisible1(true)
                 }}
             />
             <DrawerItem
-                style={{ marginTop:0 }}
-                label={(props)=><Text
+                style={{ marginTop: 0 }}
+                label={(props) => <Text
                     style={{
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 14,
@@ -552,8 +701,8 @@ const CustomDrawerContent = (props) => {
                 }}
             />
             <DrawerItem
-                style={{ marginTop:0 }}
-                label={(props)=><Text
+                style={{ marginTop: 0 }}
+                label={(props) => <Text
                     style={{
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 14,
@@ -570,7 +719,7 @@ const CustomDrawerContent = (props) => {
             />
             {user?.user_role == role.provider && <DrawerItem
                 style={{ marginTop: 0 }}
-                label={(props)=><Text
+                label={(props) => <Text
                     style={{
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 14,
@@ -586,9 +735,7 @@ const CustomDrawerContent = (props) => {
             />}
             <DrawerItem
                 style={{ marginTop: user?.user_role == role.customer ? 0 : 0 }}
-                // style={{ marginTop: -155 }}
-             
-                label={(props)=><Text
+                label={(props) => <Text
                     style={{
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 14,
@@ -601,12 +748,12 @@ const CustomDrawerContent = (props) => {
             />
             <View style={{ width: '84%', alignSelf: 'flex-end' }}>
                 <DrawerItem
-                    label={(props)=><Text
+                    label={(props) => <Text
                         style={{
                             fontFamily: LS_FONTS.PoppinsMedium,
                             fontSize: 11,
                             color: LS_COLORS.global.darkBlack,
-                            marginLeft:-20
+                            marginLeft: -20
                         }}
                         maxFontSizeMultiplier={1.7}
                     >Terms & Conditions
@@ -615,12 +762,12 @@ const CustomDrawerContent = (props) => {
                     onPress={() => { props.navigation.toggleDrawer(), props.setTermsVisible(true) }}
                 />
                 <DrawerItem
-                    label={(props)=><Text
+                    label={(props) => <Text
                         style={{
                             fontFamily: LS_FONTS.PoppinsMedium,
                             fontSize: 11,
                             color: LS_COLORS.global.darkBlack,
-                            marginLeft:-20
+                            marginLeft: -20
                         }}
                         maxFontSizeMultiplier={1.7}
                     >Copyright
@@ -629,12 +776,12 @@ const CustomDrawerContent = (props) => {
                     onPress={() => { props.navigation.toggleDrawer(), props.setCopyVisible(true) }}
                 />
                 <DrawerItem
-                    label={(props)=><Text
+                    label={(props) => <Text
                         style={{
                             fontFamily: LS_FONTS.PoppinsMedium,
                             fontSize: 11,
                             color: LS_COLORS.global.darkBlack,
-                            marginLeft:-20
+                            marginLeft: -20
                         }}
                         maxFontSizeMultiplier={1.7}
                     >Privacy Policy
@@ -643,12 +790,12 @@ const CustomDrawerContent = (props) => {
                     onPress={() => { props.navigation.toggleDrawer(), props.setPrivacyVisible(true) }}
                 />
                 <DrawerItem
-                    label={(props)=><Text
+                    label={(props) => <Text
                         style={{
                             fontFamily: LS_FONTS.PoppinsMedium,
                             fontSize: 11,
                             color: LS_COLORS.global.darkBlack,
-                            marginLeft:-20
+                            marginLeft: -20
                         }}
                         maxFontSizeMultiplier={1.7}
                     >Software License

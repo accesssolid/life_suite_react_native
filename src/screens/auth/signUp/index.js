@@ -20,7 +20,7 @@ import Loader from "../../../components/loader"
 import { showToast, storeItem } from '../../../components/validators';
 import { getApi } from '../../../api/api';
 import { DropDown } from '../../../components/dropDown';
-import { loginReducer, setAuthToken, setUserRole } from '../../../redux/features/loginReducer';
+import { loginReducer, setAuthToken, setUserRole, setUserType } from '../../../redux/features/loginReducer';
 import SearchableDropDown from '../../../components/searchableDropDown';
 import { role as roles } from '../../../constants/globals';
 import TermsModal from '../../../components/termsModal';
@@ -543,6 +543,7 @@ const SignUpScreen = (props) => {
                     await storeItem('user', response.data)
                     await storeItem('user_bio_data', response.data)
                     await storeItem('access_token', response.access_token)
+                    dispatch(setUserType("user"))
                     dispatch(setAuthToken({ data: response.access_token }))
                     dispatch(loginReducer(response.data))
                     dispatch(changeSwitched(false))

@@ -28,11 +28,14 @@ import { role } from '../../../constants/globals';
 import { getStringData, storeStringData } from '../../../asyncStorage/async'
 import moment from 'moment';
 import { updateBankModelData } from '../../../redux/features/bankModel';
+import { updateSignupModal } from '../../../redux/features/signupModal';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
     const navigation = useNavigation();
     const user = useSelector(state => state.authenticate.user)
+    const userType = useSelector(state => state.authenticate.type)
+
     const services = useSelector(state => state.authenticate.services)
     const myJobs = useSelector(state => state.provider.myJobs)
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -81,25 +84,32 @@ const HomeScreen = (props) => {
         }
     }
     useEffect(() => {
-        getServices(true)
-        if (switched == false) {
+        if (userType !== "guest") {
+            getServices(true)
+            if (switched == false) {
+                if (user.user_role == 3) {
+                    getMyJobs()
+                }
+            }
+        }
+
+    }, [switched, userType])
+
+    useEffect(() => {
+        if (userType != "guest") {
+            getServices(true)
             if (user.user_role == 3) {
                 getMyJobs()
             }
+            setTimeout(() => {
+                GetToken()
+            }, 15000)
+            setTimeout(() => {
+                getConnectAccountDetail()
+            }, 300);
+        } else {
+            getGuestServices(true)
         }
-    }, [switched])
-
-    useEffect(() => {
-        getServices(true)
-        if (user.user_role == 3) {
-            getMyJobs()
-        }
-        setTimeout(() => {
-            GetToken()
-        }, 15000)
-        setTimeout(() => {
-            getConnectAccountDetail()
-        }, 300);
     }, [])
     const [allowJobAdd, setAllowedJobAdd] = React.useState(false)
     const getConnectAccountDetail = async () => {
@@ -136,28 +146,36 @@ const HomeScreen = (props) => {
     }
     useFocusEffect(
         React.useCallback(() => {
-            if (user.user_role == 3) {
-                setTimeout(() => {
-                    getLocationPermission()
-                }, 2000)
-            }
-        }, [])
-    );
-
-    useFocusEffect(
-        useCallback(() => {
-            dispatch(setAddServiceMode({ data: false }))
-        }, [])
-    );
-
-    useFocusEffect(
-        useCallback(() => {
-            if (props.route?.params) {
-                if (props.route?.params.addJobClear) {
-                    setIsAddJobActive(false)
+            if (userType !== "guest") {
+                if (user.user_role == 3) {
+                    setTimeout(() => {
+                        getLocationPermission()
+                    }, 2000)
                 }
             }
-            getServices(false)
+        }, [])
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            if (userType !== "guest") {
+                dispatch(setAddServiceMode({ data: false }))
+            }
+
+        }, [])
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            if (userType != "guest") {
+                if (props.route?.params) {
+                    if (props.route?.params.addJobClear) {
+                        setIsAddJobActive(false)
+                    }
+                }
+                getServices(false)
+            }
+
         }, [props.route])
     );
 
@@ -191,6 +209,41 @@ const HomeScreen = (props) => {
 
             }).finally(() => {
 
+            })
+    }
+
+    const getGuestServices = (load = true) => {
+       
+            setLoading(true)
+       
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        }
+        let user_data = {
+            "user_id": user.id
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: '/api/guestCustomerServicesList',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                console.log(response)
+                if (response.status == true) {
+                    dispatch(setServices({ data: [...response.data] }))
+                    setItems([...response.data])
+                }
+                else {
+                    // showToast(response.message, 'danger')
+
+                }
+            }).catch(err => {
+
+            }).finally(() => {
+                setLoading(false)
             })
     }
 
@@ -307,7 +360,7 @@ const HomeScreen = (props) => {
     }
 
     const deleteMyJob = (service_id) => {
-        
+
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -466,7 +519,7 @@ const HomeScreen = (props) => {
                         getConnectAccountDetail()
                         setIsAddJobActive(!isAddJobActive)
                     }}>
-                    <View style={{ height: 30, aspectRatio: 1 ,justifyContent:"center",alignItems:"center"}}>
+                    <View style={{ height: 30, aspectRatio: 1, justifyContent: "center", alignItems: "center" }}>
                         {!isAddJobActive && <Image source={require('../../../assets/addgreen.png')} resizeMode="contain" style={{ width: '100%', height: '100%' }} />}
                         {isAddJobActive && <View style={{ height: 30, width: 30, borderRadius: 20, backgroundColor: LS_COLORS.global.green, justifyContent: "center", alignItems: "center" }}>
                             <View style={{ height: 2, width: 18, backgroundColor: "white" }} />
@@ -569,6 +622,7 @@ const HomeScreen = (props) => {
                                     <View key={index}
                                         style={{ alignItems: 'center', justifyContent: 'center' }}
                                         onTap={() => {
+                                            
                                             item.itemsData.length > 0
                                                 ?
                                                 props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
@@ -588,7 +642,15 @@ const HomeScreen = (props) => {
                     </ScrollView>
                 }
                 {!loading && <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                    <TouchableOpacity activeOpacity={0.7} onPress={() => props.navigation.navigate("Orders")} style={[styles.orderContainer,{paddingHorizontal:2,minWidth:111}]}>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                        if(userType=="guest"){
+                            dispatch(updateSignupModal(true))
+                        }else{
+                            props.navigation.navigate("Orders")
+                        }
+                        
+                        
+                        }} style={[styles.orderContainer, { paddingHorizontal: 2, minWidth: 100 }]}>
                         <View
 
                         >
@@ -599,7 +661,7 @@ const HomeScreen = (props) => {
                     </TouchableOpacity>
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => {
                         props.navigation.navigate("LocationServiceSelect")
-                    }} style={[styles.orderContainer,{paddingHorizontal:2,marginHorizontal:2,minWidth:111}]}>
+                    }} style={[styles.orderContainer, { paddingHorizontal: 2, marginHorizontal: 5, minWidth: 100 }]}>
                         <View
 
                         >
@@ -609,7 +671,7 @@ const HomeScreen = (props) => {
                         </View>
                     </TouchableOpacity>}
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7}
-                        onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={[styles.orderContainer,{paddingHorizontal:2,minWidth:111}]}>
+                        onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={[styles.orderContainer, { paddingHorizontal: 2, minWidth: 100 }]}>
                         <View
                         >
                             <Text maxFontSizeMultiplier={1.45} style={styles.order}>
@@ -662,7 +724,7 @@ const styles = StyleSheet.create({
         width: 111,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,
-        alignSelf: 'center', 
+        alignSelf: 'center',
         width: '30%'
     },
     order: {

@@ -764,7 +764,7 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                     </View>
                 </View>
                 <View  style={{flex:1}}>
-                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}>Created on: {moment(data?.order_start_time).fromNow()}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}>Created on: {moment(data?.created_at).fromNow()}</Text>
                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}># {data?.id}</Text></Text>
                     <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" },styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
                 </View>

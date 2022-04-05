@@ -8,6 +8,7 @@ import BankModelReducer from './features/bankModel'
 import NotificationReducer from './features/notification'
 import switchTo from './features/switchTo'
 import faq from './features/faq'
+import signupModal from './features/signupModal'
 const store = configureStore({
     reducer: {
         authenticate: AuthenticateReducer,
@@ -18,7 +19,8 @@ const store = configureStore({
         bank_model:BankModelReducer,
         notification:NotificationReducer,
         switchTo,
-        faq
+        faq,
+        signupModal
     },
 })
 

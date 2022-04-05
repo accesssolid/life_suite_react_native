@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, Text, FlatList, Alert, Pressable, Dimensions, TouchableOpacity, ImageBackground } from 'react-native'
+import { View, StyleSheet, Image, Text, FlatList, ScrollView, Pressable, Dimensions, TouchableOpacity, ImageBackground } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -24,7 +24,7 @@ import { getApi, BASE_URL } from '../../../api/api';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
 import { setAddServiceMode, clearCleanData } from '../../../redux/features/services';
-import { ScrollView } from 'react-native-gesture-handler';
+import {  } from 'react-native-gesture-handler';
 import Cards from '../../../components/cards';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { set } from 'lodash';
@@ -327,14 +327,14 @@ const ScheduleTime = (props) => {
                     }} customTextStyles={{ fontSize: 12 }} customStyles={{ width: window_width * 0.4, height: 45, marginVertical: 10 }} action={() => {
                         setCurrentTab(1)
                     }} />
-                    <CustomButton title={"Add Time Frame"} textProps={{
+                    <CustomButton title={"Add/Remove TimeFrame"} textProps={{
                         maxFontSizeMultiplier:1.3
                     }} customTextStyles={{ fontSize: 12 }} customStyles={{ width: window_width * 0.4, height: 45, marginVertical: 10 }} action={() => {
                         setCurrentTab(2)
 
                     }} />
                 </View>
-                <ScrollView >
+                <ScrollView contentContainerStyle={{paddingBottom:20}} persistentScrollbar={true} showsVerticalScrollIndicator={true} >
                     {currentTab == 1 ? <View style={styles.calendar}>
                         <Calendar
                             hideArrows={false}

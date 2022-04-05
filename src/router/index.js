@@ -43,6 +43,10 @@ const Router = () => {
         <Stack.Screen name="ChatMembers" component={ChatMembers} />
         <Stack.Screen name="OrderHistoryCustomer" component={OrderHistoryCustomer} />
         <Stack.Screen name="OrderHistoryProvider" component={OrderHistoryProvider} />
+        <Stack.Screen name="WelcomeScreen1" options={{
+          gestureEnabled:false
+        }} component={Welcomescreen} />
+
       
         {/* <Stack.Screen name="Settings" component={Settings} /> */}
       </Stack.Navigator>

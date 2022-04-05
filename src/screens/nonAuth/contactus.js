@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet, TextInput } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Header from '../../components/header'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -27,17 +27,17 @@ export default function ContactUs({ navigation, route }) {
         email: '',
         message: '',
     })
- 
+
 
     const cardNameRef = useRef(null)
     const cardDateRef = useRef(null)
- 
-   
-   
 
-   
 
-  
+
+
+
+
+
     const submit = async (token) => {
         setLoader(true)
         let headers = {
@@ -45,9 +45,9 @@ export default function ContactUs({ navigation, route }) {
         }
         const formdata = new FormData()
         formdata.append("name", data.name)
-        formdata.append("email",data.email)
-        formdata.append("message",data.message)
-        formdata.append("submit_from","mobile")
+        formdata.append("email", data.email)
+        formdata.append("message", data.message)
+        formdata.append("submit_from", "mobile")
         let config = {
             headers: headers,
             data: formdata,
@@ -87,65 +87,67 @@ export default function ContactUs({ navigation, route }) {
                     // action1={() => props.navigation.navigate("HomeScreen")}
                     title={'contact us'} />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
-                    <Container>
-                        <Content>
-                            <View style={{ alignItems: "center" }}>
-                                <View style={{ marginTop: 20 }} />
-                                <Image source={require("./contact.png")} resizeMode="contain" style={{width:"80%",height:"40%"}} />
-                                <Text maxFontSizeMultiplier={1.5} style={{
-                                         color: LS_COLORS.global.black,
-                                         marginTop:10,
-                                         fontFamily: LS_FONTS.PoppinsMedium,
-                                }}>Fill the form below in case of any query.</Text>
-                                <TextInputMask maxFontSizeMultiplier={1.5}
-                                    style={styles.inputMaskStyle}
-                                    placeholder={'Name*'}
-                                    placeholderTextColor={"gray"}
-                                    onChangeText={(formatted, extracted) => {
-                                        setData({ ...data, name: formatted })
-                                    }}
-                                    value={data.name}
-                                    ref={cardNameRef}
-                                    returnKeyType="next"
-                                    maxFontSizeMultiplier={1.5}
-                                    onSubmitEditing={() => cardDateRef.current.focus()}
-                                />
-                               <TextInputMask maxFontSizeMultiplier={1.5}
-                                    style={styles.inputMaskStyle}
-                                    placeholder={'Email*'}
-                                    placeholderTextColor={"gray"}
-                                    onChangeText={(formatted, extracted) => {
-                                        setData({ ...data, email: formatted })
-                                    }}
-                                    value={data.email}
-                                    ref={cardNameRef}
-                                    returnKeyType="next"
-                                    onSubmitEditing={() => cardDateRef.current.focus()}
-                                />
-                                <TextInput 
-                                    style={[styles.inputMaskStyle,{minHeight:120}]}
-                                    multiline={true}
-                                    placeholder="Message"
-                                    placeholderTextColor={"gray"}
-                                    onChangeText={(t) => {
-                                        setData({ ...data, message: t })
-                                    }}
-                                    maxFontSizeMultiplier={1.5}
-                                />
-                            </View>
-                        </Content>
-                    </Container>
-                    <TouchableOpacity
-                    style={styles.save}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                        submit()
+                    <ScrollView 
+                    style={{flex:1}}
+                    contentContainerStyle={{
+                        flex:1,
+                        flexGrow:1
                     }}
-                >
-                    <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Send</Text>
-                </TouchableOpacity>
+                    >
+                        <View style={{ alignItems: "center" }}>
+                            <View style={{ marginTop: 20 }} />
+                            <Image source={require("./contact.png")} resizeMode="contain" style={{ width: "80%", height: "40%" }} />
+                            <Text maxFontSizeMultiplier={1.5} style={{
+                                color: LS_COLORS.global.black,
+                                marginTop: 10,
+                                fontFamily: LS_FONTS.PoppinsMedium,
+                            }}>Fill the form below in case of any query.</Text>
+                            <TextInput
+                                maxFontSizeMultiplier={1.5}
+                                style={styles.inputMaskStyle}
+                                placeholder={'Name*'}
+                                placeholderTextColor={"gray"}
+                                onChangeText={(t) => {
+                                    setData({ ...data, name: t })
+                                }}
+                                value={data.name}
+                                ref={cardNameRef}
+                            />
+                            <TextInput maxFontSizeMultiplier={1.5}
+                                style={styles.inputMaskStyle}
+                                placeholder={'Email*'}
+                                placeholderTextColor={"gray"}
+                                onChangeText={(t) => {
+                                    setData({ ...data, email: t })
+                                }}
+                                value={data.email}
+                                ref={cardNameRef}
+                            />
+                            <TextInput
+                                style={[styles.inputMaskStyle, { minHeight: 120 ,textAlignVertical:"top"}]}
+                                multiline={true}
+                                placeholder="Message"
+                                placeholderTextColor={"gray"}
+                                onChangeText={(t) => {
+                                    setData({ ...data, message: t })
+                                }}
+                                maxFontSizeMultiplier={1.5}
+                            />
+                        </View>
+                        </ScrollView>
+                        {Platform.OS=="ios"&&<KeyboardAvoidingView behavior='padding' />}
+                    <TouchableOpacity
+                        style={styles.save}
+                        activeOpacity={0.7}
+                        onPress={() => {
+                            submit()
+                        }}
+                    >
+                        <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Send</Text>
+                    </TouchableOpacity>
+                
                 </View>
-              
+
             </SafeAreaView>
             {loader && <Loader />}
         </>
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     save: {
         justifyContent: "center",
         alignItems: 'center',
-        minHeight: 40,
+        height: 40,
         width: "40%",
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 5,

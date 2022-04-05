@@ -20,6 +20,7 @@ import { showToast } from '../../../components/validators';
 import ServiceItemUser from '../../../components/serviceItemUser';
 
 import _ from 'lodash'
+import { updateSignupModal } from '../../../redux/features/signupModal';
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -29,6 +30,8 @@ const ServicesProvided = (props) => {
     const [selectedItems, setSelectedItems] = useState([])
     const [selectedProducts, setSelectedProducts] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
+    const userType = useSelector(state => state.authenticate.type)
+
     const [activeItem, setActiveItem] = useState(null)
     const [extraData, setExtraDataa] = useState([])
     const [vehicleType, setVehicleType] = useState({
@@ -220,9 +223,50 @@ const ServicesProvided = (props) => {
         if (subService.id == 14||vehicle_types?.length>0) {
             filterServices()
         }
-        getServiceItems()
+        if(userType=="guest"){
+            getGuestServiceItems()
+        }else{
+            getServiceItems()
+        }
+       
     }, [])
 
+    const getGuestServiceItems = () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        }
+
+        let user_data = {
+            "service_id": subService.id
+        }
+
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: '/api/guestCustomerSubServicesItemList',
+            type: 'post'
+        }
+
+        getApi(config)
+            .then((response) => {
+                console.log("Response", JSON.stringify(response))
+                if (response.status == true) {
+                    setLoading(false)
+                    setItemList([...response.data])
+                    setItemListMaster([...response.data])
+                    if (subService.id == 14||vehicle_types?.length>0) {
+                        filterServices()
+                    }
+                }
+                else {
+                    setLoading(false)
+                }
+            }).catch(err => {
+                setLoading(false)
+            })
+    }
     const getServiceItems = () => {
         setLoading(true)
         let headers = {
@@ -283,6 +327,7 @@ const ServicesProvided = (props) => {
     }
 
     const next = () => {
+       
         let servicedata = []
         itemList.forEach(element => {
             if (selectedItems.includes(element.id)) {
@@ -595,6 +640,10 @@ const ServicesProvided = (props) => {
                         style={styles.save}
                         activeOpacity={0.7}
                         onPress={() => {
+                            if(userType=="guest"){
+                                dispatch(updateSignupModal(true))
+                                return
+                            }
                             activeItem !== null
                                 ?
                                 saveRequest()

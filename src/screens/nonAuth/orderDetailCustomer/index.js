@@ -815,7 +815,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     </View>
                 </Pressable>
                 <View style={{ flex: 1 }} >
-                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}>Created on: {moment(data?.order_start_time).fromNow()}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}>Created on: {moment(data?.created_at).fromNow()}</Text>
                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
                     <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right",width:"90%" ,alignSelf:"flex-end"}, styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
 
