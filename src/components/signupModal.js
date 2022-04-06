@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'
-import Modal from 'react-native-modal';
+import { View, StyleSheet, Text, Image,Modal, TouchableOpacity, Pressable } from 'react-native'
+// import Modal from 'react-native-modal';
 import { getInfoDescription } from '../utils';
 import LS_COLORS from "../constants/colors";
 import LS_FONTS from "../constants/fonts";
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSignupModal } from '../redux/features/signupModal';
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import { logoutAll } from '../redux/features/loginReducer';
 const SignUpModal = () => {
     const dispatch = useDispatch()
@@ -22,18 +22,36 @@ const SignUpModal = () => {
             onBackButtonPress={() => dispatch(updateSignupModal(false))}
             onBackdropPress={() => dispatch(updateSignupModal(false))}
             hasBackdrop={true}
-            isVisible={isVisible}>
+            visible={isVisible}
+            transparent={true}
+            // animationType="slide"
+            >
+            <View style={{flex:1,backgroundColor:"#0005",justifyContent:"center"}}>
             <View style={styles.container}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.title}></Text>
                 <Image source={require('../assets/splash/logo.png')} resizeMode="contain" style={{ height: 100, width: 200, alignSelf: "center" }} />
                 <Text maxFontSizeMultiplier={1.5} style={{ color: "black", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16, textAlign: "center" }}>To use this feature you need to sign up</Text>
                 <TouchableOpacity onPress={() => {
                     dispatch(updateSignupModal(false))
-                    navigation.navigate('WelcomeScreen1')
+                    // navigation.navigate('WelcomeScreen1')
+                    // navigation.dispatch(
+                    //     CommonActions.reset({
+                    //         index: 1,
+                    //         routes: [
+                    //             { name: "AuthStack" },
+                    //         ],
+                    //     })
+                    // );
+                    navigation.reset({
+                        index: 1,
+                        routes: [{name: 'AuthStack'}],
+                      });
+                    //   console.log("Navigations",navigation.getState())
+                   navigation.push("AuthStack",{screen:"SignUpScreen"})
                     // setTimeout(()=>{
                     //     navigation.navigate('WelcomeScreen')
                     // },200)
-                    dispatch(logoutAll())
+                    // dispatch(logoutAll())
                 }} style={{ backgroundColor: LS_COLORS.global.green, padding: 10, borderRadius: 5, margin: 10 }} >
                     <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white", textAlign: "center" }}>Sign up</Text>
                 </TouchableOpacity>
@@ -42,6 +60,7 @@ const SignUpModal = () => {
                 }} style={{ position: 'absolute', top: '3%', right: '3%' }}>
                     <Image source={require('../assets/cancel.png')} resizeMode="contain" style={{ height: 25, width: 25 }} />
                 </TouchableOpacity>
+            </View>
             </View>
         </Modal>
     )

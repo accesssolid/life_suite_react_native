@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet, TextInput, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Header from '../../components/header'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -29,8 +29,8 @@ export default function ContactUs({ navigation, route }) {
     })
 
 
-    const cardNameRef = useRef(null)
-    const cardDateRef = useRef(null)
+    const emailRef = useRef(null)
+    const messageRef = useRef(null)
 
 
 
@@ -87,16 +87,12 @@ export default function ContactUs({ navigation, route }) {
                     // action1={() => props.navigation.navigate("HomeScreen")}
                     title={'contact us'} />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
-                    <ScrollView 
-                    style={{flex:1}}
-                    contentContainerStyle={{
-                        flex:1,
-                        flexGrow:1
-                    }}
+                    <ScrollView
+
                     >
                         <View style={{ alignItems: "center" }}>
                             <View style={{ marginTop: 20 }} />
-                            <Image source={require("./contact.png")} resizeMode="contain" style={{ width: "80%", height: "40%" }} />
+                            <Image source={require("./contact.png")} resizeMode="contain" style={{ width: Dimensions.get("window").width * 0.8, height: Dimensions.get("window").height * 0.4 }} />
                             <Text maxFontSizeMultiplier={1.5} style={{
                                 color: LS_COLORS.global.black,
                                 marginTop: 10,
@@ -111,7 +107,10 @@ export default function ContactUs({ navigation, route }) {
                                     setData({ ...data, name: t })
                                 }}
                                 value={data.name}
-                                ref={cardNameRef}
+                                returnKeyType="next"
+                                onSubmitEditing={()=>{
+                                    emailRef?.current?.focus()
+                                }}
                             />
                             <TextInput maxFontSizeMultiplier={1.5}
                                 style={styles.inputMaskStyle}
@@ -121,10 +120,14 @@ export default function ContactUs({ navigation, route }) {
                                     setData({ ...data, email: t })
                                 }}
                                 value={data.email}
-                                ref={cardNameRef}
+                                ref={emailRef}
+                                returnKeyType="next"
+                                onSubmitEditing={()=>{
+                                    messageRef?.current?.focus()
+                                }}
                             />
                             <TextInput
-                                style={[styles.inputMaskStyle, { minHeight: 120 ,textAlignVertical:"top"}]}
+                                style={[styles.inputMaskStyle, { height: 120, textAlignVertical: "top" }]}
                                 multiline={true}
                                 placeholder="Message"
                                 placeholderTextColor={"gray"}
@@ -132,10 +135,11 @@ export default function ContactUs({ navigation, route }) {
                                     setData({ ...data, message: t })
                                 }}
                                 maxFontSizeMultiplier={1.5}
+                                ref={messageRef}
                             />
                         </View>
-                        </ScrollView>
-                        {Platform.OS=="ios"&&<KeyboardAvoidingView behavior='padding' />}
+                    </ScrollView>
+                    {Platform.OS == "ios" && <KeyboardAvoidingView behavior='padding' />}
                     <TouchableOpacity
                         style={styles.save}
                         activeOpacity={0.7}
@@ -145,7 +149,7 @@ export default function ContactUs({ navigation, route }) {
                     >
                         <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Send</Text>
                     </TouchableOpacity>
-                
+
                 </View>
 
             </SafeAreaView>
@@ -218,7 +222,7 @@ const styles = StyleSheet.create({
         width: '90%',
         alignSelf: 'center',
         color: LS_COLORS.global.black,
-        minHeight: 50,
+        height: 50,
         fontFamily: LS_FONTS.PoppinsMedium,
         fontSize: 16,
         borderWidth: 1,

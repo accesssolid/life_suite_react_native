@@ -74,37 +74,7 @@ const WelcomeScreen = (props) => {
                                 <Text maxFontSizeMultiplier={1.7} style={{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
-                    <View
-                        style={{
-                            marginHorizontal: 20,
-                            borderWidth: 2,
-                            borderRadius: 10,
-                            padding: 10,
-                            minHeight: 180,
-                            borderColor: LS_COLORS.global.green,
-                            marginTop: "20%",
-                            justifyContent: "space-evenly"
-                        }}
-                    >
-                        <Text maxFontSizeMultiplier={1.7} style={{ color: "white", fontSize: 24, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }}>Service Provider</Text>
-                        <Text maxFontSizeMultiplier={1.7} style={{ color: "white", fontSize: 18, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }}>Utilize your expertise and grow your business</Text>
-                        <View maxFontSizeMultiplier={1.7} style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                            <TouchableOpacity onPress={() => {
-                                next(2, "login")
-                            }} style={{ minHeight: 45, flex: 1, backgroundColor: LS_COLORS.global.green, justifyContent: "center", borderRadius: 6 }}>
-                                <Text maxFontSizeMultiplier={1.7} style={{ color: "white", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Login</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    next(2, "register")
-                                }}
-                                style={{ minHeight: 45, flex: 1, backgroundColor: LS_COLORS.global.white, justifyContent: "center", borderRadius: 6, marginLeft: 10 }}>
-                                <Text maxFontSizeMultiplier={1.7} style={{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Sign Up</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    <TouchableOpacity
+                        <TouchableOpacity
                         onPress={() => {
                             dispatch(setUserRole({ data: 1 }))
                             dispatch(setUserType("guest"))
@@ -148,9 +118,40 @@ const WelcomeScreen = (props) => {
                             );
                             props.navigation.navigate("MainDrawer")
                         }}
-                        style={{ minHeight: 45, marginHorizontal: 20, backgroundColor: LS_COLORS.global.green, justifyContent: "center", borderRadius: 6, marginTop: 20 }}>
+                        style={{ minHeight: 45, backgroundColor: LS_COLORS.global.green, justifyContent: "center", borderRadius: 6, marginTop: 10 }}>
                         <Text maxFontSizeMultiplier={1.7} style={{ color: "white", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Guest Login</Text>
                     </TouchableOpacity>
+                    </View>
+                    <View
+                        style={{
+                            marginHorizontal: 20,
+                            borderWidth: 2,
+                            borderRadius: 10,
+                            padding: 10,
+                            minHeight: 180,
+                            borderColor: LS_COLORS.global.green,
+                            marginTop: "20%",
+                            justifyContent: "space-evenly"
+                        }}
+                    >
+                        <Text maxFontSizeMultiplier={1.7} style={{ color: "white", fontSize: 24, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }}>Service Provider</Text>
+                        <Text maxFontSizeMultiplier={1.7} style={{ color: "white", fontSize: 18, textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold }}>Utilize your expertise and grow your business</Text>
+                        <View maxFontSizeMultiplier={1.7} style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+                            <TouchableOpacity onPress={() => {
+                                next(2, "login")
+                            }} style={{ minHeight: 45, flex: 1, backgroundColor: LS_COLORS.global.green, justifyContent: "center", borderRadius: 6 }}>
+                                <Text maxFontSizeMultiplier={1.7} style={{ color: "white", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Login</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    next(2, "register")
+                                }}
+                                style={{ minHeight: 45, flex: 1, backgroundColor: LS_COLORS.global.white, justifyContent: "center", borderRadius: 6, marginLeft: 10 }}>
+                                <Text maxFontSizeMultiplier={1.7} style={{ color: "black", fontSize: 16, textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular }}>Sign Up</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                   
                 </ScrollView>
             </View>
         </ImageBackground>

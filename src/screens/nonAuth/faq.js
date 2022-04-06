@@ -71,7 +71,12 @@ export default function FAQ({ navigation, route }) {
                         title={'FAQ'}
                         containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
                     />
-                    <ScrollView>
+                    <ScrollView 
+                        contentContainerStyle={{
+                            flex:1,
+                            flexGrow:1
+                        }}
+                    >
                         {cards.map((f, index) => {
                             return (
                                 <FAQComponent key={index + ""} faq={f} />

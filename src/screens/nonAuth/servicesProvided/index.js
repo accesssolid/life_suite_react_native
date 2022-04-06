@@ -327,7 +327,10 @@ const ServicesProvided = (props) => {
     }
 
     const next = () => {
-       
+        if(userType=="guest"){
+            dispatch(updateSignupModal(true))
+            return
+        }
         let servicedata = []
         itemList.forEach(element => {
             if (selectedItems.includes(element.id)) {
@@ -640,10 +643,7 @@ const ServicesProvided = (props) => {
                         style={styles.save}
                         activeOpacity={0.7}
                         onPress={() => {
-                            if(userType=="guest"){
-                                dispatch(updateSignupModal(true))
-                                return
-                            }
+                           
                             activeItem !== null
                                 ?
                                 saveRequest()

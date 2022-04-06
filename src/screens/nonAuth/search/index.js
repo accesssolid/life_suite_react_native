@@ -22,7 +22,7 @@ const Search = (props) => {
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
-
+    const userType=useSelector(state=>state.authenticate?.type)
     const onChange = (text) => {
         setSearch(text)
         setLoading(true)
@@ -43,7 +43,7 @@ const Search = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ ...search_data }),
-            endPoint: '/api/filterServices',
+            endPoint: userType=="guest"?"/api/guestCustomerFilterServices":'/api/filterServices',
             type: 'post'
         }
         getApi(config)
