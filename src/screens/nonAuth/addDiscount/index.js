@@ -85,11 +85,12 @@ export default function AddDiscount({ navigation, route }) {
             <Container>
                 <Content>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, alignItems: "center", paddingHorizontal: 20 }}>
-                        <Text style={styles.textStyle}>DISCOUNT</Text>
+                        <Text maxFontSizeMultiplier={1.3}  style={styles.textStyle}>DISCOUNT</Text>
                         <View style={{ flex: 1, alignItems: "flex-end", justifyContent: "center", }}>
                             <DropDown
                                 item={types}
                                 value={type}
+                                handleTextValue={true}
                                 onChangeValue={(index, value) => { setType(value) }}
                                 containerStyle={{ width: "60%", borderRadius: 6, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0 }}
                                 dropdownStyle={{ width: "40%", height: 90, marginTop: Platform.OS == "android" ? -30 : 0 }}
@@ -100,17 +101,17 @@ export default function AddDiscount({ navigation, route }) {
                     <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", paddingHorizontal: 20 }}>
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
-                                <View style={{ width: "50%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount ($)"} placeholderTextColor="black" style={{ height: 40,color:"black"  }} textAlign="center" />
+                                <View style={{ borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
+                                    <TextInput maxFontSizeMultiplier={1.3} value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount ($)"} placeholderTextColor="black" style={{ height: 40,minWidth:100,color:"black"  }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
-                                <View style={{ width: "50%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage (%)"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40,color:"black" }} textAlign="center" />
+                                <View style={{  alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
+                                    <TextInput maxFontSizeMultiplier={1.3} value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage (%)"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40,minWidth:100,color:"black" }} textAlign="center" />
                                 </View>
-                                <View style={{ width: "50%", alignSelf: "center", borderRadius: 6, height: 40, marginTop: 20, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40 }} >{Number(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2)) ?? "Calculated Amount"}</Text>
+                                <View style={{ alignSelf: "center", borderRadius: 6, height: 40, marginTop: 20, backgroundColor: LS_COLORS.global.lightGrey }}>
+                                    <Text maxFontSizeMultiplier={1.3} style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40,minWidth:100 }} >{Number(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2)) ?? "Calculated Amount"}</Text>
                                 </View>
                             </View>
                         }
@@ -129,7 +130,7 @@ export default function AddDiscount({ navigation, route }) {
                             discount_amount: type == types[0] ? flat_amount : Number(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))
                         })
                     }}>
-                    <Text style={styles.saveText}>Confirm</Text>
+                    <Text maxFontSizeMultiplier={1.3} style={styles.saveText}>Confirm</Text>
                 </TouchableOpacity>
                 {loader && <Loader />}
             </Container>

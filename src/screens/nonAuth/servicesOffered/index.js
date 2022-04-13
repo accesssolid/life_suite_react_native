@@ -947,7 +947,7 @@ const ServicesProvided = (props) => {
                 // backgroundColor={"transparent"} 
                 backgroundColor={LS_COLORS.global.green}
                 barStyle="light-content" />
-            <View style={{ width: '100%', height: '15%' }}>
+            <View style={{ width: '100%', height: '18%' }}>
                 <ImageBackground
                     resizeMode="cover"
                     source={{ uri: BASE_URL + subService.image }}
@@ -1003,13 +1003,13 @@ const ServicesProvided = (props) => {
                         </ScrollView>
                     </View>}
                     {activeItem !== null && <View style={{ flexDirection: 'row', width: '98%', alignSelf: "center", marginBottom: '2%' }}>
-                        <View style={{ width: "45%" }} />
-                        <View style={{ width: "55%", flexDirection: "row", justifyContent: 'flex-end' }}>
-                            <View style={{ alignItems: 'center', width: 110,marginRight:10, }}>
-                                <Text  maxFontSizeMultiplier={1.5} style={{ ...styles.priceTime, }}>Estimated Time</Text>
+                        <View style={{ flex:1 }} />
+                        <View style={{  flexDirection: "row", justifyContent: 'flex-end' }}>
+                            <View style={{ alignItems: 'center',marginRight:15}}>
+                                <Text  maxFontSizeMultiplier={1.2} style={{ ...styles.priceTime, }}>Estimated Time</Text>
                             </View>
-                            <View style={{width:75,alignItems:"center",marginRight:"10%"}}>
-                                <Text  maxFontSizeMultiplier={1.5} style={styles.priceTime}>Price</Text>
+                            <View style={{alignItems:"center",marginRight:10}}>
+                                <Text  maxFontSizeMultiplier={1.2} style={styles.priceTime}>Price</Text>
                             </View>
                         </View>
                     </View>}
@@ -1054,6 +1054,7 @@ const ServicesProvided = (props) => {
                                 {newServices.map((item, index) => {
                                     return (
                                         <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
+                                            <View style={{width: width * 0.70}}>
                                             <ServiceItem
                                                 key={index}
                                                 item={item}
@@ -1061,7 +1062,8 @@ const ServicesProvided = (props) => {
                                                 onCheckPress={() => { onPressItem(index, item) }}
                                                 isSelected={selectedItems.includes(item.id)}
                                             />
-                                            <Text  maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
+                                            </View>
+                                            <Text  maxFontSizeMultiplier={1.2} style={{fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
                                                 removeNewService(item)
                                             }}>Remove</Text>
                                         </View>
@@ -1071,6 +1073,7 @@ const ServicesProvided = (props) => {
                                     action={() => {
                                         setOpenModal(true)
                                     }}
+                                    maxFont={1.2}
                                     customStyles={{
                                         height: 40,
                                         width: "35%",
@@ -1090,11 +1093,11 @@ const ServicesProvided = (props) => {
                         {activeItem == null
                             ?
                             selectedItems.length > 0 && (isAddServiceMode ? <CustomButton title={"Next"} action={() => next()} /> : <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                                <CustomButton title={"Save"} action={() => { saveData() }} customStyles={{ width: width * 0.45 }} />
-                                <CustomButton title={"Next"} action={() => next()} customStyles={{ width: width * 0.45 }} />
+                                <CustomButton maxFont={1.2} title={"Save"} action={() => { saveData() }} customStyles={{ width: width * 0.45 }} />
+                                <CustomButton  maxFont={1.2} title={"Next"} action={() => next()} customStyles={{ width: width * 0.45 }} />
                             </View>)
                             :
-                            <CustomButton title={"Save"} action={() => saveRequest()} />
+                            <CustomButton  maxFont={1.2} title={"Save"} action={() => saveRequest()} />
                         }
                     </View>
                 </Container>

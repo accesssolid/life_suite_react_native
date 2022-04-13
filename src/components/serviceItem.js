@@ -47,22 +47,27 @@ const ServiceItem = React.forwardRef((props, ref) => {
         <>
             <View key={props.index} style={{ width: '98%', flexDirection: "row", alignItems: 'center', alignSelf: 'center' }}>
                 <View style={{
-                    flexDirection: 'row', justifyContent: 'flex-start', overflow: 'hidden',
-                    width: props.showInputs ? '45%' : '90%'
+                    flexDirection: 'row', justifyContent: 'flex-start', alignItems: "center", overflow: 'hidden',
+                    // width: props.showInputs ? '45%' : '90%'
+                    flex: 1
                 }}>
                     <CheckBox
                         checked={props.isSelected ?? false}
                         onPress={props.onCheckPress}
                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../assets/unchecked.png")} />}
+                        containerStyle={{ marginRight: 0 }}
                     />
-                    <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: props.showInputs ? '50%' : '100%' }}>{props.item.name}</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={{
+                        fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium,
+                        flex: 1
+                    }}>{props.item.name}</Text>
                 </View>
 
-                {props.showInputs && <View style={{ flexDirection: 'row', width: '55%', justifyContent: 'flex-end' }}>
-                    <View>
-                        <Text  maxFontSizeMultiplier={1.4} style={{ textAlign: "center",marginBottom:5, width: 50, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Hour</Text>
-                        <View style={{ ...styles.fromContainer, width: 50, marginRight: 10 }}>
+                {props.showInputs && <View style={{ flexDirection: 'row',alignItems:"center", justifyContent: 'flex-end' }}>
+                    <View style={{alignItems:"center",marginRight: 10 }}> 
+                        <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", marginBottom: 5, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Hour</Text>
+                        <View style={{ ...styles.fromContainer}}>
                             <TextInputMask
                                 onChangeText={(formatted, extracted) => {
                                     props.setText("time_duration_h", extracted, props.index, props.serviceItem)
@@ -77,13 +82,13 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 ref={hourRef}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
-                                maxFontSizeMultiplier={1.5}
+                                maxFontSizeMultiplier={1.2}
                             />
                         </View>
                     </View>
-                    <View>
-                        <Text  maxFontSizeMultiplier={1.4} numberOfLines={1.} style={{ textAlign: "center",marginBottom:5, width: 50, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Minutes</Text>
-                        <View style={{ ...styles.fromContainer, width: 50, marginRight: 10 }}>
+                    <View style={{alignItems:"center",marginRight: 10 }}>
+                        <Text maxFontSizeMultiplier={1.2} numberOfLines={1.} style={{ textAlign: "center", marginBottom: 5,  fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Minutes</Text>
+                        <View style={{ ...styles.fromContainer}}>
                             <TextInputMask
                                 onChangeText={(formatted, extracted) => {
                                     props.setText("time_duration_m", extracted, props.index, props.serviceItem)
@@ -98,12 +103,12 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 ref={minRef}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
-                                maxFontSizeMultiplier={1.5}
+                                maxFontSizeMultiplier={1.2}
                             />
                         </View>
                     </View>
-                    <View>
-                    <Text  maxFontSizeMultiplier={1.4} style={{ textAlign: "center",color:"white",marginBottom:5, width: 50, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>dd</Text>
+                    <View style={{marginRight:5}}>
+                        <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", color: "white", marginBottom: 5,  fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>dd</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
                                 style={styles.inputStyle}
@@ -117,7 +122,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 numberOfLines={1}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
-                                maxFontSizeMultiplier={1.5}
+                                maxFontSizeMultiplier={1.2}
                             />
                         </View>
                     </View>
@@ -132,20 +137,20 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                             uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                         />
-                        <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%' }}>{item.name}</Text>
+                        <Text maxFontSizeMultiplier={1.2} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%' }}>{item.name}</Text>
                     </View>
-                    <View style={{ ...styles.fromContainer, marginRight: '8%' }}>
+                    <View style={{ ...styles.fromContainer, marginRight: 10 }}>
                         <TextInput
                             style={styles.inputStyle}
                             color="black"
-                            placeholder="$000"
+                            placeholder="$00"
                             editable={props.selectedProducts.includes(item.id)}
                             onChangeText={(text) => props.setProductText(item, text)}
                             keyboardType="numeric"
                             value={item.price}
                             returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
                             placeholderTextColor={LS_COLORS.global.placeholder}
-                            maxFontSizeMultiplier={1.5}
+                            maxFontSizeMultiplier={1.2}
                         />
                     </View>
                 </View>
@@ -158,7 +163,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                         checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                     />
-                    <Text   maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Other</Text>
+                    <Text maxFontSizeMultiplier={1.2} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Other</Text>
                 </View>
             </View>}
             {props.showInputs && props.isOtherSelected && props.newProducts.map((item, index) => {
@@ -182,7 +187,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             ref={nameRef}
                             returnKeyType={"default"}
                             placeholderTextColor={LS_COLORS.global.placeholder}
-                            maxFontSizeMultiplier={1.5}
+                            maxFontSizeMultiplier={1.2}
                         />
                     </View>
                     <View style={{ ...styles.fromContainer, marginRight: '2%' }}>
@@ -197,7 +202,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             ref={priceNewRef}
                             returnKeyType={'done'}
                             placeholderTextColor={LS_COLORS.global.placeholder}
-                            maxFontSizeMultiplier={1.5}
+                            maxFontSizeMultiplier={1.2}
                         />
                     </View>
                     <TouchableOpacity onPress={() => props.removeNewproduct(item)} activeOpacity={0.7} style={{ height: 40, aspectRatio: 1, padding: 10, marginRight: '2%' }}>
@@ -274,13 +279,11 @@ const styles = StyleSheet.create({
     },
     fromContainer: {
         height: 40,
-        width: 75,
         alignItems: 'center',
         borderColor: LS_COLORS.global.lightTextColor,
         justifyContent: "center",
         backgroundColor: '#ECECEC',
         paddingHorizontal: 5,
-        marginRight: '10%'
     },
     inputStyle: {
         height: '100%',

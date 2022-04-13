@@ -30,7 +30,7 @@ import CustomButton from '../../../components/customButton';
 
 const OrderClientDetail = (props) => {
     const { subService, item } = props.route.params
-   
+
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -130,7 +130,7 @@ const OrderClientDetail = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-      
+
 
         let newServices = items.filter(x => String(x.id).startsWith("new")).map(x => {
             return (
@@ -271,7 +271,7 @@ const OrderClientDetail = (props) => {
                         style={[styles.save, { borderRadius: 40, height: 35, marginTop: 0 }]}
                         activeOpacity={0.7}
                         onPress={() => { props.navigation.navigate("AddDiscount", { totalPrice, setDiscount: setDiscount.bind(this), discount: discount, order_id: item.id }) }}>
-                        <Text style={styles.saveText}>Add Discount</Text>
+                        <Text maxFontSizeMultiplier={1.2} style={styles.saveText}>Add Discount</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.container}>
@@ -306,6 +306,9 @@ const OrderClientDetail = (props) => {
                                 fontSize: 13,
                                 fontFamily: LS_FONTS.PoppinsRegular
                             }}
+                            textProps={{
+                                maxFontSizeMultiplier: 1.2
+                            }}
                         />}
                     </ScrollView>
                     <View style={{ flexDirection: "row", justifyContent: "space-around", marginHorizontal: 20, marginVertical: 5 }}>
@@ -313,7 +316,7 @@ const OrderClientDetail = (props) => {
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={() => { submitOrderUpdateDetail() }}>
-                            <Text style={styles.saveText}>Update Order Item</Text>
+                            <Text maxFontSizeMultiplier={1.2} style={styles.saveText}>Update Order Item</Text>
                         </TouchableOpacity>}
                         {selectedItem && <TouchableOpacity
                             style={styles.save}
@@ -326,7 +329,7 @@ const OrderClientDetail = (props) => {
                                 setProductShow(false)
                                 setSelectedItem(null)
                             }}>
-                            <Text style={styles.saveText}>Save</Text>
+                            <Text maxFontSizeMultiplier={1.2} style={styles.saveText}>Save</Text>
                         </TouchableOpacity>}
                     </View>
                 </View>
@@ -359,8 +362,8 @@ const ItemsView = ({ items, selectedItem, setItems, productShow, setProductShow,
             <View style={styles.itemViewContainerStyle}>
                 <View style={styles.itemNameContainerStyle} />
                 <View style={{ flex: 1, flexDirection: "row", paddingHorizontal: 20 }}>
-                    <Text style={[styles.itemTextStyle, { width: "55%" }]}>Estimated Time</Text>
-                    <Text style={[styles.itemTextStyle, { width: "45%" }]}>Price</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "55%" }]}>Estimated Time</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "45%" }]}>Price</Text>
                 </View>
             </View>
             {showItems.map(x => {
@@ -409,7 +412,7 @@ const ItemView = ({
     return (
         <>
             <View style={styles.itemViewContainerStyle}>
-                <View style={styles.itemNameContainerStyle}>
+                <View style={[styles.itemNameContainerStyle]}>
                     <CheckBox
                         checked={isSelected}
                         onPress={() => {
@@ -433,7 +436,7 @@ const ItemView = ({
                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                     />
-                    <Text numberOfLines={1} style={[styles.itemTextStyle]}>{item?.name}</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle,{flex:1}]}>{item?.name}</Text>
                 </View>
                 {String(item?.id)?.startsWith("new") && productShow ? <View style={{ flexDirection: "row", justifyContent: "space-around", flex: 1, paddingHorizontal: 20 }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -446,7 +449,8 @@ const ItemView = ({
                             }}
                             placeholder="hh"
                             keyboardType="numeric"
-                            style={[styles.itemTextStyle, { width: 40, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
+                            maxFontSizeMultiplier={1.1}
+                            style={[styles.itemTextStyle, {height: 40,minWidth:35,maxWidth:40,  paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                         <TextInput value={item?.time_duration_m}
                             onChangeText={t => {
                                 setItems(state => {
@@ -456,23 +460,25 @@ const ItemView = ({
                             }}
                             placeholder="mm"
                             keyboardType="numeric"
-                            style={[styles.itemTextStyle, { width: 40, height: 40, marginLeft: 5, marginRight: 10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
+                            maxFontSizeMultiplier={1.1}
+                            style={[styles.itemTextStyle, {minWidth:37,maxWidth:40,  height: 40, marginLeft: 5, marginRight: 10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                     </View>
                     <TextInput
-                        value={"$"+(item?.price==0?"":item?.price)}
+                        value={"$" + (item?.price == 0 ? "" : item?.price)}
                         onChangeText={t => {
-                            let textD=t.replace(/\$/g,"")
+                            let textD = t.replace(/\$/g, "")
                             setItems(state => {
                                 let d = _.cloneDeep(state).filter(x => x.id != item.id)
                                 return ([...d, { ...item, price: textD }])
                             })
                         }}
                         placeholder="$"
+                        maxFontSizeMultiplier={1.1}
                         keyboardType="numeric"
-                        style={[styles.itemTextStyle, { width: 50, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
+                        style={[styles.itemTextStyle, { minWidth:35,maxWidth:40, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                 </View> : <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
-                    <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{checkNewOrNot(item?.time_duration_h, item?.time_duration_m, item?.time_duration)}</Text>
-                    <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${item.price}</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{checkNewOrNot(item?.time_duration_h, item?.time_duration_m, item?.time_duration)}</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${item.price}</Text>
                 </View>
                 }
             </View>
@@ -503,10 +509,10 @@ const ItemView = ({
                                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
-                                    <Text numberOfLines={1} style={[styles.itemTextStyle]}>{product?.name}</Text>
+                                    <Text maxFontSizeMultiplier={1.2}  style={[styles.itemTextStyle,{flex:1}]}>{product?.name}</Text>
                                 </View>
                                 <View style={{ flexDirection: "row", flex: 1, justifyContent: "flex-end", paddingHorizontal: 20 }}>
-                                    <Text style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${product.price}</Text>
+                                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${product.price}</Text>
                                 </View>
                             </View>
                         )
@@ -532,7 +538,7 @@ const ItemView = ({
                                 checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                             />
-                            <Text numberOfLines={1} style={[styles.itemTextStyle]}>Other</Text>
+                            <Text maxFontSizeMultiplier={1.2} numberOfLines={1} style={[styles.itemTextStyle]}>Other</Text>
                         </View>
                         <View style={{ flexDirection: "row", flex: 1, justifyContent: "flex-end", paddingHorizontal: 20 }}>
                         </View>
@@ -566,7 +572,7 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
             <View style={{ marginRight: '2.5%' }}>
                 <TextInput
                     // style={[styles.inputStyle, , { width: 120, height: 40 }]}
-                    style={[styles.itemTextStyle, {width: 120, height: 40 , color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]}
+                    style={[styles.itemTextStyle, { width: 120, height: 40, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]}
                     color="black"
                     placeholder="Product Name"
                     // editable={props.selectedNewProducts.includes(item.temp_id)}
@@ -580,16 +586,17 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
                     value={other?.product_name}
                     returnKeyType={"default"}
                     placeholderTextColor={LS_COLORS.global.placeholder}
+                    maxFontSizeMultiplier={1.2}
                 />
             </View>
             <View style={{ marginRight: '2%' }}>
                 <TextInput
                     // style={[styles.inputStyle, { width: 60, height: 40 }]}
-                    style={[styles.itemTextStyle, {width: 60, height: 40 , color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]}
+                    style={[styles.itemTextStyle, { width: 60, height: 40, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]}
                     color="black"
                     placeholder="$000"
                     onChangeText={(text) => {
-                        let d=text.replace(/\$/g,"")
+                        let d = text.replace(/\$/g, "")
                         setOtherProducts(state => {
                             let data = _.cloneDeep(state)
                             data[other.index].product_price = d
@@ -597,9 +604,10 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
                         })
                     }}
                     keyboardType="numeric"
-                    value={"$"+other?.product_price}
+                    value={"$" + other?.product_price}
                     returnKeyType={'done'}
                     placeholderTextColor={LS_COLORS.global.placeholder}
+                    maxFontSizeMultiplier={1.2}
                 />
             </View>
             <TouchableOpacity onPress={() => {
@@ -665,7 +673,7 @@ const HeaderView = ({ subService, navigation, data, action }) => {
                             />
                         </View>
                         <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                            <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
+                            <Text maxFontSizeMultiplier={1.2} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
                         </View>
                     </SafeAreaView>
                 </View>
@@ -752,7 +760,7 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setL
         >
             <Pressable onPress={() => setVisible(false)} style={{ flex: 1, justifyContent: "center", backgroundColor: "#0005" }}>
                 <Pressable style={{ backgroundColor: "white", padding: 10, borderRadius: 10, marginHorizontal: 15 }}>
-                    <Text style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 16 }}>Enter Service name</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 16 }}>Enter Service name</Text>
                     <CustomInput
                         text="Service Name"
                         customContainerStyles={{ marginTop: 20 }}

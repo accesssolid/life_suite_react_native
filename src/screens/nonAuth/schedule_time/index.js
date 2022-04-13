@@ -323,13 +323,13 @@ const ScheduleTime = (props) => {
             <View style={styles.container}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20 }}>
                     <CustomButton title={"View Calendar"}  textProps={{
-                        maxFontSizeMultiplier:1.3
-                    }} customTextStyles={{ fontSize: 12 }} customStyles={{ width: window_width * 0.4, height: 45, marginVertical: 10 }} action={() => {
+                        maxFontSizeMultiplier:1.2
+                    }} customTextStyles={{ fontSize: 12 ,lineHeight:17}} customStyles={{ width: window_width * 0.4, height: 45, marginVertical: 10 }} action={() => {
                         setCurrentTab(1)
                     }} />
                     <CustomButton title={"Add/Remove TimeFrame"} textProps={{
-                        maxFontSizeMultiplier:1.3
-                    }} customTextStyles={{ fontSize: 12 }} customStyles={{ width: window_width * 0.4, height: 45, marginVertical: 10 }} action={() => {
+                        maxFontSizeMultiplier:1.2
+                    }}  customTextStyles={{ fontSize: 12,lineHeight:17 }} customStyles={{ width: window_width * 0.4, height: 45, marginVertical: 10 }} action={() => {
                         setCurrentTab(2)
 
                     }} />
@@ -579,7 +579,7 @@ const SingleFrameDataShow = ({ orderData, frames, title }) => {
                         navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
                     }} style={{ paddingVertical: 13, paddingHorizontal: 10, marginHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold ,flex:1}}>{title} ({o.customers_first_name})</Text>
                             <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
 
                         </View>
@@ -635,7 +635,7 @@ const OrderList = ({ title, data, timeFrameData, headerDate }) => {
                             navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
                         }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                                <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                                <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold ,flex:1}}>{title} ({o.customers_first_name})</Text>
                                 <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
 
                             </View>
@@ -755,7 +755,7 @@ const ShowAllScheduleWithOrders = ({ timeFrameData, orderData, currentMonth }) =
                                                         navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item: { id: o.id } } })
                                                     }} style={{ paddingVertical: 13, paddingHorizontal: 10, borderWidth: 1, borderColor: "#1AB8AA", backgroundColor: "#C8E9A2", borderRadius: 10, marginTop: 7 }}>
                                                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                                                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold }}>{title} ({o.customers_first_name})</Text>
+                                                            <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsSemiBold ,flex:1}}>{title} ({o.customers_first_name})</Text>
                                                             <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>#{o.id}</Text>
 
                                                         </View>
