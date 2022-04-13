@@ -21,7 +21,7 @@ const Header = (props) => {
                     source={props.imageUrl}
                 />
             </Pressable>
-            <View style={styles.middleView}>
+            <View style={[styles.middleView,{flex:1}]}>
                 <Text maxFontSizeMultiplier={1.4} style={[styles.title, props.titleStyle,{color:"white"}]}>{props.title}</Text>
             </View>
             <Pressable style={styles.rightView}
@@ -84,10 +84,9 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         justifyContent: 'space-between',
         zIndex: 500,
+        paddingHorizontal:10,
     },
     leftView: {
-        left: 20,
-        padding:5,
         aspectRatio: 1,
         alignItems: 'center',
         height: 30,
@@ -99,7 +98,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     rightView: {
-        right: 20,
         alignItems: 'center',
     },
     title: {

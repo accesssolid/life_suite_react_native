@@ -76,6 +76,7 @@ export function CustomTextInput(props) {
                             marginTop:10,
                             alignSelf: 'center',
                             fontSize: 14,
+                            height:60,
                             fontFamily: LS_FONTS.PoppinsRegular,
                             paddingVertical: 10,
                             ...props.customInputStyle
@@ -98,7 +99,7 @@ export function CustomTextInput(props) {
                         maxFontSizeMultiplier={1.7}
                     />
                 </View>
-                {props.title && <Text  maxFontSizeMultiplier={1.7} style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }, props.titleStyle]}>{props.title}{props.required && '*'}</Text>}
+                {props.title && <Text  maxFontSizeMultiplier={1.4} style={[styles.title, { fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }, props.titleStyle]}>{props.title}{props.required && '*'}</Text>}
                 {props.icon}
                 {props.secureTextEntry&&
                     <Entypo onPress={()=>setIsSecure(!isSecure)} name={!isSecure ? "eye" : 'eye-with-line'} size={18} />
@@ -118,6 +119,7 @@ export function CustomTextInput(props) {
                         fontFamily: LS_FONTS.PoppinsRegular,
                         paddingVertical: 10,
                         marginTop:10,
+                        minHeight:60,
                         ...props.customInputStyle
                     }}
                     value={props.value}

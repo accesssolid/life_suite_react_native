@@ -136,7 +136,7 @@ const Passcode = (props) => {
                             />
                         </View>
                         <Text style={{ width: '80%', alignSelf: 'center', marginVertical: 5, textAlign: 'center' }}>Enter Passcode</Text>
-                        <View style={{ backgroundColor: LS_COLORS.global.lightGrey, width: Dimensions.get('screen').width - 200, height: 50, alignSelf: 'center', marginTop: 20 }}>
+                        <View style={{ backgroundColor: LS_COLORS.global.lightGrey, width: Dimensions.get('screen').width-50, height: 50, alignSelf: 'center', marginTop: 20 }}>
                             <TextInput
                                 secureTextEntry={true}
                                 style={{ flex: 1, paddingHorizontal: 10, textAlign: 'center', }}
@@ -144,6 +144,7 @@ const Passcode = (props) => {
                                 returnKeyType={'default'}
                                 enablesReturnKeyAutomatically={true}
                                 value={Passcode}
+                                maxFontSizeMultiplier={1.2}
                                 placeholder={'Enter Passcode'}
                                 onChangeText={(i) => setPasscode(i)}
                                 placeholderTextColor={LS_COLORS.global.black}

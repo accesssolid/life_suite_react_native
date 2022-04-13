@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
         width: '90%',
         alignSelf: 'center',
         color: LS_COLORS.global.black,
-        height: 50,
+        height: 60,
         fontFamily: LS_FONTS.PoppinsMedium,
         fontSize: 16,
         borderWidth: 1,

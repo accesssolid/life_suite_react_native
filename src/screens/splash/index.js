@@ -30,7 +30,7 @@ const Splash = (props) => {
         if (access_token !== null) {
             getUser(user.id)
         }
-    }, [access_token,user])
+    }, [access_token])
 
     const getUser = (id) => {
         // alert()

@@ -320,13 +320,14 @@ export default function ProviderDetail(props) {
                                     <View style={{ flexDirection: "row", alignItems: "center",width:"50%" }}>
                                         <Text maxFontSizeMultiplier={1.3} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: "black" }}>{x.customers_first_name} {x.customers_last_name}</Text>
                                         <AirbnbRating
-                                            count={5}
-                                            defaultRating={x?.rating != "null" ? Number(x.rating) : 0}
+                                            count={1}
+                                            defaultRating={1}
                                             selectedColor={LS_COLORS.global.green}
                                             showRating={false}
                                             size={14}
                                             isDisabled={true}
                                         />
+                                        <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: "black" }} maxFontSizeMultiplier={1.3}>: {x?.rating != "null" ? Number(x.rating) : 0}</Text>
                                     </View>
                                     <Text maxFontSizeMultiplier={1.3} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.grey }}>{moment(x.created_at, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY")}</Text>
                                 </View>

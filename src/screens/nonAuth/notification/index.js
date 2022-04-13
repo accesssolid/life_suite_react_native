@@ -176,7 +176,7 @@ const Notification = (props) => {
                         borderColor: '#4141411A',
                         width: "90%",
                         overflow: "hidden",
-                        height: 62
+                        minHeight: 62
                     }}
                     activeOpacity={0.7}
                 >

@@ -170,15 +170,15 @@ export default function CardList({ navigation, route }) {
                     ListEmptyComponent={<View style={[styles.saveText, { justifyContent: "center", alignItems: "center", marginTop: 20 }]}><Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "gray" }]}>No Cards</Text></View>}
                     renderItem={({ item }) => {
                         return (
-                            <TouchableOpacity activeOpacity={0.5} key={item.id} style={{ height: 200, marginTop: 20, position: "relative" }} onPress={() => {
+                            <TouchableOpacity activeOpacity={0.5} key={item.id} style={{ minHeight: 200, marginTop: 20, position: "relative" }} onPress={() => {
                                 navigation.navigate("AddCard", { type: "edit", item })
                             }}>
                                 <ImageBackground
                                     source={require('../../assets/card.png')}
                                     style={{
                                         width: widthPercentageToDP(90),
-                                        justifyContent: "flex-end",
-                                        height: 200,
+                                        justifyContent: "space-between",
+                                        minHeight: 200,
                                         alignSelf: 'center',
                                         overflow: "hidden",
                                         borderRadius: 20,
@@ -186,21 +186,9 @@ export default function CardList({ navigation, route }) {
                                     }}
                                     resizeMode="cover"
                                 >
-                                    <View>
-                                        <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black",textAlign:"center" ,fontSize:18,letterSpacing:3}]}>**** **** **** {item.last4}</Text>
-                                    </View>
-                                    <View style={{ marginHorizontal: 15, flexDirection: "row", marginBottom: 20, justifyContent: "space-between" }}>
-                                        <View style={{ justifyContent: "flex-end" }}>
-                                            {/* <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>{item.brand}</Text> */}
-
-                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black", fontSize: 15,textTransform:"uppercase" }]}>{item.name}</Text>
-                                        </View>
-                                        <View>
-                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>Expiry Date</Text>
-                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>{item.exp_month}/{item.exp_year}</Text>
-                                        </View>
-                                    </View>
-                                    <Image style={{ height: 60, width: 60, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type(item.brand)} />
+                                    <View style={{flexDirection:"row",justifyContent:"space-between"}}>
+                                    <Image style={{ height: 60, width: 60 }} resizeMode="contain" source={Type(item.brand)} />
+                                    <View style={{justifyContent:"center",alignItems:"center"}}>
                                     {cards.length>1&&<AntDesign
                                         name="delete"
                                         size={20}
@@ -218,10 +206,10 @@ export default function CardList({ navigation, route }) {
                                             ])
                                         }}
                                         color="red"
-                                        style={{ position: "absolute", top: 10, right: 10 }}
+                                        style={{ marginRight:5}}
                                     />}
                                     <CheckBox
-                                        containerStyle={{ width: 25, position: "absolute", top: 30, right: 5 }}
+                                        containerStyle={{ width: 25,margin:0,padding:0 ,marginTop:5 }}
                                         wrapperStyle={{}}
                                         checked={item.default_type}
                                         onPress={() => {
@@ -241,6 +229,23 @@ export default function CardList({ navigation, route }) {
                                         checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
                                     />
+                                    </View>
+                                    </View>
+                                    <View >
+                                        <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black",textAlign:"center" ,fontSize:18,letterSpacing:3}]}>**** **** **** {item.last4}</Text>
+                                    </View>
+                                    <View style={{ marginHorizontal: 15, flexDirection: "row", marginBottom: 20, justifyContent: "space-between" }}>
+                                        <View style={{ justifyContent: "flex-end" ,flex:1}}>
+                                            {/* <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>{item.brand}</Text> */}
+
+                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black", fontSize: 15,textTransform:"uppercase" }]}>{item.name}</Text>
+                                        </View>
+                                        <View>
+                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>Expiry Date</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "black" }]}>{item.exp_month}/{item.exp_year}</Text>
+                                        </View>
+                                    </View>
+                                 
                                 </ImageBackground>
                             </TouchableOpacity>)
                     }

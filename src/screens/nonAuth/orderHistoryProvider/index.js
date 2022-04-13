@@ -223,8 +223,8 @@ const OrderHistory = (props) => {
 
                             return (<TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
                                 props.navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item } })
-                            }} style={{ height: 72, width: "95%", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
-                                <View style={{ width: 6, height: 65, position: "absolute", borderRadius: 12, left: 0, backgroundColor: backgroundColor }}></View>
+                            }} style={{ height: 72, width: "95%",overflow:"hidden", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
+                                <View style={{ width: 6, height: 2000, position: "absolute", borderRadius: 12, left: 0, backgroundColor: backgroundColor }}></View>
                                 <View style={{ flexDirection: 'row',alignItems:"center", justifyContent: 'space-between' }}>
                                             <View>
                                                 <Image
@@ -232,7 +232,7 @@ const OrderHistory = (props) => {
                                                     source={user.user_role === 3 ? item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image : item?.providers_profile_image ? { uri: BASE_URL + item?.providers_profile_image } : placeholder_image}
                                                 />
                                             </View>
-                                            <View style={{ justifyContent: 'center', paddingLeft: 10 }}>
+                                            <View style={{ justifyContent: 'center', paddingLeft: 10,flex:1 }}>
                                                 <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
                                                 <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
                                             </View>

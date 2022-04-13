@@ -85,7 +85,7 @@ const VerificationCode = props => {
                 keyboardType="email-address"
                 returnKeyType="done"
                 onChangeText={(text) => {
-                  setEmail(text)
+                  setEmail(text?.trim())
                 }}
               />
             </View>

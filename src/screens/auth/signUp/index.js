@@ -1035,7 +1035,7 @@ const SignUpScreen = (props) => {
                             }} style={{ color: LS_COLORS.global.green, textDecorationLine: "underline", marginTop: 0, marginBottom: 20, marginLeft: 20 }}>Verify Phone Number</Text>}
                             {role !== 1 &&
                                 <View style={{ flexDirection: 'row', marginBottom: 30, alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text maxFontSizeMultiplier={1.7}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
+                                    <Text maxFontSizeMultiplier={1.7}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor,flex:1 }}>Make phone number public</Text>
                                     <CheckBox
                                         style={{}}
                                         containerStyle={{ width: 25 }}
@@ -1149,7 +1149,7 @@ const SignUpScreen = (props) => {
                             </View>
                             {role !== 1 &&
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text  maxFontSizeMultiplier={1.7} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Provide service only at my address</Text>
+                                    <Text  maxFontSizeMultiplier={1.7} style={{ fontSize: 12,flex:1, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Provide service only at my address</Text>
                                     <CheckBox
                                         style={{}}
                                         containerStyle={{ width: 25, marginBottom: 0 }}

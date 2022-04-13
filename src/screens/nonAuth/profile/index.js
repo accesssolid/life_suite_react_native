@@ -1104,9 +1104,8 @@ const Profile = (props) => {
                     height: 100,
                     aspectRatio: 1,
                     alignSelf: 'center',
-                    position: 'absolute',
                     zIndex: 100,
-                    top: Platform.OS === 'ios' ? "6%" : "1%",
+                    // top: Platform.OS === 'ios' ? "6%" : "1%",
                     overflow: 'hidden',
                     borderRadius: 70,
                     borderWidth: 0.5,
@@ -1123,9 +1122,9 @@ const Profile = (props) => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : null}
                 style={styles.container}>
-                <View style={{ marginTop: '15%', }}>
+                <View style={{ marginTop: '0%', }}>
                     <Text maxFontSizeMultiplier={1.5} style={styles.text}>{user.user_role == role.provider ? "Service Provider Profile" : "Customer Profile"}</Text>
-                    <Text maxFontSizeMultiplier={1.5}  style={styles.text1}>{userData.first_name}</Text>
+                    <Text maxFontSizeMultiplier={1.5}  style={[styles.text1,{marginTop:0}]}>{userData.first_name}</Text>
                     <Text maxFontSizeMultiplier={1.5}  style={styles.text2}>Profile ID : {userData.id}</Text>
                 </View>
                 <ScrollView
@@ -1232,7 +1231,7 @@ const Profile = (props) => {
                                 containerStyle={{
                                     marginTop: 35,
                                     width: "90%",
-                                    // height: 50,
+                                    height: 80,
                                     alignSelf: "center",
                                     borderColor: LS_COLORS.global.textInutBorderColor,
 
@@ -1241,6 +1240,8 @@ const Profile = (props) => {
                                     color: LS_COLORS.global.black,
                                     fontFamily: LS_FONTS.PoppinsMedium,
                                     fontSize: 16,
+                                    // height:60,
+                                    marginTop:10,
                                     paddingHorizontal: 20
                                 }}
                                 titleStyle={{
@@ -1270,7 +1271,7 @@ const Profile = (props) => {
                                 containerStyle={{
                                     marginTop: 35,
                                     width: "90%",
-                                    // height: 50,
+                                    height: 80,
                                     alignSelf: "center",
                                     alignItems: "center",
                                     flexDirection: "row",
@@ -1299,7 +1300,7 @@ const Profile = (props) => {
                                 checkISVerified()
                             }} style={{ color: LS_COLORS.global.green, textDecorationLine: "underline", marginLeft: 20 }}>Verify Phone Number</Text>}
                             {user.user_role == role.provider && <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                <Text maxFontSizeMultiplier={1.5}  numberOfLines={1} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Make phone number public</Text>
+                                <Text maxFontSizeMultiplier={1.5}   style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor ,flex:1}}>Make phone number public</Text>
                                 <CheckBox
                                     style={{}}
                                     containerStyle={{ width: 25 }}
@@ -1434,7 +1435,7 @@ const Profile = (props) => {
                             </View>
                             {user.user_role == role.provider &&
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, justifyContent: "space-between" }}>
-                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor }}>Provide service only at my address</Text>
+                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 5, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor ,flex:1}}>Provide service only at my address</Text>
                                     <CheckBox
                                         style={{}}
                                         containerStyle={{ width: 25, marginBottom: 0 }}
@@ -1467,7 +1468,7 @@ const Profile = (props) => {
                             }
                             <View style={{ marginTop: 10 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: '10%', alignItems: 'center', paddingLeft: '1.5%' }}>
-                                    <Text maxFontSizeMultiplier={1.2}  style={{
+                                    <Text maxFontSizeMultiplier={1.1}  style={{
                                         fontFamily: LS_FONTS.PoppinsMedium,
                                         marginHorizontal: '10%',
                                         color: LS_COLORS.global.black,
@@ -1484,7 +1485,7 @@ const Profile = (props) => {
                                             checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                             uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                         />
-                                        <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same address</Text>
+                                        <Text maxFontSizeMultiplier={1.26}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same address</Text>
                                     </View>
                                 </View>
                                 <GooglePlacesAutocomplete

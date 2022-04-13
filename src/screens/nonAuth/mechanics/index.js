@@ -560,7 +560,7 @@ const Mechanics = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "60%" }}>
-                                <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
                             </View>
                         </SafeAreaView>
                     </View>
@@ -585,7 +585,7 @@ const Mechanics = (props) => {
                                     }
                                     setDupProviders(data)
                                 }} style={styles.upper} >
-                                    <Text  maxFontSizeMultiplier={1.5} style={styles.upperText}>Price</Text>
+                                    <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Price</Text>
                                     <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
@@ -598,7 +598,7 @@ const Mechanics = (props) => {
                                     }
                                     setDupProviders(data)
                                 }} style={[styles.upper, { marginHorizontal: 5 }]} >
-                                    <Text  maxFontSizeMultiplier={1.5} style={styles.upperText}>Time</Text>
+                                    <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Time</Text>
                                     <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => {
@@ -611,7 +611,7 @@ const Mechanics = (props) => {
                                     }
                                     setDupProviders(data)
                                 }} style={styles.upper} >
-                                    <Text  maxFontSizeMultiplier={1.5} style={styles.upperText}>Rating</Text>
+                                    <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Rating</Text>
                                     <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
                                 </TouchableOpacity>
                             </View>
@@ -629,32 +629,32 @@ const Mechanics = (props) => {
                                     }
                                     let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
                                     let totalProductPrice = 0
-                                    let showDistanceOrNot=false
+                                    let showDistanceOrNot = false
                                     for (let z of item.item_list) {
                                         for (let p of z.products) {
-                                            if(p.item_products_name=="Per Mile"){
-                                                showDistanceOrNot=true
+                                            if (p.item_products_name == "Per Mile") {
+                                                showDistanceOrNot = true
                                             }
                                             if (p.checked) {
-                                                let p_price=p.price
-                                                if(p.item_products_name=="Per Mile"){
-                                                    p_price=Number(p.price)*lodash.round(Number(data.mile_distance),2)
+                                                let p_price = p.price
+                                                if (p.item_products_name == "Per Mile") {
+                                                    p_price = Number(p.price) * lodash.round(Number(data.mile_distance), 2)
                                                 }
-                                                totalProductPrice =lodash.round(totalProductPrice,2)+ lodash.round(p_price,2)
-                                              
+                                                totalProductPrice = lodash.round(totalProductPrice, 2) + lodash.round(p_price, 2)
+
                                             }
                                         }
                                     }
-                                    let totalPrice=0
-                                    totalPrice= Number(totalServicePrice) + Number(totalProductPrice)
-                                   
+                                    let totalPrice = 0
+                                    totalPrice = Number(totalServicePrice) + Number(totalProductPrice)
+
 
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Pressable onPress={() => {
                                                 // props.navigation.navigate("AddCard1")
                                                 props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService.name })
-                                            }} style={{ width: "70%", flexDirection: 'row' }}>
+                                            }} style={{ flexDirection: 'row' }}>
                                                 <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
                                                     <Image
                                                         style={{ height: '100%', width: '100%' }}
@@ -662,42 +662,42 @@ const Mechanics = (props) => {
                                                         resizeMode='cover'
                                                     />
                                                 </View>
-                                                <View style={{ flexDirection: 'column', marginLeft: "5%", alignSelf: "center" }}>
-                                                    <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item.first_name}</Text>
-                                                    <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>{countryName.trim()}</Text>
+                                                <View style={{ flexDirection: 'column', marginLeft: "5%",}}>
+                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item.first_name}</Text>
+                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>{countryName.trim()}</Text>
                                                 </View>
                                             </Pressable>
-                                            <View style={{width:"30%",paddingTop:10}}>
-                                            <TouchableOpacity onPress={() => { like(item.id, item.is_favourite) }} style={{ height: 20,alignSelf:"center", width: 25, justifyContent: "center", alignItems: 'center'}}>
-                                                {item.is_favourite === 1
-                                                    ?
-                                                    <Image style={{ height: 18, width: 21 }} source={require('../../../assets/heartGreen.png')} resizeMode="cover" />
-                                                    :
-                                                    <Image style={{ height: 18, width: 21 }} source={require('../../../assets/whiteHeart.png')} resizeMode="cover" />
-                                                }
-                                            </TouchableOpacity>
-                                            {totalPrice > 0 && <View style={{ flexDirection: "row",}}>
-                                                <CheckBox
-                                                    checked={totalPrice > 0}
-                                                    onPress={() => {
-                                                        onGlobCheckBoxClicked(index)
+                                            <View style={{ paddingTop: 10 ,flex:1,alignItems:"flex-end"}}>
+                                                <TouchableOpacity onPress={() => { like(item.id, item.is_favourite) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center' }}>
+                                                    {item.is_favourite === 1
+                                                        ?
+                                                        <Image style={{ height: 18, width: 21 }} source={require('../../../assets/heartGreen.png')} resizeMode="cover" />
+                                                        :
+                                                        <Image style={{ height: 18, width: 21 }} source={require('../../../assets/whiteHeart.png')} resizeMode="cover" />
+                                                    }
+                                                </TouchableOpacity>
+                                                {totalPrice > 0 && <View style={{ flexDirection: "row",justifyContent:"flex-end"}}>
+                                                    <CheckBox
+                                                        checked={totalPrice > 0}
+                                                        onPress={() => {
+                                                            onGlobCheckBoxClicked(index)
 
-                                                    }}
-                                                    containerStyle={{marginHorizontal:0,paddingHorizontal:0}}
-                                                    checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
-                                                    uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
-                                                />
-                                                <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 16,flex:1, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15}}>${totalPrice}</Text>
-                                            </View>}
+                                                        }}
+                                                        containerStyle={{ marginHorizontal: 0, paddingHorizontal: 0 }}
+                                                        checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
+                                                        uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
+                                                    />
+                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15 }}>${totalPrice}</Text>
+                                                </View>}
                                             </View>
                                         </View>
                                         {!open ?
-                                            <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
+                                            <Text maxFontSizeMultiplier={1.5} numberOfLines={1} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
                                             :
-                                            <Text  maxFontSizeMultiplier={1.5} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
+                                            <Text maxFontSizeMultiplier={1.5} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
                                         }
                                         <View style={{ width: 120, flexDirection: "row", overflow: "hidden", justifyContent: "space-evenly", alignItems: "center" }}>
-                                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}> {"Rating"}</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}> {"Rating"}</Text>
                                             <Rating
                                                 readonly={true}
                                                 imageSize={10}
@@ -708,8 +708,8 @@ const Mechanics = (props) => {
                                                 startingValue={parseInt(item.rating ?? 0)}
                                             />
                                         </View>
-                                        {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text  maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Address : {item.current_address}</Text>}
-                                        {(checkShowAddress(Number(item?.service_is_at_address))||showDistanceOrNot) && <Text  maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {lodash.round(data.mile_distance,2)} miles</Text>}
+                                        {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Address : {item.current_address}</Text>}
+                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {lodash.round(data.mile_distance, 2)} miles</Text>}
                                         {/* <Text  maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text> */}
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
@@ -727,7 +727,7 @@ const Mechanics = (props) => {
                                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                                         <Text maxFontSizeMultiplier={1.4} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>{i.service_items_name + "(Service)"}</Text>
                                                         <View style={{ height: 25, flexDirection: "row", }}>
-                                                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.price}</Text>
+                                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.price}</Text>
                                                             <CheckBox
                                                                 checked={i.checked}
                                                                 onPress={() => {
@@ -741,12 +741,12 @@ const Mechanics = (props) => {
                                                     </View>
                                                     {i.products.map((itemData, prIndex) => {
                                                         let productTitle = "(Product)"
-                                                        let price=itemData?.price
-                                                        if(itemData.item_products_name=="Per Mile"){
-                                                            productTitle=`(Product) $${price}/Mile`
-                                                            let m=0
-                                                            m=lodash.round(Number(data?.mile_distance),2)
-                                                            price=lodash.round(lodash.round(Number(itemData?.price),2)*m,2)
+                                                        let price = itemData?.price
+                                                        if (itemData.item_products_name == "Per Mile") {
+                                                            productTitle = `(Product) $${price}/Mile`
+                                                            let m = 0
+                                                            m = lodash.round(Number(data?.mile_distance), 2)
+                                                            price = lodash.round(lodash.round(Number(itemData?.price), 2) * m, 2)
                                                             console.log(price)
                                                         }
                                                         let type = itemData.type
@@ -762,14 +762,14 @@ const Mechanics = (props) => {
                                                             isPriced = false
                                                         }
                                                         return (
-                                                            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                                                                <View style={{}} >
-                                                                    <Text  maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
-                                                                        <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>{itemData.item_products_name + productTitle}</Text>
+                                                            <View style={{ justifyContent: 'space-between', alignItems: "center", flexDirection: 'row', marginTop: 10 }} >
+                                                                <View style={{ flex: 1 }} >
+                                                                    <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
+                                                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium, }}>{itemData.item_products_name + productTitle}</Text>
                                                                     </Text>
                                                                 </View>
                                                                 <View style={{ height: 20, flexDirection: "row" }}>
-                                                                    {isPriced && <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + price}</Text>}
+                                                                    {isPriced && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + price}</Text>}
                                                                     <CheckBox
                                                                         checked={itemData.checked}
                                                                         onPress={() => {
@@ -787,14 +787,14 @@ const Mechanics = (props) => {
                                             )
                                         })}
                                         <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Estimated Time</Text>
-                                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{time_format}</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Estimated Time</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{time_format}</Text>
                                         </View>
                                     </Card>
                                 })
                                 :
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                    {!loading && <Text  maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginTop: 10 }}>No Providers Found</Text>}
+                                    {!loading && <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginTop: 10 }}>No Providers Found</Text>}
                                 </View>
                             }
                         </Content>
@@ -826,7 +826,7 @@ const Mechanics = (props) => {
                                     // showToast("Please select service provider for all the service listed.")
                                 }
                             }}>
-                            <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Request</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Request</Text>
                         </TouchableOpacity>
                         <View style={{ height: 10 }}></View>
                     </Container>

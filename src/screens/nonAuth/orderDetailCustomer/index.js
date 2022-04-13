@@ -797,7 +797,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                         rounded
                         source={user.user_role === 3 ? data?.customers_profile_image ? { uri: BASE_URL + data?.customers_profile_image } : placeholder_image : data?.providers_profile_image ? { uri: BASE_URL + data?.providers_profile_image } : placeholder_image}
                     />
-                    <View style={{ marginLeft: 10, justifyContent: "center" }}>
+                    <View style={{ marginLeft: 10, justifyContent: "center",flex:1.3 }}>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle]}>{country}</Text>
                         <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
@@ -815,9 +815,9 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     </View>
                 </Pressable>
                 <View style={{ flex: 1 }} >
-                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}>Created on: {moment(data?.created_at).fromNow()}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}><Text style={{color:"black"}}>Requested :</Text> {moment(data?.created_at).fromNow()}</Text>
                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
-                    <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right",width:"90%" ,alignSelf:"flex-end"}, styles.greenTextStyle]}>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right",width:"90%" ,alignSelf:"flex-end"}, styles.greenTextStyle]}><Text style={{color:"black"}}>Service Date : </Text>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
 
                 </View>
             </View>
@@ -907,7 +907,7 @@ const OrderItemsDetail = ({ i }) => {
             {i.product.map((itemData, index) => {
                 return (
                     <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                        <View style={{}} >
+                        <View style={{flex:1}} >
                             <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
                                 <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
                             </Text>

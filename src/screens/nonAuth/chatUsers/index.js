@@ -117,11 +117,11 @@ const ChatUsers = (props) => {
                             overflow: 'hidden',
                         }}
                     />
-                    <View style={{ marginLeft: '8%', alignSelf: 'center', width: "55%" }}>
+                    <View style={{ marginLeft: '8%', alignSelf: 'center'}}>
                         <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 15, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>{otherUser.first_name}</Text>
                         <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>{itemData.item._data.lastMessage}</Text>
                     </View>
-                    <View style={{ width: "20%", justifyContent: "flex-start", alignItems: "flex-end" }}>
+                    <View style={{ flex:1, justifyContent: "flex-start", alignItems: "flex-end" }}>
                         {readcount ?
                             <View style={{ height: 25, width: 25, borderRadius: 30, justifyContent: 'center', alignItems: 'center', backgroundColor: LS_COLORS.global.green, alignSelf: "flex-end" }}>
                                 <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: 'white', alignSelf: 'center' }}>{readcount}</Text>
@@ -153,7 +153,9 @@ const ChatUsers = (props) => {
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
                     <View style={{
-                        width: "90%", alignSelf: 'center', paddingHorizontal: 10, height: 44, flexDirection: 'row', backgroundColor: '#F9F9F9', elevation: 5, shadowColor: '#000',
+                        width: "90%", 
+                        alignSelf: 'center', paddingHorizontal: 10, 
+                        height: 60, flexDirection: 'row', backgroundColor: '#F9F9F9', elevation: 5, shadowColor: '#000',
                         shadowOffset: { width: 0, height: 1 },
                         shadowOpacity: 0.2,
                         shadowRadius: 0.8, marginTop: 20,
@@ -165,6 +167,7 @@ const ChatUsers = (props) => {
                                 color: "black",
                                 fontFamily: LS_FONTS.PoppinsRegular,
                                 width: '90%',
+                                height:60,
                             }}
                             onChangeText={(text) => {
                                 setSearch(text)

@@ -233,7 +233,7 @@ const LoginScreen = (props) => {
                             placeholder="Your Email"
                             value={email}
                             onChangeText={(text) => {
-                                setEmail(text)
+                                setEmail(text?.trim())
                             }}
                             keyboardType="email-address"
                             returnKeyType="next"

@@ -58,7 +58,7 @@ function CustomInput({
                 numberOfLines={numberOfLines}
                 style={{
                     color: LS_COLORS.global.black,
-                    height: 50,
+                    height: 60,
                     fontFamily: LS_FONTS.PoppinsMedium,
                     fontSize: 16,
                     ...customInputStyles

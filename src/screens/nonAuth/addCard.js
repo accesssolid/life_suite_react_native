@@ -30,7 +30,7 @@ export default function CardList({ navigation, route }) {
         expiry: '',
         cvv: ''
     })
-    const [selection,setShowSelection]=React.useState({start:0})
+    const [selection, setShowSelection] = React.useState({ start: 0 })
     const [address, setAddress] = React.useState({
         address_line1: "",
         address_line2: "",
@@ -47,9 +47,9 @@ export default function CardList({ navigation, route }) {
 
     var cards = creditCardType(cardDetails.number);
 
-    const checkMonthLength=d=>{
-        if(String(d).length==1){
-            return "0"+d
+    const checkMonthLength = d => {
+        if (String(d).length == 1) {
+            return "0" + d
         }
         return d
     }
@@ -59,7 +59,7 @@ export default function CardList({ navigation, route }) {
             if (item.address_line1) {
                 setAddress({ ...address, address_line1: item.address_line1 })
             }
-            setCardDetails({ ...cardDetails, name: item.name, expiry: checkMonthLength(item.exp_month) + "/" + item.exp_year ,number:"**** **** **** "+item.last4})
+            setCardDetails({ ...cardDetails, name: item.name, expiry: checkMonthLength(item.exp_month) + "/" + item.exp_year, number: "**** **** **** " + item.last4 })
         }
     }, [item])
 
@@ -78,9 +78,9 @@ export default function CardList({ navigation, route }) {
     }, [isSameAddress])
 
 
-    const Type =()=> {
-        if (cards||type=="edit") {
-            let switchValue=type=="edit"?item?.brand?.toLowerCase():cards[0]?.type
+    const Type = () => {
+        if (cards || type == "edit") {
+            let switchValue = type == "edit" ? item?.brand?.toLowerCase() : cards[0]?.type
             switch (switchValue) {
                 case 'visa':
                     return require('../../assets/Images1/visa.png');
@@ -116,7 +116,7 @@ export default function CardList({ navigation, route }) {
 
     const generateCardToken = async () => {
         try {
-            if(checkCardDetails()){
+            if (checkCardDetails()) {
                 return
             }
             setLoader(true)
@@ -184,19 +184,30 @@ export default function CardList({ navigation, route }) {
                 setLoader(false)
             })
     }
-    const checkCardDetails=()=>{
-        let returnValue=false
-        if(cardDetails.number==""||cardDetails.name==""||cardDetails.expiry==""||cardDetails.cvv==""){
-            showToast("Please fill the card details.")
-            returnValue=true
-        }else if(address.address_line1==""){
-            returnValue=true
-            showToast("Home address is not added, please enter address details")
+    const checkCardDetails = () => {
+        let returnValue = false
+        if (type == "edit") {
+            if (cardDetails.name == "" || cardDetails.expiry == "") {
+                showToast("Please fill the card details.")
+                returnValue = true
+            } else if (address.address_line1 == "") {
+                returnValue = true
+                showToast("Home address is not added, please enter address details")
+            }
+        } else {
+            if (cardDetails.number == "" || cardDetails.name == "" || cardDetails.expiry == "" || cardDetails.cvv == "") {
+                showToast("Please fill the card details.")
+                returnValue = true
+            } else if (address.address_line1 == "") {
+                returnValue = true
+                showToast("Home address is not added, please enter address details")
+            }
         }
+
         return returnValue
     }
     const cardUpdate = async () => {
-        if(checkCardDetails()){
+        if (checkCardDetails()) {
             return
         }
         setLoader(true)
@@ -238,90 +249,103 @@ export default function CardList({ navigation, route }) {
     return (
         <>
             <SafeAreaView style={{ flex: 1, backgroundColor: LS_COLORS.global.cyan }}>
-                <Header 
-                    containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                <Header
+                    containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
                     imageUrl={require("../../assets/back.png")}
                     action={() => navigation.goBack()}
                     // imageUrl1={require("../../assets/home.png")}
                     // action1={() => props.navigation.navigate("HomeScreen")}
-                    title={type=="edit"?"Edit Card":'Add Card'} />
-                    <View style={{flex:1,backgroundColor:"white"}}>
-                        <Container style={{backgroundColor:"white"}}>
-                    <Content  style={{backgroundColor:"white"}}>
-                        <View style={{ alignItems: "center" }}>
-                            <View style={{ position: "relative" }}>
-                                <CardView
-                                    number={cardDetails.number}
-                                    name={cardDetails.name}
-                                    expiry={cardDetails.expiry}
-                                    imageFront={require("../../assets/card.png")}
-                                    onChange={(e => { })} />
-                                {cardDetails.number.length == 0 ? null : (
-                                    <Image style={{ height: 40, width: 40, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type()} />
-                                )}
-                            </View>
+                    title={type == "edit" ? "Edit Card" : 'Add Card'} />
+                <View style={{ flex: 1, backgroundColor: "white" }}>
+                    <Container style={{ backgroundColor: "white" }}>
+                        <Content style={{ backgroundColor: "white" }}>
+                            <View style={{ alignItems: "center" }}>
+                                <View style={{ position: "relative" }}>
+                                    <CardView
+                                        number={cardDetails.number}
+                                        name={cardDetails.name}
+                                        expiry={cardDetails.expiry}
+                                        imageFront={require("../../assets/card.png")}
+                                        onChange={(e => { })} />
+                                    {cardDetails.number.length == 0 ? null : (
+                                        <Image style={{ height: 40, width: 40, position: "absolute", left: 10, top: 15 }} resizeMode="contain" source={Type()} />
+                                    )}
+                                </View>
 
-                            <View style={{ marginTop: 20 }} />
-                            {type == "add" && <View style={{ flexDirection: "row" }}>
+                                <View style={{ marginTop: 20 }} />
+                                {type == "add" && <View style={{
+                                    flexDirection: "row",
+                                    borderRadius: 7,
+                                    borderColor: LS_COLORS.global.textInutBorderColor,
+                                    alignSelf: 'center',
+                                    alignItems:"center",
+                                    borderWidth: 1,
+                                    width:"80%"
+                                }}>
+                                    <TextInputMask
+                                        style={[styles.inputMaskStyle, { borderWidth: 0 ,marginTop:0,flex:1}]}
+                                        placeholder={'Credit Card Number'}
+                                        placeholderTextColor={"gray"}
+                                        onChangeText={(formatted, extracted) => {
+                                            setCardDetails({ ...cardDetails, number: formatted })
+                                        }}
+                                        mask={"[0000] [0000] [0000] [0000]"}
+                                        keyboardType="numeric"
+                                        ref={cardNumberRef}
+                                        returnKeyType="next"
+                                        maxFontSizeMultiplier={1.2}
+                                        numberOfLines={1}
+                                        onSubmitEditing={() => cardNameRef.current.focus()}
+                                    />
+                                    {cardDetails.number?.trim().length == 0 ? null : (
+                                        <Image style={{ height: 40, width: 40, }} resizeMode="contain" source={Type()} />
+                                    )}
+                                </View>}
                                 <TextInputMask
                                     style={styles.inputMaskStyle}
-                                    placeholder={'Credit Card Number'}
+                                    placeholder={'Card Holder Name'}
                                     placeholderTextColor={"gray"}
                                     onChangeText={(formatted, extracted) => {
-                                        setCardDetails({ ...cardDetails, number: formatted })
+                                        setCardDetails({ ...cardDetails, name: formatted })
                                     }}
-                                    mask={"[0000] [0000] [0000] [0000]"}
-                                    keyboardType="numeric"
-                                    ref={cardNumberRef}
+                                    value={cardDetails.name}
+                                    ref={cardNameRef}
+                                    numberOfLines={1}
                                     returnKeyType="next"
-                                    maxFontSizeMultiplier={1.5}
-                                    onSubmitEditing={() => cardNameRef.current.focus()}
+                                    maxFontSizeMultiplier={1.2}
+                                    onSubmitEditing={() => cardDateRef.current.focus()}
                                 />
-                                {cardDetails.number.length == 0 ? null : (
-                                    <Image style={{ height: 40, width: 40, position: "absolute", right: 10, top: 15 }} resizeMode="contain" source={Type()} />
-                                )}
-                            </View>}
-                            <TextInputMask
-                                style={styles.inputMaskStyle}
-                                placeholder={'Credit Card Holder Name'}
-                                placeholderTextColor={"gray"}
-                                onChangeText={(formatted, extracted) => {
-                                    setCardDetails({ ...cardDetails, name: formatted })
-                                }}
-                                value={cardDetails.name}
-                                ref={cardNameRef}
-                                returnKeyType="next"
-                                onSubmitEditing={() => cardDateRef.current.focus()}
-                            />
-                            <TextInputMask
-                                style={styles.inputMaskStyle}
-                                placeholder={'Expiry Date(MM/YYYY)'}
-                                placeholderTextColor={"gray"}
-                                onChangeText={(formatted, extracted) => {
-                                    setCardDetails({ ...cardDetails, expiry: formatted })
-                                }}
-                                value={cardDetails.expiry}
-                                mask={"[00]/[0000]"}
-                                keyboardType="numeric"
-                                ref={cardDateRef}
-                                returnKeyType="done"
-                                maxFontSizeMultiplier={1.5}
-                            />
+                                <TextInputMask
+                                    style={styles.inputMaskStyle}
+                                    placeholder={'Expiry Date(MM/YYYY)'}
+                                    placeholderTextColor={"gray"}
+                                    onChangeText={(formatted, extracted) => {
+                                        setCardDetails({ ...cardDetails, expiry: formatted })
+                                    }}
+                                    value={cardDetails.expiry}
+                                    mask={"[00]/[0000]"}
+                                    keyboardType="numeric"
+                                    numberOfLines={1}
+                                    ref={cardDateRef}
+                                    returnKeyType="done"
+                                    maxFontSizeMultiplier={1.2}
+                                />
 
-                            {type == "add" && <TextInputMask maxFontSizeMultiplier={1.5}
-                                style={styles.inputMaskStyle}
-                                placeholder={'CVV'}
-                                placeholderTextColor={"gray"}
-                                onChangeText={(formatted, extracted) => {
-                                    setCardDetails({ ...cardDetails, cvv: extracted })
-                                }}
-                                mask={"[000]"}
-                                keyboardType="numeric"
-                                ref={cardDateRef}
-                                returnKeyType="done"
-                            />}
-                            {/* <Text style={[styles.saveText, { color: "gray", fontSize: 16, textAlign: "left", width: "80%", marginTop: 10 }]}>Address : (Optional)</Text> */}
-                            {/* <TextInputMask maxFontSizeMultiplier={1.5}
+                                {type == "add" && <TextInputMask maxFontSizeMultiplier={1.2}
+                                    style={styles.inputMaskStyle}
+                                    placeholder={'CVV'}
+                                    numberOfLines={1}
+                                    placeholderTextColor={"gray"}
+                                    onChangeText={(formatted, extracted) => {
+                                        setCardDetails({ ...cardDetails, cvv: extracted })
+                                    }}
+                                    mask={"[000]"}
+                                    keyboardType="numeric"
+                                    ref={cardDateRef}
+                                    returnKeyType="done"
+                                />}
+                                {/* <Text style={[styles.saveText, { color: "gray", fontSize: 16, textAlign: "left", width: "80%", marginTop: 10 }]}>Address : (Optional)</Text> */}
+                                {/* <TextInputMask maxFontSizeMultiplier={1.45}
                                 style={styles.inputMaskStyle}
                                 placeholder={'Address'}
                                 placeholderTextColor={"gray"}
@@ -330,68 +354,68 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_line1: formatted })
                                 }}
                             /> */}
-                            <View style={{ flexDirection: 'row', width: "80%", alignItems: 'center', alignSelf: "center" }}>
-                                <CheckBox
-                                    containerStyle={{ marginHorizontal: 0, paddingHorizontal: 0 }}
-                                    checked={isSameAddress}
-                                    onPress={() => {
-                                        if (isSameAddress) {
-                                            setAddress({ ...address, address_line1: "" })
-                                        }
-                                        setIsSameAddress(!isSameAddress)
+                                <View style={{ flexDirection: 'row', width: "80%", alignItems: 'center', alignSelf: "center" }}>
+                                    <CheckBox
+                                        containerStyle={{ marginHorizontal: 0, paddingHorizontal: 0 }}
+                                        checked={isSameAddress}
+                                        onPress={() => {
+                                            if (isSameAddress) {
+                                                setAddress({ ...address, address_line1: "" })
+                                            }
+                                            setIsSameAddress(!isSameAddress)
+                                        }}
+                                        checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/checked.png")} />}
+                                        uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
+                                    />
+                                    <Text maxFontSizeMultiplier={1.2} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same as home address</Text>
+                                </View>
+                                <GooglePlacesAutocomplete
+                                    styles={{
+                                        container: {
+                                            width: '100%',
+                                            borderRadius: 28,
+                                            alignSelf: 'center',
+                                            paddingTop: 5,
+                                            paddingHorizontal: '10%',
+                                            maxHeight: 200
+                                        },
+                                        textInput: {
+                                            color: LS_COLORS.global.black,
+                                            borderWidth: 1,
+                                            borderRadius: 7,
+                                            borderColor: LS_COLORS.global.textInutBorderColor,
+                                            fontFamily: LS_FONTS.PoppinsMedium,
+                                            fontSize: 16,
+                                            paddingLeft: 16,
+
+                                        },
+                                        listView: { paddingVertical: 5 },
+                                        separator: {}
                                     }}
-                                    checkedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/checked.png")} />}
-                                    uncheckedIcon={<Image style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../assets/unchecked.png")} />}
-                                />
-                                <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>Same as home address</Text>
-                            </View>
-                            <GooglePlacesAutocomplete
-                                styles={{
-                                    container: {
-                                        width: '100%',
-                                        borderRadius: 28,
-                                        alignSelf: 'center',
-                                        paddingTop: 5,
-                                        paddingHorizontal: '10%',
-                                        maxHeight: 200
-                                    },
-                                    textInput: {
-                                        color: LS_COLORS.global.black,
-                                        borderWidth: 1,
-                                        borderRadius: 7,
-                                        borderColor: LS_COLORS.global.textInutBorderColor,
-                                        fontFamily: LS_FONTS.PoppinsMedium,
-                                        fontSize: 16,
-                                        paddingLeft: 16,
-                                        
-                                    },
-                                    listView: { paddingVertical: 5 },
-                                    separator: {}
-                                }}
-                                placeholder={`Billing Address`}
-                                onPress={(data, details) => {
-                                    setAddress({ ...address, address_line1: data.description })
-                                }}
-                                textInputProps={{
-                                    placeholderTextColor: "gray",
-                                    value: address.address_line1,
-                                    selection:selection,
-                                    onBlur:()=>{setShowSelection({start:0})},
-                                    onFocus:()=>{setShowSelection(null)},
-                                    maxFontSizeMultiplier:1.5,
-                                    onChangeText: (t) => {
-                                        if (isSameAddress) {
-                                            return
+                                    placeholder={`Billing Address`}
+                                    onPress={(data, details) => {
+                                        setAddress({ ...address, address_line1: data.description })
+                                    }}
+                                    textInputProps={{
+                                        placeholderTextColor: "gray",
+                                        value: address.address_line1,
+                                        selection: selection,
+                                        onBlur: () => { setShowSelection({ start: 0 }) },
+                                        onFocus: () => { setShowSelection(null) },
+                                        maxFontSizeMultiplier: 1.2,
+                                        onChangeText: (t) => {
+                                            if (isSameAddress) {
+                                                return
+                                            }
+                                            setAddress({ ...address, address_line1: t })
                                         }
-                                        setAddress({ ...address, address_line1: t })
-                                    }
-                                }}
-                                query={{
-                                    key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
-                                    language: 'en',
-                                }}
-                            />
-                            {/* <TextInputMask maxFontSizeMultiplier={1.5}
+                                    }}
+                                    query={{
+                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        language: 'en',
+                                    }}
+                                />
+                                {/* <TextInputMask maxFontSizeMultiplier={1.45}
                                 style={styles.inputMaskStyle}
                                 placeholder={'Address 2'}
                                 placeholderTextColor={"gray"}
@@ -400,7 +424,7 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_line2: formatted })
                                 }}
                             />
-                            <TextInputMask maxFontSizeMultiplier={1.5}
+                            <TextInputMask maxFontSizeMultiplier={1.45}
                                 style={styles.inputMaskStyle}
                                 placeholder={'City'}
                                 placeholderTextColor={"gray"}
@@ -409,7 +433,7 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_city: formatted })
                                 }}
                             />
-                            <TextInputMask maxFontSizeMultiplier={1.5}
+                            <TextInputMask maxFontSizeMultiplier={1.45}
                                 style={styles.inputMaskStyle}
                                 placeholder={'State'}
                                 placeholderTextColor={"gray"}
@@ -418,7 +442,7 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_state: formatted })
                                 }}
                             />
-                            <TextInputMask maxFontSizeMultiplier={1.5}
+                            <TextInputMask maxFontSizeMultiplier={1.45}
                                 style={styles.inputMaskStyle}
                                 placeholder={'ZipCode'}
                                 placeholderTextColor={"gray"}
@@ -427,7 +451,7 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_zip: formatted })
                                 }}
                             />
-                              <TextInputMask maxFontSizeMultiplier={1.5}
+                              <TextInputMask maxFontSizeMultiplier={1.45}
                                 style={styles.inputMaskStyle}
                                 placeholder={'Country'}
                                 placeholderTextColor={"gray"}
@@ -436,23 +460,23 @@ export default function CardList({ navigation, route }) {
                                     setAddress({ ...address, address_country: formatted })
                                 }}
                             /> */}
-                        </View>
-                    </Content>
-                </Container>
-                <TouchableOpacity
-                    style={styles.save}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                        if (type == "add") {
-                            generateCardToken()
-                        } else if (type == "edit") {
-                            cardUpdate()
-                        }
+                            </View>
+                        </Content>
+                    </Container>
+                    <TouchableOpacity
+                        style={styles.save}
+                        activeOpacity={0.7}
+                        onPress={() => {
+                            if (type == "add") {
+                                generateCardToken()
+                            } else if (type == "edit") {
+                                cardUpdate()
+                            }
 
-                    }}
-                >
-                    <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Save</Text>
-                </TouchableOpacity>
+                        }}
+                    >
+                        <Text maxFontSizeMultiplier={1.45} style={styles.saveText}>Save</Text>
+                    </TouchableOpacity>
                 </View>
             </SafeAreaView>
             {loader && <Loader />}
@@ -524,7 +548,7 @@ const styles = StyleSheet.create({
         width: '80%',
         alignSelf: 'center',
         color: LS_COLORS.global.black,
-        height: 50,
+        height: 60,
         fontFamily: LS_FONTS.PoppinsMedium,
         fontSize: 16,
         borderWidth: 1,

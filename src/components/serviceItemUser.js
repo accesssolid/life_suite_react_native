@@ -124,7 +124,7 @@ const ServiceItemUser = (props) => {
                             <TextInput
                                 value={haveOwnText}
                                 onChangeText={setHaveOwnText}
-                                style={styles.inputStyle}
+                                style={[styles.inputStyle]}
                                 color="black"
                                 placeholder="your products"
                                 placeholderTextColor={LS_COLORS.global.placeholder}
@@ -140,7 +140,7 @@ const ServiceItemUser = (props) => {
                                 checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                                 uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                             />
-                            <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Need recommendation</Text>
+                            <Text  maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Need recommendation</Text>
                         </View>
                     </View>
                 </ScrollView>
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
         borderRadius: 6
     },
     inputStyle: {
-        height: '100%',
+        height: 60,
         width: '100%',
         alignItems: 'center',
         textAlign: 'center'

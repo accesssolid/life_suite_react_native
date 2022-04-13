@@ -650,31 +650,31 @@ const HomeScreen = (props) => {
                         }
                         
                         
-                        }} style={[styles.orderContainer, { paddingHorizontal: 2, minWidth: 100 }]}>
+                        }} style={[styles.orderContainer, { paddingHorizontal: 3 }]}>
                         <View
 
                         >
-                            <Text maxFontSizeMultiplier={1.45} style={[styles.order]}>
+                            <Text maxFontSizeMultiplier={1.4} style={[styles.order]}>
                                 MY ORDERS
                             </Text>
                         </View>
                     </TouchableOpacity>
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => {
                         props.navigation.navigate("LocationServiceSelect")
-                    }} style={[styles.orderContainer, { paddingHorizontal: 2, marginHorizontal: 5, minWidth: 100 }]}>
+                    }} style={[styles.orderContainer, { paddingHorizontal: 3, marginHorizontal: 5 }]}>
                         <View
 
                         >
-                            <Text maxFontSizeMultiplier={1.45} style={styles.order}>
+                            <Text maxFontSizeMultiplier={1.4} style={styles.order}>
                                 LOCATION
                             </Text>
                         </View>
                     </TouchableOpacity>}
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7}
-                        onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={[styles.orderContainer, { paddingHorizontal: 2, minWidth: 100 }]}>
+                        onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={[styles.orderContainer, { paddingHorizontal: 3}]}>
                         <View
                         >
-                            <Text maxFontSizeMultiplier={1.45} style={styles.order}>
+                            <Text maxFontSizeMultiplier={1.4} style={[styles.order]}>
                                 SCHEDULE
                             </Text>
                         </View>
@@ -720,8 +720,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         // position: 'absolute',
         // bottom: "4%",
-        height: 32,
-        width: 111,
+        minHeight: 32,
+        // width: 110,
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 28,
         alignSelf: 'center',

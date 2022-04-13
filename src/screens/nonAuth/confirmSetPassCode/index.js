@@ -59,7 +59,7 @@ const ConfirmSetPassCode = (props) => {
                     action={() => props.navigation.goBack()}
                     imageUrl1={require("../../../assets/home.png")}
                     action1={() => props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})}
-                    title="Confirm Set Passcode"
+                    title="Confirm Passcode"
                     
                     containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
@@ -77,7 +77,7 @@ const ConfirmSetPassCode = (props) => {
                                     returnKeyType={'default'}
                                     enablesReturnKeyAutomatically={true}
                                     value={Passcode}
-                                    placeholder={'Enter Confirm Passcode'}
+                                    placeholder={'Confirm Passcode'}
                                     placeholderTextColor={LS_COLORS.global.grey}
                                     onChangeText={(i) => setPasscode(i)}
                                 />

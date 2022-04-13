@@ -117,19 +117,18 @@ export default function ModalOTP({ visible, setVisible, setIsVerifiedPhone, phon
                         />
                     </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 30 }}>
-                        <Text maxFontSizeMultiplier={1.5} style={{ color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Don't receive a code?</Text>
-                        <Text maxFontSizeMultiplier={1.5} onPress={() => checkISVerified()} style={{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsSemiBold }}>Resend</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={{ color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>Don't receive a code? <Text maxFontSizeMultiplier={1.5} onPress={() => checkISVerified()} style={{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsSemiBold }}>Resend</Text></Text>
                     </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginTop: 30 }}>
 
                         <CustomButton action={() => {
                             VerifyPhoneNumber()
-                        }} title="Verify"  customTextStyles={{fontSize:14}} customStyles={{ marginBottom: 0, borderRadius: 5, width: width * 0.25 }} />
+                        }} title="Verify"  customTextStyles={{fontSize:14}} customStyles={{ marginBottom: 0, borderRadius: 5, width: width * 0.3 }} />
                         <CustomButton
                             action={() => {
                                 setVisible(false)
                             }}
-                            title="Cancel" customTextStyles={{fontSize:14}}  customStyles={{ marginBottom: 0, borderRadius: 5, width: width * 0.25, backgroundColor: "#d9534f" }} />
+                            title="Cancel" customTextStyles={{fontSize:14}}  customStyles={{ marginBottom: 0, borderRadius: 5, width: width * 0.3, backgroundColor: "#d9534f" }} />
                     </View>
                 </View> :
                     <View style={{ width: 80, height: 80, alignSelf: "center", justifyContent: "center", alignItems: "center", backgroundColor: "white", borderRadius: 10 }}>

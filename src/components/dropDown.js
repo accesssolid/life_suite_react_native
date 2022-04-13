@@ -29,10 +29,10 @@ const DropDown1 = (props) => {
                 </View>
                 {props.handleTextValue &&
                 <View style={{ left:"0%",
-                position:"absolute",height:52,justifyContent:"center"}}>
-                <Text  maxFontSizeMultiplier={1.5} style={[{
+                position:"absolute",width:"100%",height:52,justifyContent:"center"}}>
+                <Text  maxFontSizeMultiplier={1.2} numberOfLines={1} style={[{
                     fontSize: 14,
-                    width: "100%",
+                    width: "80%",
                     fontFamily: LS_FONTS.PoppinsRegular,
                     paddingLeft: 20,
                     textAlignVertical: "center",
@@ -74,7 +74,7 @@ const DropDown1 = (props) => {
                             paddingHorizontal: '2%',
                             backgroundColor: LS_COLORS.global.white
                         }}>
-                            <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
+                            <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
                             {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}
                         </View>)
                     }}

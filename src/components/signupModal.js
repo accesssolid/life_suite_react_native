@@ -51,7 +51,7 @@ const SignUpModal = () => {
                     // setTimeout(()=>{
                     //     navigation.navigate('WelcomeScreen')
                     // },200)
-                    // dispatch(logoutAll())
+                    dispatch(logoutAll())
                 }} style={{ backgroundColor: LS_COLORS.global.green, padding: 10, borderRadius: 5, margin: 10 }} >
                     <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white", textAlign: "center" }}>Sign up</Text>
                 </TouchableOpacity>
