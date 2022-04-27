@@ -326,20 +326,16 @@ const OrderHistory1 = (props) => {
                             console.log(item)
                             let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
                             let backgroundColor = "#5CBFBF"
+                            let oType=""
                             for (let c of notification_color) {
                                 if (c.ids.includes(item.order_status)) {
                                     backgroundColor = c.color
+                                    oType=c.title
                                     break
                                 }
                             }
                             return (
                                 <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
-                                    // if (done === index) {
-                                    //     setDone("")
-                                    // }
-                                    // else {
-                                    //     setDone(index)
-                                    // }
                                     props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item } })
                                 }} style={{ width: "95%", marginTop: 15,overflow:"hidden", padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
                                     <View style={{ width: 6,height:2000,position:"absolute", borderRadius: 12,left:0,backgroundColor: backgroundColor }}></View>
@@ -357,6 +353,7 @@ const OrderHistory1 = (props) => {
                                     <View style={{ justifyContent: 'center', alignItems: 'flex-end', flex: 1 }}>
                                         <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
                                         <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, textAlign: "right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
+                                        {selected?.id==undefined&&<Text maxFontSizeMultiplier={1.2}  style={{ fontSize: 11,textAlign:"right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{oType}</Text>}
                                     </View>
                                 </View>
                                   

@@ -214,9 +214,11 @@ const OrderHistory = (props) => {
                         renderItem={({ item, index }) => {
                             let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
                             let backgroundColor = "#5CBFBF"
+                            let oType=""
                             for (let c of notification_color) {
                                 if (c.ids.includes(item.order_status)) {
                                     backgroundColor = c.color
+                                    oType=c.title
                                     break
                                 }
                             }
@@ -239,6 +241,7 @@ const OrderHistory = (props) => {
                                             <View style={{ justifyContent: 'center', alignItems: 'flex-end' , flex: 1}}>
                                                 <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
                                                 <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12,textAlign:"right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
+                                                {selected?.id==undefined&&<Text maxFontSizeMultiplier={1.2}  style={{ fontSize: 11,textAlign:"right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{oType}</Text>}
                                             </View>
                                         </View>
                             </TouchableOpacity>)

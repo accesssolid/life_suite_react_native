@@ -46,7 +46,33 @@ function generate_series(step, start_time) {
     }
     return rc;
 }
-
+const notification_color = [
+    {
+        title: "Requesting",
+        ids: [1],
+        color: "orange"
+    },
+    {
+        title: "Upcoming",
+        ids: [3, 4, 6, 5, 12, 9, 10, 11],
+        color: "#02a4ea"
+    },
+    {
+        title: "InProgress",
+        ids: [7, 15],
+        color: "#fdca0d"
+    },
+    {
+        title: "Completed",
+        ids: [8],
+        color: "#23b14d"
+    },
+    {
+        title: "Cancelled",
+        ids: [2, 14, 16, 13, 17],
+        color: "#ec1c25"
+    }
+]
 
 
 const OrderClientDetail = (props) => {
@@ -54,7 +80,7 @@ const OrderClientDetail = (props) => {
     const fromInputRef = useRef(null)
     const toInputRef = useRef(null)
     let { servicedata, subService, item, order_id } = props.route.params
-    const [itemdata,setitemData]=React.useState({})
+    const [itemdata, setitemData] = React.useState({})
     const [data, setData] = useState(null)
     const [virtualdata, setVirtualData] = React.useState({})
     const user = useSelector(state => state.authenticate.user)
@@ -73,18 +99,21 @@ const OrderClientDetail = (props) => {
     const [delayModalOpen, setDelayModalOpen] = React.useState(false)
     const [ratingModal, setRatingModal] = React.useState(false)
     const [textShowWithRed, settextShowWithRed] = React.useState("")
-
+    const [notificationData,setNotificationData]=React.useState({
+        title:"",
+        color: "white"
+    })
     // books data from  modal
     const [booked, setBooked] = React.useState([])
 
     useEffect(() => {
-        if(item){
+        if (item) {
             setitemData(item)
         }
         if (order_id >= 0) {
             setitemData({ id: order_id })
         }
-       
+
     }, [order_id])
 
     React.useEffect(() => {
@@ -98,6 +127,12 @@ const OrderClientDetail = (props) => {
                 setSelectedStartTime(moment(data.order_start_time, "YYYY-MM-DD HH:mm"))
             }
             setAvailableStartTimes(filteredDs)
+            for (let c of notification_color) {
+                if (c.ids.includes(data.order_status)) {
+                    setNotificationData(c)
+                    break
+                }
+            }
         }
     }, [data, totalWorkingMinutes])
 
@@ -325,6 +360,9 @@ const OrderClientDetail = (props) => {
         if (delay_time) {
             datac[`delay_time`] = delay_time
         }
+        if(order_status==order_types.processing||order_status==order_types.service_finished){
+            datac[`current_date`] = moment().format("YYYY-MM-DD HH:mm:[00]")
+        }
         let config = {
             headers: headers,
             data: JSON.stringify(datac),
@@ -340,7 +378,7 @@ const OrderClientDetail = (props) => {
             })
         }
 
-    
+
 
         getApi(config)
             .then((response) => {
@@ -447,11 +485,11 @@ const OrderClientDetail = (props) => {
     }
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
-            <StatusBar 
-             // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-             barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <View style={{ width: '100%', height: '20%', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, overflow: "hidden" }}>
                 <ImageBackground
                     resizeMode="cover"
@@ -485,8 +523,11 @@ const OrderClientDetail = (props) => {
                 <View style={styles.container}>
                     {/* <RenderView /> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
-                        <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text]}>Client Info</Text>
-                        <CardClientInfo settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        <View style={{flexDirection:"row",justifyContent:"space-between",marginHorizontal:20,alignItems:"center"}}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Client Info</Text>
+                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize:12,textTransform:"none"}]}>{notificationData?.title}</Text>
+                        </View>
+                        <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
                         <RenderAddressFromTO
                             fromShow={data?.order_items[0]?.services_location_type == 2}
@@ -498,18 +539,18 @@ const OrderClientDetail = (props) => {
                                 toCoordinates: { latitude: Number(data?.order_placed_lat), longitude: Number(data?.order_placed_long) } //to in lat && long
                             }}
                         />
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium ,flex:1}]}>User Requested Time Frame </Text>
+                       <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]}>User Requested Time Frame </Text>
                             <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{moment(data?.requested_start_time).format("hh:mm a")} - {moment(data?.requested_end_time).format("hh:mm a")}</Text>
                         </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order Start Time</Text>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{moment(data?.order_start_time).format("hh:mm a")}</Text>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }]}>Order End Time </Text>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{moment(data?.order_end_time).format("hh:mm a")}</Text>
-                        </View>
+                   {Boolean(data?.provider_order_start_at)&&data?.provider_order_start_at!=""&&<View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium,flex:1, color: LS_COLORS.global.green }]}>Order Start Date & Time</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle,{marginLeft:5,textAlign:"right"}]}>{moment(data?.provider_order_start_at,"YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
+                        </View>}
+                     {Boolean(data?.provider_order_end_at)&&data?.provider_order_end_at!=""&&<View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium,flex:1, color: LS_COLORS.global.green }]}>Order End Date & Time </Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle,{marginLeft:5,textAlign:"right"}]}>{moment(data?.provider_order_end_at,"YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
+                        </View>}
                         {/* only show if order status is pending i.e 1 */}
                         {(data?.order_status == 1) &&
                             <>
@@ -544,7 +585,7 @@ const OrderClientDetail = (props) => {
                         openRatingModal={() => setRatingModal(true)}
                         gotoUpdateScreen={() => {
                             props.navigation.navigate("UpdateOrderItems", {
-                                servicedata, subService, item:itemdata
+                                servicedata, subService, item: itemdata
                             })
                         }}
                     />
@@ -631,17 +672,17 @@ const OrderClientDetail = (props) => {
 
 export default OrderClientDetail;
 
-const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkingMinutes }) => {
+const CardClientInfo = ({ data,noti_color,orderType, virtual_data, settextShowWithRed, setTotalWorkingMinutes }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
     const [totalTime, setTotalTime] = React.useState(0)
     const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
     const [showVirtualData, setShowVirtualData] = React.useState(false)
-    
+
     useEffect(() => {
         if (showVirtualData) {
-          
+
             if (totalTime && totalVirtualTime) {
                 if (totalTime < totalVirtualTime) {
                     settextShowWithRed(`Adding new service requires ${totalVirtualTime - totalTime} min extra`)
@@ -708,23 +749,23 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
     const user = useSelector(state => state.authenticate.user)
     const getTotalVirtualAmount = (dtype, amount, totalAmount) => {
         if (amount && amount !== "" && amount != 0) {
-            let totalAmount1 =  Number(totalAmount)
+            let totalAmount1 = Number(totalAmount)
             if (dtype == "flat") {
                 totalAmount1 = totalAmount - Number(amount)
             } else if (dtype == "per") {
                 totalAmount1 = totalAmount - (amount * totalAmount / 100)
             }
-            let return_value= Number(totalAmount1)+Number(data?.provider_rating_data?.tip ?? 0)
-            if(Number.isNaN(return_value)){
+            let return_value = Number(totalAmount1) + Number(data?.provider_rating_data?.tip ?? 0)
+            if (Number.isNaN(return_value)) {
                 return 0
-            }else{
+            } else {
                 return return_value
             }
         } else {
-            let return_value=Number(totalAmount)+Number(data?.provider_rating_data?.tip ?? 0)
-            if(Number.isNaN(return_value)){
+            let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
+            if (Number.isNaN(return_value)) {
                 return 0
-            }else{
+            } else {
                 return return_value
 
             }
@@ -750,7 +791,7 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
     }
 
     return (
-        <Card containerStyle={{ borderRadius: 10 }}>
+        <Card containerStyle={{ borderRadius: 10,overflow:"hidden" }}>
             <View style={{ flexDirection: "row" }}>
                 <View style={{ flex: 1.3, flexDirection: "row" }}>
                     <Avatar
@@ -758,15 +799,15 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
                         rounded
                         source={user.user_role === 3 ? data?.customers_profile_image ? { uri: BASE_URL + data?.customers_profile_image } : placeholder_image : data?.providers_profile_image ? { uri: BASE_URL + data?.providers_profile_image } : placeholder_image}
                     />
-                    <View style={{ marginLeft: 10, justifyContent: "center" ,flex:1.2}}>
-                        <Text maxFontSizeMultiplier={1.5}  style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
+                    <View style={{ marginLeft: 10, justifyContent: "center", flex: 1.2 }}>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle]}>{country}</Text>
                     </View>
                 </View>
-                <View  style={{flex:1}}>
-                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}><Text style={{color:"black"}}>Requested :</Text> {moment(data?.created_at).fromNow()}</Text>
+                <View style={{ flex: 1 }}>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}><Text style={{ color: "black" }}>Requested :</Text> {moment(data?.created_at).fromNow()}</Text>
                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}># {data?.id}</Text></Text>
-                    <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" },styles.greenTextStyle]}><Text style={{color:"black"}}>Service Date : </Text>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }, styles.greenTextStyle]}><Text style={{ color: "black" }}>Requested Service Date : </Text>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
                 </View>
             </View>
             {/* request data */}
@@ -787,21 +828,21 @@ const CardClientInfo = ({ data, virtual_data, settextShowWithRed, setTotalWorkin
             </View>}
             {data?.provider_rating_data?.id &&
                 <>
-                    <View style={{ backgroundColor: "white", width: "100%", justifyContent: "space-between", flexDirection: "row", alignItems: "center",marginTop:10 }}>
-                    <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Tip</Text>
+                    <View style={{ backgroundColor: "white", width: "100%", justifyContent: "space-between", flexDirection: "row", alignItems: "center", marginTop: 10 }}>
+                        <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Tip</Text>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ?? 0}</Text>
                     </View>
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType=="Upcoming"&&"Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType=="Upcoming"&&"Estimated "}Total Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
             </View>
-           
+            <View style={{position:"absolute",height:1000,backgroundColor:noti_color,width:4,left:-15,top:-20}} />
         </Card>
     )
 }
@@ -817,8 +858,8 @@ const OrderItemsDetail = ({ i }) => {
             </View>
             {i.product.map((itemData, index) => {
                 return (
-                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row',marginTop:10}}>
-                        <View style={{flex: 1 }} >
+                    <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                        <View style={{ flex: 1 }} >
                             <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
                                 <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
                             </Text>
@@ -887,7 +928,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
         <View style={{ marginHorizontal: 20 }}>
             {fromShow &&
                 <>
-                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginBottom: 8,marginTop:16 }]}>From</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginBottom: 8, marginTop: 16 }]}>From</Text>
                     <TouchableOpacity
                         onPress={() => {
                             // navigation.navigate('MapScreen', { onConfirm: () => { }, coords: addresses.fromCoordinates })

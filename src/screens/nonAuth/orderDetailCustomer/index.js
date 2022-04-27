@@ -1,6 +1,6 @@
 // #liahs
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, PermissionsAndroid, TouchableOpacity, Dimensions, ScrollView, Image, Linking, Pressable } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, PermissionsAndroid, TouchableOpacity, Dimensions, ScrollView, Image, Linking, Pressable, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -31,6 +31,35 @@ import { order_types, buttons_customer, buttons_types } from '../../../constants
 import * as RNLocalize from "react-native-localize";
 import Entypo from 'react-native-vector-icons/Entypo'
 import RateAndCommentModal from '../../../components/RateAndComment';
+
+const notification_color = [
+    {
+        title: "Requesting",
+        ids: [1],
+        color: "orange"
+    },
+    {
+        title: "Upcoming",
+        ids: [3, 4, 6, 5, 12, 9, 10, 11],
+        color: "#02a4ea"
+    },
+    {
+        title: "InProgress",
+        ids: [7, 15],
+        color: "#fdca0d"
+    },
+    {
+        title: "Completed",
+        ids: [8],
+        color: "#23b14d"
+    },
+    {
+        title: "Cancelled",
+        ids: [2, 14, 16, 13, 17],
+        color: "#ec1c25"
+    }
+]
+
 export default function OrderDetailUpdateCustomer(props) {
     let { item, order_id } = props.route.params
     const [data, setData] = useState(null)
@@ -59,6 +88,10 @@ export default function OrderDetailUpdateCustomer(props) {
         latitude: 37.78825,
         longitude: -122.4324,
     })
+    const [notificationData, setNotificationData] = React.useState({
+        title: "",
+        color: "white"
+    })
     useEffect(() => {
         if (item?.id) {
             setItemData(item)
@@ -82,6 +115,12 @@ export default function OrderDetailUpdateCustomer(props) {
                     latitude: data.order_to_lat,
                     longitude: data.order_to_long,
                 })
+            }
+            for (let c of notification_color) {
+                if (c.ids.includes(data.order_status)) {
+                    setNotificationData(c)
+                    break
+                }
             }
         }
     }, [data])
@@ -217,13 +256,17 @@ export default function OrderDetailUpdateCustomer(props) {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
+        let datac = {
+            order_id: data.id,
+            order_status: order_status,
+            reason: reason
+        }
+        // if(order_status==order_types.processing||order_status==order_types.completed){
+        //     datac[`current_date`] = moment().format("YYYY-MM-DD HH:mm:[00]")
+        // }
         let config = {
             headers: headers,
-            data: JSON.stringify({
-                order_id: data.id,
-                order_status: order_status,
-                reason: reason
-            }),
+            data: JSON.stringify(datac),
             endPoint: "/api/customerOrderStatusUpdate",
             type: 'post'
         }
@@ -536,8 +579,11 @@ export default function OrderDetailUpdateCustomer(props) {
                 <View style={styles.container}>
                     {/* <RenderView Card Main/> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
-                        <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text]}>Order Detail</Text>
-                        <CardClientInfo handleClickOnEdit={(v, t) => {
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, alignItems: "center" }}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Order Detail</Text>
+                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none" }]}>{notificationData?.title}</Text>
+                        </View>
+                        <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
                             setRateType(t)
                             setRateVisible(true)
                         }} virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
@@ -572,6 +618,7 @@ export default function OrderDetailUpdateCustomer(props) {
                                 </View>
                             </>
                         }
+
                         {/* <TextReasonForCancel data= /> */}
                         {textShowWithRed !== "" && <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>}
                     </ScrollView>
@@ -666,7 +713,7 @@ export default function OrderDetailUpdateCustomer(props) {
 
 
 //items && virtual order items manage screens
-const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
+const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
@@ -786,7 +833,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
     }
 
     return (
-        <Card containerStyle={{ borderRadius: 10 }}>
+        <Card containerStyle={{ borderRadius: 10, overflow: "hidden" }}>
             <View style={{ flexDirection: "row" }}>
                 <Pressable onPress={() => {
                     console.log(data)
@@ -797,7 +844,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                         rounded
                         source={user.user_role === 3 ? data?.customers_profile_image ? { uri: BASE_URL + data?.customers_profile_image } : placeholder_image : data?.providers_profile_image ? { uri: BASE_URL + data?.providers_profile_image } : placeholder_image}
                     />
-                    <View style={{ marginLeft: 10, justifyContent: "center",flex:1.3 }}>
+                    <View style={{ marginLeft: 10, justifyContent: "center", flex: 1.3 }}>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle]}>{country}</Text>
                         <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
@@ -815,9 +862,9 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     </View>
                 </Pressable>
                 <View style={{ flex: 1 }} >
-                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}><Text style={{color:"black"}}>Requested :</Text> {moment(data?.created_at).fromNow()}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}><Text style={{ color: "black" }}>Requested :</Text> {moment(data?.created_at).fromNow()}</Text>
                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
-                    <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right",width:"90%" ,alignSelf:"flex-end"}, styles.greenTextStyle]}><Text style={{color:"black"}}>Service Date : </Text>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right", width: "90%", alignSelf: "flex-end" }, styles.greenTextStyle]}><Text style={{ color: "black" }}>Requested Service Date : </Text>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
 
                 </View>
             </View>
@@ -846,7 +893,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
@@ -857,8 +904,16 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Order End Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? moment(virtual_data?.order_end_time).format("hh:mm a") : moment(data?.order_end_time).format("hh:mm a")}</Text>
             </View>
+            {Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between",marginTop: 10 }}>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Provider Start At</Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
+            </View>}
+            {Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Provider End At</Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
+            </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
             </View>
             {data?.order_status == order_types.completed &&
@@ -890,6 +945,7 @@ const CardClientInfo = ({ data, virtual_data, setTotalWorkingMinutes, settextSho
                     </View>
                 </>
             }
+            <View style={{ position: "absolute", height: 1000, backgroundColor: noti_color, width: 4, left: -15, top: -20 }} />
         </Card>
     )
 }
@@ -907,7 +963,7 @@ const OrderItemsDetail = ({ i }) => {
             {i.product.map((itemData, index) => {
                 return (
                     <View key={itemData.id + " " + index} style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }} >
-                        <View style={{flex:1}} >
+                        <View style={{ flex: 1 }} >
                             <Text maxFontSizeMultiplier={1.5} style={{ marginLeft: 20 }}>
                                 <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{itemData.item_products_name + "(Product)"}</Text>
                             </Text>
@@ -1114,7 +1170,13 @@ const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, open
                 submit(order_types.delay_request_accept)
                 break
             case buttons_types.decline:
-                submit(order_types.delay_request_reject)
+                Alert.alert("Decline","Are you sure?  This will also Cancel the request.",[
+                    {text:"No, Keep Request"},
+                    {text:"Yes, Please Cancel",onPress:()=>{
+                        submit(order_types.delay_request_reject)
+                    }},
+                ])
+                
                 break
             case buttons_types.suspend:
                 navigation.navigate("OrderSuspend", { item: data })

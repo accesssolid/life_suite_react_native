@@ -37,7 +37,7 @@ export default function OrderSuspend(props) {
     const [cancelOrderText, setCancelOrderText] = React.useState("Remaining suspend requests: 10")
     const [virtualdata, setVirtualData] = React.useState({})
     const [extraTime, setExtraTime] = React.useState("1 hour")
-
+    const scrollRef=React.useRef(null)
     const getOrderDetail = (order_id) => {
         setLoading(true)
         let headers = {
@@ -166,7 +166,7 @@ export default function OrderSuspend(props) {
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
                     {/* <RenderView Card Main/> */}
-                    <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
+                    <ScrollView ref={scrollRef} contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Suspend in progress</Text>
                         <CardClientInfo virtual_data={virtualdata} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5,color:"red"}]}>{cancelOrderText}</Text>
@@ -183,10 +183,12 @@ export default function OrderSuspend(props) {
                                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
-                                    <Text>{x}</Text>
+                                    <Text style={styles.baseTextStyle}>{x}</Text>
                                 </View>)
                         })}
-                        <Input disabled={reasonCheck != "Other"} value={reason} onChangeText={t => setReason(t)} multiline={true} containerStyle={{ height: 100, borderWidth: 1, width: "90%", alignSelf: "center", borderColor: "gray", borderRadius: 5 }} inputContainerStyle={{ borderBottomWidth: 0 }} inputStyle={{ fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.black, borderWidth: 0 }} />
+                        <Input onFocus={()=>{
+                            scrollRef?.current?.scrollTo({y:1000})
+                        }} maxFontSizeMultiplier={1.4} disabled={reasonCheck != "Other"} value={reason} onChangeText={t => setReason(t)} multiline={true} containerStyle={{ height: 100, borderWidth: 1, width: "90%", alignSelf: "center", borderColor: "gray", borderRadius: 5 }} inputContainerStyle={{ borderBottomWidth: 0 }} inputStyle={[styles.baseTextStyle,{ borderWidth: 0 }]} />
                     </ScrollView>
                     {/* lowerButton */}
                     <View style={{ flexDirection: "row", marginBottom: 10, justifyContent: "space-evenly" }}>

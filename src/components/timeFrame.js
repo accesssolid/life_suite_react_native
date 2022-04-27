@@ -201,7 +201,7 @@ const TimeFrame = props => {
 
                             if (p_obj) {
                                 if (p_obj?.service_is_at_address == "1") {
-                                    location = p_obj?.current_address
+                                    location = p_obj?.address?.address_line_1
                                 }
                             }
                             return <View style={{ marginTop: "5%" }}>

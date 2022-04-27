@@ -283,28 +283,6 @@ const Mechanics = (props) => {
             })
     }
 
-    // const add = () => {
-    //     let json_data = {
-    //         "provider_id": selectedItemsWithProviders[0]?.providerId,
-    //         "estimated_reached_time": "0",
-    //         "order_start_time": "2021-09-26 08:00:00",
-    //         "order_end_time": "2021-09-26 11:00:00",
-    //         "items": selectedItemsWithProviders.map((i) => { return String(i.itemId) }),
-    //         "products": ["1"],
-    //         "other_options": [
-    //             // {
-    //             //     "item_id": "",
-    //             //     "product_id": "",
-    //             //     "other": "",
-    //             //     "have_own": "",
-    //             //     "need_recommendation": ""
-    //             // }
-    //         ]
-    //     }
-    //     let arr = [...apiData]
-    //     { json_data.provider_id ? arr.push(json_data) : null }
-    //     setApiData([...arr])
-    // }
     const [cards, setCards] = React.useState([])
 
     useFocusEffect(useCallback(() => {
@@ -618,6 +596,7 @@ const Mechanics = (props) => {
                             {/* providers changed to dupProviders */}
                             {dupProviders.length > 0 ?
                                 dupProviders.map((item, index) => {
+                                    console.log(item)
                                     let country = item?.current_address?.split(",")
                                     let countryName = country && country.length > 0 ? country[country.length - 1] : ""
                                     let x = item.timeDuration / 60
@@ -708,8 +687,8 @@ const Mechanics = (props) => {
                                                 startingValue={parseInt(item.rating ?? 0)}
                                             />
                                         </View>
-                                        {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Address : {item.current_address}</Text>}
-                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {lodash.round(data.mile_distance, 2)} miles</Text>}
+                                        {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Services will be provided at this address : <Text style={{textAlign:"right"}}>{item?.address?.address_line_1}</Text></Text>}
+                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {lodash.round(data.mile_distance,2)} miles</Text>}
                                         {/* <Text  maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text> */}
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
