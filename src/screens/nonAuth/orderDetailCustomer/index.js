@@ -581,7 +581,7 @@ export default function OrderDetailUpdateCustomer(props) {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, alignItems: "center" }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Order Detail</Text>
-                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none" }]}>{notificationData?.title}</Text>
+                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none" ,flex:1,textAlign:"right"}]}>Order Status: {notificationData?.title}</Text>
                         </View>
                         <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
                             setRateType(t)
@@ -831,7 +831,14 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
             return false
         }
     }
-
+    const getDifferenceTime = () => {
+        if (data?.order_status == order_types.completed || data?.order_status == order_types.service_finished) {
+            if(Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != ""&&Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != ""){
+                return getTimeInHours(moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").diff(moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]"), "minute"))
+            }
+        }
+        return getTimeInHours(totalTime)
+    }
     return (
         <Card containerStyle={{ borderRadius: 10, overflow: "hidden" }}>
             <View style={{ flexDirection: "row" }}>
@@ -914,7 +921,7 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
             </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Time</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getDifferenceTime()}</Text>
             </View>
             {data?.order_status == order_types.completed &&
                 <>

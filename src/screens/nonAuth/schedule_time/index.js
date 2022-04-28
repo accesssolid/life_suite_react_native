@@ -340,7 +340,7 @@ const ScheduleTime = (props) => {
                             hideArrows={false}
                             hideExtraDays={true}
                             disableMonthChange={false}
-                            firstDay={1}
+                            firstDay={0}
                             hideDayNames={false}
                             onMonthChange={(e) => {
                                 setCurrentDate(null)

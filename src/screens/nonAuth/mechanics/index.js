@@ -31,7 +31,6 @@ import lodash from 'lodash'
 
 const Mechanics = (props) => {
     const { data, subService, extraData } = props.route.params
-
     const [loading, setLoading] = useState(false)
     const [providers, setProviders] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -42,14 +41,12 @@ const Mechanics = (props) => {
     const [rating, setRating] = useState(false)
     const [open1, setOpen1] = useState(false)
     const [open2, setOpen2] = useState(false)
-    const [selectedItems, setSelectedItems] = useState([])
     const [selectedItemsWithProviders, setSelectedItemsWithProviders] = useState([])
-    const [selectedProducts, setSelectedProducts] = useState([])
-    const [apiData, setApiData] = useState([])
     const [mycords, setMyCords] = useState({
         latitude: 37.785834,
         longitude: -122.406417
     })
+    const [mile_distanceP, setMileDistanceP] = React.useState({})
     const [current_address, setCurrentAddress] = useState({
         country: "USA",
         city: "",
@@ -242,6 +239,22 @@ const Mechanics = (props) => {
             console.err(err)
         }
 
+    }
+
+    React.useEffect(() => {
+        if (mycords.latitude && mycords.longitude && dupProviders?.length > 0) {
+            locationMileDistanceUpdate()
+        }
+    }, [dupProviders, mycords])
+
+
+    const locationMileDistanceUpdate = async () => {
+        let d = {...mile_distanceP}
+        for (let provider of dupProviders) {
+            let x = await getMilesBetweenCords({ latitude: provider?.address?.lat, longitude: provider?.address?.long }, {latitude: data.order_placed_lat, longitude: data.order_placed_long})
+            d[`${provider._id}`] = x
+        }
+        setMileDistanceP(d)
     }
 
     const getProviders = (rangeData = {}, showRangeResult = false, my_location = false) => {
@@ -641,12 +654,12 @@ const Mechanics = (props) => {
                                                         resizeMode='cover'
                                                     />
                                                 </View>
-                                                <View style={{ flexDirection: 'column', marginLeft: "5%",}}>
+                                                <View style={{ flexDirection: 'column', marginLeft: "5%", }}>
                                                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item.first_name}</Text>
                                                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>{countryName.trim()}</Text>
                                                 </View>
                                             </Pressable>
-                                            <View style={{ paddingTop: 10 ,flex:1,alignItems:"flex-end"}}>
+                                            <View style={{ paddingTop: 10, flex: 1, alignItems: "flex-end" }}>
                                                 <TouchableOpacity onPress={() => { like(item.id, item.is_favourite) }} style={{ height: 20, width: 25, justifyContent: "center", alignItems: 'center' }}>
                                                     {item.is_favourite === 1
                                                         ?
@@ -655,12 +668,11 @@ const Mechanics = (props) => {
                                                         <Image style={{ height: 18, width: 21 }} source={require('../../../assets/whiteHeart.png')} resizeMode="cover" />
                                                     }
                                                 </TouchableOpacity>
-                                                {totalPrice > 0 && <View style={{ flexDirection: "row",justifyContent:"flex-end"}}>
+                                                {totalPrice > 0 && <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
                                                     <CheckBox
                                                         checked={totalPrice > 0}
                                                         onPress={() => {
                                                             onGlobCheckBoxClicked(index)
-
                                                         }}
                                                         containerStyle={{ marginHorizontal: 0, paddingHorizontal: 0 }}
                                                         checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
@@ -687,8 +699,8 @@ const Mechanics = (props) => {
                                                 startingValue={parseInt(item.rating ?? 0)}
                                             />
                                         </View>
-                                        {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Services will be provided at this address : <Text style={{textAlign:"right"}}>{item?.address?.address_line_1}</Text></Text>}
-                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {lodash.round(data.mile_distance,2)} miles</Text>}
+                                        {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Services will be provided at this address : <Text style={{ textAlign: "right" }}>{item?.address?.address_line_1}</Text></Text>}
+                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {checkShowAddress(Number(item?.service_is_at_address)) ? lodash.round(mile_distanceP[`${item?._id}`] ?? 0,2) : lodash.round(data.mile_distance, 2)} miles</Text>}
                                         {/* <Text  maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text> */}
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
@@ -703,15 +715,14 @@ const Mechanics = (props) => {
                                             let extra = extraData.find(x => x.parent_id == service_id)
                                             return (
                                                 <>
-                                                    <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
-                                                        <Text maxFontSizeMultiplier={1.4} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>{i.service_items_name + "(Service)"}</Text>
+                                                    <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 ,alignItems:"center"}}>
+                                                        <Text maxFontSizeMultiplier={1.4} style={{ fontSize: 12,flex:1, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>{i.service_items_name + "(Service)"}</Text>
                                                         <View style={{ height: 25, flexDirection: "row", }}>
                                                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.price}</Text>
                                                             <CheckBox
                                                                 checked={i.checked}
                                                                 onPress={() => {
                                                                     onCheckBoxClicked(!i.checked, index, iIndex, null)
-
                                                                 }}
                                                                 checkedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/checked.png")} />}
                                                                 uncheckedIcon={<Image style={{ height: 18, width: 17, resizeMode: 'contain', bottom: 5 }} source={require("../../../assets/unchecked.png")} />}
@@ -753,7 +764,6 @@ const Mechanics = (props) => {
                                                                         checked={itemData.checked}
                                                                         onPress={() => {
                                                                             onCheckBoxClicked(!itemData.checked, index, iIndex, prIndex)
-
                                                                         }}
                                                                         checkedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/checked.png")} />}
                                                                         uncheckedIcon={<Image style={{ height: 18, width: 17, bottom: 5, resizeMode: 'contain' }} source={require("../../../assets/unchecked.png")} />}

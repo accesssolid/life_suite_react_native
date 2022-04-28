@@ -539,7 +539,7 @@ const Profile = (props) => {
 
         const address = [
             {
-                "country":  homeAddressData?.country,
+                "country": homeAddressData?.country,
                 "state": homeAddressData.state,
                 "city": homeAddressData.city,
                 "address_line_1": homeAddressData.address_line_1,
@@ -550,7 +550,7 @@ const Profile = (props) => {
                 "zip_code": homeAddressData.zip,
             },
             {
-                "country":   homeAddressData?.country,
+                "country": homeAddressData?.country,
                 "state": workAddressData.state,
                 "city": workAddressData.city,
                 "address_line_1": workAddressData.address_line_1,
@@ -1423,10 +1423,10 @@ const Profile = (props) => {
                                                 address_line_1: data.description,
                                                 lat: details.geometry.location.lat,
                                                 lon: details.geometry.location.lng,
-                                                city,
-                                                state,
-                                                country,
-                                                zip_code
+                                                city: city ?? "",
+                                                state: state ?? "",
+                                                country: country ?? "",
+                                                zip_code: zip_code ?? ""
                                             })
                                         }}
                                         textInputProps={{
@@ -1437,7 +1437,6 @@ const Profile = (props) => {
                                                 setHomeAddressData({
                                                     ...homeAddressData,
                                                     address_line_1: t,
-
                                                 })
                                                 setSelection({ start: t?.length })
                                             },
@@ -1447,8 +1446,7 @@ const Profile = (props) => {
                                         }}
                                         query={{
                                             key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
-                                            language: 'en',
-                                            types: "(cities)",
+                                            language: 'en'
                                         }}
                                     />
 

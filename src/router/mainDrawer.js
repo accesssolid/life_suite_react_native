@@ -490,7 +490,11 @@ const CustomDrawerContent = (props) => {
                 }
                 else {
                     setLoader(false)
-                    showToast(response.message, 'danger')
+                    // showToast(response.message, 'danger')
+                    storeItem('user', null)
+                    storeItem('passcode', null)
+                    navigation.navigate('WelcomeScreen')
+                    dispatch(logoutAll())
                 }
             })
             .catch(err => {
@@ -526,11 +530,11 @@ const CustomDrawerContent = (props) => {
                 <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, color: "white", fontSize: 18, marginLeft: 10 }}>{user?.first_name} {user?.last_name}</Text>
             </View>
             <View onTouchEnd={() => {
-                if(userType=="guest"){
-                    props.navigation.toggleDrawer()
-                    dispatch(updateSignupModal(true))
-                    return
-                }
+                // if(userType=="guest"){
+                //     props.navigation.toggleDrawer()
+                //     dispatch(updateSignupModal(true))
+                //     return
+                // }
                 logout()
                 dispatch(changeSwitched(true))
             }} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10, backgroundColor: LS_COLORS.global.green, paddingVertical: 5 }}>

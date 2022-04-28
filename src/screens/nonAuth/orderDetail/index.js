@@ -95,12 +95,13 @@ const OrderClientDetail = (props) => {
     const [estimated_time, setEstimatedTime] = React.useState("1 hr")
     const [reason, setReason] = React.useState("")
     const [cancelModa, setCancelModal] = React.useState(false)
+    const [declineModal, setDeclineModal] = React.useState(false)
     const [blockModal, setBlockModal] = React.useState(false)
     const [delayModalOpen, setDelayModalOpen] = React.useState(false)
     const [ratingModal, setRatingModal] = React.useState(false)
     const [textShowWithRed, settextShowWithRed] = React.useState("")
-    const [notificationData,setNotificationData]=React.useState({
-        title:"",
+    const [notificationData, setNotificationData] = React.useState({
+        title: "",
         color: "white"
     })
     // books data from  modal
@@ -360,7 +361,7 @@ const OrderClientDetail = (props) => {
         if (delay_time) {
             datac[`delay_time`] = delay_time
         }
-        if(order_status==order_types.processing||order_status==order_types.service_finished){
+        if (order_status == order_types.processing || order_status == order_types.service_finished) {
             datac[`current_date`] = moment().format("YYYY-MM-DD HH:mm:[00]")
         }
         let config = {
@@ -378,7 +379,7 @@ const OrderClientDetail = (props) => {
             })
         }
 
-
+        console.log(config.data)
 
         getApi(config)
             .then((response) => {
@@ -523,9 +524,9 @@ const OrderClientDetail = (props) => {
                 <View style={styles.container}>
                     {/* <RenderView /> */}
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
-                        <View style={{flexDirection:"row",justifyContent:"space-between",marginHorizontal:20,alignItems:"center"}}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, alignItems: "center" }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Client Info</Text>
-                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize:12,textTransform:"none"}]}>{notificationData?.title}</Text>
+                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
                         <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
@@ -539,17 +540,17 @@ const OrderClientDetail = (props) => {
                                 toCoordinates: { latitude: Number(data?.order_placed_lat), longitude: Number(data?.order_placed_long) } //to in lat && long
                             }}
                         />
-                       <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 20 }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]}>User Requested Time Frame </Text>
                             <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{moment(data?.requested_start_time).format("hh:mm a")} - {moment(data?.requested_end_time).format("hh:mm a")}</Text>
                         </View>
-                   {Boolean(data?.provider_order_start_at)&&data?.provider_order_start_at!=""&&<View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium,flex:1, color: LS_COLORS.global.green }]}>Order Start Date & Time</Text>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle,{marginLeft:5,textAlign:"right"}]}>{moment(data?.provider_order_start_at,"YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
+                        {Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Order Start Date & Time</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
                         </View>}
-                     {Boolean(data?.provider_order_end_at)&&data?.provider_order_end_at!=""&&<View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium,flex:1, color: LS_COLORS.global.green }]}>Order End Date & Time </Text>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle,{marginLeft:5,textAlign:"right"}]}>{moment(data?.provider_order_end_at,"YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
+                        {Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Order End Date & Time </Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
                         </View>}
                         {/* only show if order status is pending i.e 1 */}
                         {(data?.order_status == 1) &&
@@ -579,6 +580,7 @@ const OrderClientDetail = (props) => {
                         data={data}
                         checkBookedInTime={checkBookedInTime}
                         openCancelModal={() => setCancelModal(true)}
+                        openDeclineModal={()=>setDeclineModal(true)}
                         submit={submit}
                         openDelayModal={() => setDelayModalOpen(true)}
                         openBlockModal={() => setBlockModal(true)}
@@ -594,21 +596,21 @@ const OrderClientDetail = (props) => {
             <BookedSlotsModal visible={bookedModal} booked={booked} setVisible={setBookedModal} />
             <CancelModal
                 title="Kindly fill the reason for rejection."
-                visible={cancelModa}
+                visible={declineModal}
                 value={reason}
                 // pressHandler={()=>setCancelModal(false)}
                 onChangeText={(t) => { setReason(t) }}
                 action1={() => {
-                    setCancelModal(false)
+                    setDeclineModal(false)
                 }}
                 action={() => {
                     if (reason.trim() == "") {
                         showToast("Reason cannot be empty!")
                     }
                     else {
-                        setCancelModal(false)
+                        setDeclineModal(false)
                         setReason('')
-                        submit(2)
+                        submit(order_types.declined)
                     }
                 }}
             />
@@ -628,7 +630,7 @@ const OrderClientDetail = (props) => {
                     else {
                         setCancelModal(false)
                         setReason('')
-                        submit(2)
+                        submit(order_types.cancel)
                     }
                 }}
             />
@@ -672,7 +674,7 @@ const OrderClientDetail = (props) => {
 
 export default OrderClientDetail;
 
-const CardClientInfo = ({ data,noti_color,orderType, virtual_data, settextShowWithRed, setTotalWorkingMinutes }) => {
+const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShowWithRed, setTotalWorkingMinutes }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
@@ -790,8 +792,17 @@ const CardClientInfo = ({ data,noti_color,orderType, virtual_data, settextShowWi
         }
     }
 
+    const getDifferenceTime = () => {
+        if (data?.order_status == order_types.completed || data?.order_status == order_types.service_finished) {
+            if(Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != ""&&Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != ""){
+                return getTimeInHours(moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").diff(moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]"), "minute"))
+            }
+        }
+        return getTimeInHours(totalTime)
+    }
+
     return (
-        <Card containerStyle={{ borderRadius: 10,overflow:"hidden" }}>
+        <Card containerStyle={{ borderRadius: 10, overflow: "hidden" }}>
             <View style={{ flexDirection: "row" }}>
                 <View style={{ flex: 1.3, flexDirection: "row" }}>
                     <Avatar
@@ -835,14 +846,14 @@ const CardClientInfo = ({ data,noti_color,orderType, virtual_data, settextShowWi
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType=="Upcoming"&&"Estimated "}Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType=="Upcoming"&&"Estimated "}Total Time</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getTimeInHours(totalTime)}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getDifferenceTime()}</Text>
             </View>
-            <View style={{position:"absolute",height:1000,backgroundColor:noti_color,width:4,left:-15,top:-20}} />
+            <View style={{ position: "absolute", height: 1000, backgroundColor: noti_color, width: 4, left: -15, top: -20 }} />
         </Card>
     )
 }
@@ -1006,7 +1017,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
 
 
 
-const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen, openRatingModal }) => {
+const GetButtons = ({ data,openDeclineModal, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen, openRatingModal }) => {
     const [buttons, setButtons] = React.useState([])
     const navigation = useNavigation()
 
@@ -1060,7 +1071,7 @@ const GetButtons = ({ data, openCancelModal, submit, openBlockModal, openDelayMo
                 checkBookedInTime()
                 break
             case buttons_types.decline:
-                openCancelModal()
+                openDeclineModal()
                 break
             case buttons_types.delay_order:
                 openDelayModal()

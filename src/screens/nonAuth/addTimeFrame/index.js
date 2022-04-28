@@ -467,7 +467,7 @@ const AddTimeFrame = (props) => {
                             hideArrows={false}
                             hideExtraDays={true}
                             disableMonthChange={false}
-                            firstDay={1}
+                            firstDay={0}
                             hideDayNames={false}
                             showWeekNumbers={false}
                             onPressArrowLeft={subtractMonth => subtractMonth()}
