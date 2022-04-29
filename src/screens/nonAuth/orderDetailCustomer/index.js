@@ -124,6 +124,12 @@ export default function OrderDetailUpdateCustomer(props) {
             }
         }
     }, [data])
+    React.useEffect(() => {
+        if (data) {
+            // props.navigation.navigate("OrderSuspend", { item: data })
+        }
+
+    }, [data])
 
     const getOrderDetail = (order_id, showLoading = true) => {
         if (showLoading) {
@@ -581,7 +587,7 @@ export default function OrderDetailUpdateCustomer(props) {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, alignItems: "center" }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Order Detail</Text>
-                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none" ,flex:1,textAlign:"right"}]}>Order Status: {notificationData?.title}</Text>
+                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
                         <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
                             setRateType(t)
@@ -604,7 +610,7 @@ export default function OrderDetailUpdateCustomer(props) {
                                 <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Job has been delayed </Text>
                                 <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>~{moment(data?.order_start_new_time).diff(moment(data?.order_start_time), "minutes")} minutes</Text>
                             </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
+                                {/* <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                                     <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Est. Old Start Time </Text>
                                     <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>{moment(data?.order_start_time).format("hh:mm a")}</Text>
                                 </View>
@@ -615,7 +621,7 @@ export default function OrderDetailUpdateCustomer(props) {
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
                                     <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Est. New End Time</Text>
                                     <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>{moment(data?.order_end_new_time).format("hh:mm a")}</Text>
-                                </View>
+                                </View> */}
                             </>
                         }
 
@@ -787,6 +793,7 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
         }
         return `${d}`
     }
+
     const user = useSelector(state => state.authenticate.user)
 
     const getTotalVirtualAmount = (dtype, amount, totalAmount) => {
@@ -831,9 +838,53 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
             return false
         }
     }
+// liahs
+    const getDateTimeShow = () => {
+        let provider_start_date = (Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "") ? data?.provider_order_start_at : data?.order_start_time
+        let provider_end_date = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "") ? data?.provider_order_end_at : data?.order_end_time
+        let showProviderStartTime = (Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "")
+        let showProviderEndTime = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "")
+        if (data?.order_status == order_types.will_be_delayed) {
+            return ({
+                start: "Estimated Start Date/Time",
+                end: "Estimated End Date/Time",
+                start_date: moment(data?.order_start_new_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
+            })
+        }
+        else if (orderType == "InProgress") {
+            return ({
+                start: "Start Date/Time",
+                end: "End Date/Time",
+                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: "---"
+            })
+        } else if (data?.order_status == order_types.suspend) {
+            return ({
+                start: "Start Date/Time",
+                end: "End Date/Time",
+                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
+            })
+        } else if (orderType == "Completed") {
+            return ({
+                start: "Start Date/Time",
+                end: "End Date/Time",
+                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: showProviderEndTime ? moment(provider_end_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+            })
+        }
+        return ({
+            start: "Estimated Start Date/Time",
+            end: "Estimated End Date/Time",
+            start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+            end_date: moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+        })
+    }
+
     const getDifferenceTime = () => {
         if (data?.order_status == order_types.completed || data?.order_status == order_types.service_finished) {
-            if(Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != ""&&Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != ""){
+            if (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "" && Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "") {
                 return getTimeInHours(moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").diff(moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]"), "minute"))
             }
         }
@@ -900,27 +951,19 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{"Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Order Start Time</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? moment(virtual_data?.order_start_time).format("hh:mm a") : moment(data?.order_start_time).format("hh:mm a")}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { flex: 1, marginRight: 10 }]}>{getDateTimeShow().start}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? moment(virtual_data?.order_start_time).format("hh:mm a") : getDateTimeShow().start_date}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Order End Time</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? moment(virtual_data?.order_end_time).format("hh:mm a") : moment(data?.order_end_time).format("hh:mm a")}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { flex: 1, marginRight: 10 }]}>{getDateTimeShow().end}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? moment(virtual_data?.order_end_time).format("hh:mm a") : getDateTimeShow().end_date}</Text>
             </View>
-            {Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between",marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Provider Start At</Text>
-                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
-            </View>}
-            {Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Provider End At</Text>
-                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
-            </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{"Estimated "}Total Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getDifferenceTime()}</Text>
             </View>
             {data?.order_status == order_types.completed &&
@@ -1177,13 +1220,15 @@ const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, open
                 submit(order_types.delay_request_accept)
                 break
             case buttons_types.decline:
-                Alert.alert("Decline","Are you sure?  This will also Cancel the request.",[
-                    {text:"No, Keep Request"},
-                    {text:"Yes, Please Cancel",onPress:()=>{
-                        submit(order_types.delay_request_reject)
-                    }},
+                Alert.alert("Decline", "Are you sure?  This will also Cancel the request.", [
+                    { text: "No, Keep Request" },
+                    {
+                        text: "Yes, Please Cancel", onPress: () => {
+                            submit(order_types.delay_request_reject)
+                        }
+                    },
                 ])
-                
+
                 break
             case buttons_types.suspend:
                 navigation.navigate("OrderSuspend", { item: data })

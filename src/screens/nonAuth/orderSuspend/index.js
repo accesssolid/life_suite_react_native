@@ -122,8 +122,8 @@ export default function OrderSuspend(props) {
     }
 
     useEffect(() => {
-        if (item.id) {
-            getOrderDetail(item.id)
+        if (item?.id) {
+            getOrderDetail(item?.id)
         }
     }, [item])
 
@@ -187,7 +187,10 @@ export default function OrderSuspend(props) {
                                 </View>)
                         })}
                         <Input onFocus={()=>{
-                            scrollRef?.current?.scrollTo({y:1000})
+                            // scrollRef?.current?.scrollTo({y:2000})
+                            setTimeout(()=>{
+                                scrollRef?.current?.scrollTo({y:2000})
+                            },200)
                         }} maxFontSizeMultiplier={1.4} disabled={reasonCheck != "Other"} value={reason} onChangeText={t => setReason(t)} multiline={true} containerStyle={{ height: 100, borderWidth: 1, width: "90%", alignSelf: "center", borderColor: "gray", borderRadius: 5 }} inputContainerStyle={{ borderBottomWidth: 0 }} inputStyle={[styles.baseTextStyle,{ borderWidth: 0 }]} />
                     </ScrollView>
                     {/* lowerButton */}

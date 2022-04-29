@@ -74,6 +74,21 @@ const notification_color = [
     }
 ]
 
+const OrderDateTime = ({ data }) => {
+    return (
+        <> {Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Order Start Date & Time</Text>
+            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
+        </View>}
+            {Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Order End Date & Time </Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
+            </View>}
+        </>
+
+    )
+}
+
 
 const OrderClientDetail = (props) => {
     const DATE = props.route.params.data
@@ -164,6 +179,7 @@ const OrderClientDetail = (props) => {
         }
     }, [data])
 
+  
     const getBookedSlots = () => {
         // setLoading(true)
         let headers = {
@@ -476,6 +492,49 @@ const OrderClientDetail = (props) => {
         }
     }, [itemdata]))
 
+    const getDateTimeShow = () => {
+        let provider_start_date = (Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "") ? data?.provider_order_start_at : data?.order_start_time
+        let provider_end_date = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "") ? data?.provider_order_end_at : data?.order_end_time
+        let showProviderStartTime = (Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "")
+        let showProviderEndTime = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "")
+        if (data?.order_status == order_types.will_be_delayed) {
+            return ({
+                start: "Estimated Start Date/Time",
+                end: "Estimated End Date/Time",
+                start_date: moment(data?.order_start_new_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
+            })
+        }
+        else if(notificationData.title == "InProgress") {
+            return ({
+                start: "Start Date/Time",
+                end: "End Date/Time",
+                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: "---"
+            })
+        } else if (data?.order_status == order_types.suspend) {
+            return ({
+                start: "Start Date/Time",
+                end: "End Date/Time",
+                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
+            })
+        } else if (notificationData.title == "Completed") {
+            return ({
+                start: "Start Date/Time",
+                end: "End Date/Time",
+                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: showProviderEndTime ? moment(provider_end_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+            })
+        }
+        return ({
+            start: "Estimated Start Date/Time",
+            end: "Estimated End Date/Time",
+            start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+            end_date: moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+        })
+    }
+
     const getReasonForCancellationText = () => {
         let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
         let d = x?.filter(x => x.reason_description != null && x.reason_description != "")
@@ -544,14 +603,14 @@ const OrderClientDetail = (props) => {
                             <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]}>User Requested Time Frame </Text>
                             <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{moment(data?.requested_start_time).format("hh:mm a")} - {moment(data?.requested_end_time).format("hh:mm a")}</Text>
                         </View>
-                        {Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Order Start Date & Time</Text>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
-                        </View>}
-                        {Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Order End Date & Time </Text>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
-                        </View>}
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>{getDateTimeShow().start}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{getDateTimeShow().start_date}</Text>
+                        </View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>{getDateTimeShow().end}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{getDateTimeShow().end_date}</Text>
+                        </View>
                         {/* only show if order status is pending i.e 1 */}
                         {(data?.order_status == 1) &&
                             <>
@@ -580,7 +639,7 @@ const OrderClientDetail = (props) => {
                         data={data}
                         checkBookedInTime={checkBookedInTime}
                         openCancelModal={() => setCancelModal(true)}
-                        openDeclineModal={()=>setDeclineModal(true)}
+                        openDeclineModal={() => setDeclineModal(true)}
                         submit={submit}
                         openDelayModal={() => setDelayModalOpen(true)}
                         openBlockModal={() => setBlockModal(true)}
@@ -794,7 +853,7 @@ const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShow
 
     const getDifferenceTime = () => {
         if (data?.order_status == order_types.completed || data?.order_status == order_types.service_finished) {
-            if(Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != ""&&Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != ""){
+            if (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "" && Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "") {
                 return getTimeInHours(moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").diff(moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]"), "minute"))
             }
         }
@@ -846,11 +905,11 @@ const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShow
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{ "Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType == "Upcoming" && "Estimated "}Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{"Estimated "}Total Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getDifferenceTime()}</Text>
             </View>
             <View style={{ position: "absolute", height: 1000, backgroundColor: noti_color, width: 4, left: -15, top: -20 }} />
@@ -1017,7 +1076,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
 
 
 
-const GetButtons = ({ data,openDeclineModal, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen, openRatingModal }) => {
+const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlockModal, openDelayModal, checkBookedInTime, gotoUpdateScreen, openRatingModal }) => {
     const [buttons, setButtons] = React.useState([])
     const navigation = useNavigation()
 
