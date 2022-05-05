@@ -50,7 +50,7 @@ const notification_color = [
     {
         title: "Requesting",
         ids: [1],
-        color: "orange"
+        color: "purple"
     },
     {
         title: "Upcoming",
@@ -536,7 +536,8 @@ const OrderClientDetail = (props) => {
     }
 
     const getReasonForCancellationText = () => {
-        let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
+        console.log("Order Logs",data?.order_logs)
+        let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel||x.order_status==order_types.expired || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
         let d = x?.filter(x => x.reason_description != null && x.reason_description != "")
         if (d?.length > 0) {
             return d[d.length - 1].reason_description

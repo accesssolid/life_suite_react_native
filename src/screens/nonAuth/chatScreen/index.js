@@ -455,7 +455,6 @@ const ChatScreen = (props) => {
                                                 />
                                                 <View
                                                     style={{
-                                                        maxHeight: 75,
                                                         maxWidth: '70%',
                                                         // backgroundColor: "#F5FEFF",
                                                        backgroundColor:LS_COLORS.global.green,
@@ -466,7 +465,7 @@ const ChatScreen = (props) => {
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
                                                     }}>
-                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
+                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12,flex:1, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
                                                         {itemData.item.message}
                                                     </Text>
                                                 </View>
@@ -525,7 +524,6 @@ const ChatScreen = (props) => {
                                                 />
                                                 <View
                                                     style={{
-                                                        maxHeight: 75,
                                                         maxWidth: '70%',
                                                         // backgroundColor: "#F5FEFF",
                                                         backgroundColor:LS_COLORS.global.green,

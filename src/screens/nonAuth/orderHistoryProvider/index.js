@@ -43,7 +43,7 @@ const notification_color = [
     {
         title: "Requesting",
         ids: [1],
-        color: "orange"
+        color: "purple"
     },
     {
         title: "Upcoming",

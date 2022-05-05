@@ -117,7 +117,7 @@ const ChatUsers = (props) => {
                             overflow: 'hidden',
                         }}
                     />
-                    <View style={{ marginLeft: '8%', alignSelf: 'center'}}>
+                    <View style={{ marginLeft: '8%', alignSelf: 'center',flex:1}}>
                         <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 15, fontFamily: LS_FONTS.PoppinsMedium, color: 'black' }}>{otherUser.first_name}</Text>
                         <Text  maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: 'black' }}>{itemData.item._data.lastMessage}</Text>
                     </View>
