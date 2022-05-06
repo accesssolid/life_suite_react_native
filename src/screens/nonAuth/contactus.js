@@ -1,42 +1,38 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet, TextInput, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Header from '../../components/header'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
-import { useFocusEffect } from '@react-navigation/native'
-import { CreditCardInput, CardView } from "react-native-credit-card-input";
-import TextInputMask from 'react-native-text-input-mask';
-import { CheckBox } from 'react-native-elements'
-
 import { getApi } from '../../api/api'
 import { useSelector } from 'react-redux'
 import Loader from '../../components/loader'
 import LS_COLORS from '../../constants/colors'
 import LS_FONTS from '../../constants/fonts'
-import { Container, Content } from 'native-base'
 import { showToast } from '../../components/validators';
-import creditCardType from 'credit-card-type';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
 export default function ContactUs({ navigation, route }) {
     const [loader, setLoader] = useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
+    const user = useSelector(state => state.authenticate.user)
+    const userType = useSelector(state => state.authenticate.type)
     const [data, setData] = useState({
         name: '',
         email: '',
         message: '',
     })
-
-
     const emailRef = useRef(null)
     const messageRef = useRef(null)
-
-
-
-
-
-
+    const scrollRef = React.useRef(null)
+    console.log("user",user)
+    React.useEffect(()=>{
+        if(user){
+            if(userType!="guest"){
+                setData({...data,name:user?.first_name+" "+user?.last_name,email:user?.email})
+            }else{
+                setData({...data, name: '',email: '',})
+            }
+          
+        }
+    },[user,userType])
 
     const submit = async (token) => {
         setLoader(true)
@@ -48,6 +44,10 @@ export default function ContactUs({ navigation, route }) {
         formdata.append("email", data.email)
         formdata.append("message", data.message)
         formdata.append("submit_from", "mobile")
+        if(userType!="guest"){
+            formdata.append("user_role",user?.user_role)
+            formdata.append("user_id",user?.id)
+        }
         let config = {
             headers: headers,
             data: formdata,
@@ -87,10 +87,9 @@ export default function ContactUs({ navigation, route }) {
                     // action1={() => props.navigation.navigate("HomeScreen")}
                     title={'contact us'} />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
-                    <ScrollView
-
-                    >
-                        <View style={{ alignItems: "center" }}>
+                    <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "none"} style={{ backgroundColor: "white", flex: 1 }}>
+                        <ScrollView ref={scrollRef} contentContainerStyle={{ alignItems: "center" }} showsVerticalScrollIndicator={false} style={{ padding: 10 }}>
+                            {/* <View style={{ alignItems: "center" }}> */}
                             <View style={{ marginTop: 20 }} />
                             <Image source={require("./contact.png")} resizeMode="contain" style={{ width: Dimensions.get("window").width * 0.8, height: Dimensions.get("window").height * 0.4 }} />
                             <Text maxFontSizeMultiplier={1.5} style={{
@@ -99,21 +98,28 @@ export default function ContactUs({ navigation, route }) {
                                 fontFamily: LS_FONTS.PoppinsMedium,
                             }}>Fill the form below in case of any query.</Text>
                             <TextInput
-                                maxFontSizeMultiplier={1.5}
+                                maxFontSizeMultiplier={1.2}
                                 style={styles.inputMaskStyle}
                                 placeholder={'Name*'}
                                 placeholderTextColor={"gray"}
                                 onChangeText={(t) => {
                                     setData({ ...data, name: t })
                                 }}
+                                editable={userType=="guest"}
                                 value={data.name}
                                 returnKeyType="next"
-                                onSubmitEditing={()=>{
+                                onFocus={d => {
+                                    setTimeout(() => {
+                                        scrollRef?.current?.scrollTo({ y: 1000 })
+                                    }, 200)
+                                }}
+                                onSubmitEditing={() => {
                                     emailRef?.current?.focus()
                                 }}
                             />
-                            <TextInput maxFontSizeMultiplier={1.5}
+                            <TextInput maxFontSizeMultiplier={1.2}
                                 style={styles.inputMaskStyle}
+                                editable={userType=="guest"}
                                 placeholder={'Email*'}
                                 placeholderTextColor={"gray"}
                                 onChangeText={(t) => {
@@ -121,8 +127,13 @@ export default function ContactUs({ navigation, route }) {
                                 }}
                                 value={data.email}
                                 ref={emailRef}
+                                onFocus={d => {
+                                    setTimeout(() => {
+                                        scrollRef?.current?.scrollTo({ y: 1000 })
+                                    }, 200)
+                                }}
                                 returnKeyType="next"
-                                onSubmitEditing={()=>{
+                                onSubmitEditing={() => {
                                     messageRef?.current?.focus()
                                 }}
                             />
@@ -134,12 +145,19 @@ export default function ContactUs({ navigation, route }) {
                                 onChangeText={(t) => {
                                     setData({ ...data, message: t })
                                 }}
-                                maxFontSizeMultiplier={1.5}
+                                onFocus={d => {
+                                    setTimeout(() => {
+                                        scrollRef?.current?.scrollTo({ y: 1000 })
+                                    }, 200)
+                                }}
+                                maxFontSizeMultiplier={1.2}
                                 ref={messageRef}
                             />
-                        </View>
-                    </ScrollView>
-                    {Platform.OS == "ios" && <KeyboardAvoidingView behavior='padding' />}
+                            {/* </View> */}
+                            <View style={{ marginBottom: 100 }} />
+                        </ScrollView>
+                    </KeyboardAvoidingView>
+
                     <TouchableOpacity
                         style={styles.save}
                         activeOpacity={0.7}
@@ -224,7 +242,7 @@ const styles = StyleSheet.create({
         color: LS_COLORS.global.black,
         height: 60,
         fontFamily: LS_FONTS.PoppinsMedium,
-        fontSize: 16,
+        fontSize: 14,
         borderWidth: 1,
         marginTop: 10
     }

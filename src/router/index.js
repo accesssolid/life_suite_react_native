@@ -46,9 +46,6 @@ const Router = () => {
         <Stack.Screen name="WelcomeScreen1" options={{
           gestureEnabled:false
         }} component={Welcomescreen} />
-
-      
-        {/* <Stack.Screen name="Settings" component={Settings} /> */}
       </Stack.Navigator>
 
       {loading && <Loader />}

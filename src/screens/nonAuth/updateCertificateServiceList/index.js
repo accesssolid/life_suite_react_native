@@ -18,10 +18,12 @@ import Cards from '../../../components/cards';
 /* Icons */
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CustomButton from '../../../components/customButton';
+import { updateBlockModal } from '../../../redux/features/blockModel';
 
 export default function UpdateCertificateService({ navigation, route }) {
     const myJobs = useSelector(state => state.provider.myJobs)
-    
+    const user = useSelector(state => state.authenticate.user)
+    const dispatch=useDispatch()
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -50,6 +52,10 @@ export default function UpdateCertificateService({ navigation, route }) {
                                 title1={item.name}
                                 imageUrl={{ uri: BASE_URL + item.image }}
                                 action={() => {
+                                    if(user?.user_status==3){
+                                        dispatch(updateBlockModal(true))
+                                        return
+                                    }
                                     navigation.navigate("UpdateCertificates", { service_id: item.id, title: item.name ,service:item})
                                 }}
                             />

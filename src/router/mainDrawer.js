@@ -49,6 +49,9 @@ import FAQ from '../screens/nonAuth/faq';
 import ContactUs from '../screens/nonAuth/contactus';
 import SignUpModal from '../components/signupModal';
 import { updateSignupModal } from '../redux/features/signupModal';
+import BlockModal from '../components/blockModal';
+import BlockModel, { updateBlockModal } from '../redux/features/blockModel';
+import BlockMessageModal from '../components/BlockMessageModal';
 
 const Drawer = createDrawerNavigator();
 
@@ -242,10 +245,14 @@ const MainDrawer = (props) => {
     }
     React.useEffect(() => {
         if (userType !== "guest") {
-            if (user.user_role == role.customer) {
-                getCards()
-            } else if (user.user_role == role.provider) {
-                getConnectAccountDetail()
+            if(user?.user_status==1){
+                if (user.user_role == role.customer) {
+                    getCards()
+                } else if (user.user_role == role.provider) {
+                    getConnectAccountDetail()
+                }
+            }else if(user?.user_status==3){
+                dispatch(updateBlockModal(true))
             }
             // notification thunk dispatch
             dispatch(loadNotificaitonsThunk())
@@ -445,6 +452,7 @@ const MainDrawer = (props) => {
             />
             <BankModal />
             <SignUpModal />
+            <BlockMessageModal />
         </>
     )
 }
@@ -485,7 +493,7 @@ const CustomDrawerContent = (props) => {
                 if (response.status == true) {
                     storeItem('user', null)
                     storeItem('passcode', null)
-                    navigation.navigate('WelcomeScreen')
+                    navigation.navigate('WelcomeScreen1')
                     dispatch(logoutAll())
                 }
                 else {
@@ -493,11 +501,20 @@ const CustomDrawerContent = (props) => {
                     // showToast(response.message, 'danger')
                     storeItem('user', null)
                     storeItem('passcode', null)
-                    navigation.navigate('WelcomeScreen')
+                    navigation.navigate('WelcomeScreen1')
                     dispatch(logoutAll())
                 }
             })
             .catch(err => {
+                
+            }).finally(()=>{
+              
+                // setLoader(false)
+                // // showToast(response.message, 'danger')
+                // storeItem('user', null)
+                // storeItem('passcode', null)
+                // navigation.navigate('WelcomeScreen')
+                // dispatch(logoutAll())
             })
     }
     const MessageBadge = () => {

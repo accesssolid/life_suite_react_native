@@ -257,6 +257,7 @@ const Profile = (props) => {
     }, [user])
 
     useEffect(() => {
+        console.log("USERDATA",userData)
         if (userData.profile_image) {
             setProfilePic({ uri: BASE_URL + userData.profile_image })
         }
@@ -301,7 +302,8 @@ const Profile = (props) => {
         address_line_2: userData?.address[0]?.address_line_2,
         city: userData?.address[0]?.city,
         state: userData?.address[0]?.state,
-        zip: userData?.address[0]?.zip_code,
+        country:userData?.address[0]?.country,
+        zip_code: userData?.address[0]?.zip_code,
         lat: userData?.address[0]?.lat,
         lon: userData?.address[0]?.long
     })
@@ -311,7 +313,8 @@ const Profile = (props) => {
         address_line_2: userData?.address[1]?.address_line_2,
         city: userData?.address[1]?.city,
         state: userData?.address[1]?.state,
-        zip: userData?.address[1]?.zip_code,
+        zip_code: userData?.address[1]?.zip_code,
+        country:userData?.address[1]?.country,
         lat: userData?.address[1]?.lat,
         lon: userData?.address[1]?.long
     })
@@ -323,9 +326,10 @@ const Profile = (props) => {
                     address_line_2: userData?.address[0]?.address_line_2,
                     city: userData?.address[0]?.city,
                     state: userData?.address[0]?.state,
-                    zip: userData?.address[0]?.zip_code,
+                    country:userData?.address[0]?.country,
+                    zip_code: userData?.address[0]?.zip_code,
                     lat: userData?.address[0]?.lat,
-                    lon: userData?.address[0]?.long
+                    lon: userData?.address[0]?.long,
                 })
             } else {
                 setWorkAddressData({
@@ -333,7 +337,8 @@ const Profile = (props) => {
                     address_line_2: userData?.address[0]?.address_line_2,
                     city: userData?.address[0]?.city,
                     state: userData?.address[0]?.state,
-                    zip: userData?.address[0]?.zip_code,
+                    country:userData?.address[0]?.country,
+                    zip_code: userData?.address[0]?.zip_code,
                     lat: userData?.address[0]?.lat,
                     lon: userData?.address[0]?.long
                 })
@@ -344,7 +349,8 @@ const Profile = (props) => {
                     address_line_2: userData?.address[1]?.address_line_2,
                     city: userData?.address[1]?.city,
                     state: userData?.address[1]?.state,
-                    zip: userData?.address[1]?.zip_code,
+                    country:userData?.address[1]?.country,
+                    zip_code: userData?.address[1]?.zip_code,
                     lat: userData?.address[1]?.lat,
                     lon: userData?.address[1]?.long
                 })
@@ -354,7 +360,8 @@ const Profile = (props) => {
                     address_line_2: userData?.address[1]?.address_line_2,
                     city: userData?.address[1]?.city,
                     state: userData?.address[1]?.state,
-                    zip: userData?.address[1]?.zip_code,
+                    country:userData?.address[1]?.country,
+                    zip_code: userData?.address[1]?.zip_code,
                     lat: userData?.address[1]?.lat,
                     lon: userData?.address[1]?.long
                 })
@@ -367,9 +374,10 @@ const Profile = (props) => {
                 ...workAddressData,
                 address_line_1: homeAddressData.address_line_1,
                 address_line_2: homeAddressData.address_line_2,
-                city: homeAddressData.city,
-                state: homeAddressData.state,
-                zip: homeAddressData.zip,
+                city: homeAddressData?.city,
+                state: homeAddressData?.state,
+                country:homeAddressData?.country,
+                zip_code: homeAddressData?.zip_code,
                 lat: homeAddressData.lat,
                 lon: homeAddressData.lon
             })
@@ -381,9 +389,10 @@ const Profile = (props) => {
                 setWorkAddressData({
                     address_line_1: userData.address[1]?.address_line_1,
                     address_line_2: userData.address[1]?.address_line_2,
-                    city: userData.address[1]?.city,
-                    state: userData.address[1]?.state,
-                    zip: userData.address[1]?.zip_code,
+                    city: userData?.address[1]?.city,
+                    state: userData?.address[1]?.state,
+                    country:userData?.address[1]?.country,
+                    zip_code: userData?.address[1]?.zip_code,
                     lat: userData.address[1]?.lat,
                     lon: userData.address[1]?.long
                 })
@@ -403,9 +412,10 @@ const Profile = (props) => {
                 ...workAddressData,
                 address_line_1: homeAddressData.address_line_1,
                 address_line_2: homeAddressData.address_line_2,
-                city: homeAddressData.city,
-                state: homeAddressData.state,
-                zip: homeAddressData.zip,
+                city: homeAddressData?.city,
+                state:homeAddressData?.state,
+                country:homeAddressData?.country,
+                zip_code: homeAddressData?.zip_code,
                 lat: homeAddressData.lat,
                 lon: homeAddressData.lon
             })
@@ -539,26 +549,26 @@ const Profile = (props) => {
 
         const address = [
             {
-                "country": homeAddressData?.country,
-                "state": homeAddressData.state,
-                "city": homeAddressData.city,
+                "country": homeAddressData?.country??"",
+                "state": homeAddressData.state??"",
+                "city": homeAddressData.city??"",
                 "address_line_1": homeAddressData.address_line_1,
                 "address_line_2": homeAddressData.address_line_2,
                 "address_type": "home",
                 "lat": homeAddressData.lat,
                 "long": homeAddressData.lon,
-                "zip_code": homeAddressData.zip,
+                "zip_code": homeAddressData.zip??"",
             },
             {
-                "country": homeAddressData?.country,
-                "state": workAddressData.state,
-                "city": workAddressData.city,
+                "country": homeAddressData?.country??"",
+                "state": workAddressData.state??"",
+                "city": workAddressData.city??"",
                 "address_line_1": workAddressData.address_line_1,
                 "address_line_2": workAddressData.address_line_2,
                 "address_type": "work",
                 "lat": workAddressData.lat,
                 "long": workAddressData.lon,
-                "zip_code": workAddressData.zip,
+                "zip_code": workAddressData.zip??"",
             }
         ]
         // alert(user.user_role)

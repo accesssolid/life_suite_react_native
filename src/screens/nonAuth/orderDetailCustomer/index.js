@@ -16,7 +16,7 @@ import Header from '../../../components/header';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { BASE_URL, getApi } from '../../../api/api';
 import { showToast } from '../../../components/validators';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import Loader from '../../../components/loader'
 import CancelModal from '../../../components/cancelModal';
@@ -31,7 +31,8 @@ import { order_types, buttons_customer, buttons_types } from '../../../constants
 import * as RNLocalize from "react-native-localize";
 import Entypo from 'react-native-vector-icons/Entypo'
 import RateAndCommentModal from '../../../components/RateAndComment';
-
+import {updateBlockModal} from '../../../redux/features/blockModel'
+import BlockMessageModal from '../../../components/BlockMessageModal'
 const notification_color = [
     {
         title: "Requesting",
@@ -64,7 +65,7 @@ export default function OrderDetailUpdateCustomer(props) {
     let { item, order_id } = props.route.params
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
-
+    const dispatch=useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
     const [loading, setLoading] = React.useState(false)
     const [totalWorkingMinutes, setTotalWorkingMinutes] = React.useState(0)
@@ -446,17 +447,23 @@ export default function OrderDetailUpdateCustomer(props) {
         })
     }
     const gotToForReorder = () => {
-        props.navigation.navigate("MechanicLocation", {
-            servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
-            subService: {
-                name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
-                image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
-                location_type: data?.order_items[0]?.services_location_type ?? 0
-            },
-            reorder: true,
-            extraData: [],
-            orderData: data
-        })
+        if(user?.user_status==1){
+            props.navigation.navigate("MechanicLocation", {
+                servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
+                subService: {
+                    name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
+                    image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
+                    location_type: data?.order_items[0]?.services_location_type ?? 0
+                },
+                reorder: true,
+                extraData: [],
+                orderData: data
+            })
+        }else{
+           
+            dispatch(updateBlockModal(true))
+        }
+        
     }
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
@@ -712,7 +719,9 @@ export default function OrderDetailUpdateCustomer(props) {
                 handleAddUpdate={handleUpdateAddRate}
                 handleDelete={handleDeleteRate}
             />
+            <BlockMessageModal />
             {loading && <Loader />}
+            
         </View>
     )
 }

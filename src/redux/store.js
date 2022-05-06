@@ -9,6 +9,7 @@ import NotificationReducer from './features/notification'
 import switchTo from './features/switchTo'
 import faq from './features/faq'
 import signupModal from './features/signupModal'
+import blockModel from './features/blockModel'
 const store = configureStore({
     reducer: {
         authenticate: AuthenticateReducer,
@@ -20,7 +21,8 @@ const store = configureStore({
         notification:NotificationReducer,
         switchTo,
         faq,
-        signupModal
+        signupModal,
+        blockModel
     },
 })
 

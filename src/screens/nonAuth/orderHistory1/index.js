@@ -96,7 +96,7 @@ const OrderHistory1 = (props) => {
 
     function filterwithNameAndService(item){
         let serviceNames=[...new Set(item.order_items?.map(x=>x.services_name))]
-        if(`${item.providers_first_name} ${item.providers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase())||serviceNames.filter(x=>x?.toLowerCase()?.includes(searchData.text?.toLowerCase()))?.length>0){
+        if(`${item.providers_first_name} ${item.providers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase())||String(item?.id)?.includes(searchData.text?.toLowerCase())||serviceNames.filter(x=>x?.toLowerCase()?.includes(searchData.text?.toLowerCase()))?.length>0){
             return true
         }
         return false
@@ -108,11 +108,11 @@ const OrderHistory1 = (props) => {
         } else {
             setSearchData(state => ({ ...state, data: data }))
         }
-    }, [searchData.text])
+    }, [searchData.text,data])
 
-    useEffect(() => {
-        setSearchData(state => ({ ...state, data: data }))
-    }, [data])
+    // useEffect(() => {
+    //     setSearchData(state => ({ ...state, data: data }))
+    // }, [data])
 
     const getOrders = async (order_status, page = 1) => {
         setLoading(true)
@@ -290,9 +290,6 @@ const OrderHistory1 = (props) => {
 
             />
             <Container style={styles.container}>
-                <Content
-                    showsVerticalScrollIndicator={false}
-                    showsHorizontalScrollIndicator={false}>
                     <CustomTextInput
                         placeholder="Search"
                         value={searchData.text}
@@ -323,6 +320,7 @@ const OrderHistory1 = (props) => {
                                 getOrders(selected.id, pageData.current_page + 1)
                             }
                         }}
+                        onEndReachedThreshold={0}
                         renderItem={({ item, index }) => {
                             let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
                             let order_status = item.order_status
@@ -354,6 +352,7 @@ const OrderHistory1 = (props) => {
                                             <View style={{ justifyContent: 'center', paddingLeft: 10 ,flex:1}}>
                                                 <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
                                                 <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
+                                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 10, fontFamily: LS_FONTS.PoppinsMedium }}>#{item.id}</Text>
                                             </View>
                                             <View style={{ justifyContent: 'center', alignItems: 'flex-end' , flex: 1}}>
                                                 <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
@@ -366,9 +365,8 @@ const OrderHistory1 = (props) => {
                             )
                         }}
                     />
-                    <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
-                    <View style={{ height: 30 }}></View>
-                </Content>
+                    {/* <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
+                    <View style={{ height: 30 }}></View> */}
                 {loader && <Loader />}
             </Container>
         </SafeAreaView>
@@ -381,7 +379,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
-        paddingHorizontal: 10,
         paddingBottom: 10
     },
     alexiContainer: {

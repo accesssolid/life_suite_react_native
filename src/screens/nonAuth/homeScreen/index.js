@@ -29,6 +29,7 @@ import { getStringData, storeStringData } from '../../../asyncStorage/async'
 import moment from 'moment';
 import { updateBankModelData } from '../../../redux/features/bankModel';
 import { updateSignupModal } from '../../../redux/features/signupModal';
+import { updateBlockModal } from '../../../redux/features/blockModel';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
@@ -44,9 +45,8 @@ const HomeScreen = (props) => {
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState([...services])
     const [order, setOrder] = useState([])
-    const [orders, setOrders] = useState()
     const [scrollEnabled, setScrollEnabled] = React.useState(true)
-    const [fcmToken, setFcmToken] = useState("")
+    
 
     useEffect(() => {
         // props.navigation.navigate("ProviderDetail", { providerId: 59, service: "eMas" })
@@ -543,6 +543,10 @@ const HomeScreen = (props) => {
                                             title2="SERVICES"
                                             imageUrl={{ uri: BASE_URL + item.image }}
                                             action={() => {
+                                                if(user?.user_status==3){
+                                                    dispatch(updateBlockModal(true))
+                                                    return
+                                                }
                                                 if (allowJobAdd) {
                                                     item.itemsData.length > 0
                                                         ?
@@ -581,7 +585,12 @@ const HomeScreen = (props) => {
                                             title1={item.name}
                                             imageUrl={{ uri: BASE_URL + item.image }}
                                             action={() => {
-                                                props.navigation.navigate("ServicesProvided", { subService: item });
+                                                if(user?.user_status==3){
+                                                    dispatch(updateBlockModal(true))
+                                                }else{
+                                                    props.navigation.navigate("ServicesProvided", { subService: item });
+                                                }
+                                               
                                             }}
                                             showDelete={true}
                                             deleteService={() => {
@@ -622,12 +631,16 @@ const HomeScreen = (props) => {
                                     <View key={index}
                                         style={{ alignItems: 'center', justifyContent: 'center' }}
                                         onTap={() => {
-                                            
-                                            item.itemsData.length > 0
+                                            if(user?.user_status==3){
+                                                dispatch(updateBlockModal(true))
+                                            }else{
+                                                item.itemsData.length > 0
                                                 ?
                                                 props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
                                                 :
                                                 props.navigation.navigate("SubServices", { service: item })
+                                            }
+                                          
                                         }}
                                     >
                                         <UserCards
@@ -660,7 +673,12 @@ const HomeScreen = (props) => {
                         </View>
                     </TouchableOpacity>
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => {
-                        props.navigation.navigate("LocationServiceSelect")
+                        if(user?.user_status==1){
+                            props.navigation.navigate("LocationServiceSelect")
+                        }else{
+                            dispatch(updateBlockModal(true))
+                        }
+                       
                     }} style={[styles.orderContainer, { paddingHorizontal: 3, marginHorizontal: 5 }]}>
                         <View
 
@@ -671,7 +689,13 @@ const HomeScreen = (props) => {
                         </View>
                     </TouchableOpacity>}
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7}
-                        onPress={() => props.navigation.navigate('ScheduleTime', { serviceData: {} })} style={[styles.orderContainer, { paddingHorizontal: 3}]}>
+                        onPress={() => {
+                            if(user?.user_status==1){
+                                props.navigation.navigate('ScheduleTime', { serviceData: {} })
+                            }else{
+                                dispatch(updateBlockModal(true))
+                            }
+                           }} style={[styles.orderContainer, { paddingHorizontal: 3}]}>
                         <View
                         >
                             <Text maxFontSizeMultiplier={1.4} style={[styles.order]}>

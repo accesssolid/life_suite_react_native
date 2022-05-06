@@ -1140,7 +1140,7 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
                 let current = Date.now()
                 let job_start = moment(data?.requested_start_time, "YYYY-MM-DD HH:mm:[00]").unix() * 1000
                 if (current < job_start) {
-                    Alert.alert('Start Order', `Customer requested job start time is ${moment(data?.requested_start_time).format("DD/MM/YYYY, hh:mm a")}. Do you still want to start the job right now?`, [
+                    Alert.alert('Start Order', `Customer requested job start time is ${moment(data?.requested_start_time).format("MM/DD/YYYY, hh:mm a")}. Do you still want to start the job right now?`, [
                         { text: "No", onPress: () => { } },
                         {
                             text: "Yes", onPress: () => {
