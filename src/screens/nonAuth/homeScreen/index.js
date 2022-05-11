@@ -46,7 +46,7 @@ const HomeScreen = (props) => {
     const [items, setItems] = useState([...services])
     const [order, setOrder] = useState([])
     const [scrollEnabled, setScrollEnabled] = React.useState(true)
-    
+    const showDot = useSelector(state => state.dot)?.showDot
 
     useEffect(() => {
         // props.navigation.navigate("ProviderDetail", { providerId: 59, service: "eMas" })
@@ -213,9 +213,9 @@ const HomeScreen = (props) => {
     }
 
     const getGuestServices = (load = true) => {
-       
-            setLoading(true)
-       
+
+        setLoading(true)
+
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -490,13 +490,14 @@ const HomeScreen = (props) => {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <TouchableOpacity
                         activeOpacity={0.7}
-                        style={{ ...styles.image, overflow: 'hidden', /* TEMP -> */ borderRadius: 0, width: 30 /* <- TEMP */ }}
+                        style={{ ...styles.image,  /* TEMP -> */ borderRadius: 0, width: 30 /* <- TEMP */ }}
                         onPress={() => { props.navigation.openDrawer() /* props.navigation.navigate("Profile") */ }}>
                         <Image
                             style={{ width: '100%', height: '100%' }}
                             resizeMode="contain"
                             source={require('../../../assets/menu.png') /* user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/user.png") */}
                         />
+                        {showDot && <View style={{ height: 10, width: 10, backgroundColor: "red", top: 0, right: 0, position: "absolute", borderRadius: 10 }} />}
                     </TouchableOpacity>
                     <View style={{ flex: 1, paddingHorizontal: '5%' }}>
                     </View>
@@ -543,7 +544,7 @@ const HomeScreen = (props) => {
                                             title2="SERVICES"
                                             imageUrl={{ uri: BASE_URL + item.image }}
                                             action={() => {
-                                                if(user?.user_status==3){
+                                                if (user?.user_status == 3) {
                                                     dispatch(updateBlockModal(true))
                                                     return
                                                 }
@@ -585,12 +586,12 @@ const HomeScreen = (props) => {
                                             title1={item.name}
                                             imageUrl={{ uri: BASE_URL + item.image }}
                                             action={() => {
-                                                if(user?.user_status==3){
+                                                if (user?.user_status == 3) {
                                                     dispatch(updateBlockModal(true))
-                                                }else{
+                                                } else {
                                                     props.navigation.navigate("ServicesProvided", { subService: item });
                                                 }
-                                               
+
                                             }}
                                             showDelete={true}
                                             deleteService={() => {
@@ -631,16 +632,16 @@ const HomeScreen = (props) => {
                                     <View key={index}
                                         style={{ alignItems: 'center', justifyContent: 'center' }}
                                         onTap={() => {
-                                            if(user?.user_status==3){
+                                            if (user?.user_status == 3) {
                                                 dispatch(updateBlockModal(true))
-                                            }else{
+                                            } else {
                                                 item.itemsData.length > 0
-                                                ?
-                                                props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
-                                                :
-                                                props.navigation.navigate("SubServices", { service: item })
+                                                    ?
+                                                    props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+                                                    :
+                                                    props.navigation.navigate("SubServices", { service: item })
                                             }
-                                          
+
                                         }}
                                     >
                                         <UserCards
@@ -656,14 +657,14 @@ const HomeScreen = (props) => {
                 }
                 {!loading && <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                     <TouchableOpacity activeOpacity={0.7} onPress={() => {
-                        if(userType=="guest"){
+                        if (userType == "guest") {
                             dispatch(updateSignupModal(true))
-                        }else{
+                        } else {
                             props.navigation.navigate("Orders")
                         }
-                        
-                        
-                        }} style={[styles.orderContainer, { paddingHorizontal: 3 }]}>
+
+
+                    }} style={[styles.orderContainer, { paddingHorizontal: 3 }]}>
                         <View
 
                         >
@@ -673,12 +674,12 @@ const HomeScreen = (props) => {
                         </View>
                     </TouchableOpacity>
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7} onPress={() => {
-                        if(user?.user_status==1){
+                        if (user?.user_status == 1) {
                             props.navigation.navigate("LocationServiceSelect")
-                        }else{
+                        } else {
                             dispatch(updateBlockModal(true))
                         }
-                       
+
                     }} style={[styles.orderContainer, { paddingHorizontal: 3, marginHorizontal: 5 }]}>
                         <View
 
@@ -690,12 +691,12 @@ const HomeScreen = (props) => {
                     </TouchableOpacity>}
                     {user.user_role == 3 && <TouchableOpacity activeOpacity={0.7}
                         onPress={() => {
-                            if(user?.user_status==1){
+                            if (user?.user_status == 1) {
                                 props.navigation.navigate('ScheduleTime', { serviceData: {} })
-                            }else{
+                            } else {
                                 dispatch(updateBlockModal(true))
                             }
-                           }} style={[styles.orderContainer, { paddingHorizontal: 3}]}>
+                        }} style={[styles.orderContainer, { paddingHorizontal: 3 }]}>
                         <View
                         >
                             <Text maxFontSizeMultiplier={1.4} style={[styles.order]}>

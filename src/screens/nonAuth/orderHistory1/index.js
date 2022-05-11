@@ -46,12 +46,12 @@ const notification_color = [
     },
     {
         title: "Upcoming",
-        ids: [3, 4, 6, 5, 12, 9, 10, 11],
+        ids: [3, 4, 6, 5, 12,10, 11],
         color: "#02a4ea"
     },
     {
         title: "InProgress",
-        ids: [7, 15],
+        ids: [7,9,15],
         color: "#fdca0d"
     },
     {

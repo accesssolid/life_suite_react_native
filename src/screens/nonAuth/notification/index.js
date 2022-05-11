@@ -7,17 +7,11 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MapView, { Marker } from 'react-native-maps';
-import Geolocation from 'react-native-geolocation-service';
-import RNGooglePlaces from 'react-native-google-places';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 
 /* Components */;
 import Header from '../../../components/header';
-import DropDown from '../../../components/dropDown';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { Card, Row } from 'native-base'
-import { TextInput } from 'react-native-gesture-handler';
 import { BASE_URL, getApi } from '../../../api/api';
 import { Dimensions } from 'react-native';
 import { showToast } from '../../../components/validators';
@@ -26,7 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native'
 import { role } from '../../../constants/globals';
-import { loadNotificaitonsThunk } from '../../../redux/features/notification';
+import { loadNotificaitonsThunk ,updateReadNotification} from '../../../redux/features/notification';
 
 const notification_color = [
     {
@@ -82,7 +76,7 @@ const Notification = (props) => {
             getApi(config)
                 .then((response) => {
                     if (response.status == true) {
-
+                        dispatch(loadNotificaitonsThunk())
                     }
                     else {
                         showToast(response.message)

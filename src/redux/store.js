@@ -10,6 +10,7 @@ import switchTo from './features/switchTo'
 import faq from './features/faq'
 import signupModal from './features/signupModal'
 import blockModel from './features/blockModel'
+import dot from './features/showDot'
 const store = configureStore({
     reducer: {
         authenticate: AuthenticateReducer,
@@ -22,7 +23,8 @@ const store = configureStore({
         switchTo,
         faq,
         signupModal,
-        blockModel
+        blockModel,
+        dot
     },
 })
 

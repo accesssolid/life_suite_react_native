@@ -100,7 +100,8 @@ const ChatScreen = (props) => {
         ImagePicker.openPicker({
             width: 300,
             height: 300,
-            cropping: true
+            cropping: true,
+            forceJpg:true
         }).then(image => {
             uploadImage(image)
             setVisible(!visible)
@@ -112,7 +113,8 @@ const ChatScreen = (props) => {
         ImagePicker.openCamera({
             width: 300,
             height: 300,
-            cropping: true
+            cropping: true,
+            forceJpg:true
         }).then(image => {
             uploadImage(image)
             setVisible(!visible)

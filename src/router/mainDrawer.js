@@ -52,6 +52,7 @@ import { updateSignupModal } from '../redux/features/signupModal';
 import BlockModal from '../components/blockModal';
 import BlockModel, { updateBlockModal } from '../redux/features/blockModel';
 import BlockMessageModal from '../components/BlockMessageModal';
+import { updateDot } from '../redux/features/showDot';
 
 const Drawer = createDrawerNavigator();
 
@@ -71,6 +72,8 @@ const MainDrawer = (props) => {
     const [unSeen, setUnSeen] = React.useState(0)
     // get badge component
 
+
+
     useEffect(() => {
         if (userType !== "guest") {
             let noti_number = notifications?.filter(x => x.is_read == "0").length
@@ -84,15 +87,20 @@ const MainDrawer = (props) => {
             if (!authenticate) {
                 totalNoti = 0
             }
+            if (totalNoti > 0) {
+                dispatch(updateDot(true))
+            } else {
+                dispatch(updateDot(false))
+            }
             if (Platform.OS == "android") {
                 ShortcutBadge.getCount().then((count) => {
                     ShortcutBadge.setCount(totalNoti)
                 })
-
             } else {
                 PushNotification.setApplicationIconBadgeNumber(totalNoti)
-
             }
+        } else {
+            dispatch(updateDot(false))
         }
         // if(ShortcutBadge.supported){
 
@@ -245,13 +253,13 @@ const MainDrawer = (props) => {
     }
     React.useEffect(() => {
         if (userType !== "guest") {
-            if(user?.user_status==1){
+            if (user?.user_status == 1) {
                 if (user.user_role == role.customer) {
                     getCards()
                 } else if (user.user_role == role.provider) {
                     getConnectAccountDetail()
                 }
-            }else if(user?.user_status==3){
+            } else if (user?.user_status == 3) {
                 dispatch(updateBlockModal(true))
             }
             // notification thunk dispatch
@@ -506,9 +514,9 @@ const CustomDrawerContent = (props) => {
                 }
             })
             .catch(err => {
-                
-            }).finally(()=>{
-              
+
+            }).finally(() => {
+
                 // setLoader(false)
                 // // showToast(response.message, 'danger')
                 // storeItem('user', null)
@@ -573,12 +581,12 @@ const CustomDrawerContent = (props) => {
                 icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/userGreen.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
                     props.navigation.toggleDrawer()
-                    if(userType=="guest"){
+                    if (userType == "guest") {
                         dispatch(updateSignupModal(true))
-                    }else{
+                    } else {
                         navigation.navigate("Profile")
                     }
-                  
+
                 }}
             />
             <DrawerItem
@@ -597,13 +605,13 @@ const CustomDrawerContent = (props) => {
                 icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/note.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
                     props.navigation.toggleDrawer()
-                    if(userType=="guest"){
+                    if (userType == "guest") {
                         dispatch(updateSignupModal(true))
 
-                    }else{
+                    } else {
                         navigation.navigate("Orders")
                     }
-                    
+
                 }}
             />
             <DrawerItem
@@ -619,19 +627,19 @@ const CustomDrawerContent = (props) => {
                         maxFontSizeMultiplier={1.7}
                     >Messages
                     </Text>
-                    {userType!="guest"&&<MessageBadge />}
+                        {userType != "guest" && <MessageBadge />}
                     </View>
                 }
                 icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/message.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
                     props.navigation.toggleDrawer()
-                    if(userType=="guest"){
+                    if (userType == "guest") {
                         dispatch(updateSignupModal(true))
 
-                    }else{
+                    } else {
                         navigation.navigate("Messages")
                     }
-                    
+
                 }}
             />
             <DrawerItem
@@ -650,14 +658,14 @@ const CustomDrawerContent = (props) => {
                 icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/heartGreen.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
                     props.navigation.toggleDrawer()
-                    if(userType=="guest"){
+                    if (userType == "guest") {
                         dispatch(updateSignupModal(true))
 
-                    }else{
+                    } else {
                         navigation.navigate("Favorites")
                     }
-                    
-                    
+
+
                 }}
             />
 
@@ -672,16 +680,16 @@ const CustomDrawerContent = (props) => {
                     }}
                     maxFontSizeMultiplier={1.7}
                 >Notification</Text>
-                    {userType!="guest"&&<GetBadge />}
+                    {userType != "guest" && <GetBadge />}
                 </View>}
                 icon={({ focused, color }) => <FontAwesome name="bell" color={LS_COLORS.global.green} size={20} />}
                 onPress={() => {
                     props.navigation.toggleDrawer()
-                    
-                    if(userType=="guest"){
+
+                    if (userType == "guest") {
                         dispatch(updateSignupModal(true))
 
-                    }else{
+                    } else {
                         navigation.navigate("Notification")
                     }
                 }}

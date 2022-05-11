@@ -31,7 +31,7 @@ import { order_types, buttons_customer, buttons_types } from '../../../constants
 import * as RNLocalize from "react-native-localize";
 import Entypo from 'react-native-vector-icons/Entypo'
 import RateAndCommentModal from '../../../components/RateAndComment';
-import {updateBlockModal} from '../../../redux/features/blockModel'
+import { updateBlockModal } from '../../../redux/features/blockModel'
 import BlockMessageModal from '../../../components/BlockMessageModal'
 const notification_color = [
     {
@@ -65,7 +65,7 @@ export default function OrderDetailUpdateCustomer(props) {
     let { item, order_id } = props.route.params
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
-    const dispatch=useDispatch()
+    const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
     const [loading, setLoading] = React.useState(false)
     const [totalWorkingMinutes, setTotalWorkingMinutes] = React.useState(0)
@@ -93,6 +93,27 @@ export default function OrderDetailUpdateCustomer(props) {
         title: "",
         color: "white"
     })
+
+    const [whoCancelled, setWhoCancelled] = React.useState({})
+
+    React.useEffect(() => {
+        if (data?.order_logs?.length > 0) {
+            let logs = [...data?.order_logs]
+            logs.reverse()
+            let d = logs.find(x => x.order_status == data?.order_status)
+            if (d&&[2, 14, 16, 13, 17].includes(data?.order_status)) {
+                // setWhoCancelled()
+                if (d.status_change_by_role == 2) {
+                    setWhoCancelled({ type: "Customer", name: `${data?.customers_first_name} ${data?.customers_last_name}` })
+                } if (d.status_change_by_role == 3) {
+                    setWhoCancelled({ type: "Provider", name: `${data?.providers_first_name} ${data?.providers_last_name}` })
+                }
+            }
+
+
+        }
+    }, [data])
+
     useEffect(() => {
         if (item?.id) {
             setItemData(item)
@@ -435,19 +456,23 @@ export default function OrderDetailUpdateCustomer(props) {
     }
 
     const searchAgain = () => {
-        props.navigation.navigate("MechanicLocation", {
-            servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
-            subService: {
-                name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
-                image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
-                location_type: data?.order_items[0]?.services_location_type ?? 0
-            },
-            extraData: [],
-            orderData: data
-        })
+        if (user?.user_status == 1) {
+            props.navigation.navigate("MechanicLocation", {
+                servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
+                subService: {
+                    name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
+                    image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
+                    location_type: data?.order_items[0]?.services_location_type ?? 0
+                },
+                extraData: [],
+                orderData: data
+            })
+        } else {
+            dispatch(updateBlockModal(true))
+        }
     }
     const gotToForReorder = () => {
-        if(user?.user_status==1){
+        if (user?.user_status == 1) {
             props.navigation.navigate("MechanicLocation", {
                 servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
                 subService: {
@@ -459,11 +484,11 @@ export default function OrderDetailUpdateCustomer(props) {
                 extraData: [],
                 orderData: data
             })
-        }else{
-           
+        } else {
+
             dispatch(updateBlockModal(true))
         }
-        
+
     }
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
@@ -529,7 +554,7 @@ export default function OrderDetailUpdateCustomer(props) {
     }
 
     const getReasonForCancellationText = () => {
-        let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel||x.order_status==order_types.expired || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
+        let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel || x.order_status == order_types.expired || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
         let d = x?.filter(x => x.reason_description != null && x.reason_description != "")
         if (d?.length > 0) {
             return d[d.length - 1].reason_description
@@ -594,13 +619,15 @@ export default function OrderDetailUpdateCustomer(props) {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, alignItems: "center" }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Order Detail</Text>
-                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
+                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}{data?.order_status==15&&" (Payment Pending)"}</Text>
                         </View>
                         <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
                             setRateType(t)
                             setRateVisible(true)
                         }} virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
+                        {whoCancelled?.type != undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By</Text>: {whoCancelled?.type} ({whoCancelled?.name})</Text>}
+
                         <RenderAddressFromTO
                             fromShow={data?.order_items[0]?.services_location_type == 2}
                             toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
@@ -721,7 +748,7 @@ export default function OrderDetailUpdateCustomer(props) {
             />
             <BlockMessageModal />
             {loading && <Loader />}
-            
+
         </View>
     )
 }
@@ -847,7 +874,7 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
             return false
         }
     }
-// liahs
+    // liahs
     const getDateTimeShow = () => {
         let provider_start_date = (Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "") ? data?.provider_order_start_at : data?.order_start_time
         let provider_end_date = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "") ? data?.provider_order_end_at : data?.order_end_time
@@ -960,7 +987,7 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{"Estimated "}Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed"&&"Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
@@ -972,7 +999,7 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? moment(virtual_data?.order_end_time).format("hh:mm a") : getDateTimeShow().end_date}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{"Estimated "}Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed"&&"Estimated "}Total Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getDifferenceTime()}</Text>
             </View>
             {data?.order_status == order_types.completed &&

@@ -121,6 +121,25 @@ const OrderClientDetail = (props) => {
     })
     // books data from  modal
     const [booked, setBooked] = React.useState([])
+    const [whoCancelled, setWhoCancelled] = React.useState({})
+
+    React.useEffect(() => {
+        if (data?.order_logs?.length > 0) {
+            let logs = [...data?.order_logs]
+            logs.reverse()
+            let d = logs.find(x => x.order_status == data?.order_status)
+            if (d&&[2, 14, 16, 13, 17].includes(data?.order_status)) {
+                // setWhoCancelled()
+                if (d.status_change_by_role == 2) {
+                    setWhoCancelled({ type: "Customer", name: `${data?.customers_first_name} ${data?.customers_last_name}` })
+                } if (d.status_change_by_role == 3) {
+                    setWhoCancelled({ type: "Provider", name: `${data?.providers_first_name} ${data?.providers_last_name}` })
+                }
+            }
+
+
+        }
+    }, [data])
 
     useEffect(() => {
         if (item) {
@@ -179,7 +198,7 @@ const OrderClientDetail = (props) => {
         }
     }, [data])
 
-  
+
     const getBookedSlots = () => {
         // setLoading(true)
         let headers = {
@@ -505,7 +524,7 @@ const OrderClientDetail = (props) => {
                 end_date: moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
             })
         }
-        else if(notificationData.title == "InProgress") {
+        else if (notificationData.title == "InProgress") {
             return ({
                 start: "Start Date/Time",
                 end: "End Date/Time",
@@ -536,8 +555,7 @@ const OrderClientDetail = (props) => {
     }
 
     const getReasonForCancellationText = () => {
-        console.log("Order Logs",data?.order_logs)
-        let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel||x.order_status==order_types.expired || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
+        let x = data?.order_logs?.filter(x => (x.order_status == order_types.cancel || x.order_status == order_types.expired || x.order_status == order_types.suspend || x.order_status == order_types.delay_request_reject || x.order_status == order_types.declined))
         let d = x?.filter(x => x.reason_description != null && x.reason_description != "")
         if (d?.length > 0) {
             return d[d.length - 1].reason_description
@@ -586,10 +604,11 @@ const OrderClientDetail = (props) => {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, alignItems: "center" }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Client Info</Text>
-                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
+                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title} {data?.order_status==15&&" (Payment Pending)"}</Text>
                         </View>
                         <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
+                        {whoCancelled?.type!=undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By</Text>: {whoCancelled?.type} ({whoCancelled?.name})</Text>}
                         <RenderAddressFromTO
                             fromShow={data?.order_items[0]?.services_location_type == 2}
                             toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
@@ -906,11 +925,11 @@ const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShow
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{ "Estimated "}Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType!="Completed"&&"Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{"Estimated "}Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType!="Completed"&&"Estimated "}Total Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getDifferenceTime()}</Text>
             </View>
             <View style={{ position: "absolute", height: 1000, backgroundColor: noti_color, width: 4, left: -15, top: -20 }} />

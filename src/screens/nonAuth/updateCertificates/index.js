@@ -147,7 +147,8 @@ export default function UpdateCertificates({ navigation, route }) {
                         ImagePicker.openCamera({
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
-                            cropping: true
+                            cropping: true,
+                            forceJpg: true
                         }).then(image => {
                             let i = {
                                 uri: image.path,
@@ -157,10 +158,10 @@ export default function UpdateCertificates({ navigation, route }) {
                             let formdata = new FormData()
                             formdata.append("service_id", service_id)
                             formdata.append("certificate", i)
-                            if(type==0){
-                                formdata.append("file_type","certificate")
-                            }else{
-                                formdata.append("file_type","license")
+                            if (type == 0) {
+                                formdata.append("file_type", "certificate")
+                            } else {
+                                formdata.append("file_type", "license")
                             }
                             addCertificate(formdata)
                         })
@@ -171,7 +172,8 @@ export default function UpdateCertificates({ navigation, route }) {
                         ImagePicker.openPicker({
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
-                            cropping: true
+                            cropping: true,
+                            forceJpg: true
                         }).then(image => {
                             let i = {
                                 uri: image.path,
@@ -181,10 +183,10 @@ export default function UpdateCertificates({ navigation, route }) {
                             let formdata = new FormData()
                             formdata.append("service_id", service_id)
                             formdata.append("certificate", i)
-                            if(type==0){
-                                formdata.append("file_type","certificate")
-                            }else{
-                                formdata.append("file_type","license")
+                            if (type == 0) {
+                                formdata.append("file_type", "certificate")
+                            } else {
+                                formdata.append("file_type", "license")
                             }
                             addCertificate(formdata)
                         }).catch(err => {
@@ -231,7 +233,7 @@ export default function UpdateCertificates({ navigation, route }) {
                 action1={() => {
                     navigation.navigate("HomeScreen")
                 }}
-                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
             <Container style={styles.container}>
@@ -243,12 +245,12 @@ export default function UpdateCertificates({ navigation, route }) {
                     renderItem={renderItem}
                 />
                     <CustomButton action={() => {
-                        if(current_upload_type.id==1){
+                        if (current_upload_type.id == 1) {
                             pickImage(0)
-                        }else{
+                        } else {
                             pickImage(1)
                         }
-                       
+
                     }} title={current_upload_type.button_text} />
                 </>
                 }
@@ -276,7 +278,7 @@ const BothTab = ({ data, renderItem, pickImage }) => {
         <View style={{ flex: 1 }}>
             <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green }}>
                 <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
-                    <Text  style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
+                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
                 </TouchableOpacity>
                 <View style={{ width: 1, backgroundColor: LS_COLORS.global.green }} />
                 <TouchableOpacity onPress={() => setSelected(1)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 1 ? LS_COLORS.global.green : "white" }}>

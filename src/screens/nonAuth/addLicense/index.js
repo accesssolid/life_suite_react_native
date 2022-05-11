@@ -143,7 +143,8 @@ const AddLicense = (props) => {
                         ImagePicker.openCamera({
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             let data = [...images]
                             if (upload_type.id == 1) {
@@ -176,7 +177,8 @@ const AddLicense = (props) => {
                         ImagePicker.openPicker({
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             let data = [...images]
                             if (upload_type.id == 1) {
@@ -227,7 +229,8 @@ const AddLicense = (props) => {
                         ImagePicker.openCamera({
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             imagesData[index] = {
                                 uri: image.path,
@@ -248,7 +251,8 @@ const AddLicense = (props) => {
                         ImagePicker.openPicker({
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             imagesData[index] = {
                                 uri: image.path,

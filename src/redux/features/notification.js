@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import { getApi } from "../../api/api";
 import { role } from "../../constants/globals";
 
-const initialState={
-    data:[]
+const initialState = {
+    data: []
 }
 
 const notificationSlice = createSlice({
@@ -13,19 +13,27 @@ const notificationSlice = createSlice({
         setNotifications: (state, action) => {
             state.data = action.payload.data
         },
-        clearNotificationData:(state,action)=>{
+        updateReadNotification: (state, action) => {
+            state.data = state.map(x => {
+                if (x.id == action.payload.id) {
+                    return ({ ...x, is_read: "1" })
+                }
+                return x
+            })
+        },
+        clearNotificationData: (state, action) => {
             return initialState
         }
     }
 
 })
 
-export const { setNotifications ,clearNotificationData} = notificationSlice.actions
+export const { setNotifications, clearNotificationData ,updateReadNotification} = notificationSlice.actions
 
-export const loadNotificaitonsThunk = () => async (dispatch,getState) => {
+export const loadNotificaitonsThunk = () => async (dispatch, getState) => {
     try {
-        const access_token=getState().authenticate.access_token
-        const user=getState().authenticate.user
+        const access_token = getState().authenticate.access_token
+        const user = getState().authenticate.user
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -41,12 +49,12 @@ export const loadNotificaitonsThunk = () => async (dispatch,getState) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    dispatch(setNotifications({data:response.data}))
-                }else{
-                    dispatch(setNotifications({data:[]}))
+                    dispatch(setNotifications({ data: response.data }))
+                } else {
+                    dispatch(setNotifications({ data: [] }))
                 }
             }).catch(err => {
-                dispatch(setNotifications({data:[]}))
+                dispatch(setNotifications({ data: [] }))
             }).finally(() => {
 
                 // dispatch(setNotifications({data:[]}))

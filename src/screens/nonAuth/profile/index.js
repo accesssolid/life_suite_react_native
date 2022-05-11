@@ -149,7 +149,7 @@ const Profile = (props) => {
 
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
-    const [userData, setUserData] = useState({ ...user })
+    const [userData, setUserData] = useState({ ...user, dob: moment(user.dob,"YYYY-MM-DD").format("MM/DD/YYYY") })
     const [loader, setLoader] = useState(false)
     const [cardDetails, setCardDetails] = useState({
         number: '',
@@ -249,7 +249,7 @@ const Profile = (props) => {
     }
 
     useEffect(() => {
-        setUserData({ ...user })
+        setUserData({ ...user, dob: moment(user.dob,"YYYY-MM-DD").format("MM/DD/YYYY")  })
         setNotificationType(getNotificationType(user.notification_prefrence))
         homeAddressRef.current.setAddressText(homeAddressData.address_line_1)
         workAddressRef.current.setAddressText()
@@ -257,7 +257,7 @@ const Profile = (props) => {
     }, [user])
 
     useEffect(() => {
-        console.log("USERDATA",userData)
+        console.log("USERDATA", userData)
         if (userData.profile_image) {
             setProfilePic({ uri: BASE_URL + userData.profile_image })
         }
@@ -266,7 +266,7 @@ const Profile = (props) => {
     useFocusEffect(
         React.useCallback(() => {
             // getStates()
-            setUserData({ ...user })
+            setUserData({ ...user , dob: moment(user.dob,"YYYY-MM-DD").format("MM/DD/YYYY") })
             setIsSameAddress(user.is_same_address == 1 ? true : false)
             setNotificationType(getNotificationType(user.notification_prefrence))
         }, [])
@@ -302,7 +302,7 @@ const Profile = (props) => {
         address_line_2: userData?.address[0]?.address_line_2,
         city: userData?.address[0]?.city,
         state: userData?.address[0]?.state,
-        country:userData?.address[0]?.country,
+        country: userData?.address[0]?.country,
         zip_code: userData?.address[0]?.zip_code,
         lat: userData?.address[0]?.lat,
         lon: userData?.address[0]?.long
@@ -314,7 +314,7 @@ const Profile = (props) => {
         city: userData?.address[1]?.city,
         state: userData?.address[1]?.state,
         zip_code: userData?.address[1]?.zip_code,
-        country:userData?.address[1]?.country,
+        country: userData?.address[1]?.country,
         lat: userData?.address[1]?.lat,
         lon: userData?.address[1]?.long
     })
@@ -326,7 +326,7 @@ const Profile = (props) => {
                     address_line_2: userData?.address[0]?.address_line_2,
                     city: userData?.address[0]?.city,
                     state: userData?.address[0]?.state,
-                    country:userData?.address[0]?.country,
+                    country: userData?.address[0]?.country,
                     zip_code: userData?.address[0]?.zip_code,
                     lat: userData?.address[0]?.lat,
                     lon: userData?.address[0]?.long,
@@ -337,7 +337,7 @@ const Profile = (props) => {
                     address_line_2: userData?.address[0]?.address_line_2,
                     city: userData?.address[0]?.city,
                     state: userData?.address[0]?.state,
-                    country:userData?.address[0]?.country,
+                    country: userData?.address[0]?.country,
                     zip_code: userData?.address[0]?.zip_code,
                     lat: userData?.address[0]?.lat,
                     lon: userData?.address[0]?.long
@@ -349,7 +349,7 @@ const Profile = (props) => {
                     address_line_2: userData?.address[1]?.address_line_2,
                     city: userData?.address[1]?.city,
                     state: userData?.address[1]?.state,
-                    country:userData?.address[1]?.country,
+                    country: userData?.address[1]?.country,
                     zip_code: userData?.address[1]?.zip_code,
                     lat: userData?.address[1]?.lat,
                     lon: userData?.address[1]?.long
@@ -360,7 +360,7 @@ const Profile = (props) => {
                     address_line_2: userData?.address[1]?.address_line_2,
                     city: userData?.address[1]?.city,
                     state: userData?.address[1]?.state,
-                    country:userData?.address[1]?.country,
+                    country: userData?.address[1]?.country,
                     zip_code: userData?.address[1]?.zip_code,
                     lat: userData?.address[1]?.lat,
                     lon: userData?.address[1]?.long
@@ -376,7 +376,7 @@ const Profile = (props) => {
                 address_line_2: homeAddressData.address_line_2,
                 city: homeAddressData?.city,
                 state: homeAddressData?.state,
-                country:homeAddressData?.country,
+                country: homeAddressData?.country,
                 zip_code: homeAddressData?.zip_code,
                 lat: homeAddressData.lat,
                 lon: homeAddressData.lon
@@ -391,7 +391,7 @@ const Profile = (props) => {
                     address_line_2: userData.address[1]?.address_line_2,
                     city: userData?.address[1]?.city,
                     state: userData?.address[1]?.state,
-                    country:userData?.address[1]?.country,
+                    country: userData?.address[1]?.country,
                     zip_code: userData?.address[1]?.zip_code,
                     lat: userData.address[1]?.lat,
                     lon: userData.address[1]?.long
@@ -413,8 +413,8 @@ const Profile = (props) => {
                 address_line_1: homeAddressData.address_line_1,
                 address_line_2: homeAddressData.address_line_2,
                 city: homeAddressData?.city,
-                state:homeAddressData?.state,
-                country:homeAddressData?.country,
+                state: homeAddressData?.state,
+                country: homeAddressData?.country,
                 zip_code: homeAddressData?.zip_code,
                 lat: homeAddressData.lat,
                 lon: homeAddressData.lon
@@ -478,7 +478,8 @@ const Profile = (props) => {
                         ImagePicker.openCamera({
                             width: 400,
                             height: 400,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             updateProfilePic(image)
                         }).catch(err => {
@@ -491,7 +492,8 @@ const Profile = (props) => {
                         ImagePicker.openPicker({
                             width: 400,
                             height: 400,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             updateProfilePic(image)
                         }).catch(err => {
@@ -549,26 +551,26 @@ const Profile = (props) => {
 
         const address = [
             {
-                "country": homeAddressData?.country??"",
-                "state": homeAddressData.state??"",
-                "city": homeAddressData.city??"",
+                "country": homeAddressData?.country ?? "",
+                "state": homeAddressData.state ?? "",
+                "city": homeAddressData.city ?? "",
                 "address_line_1": homeAddressData.address_line_1,
                 "address_line_2": homeAddressData.address_line_2,
                 "address_type": "home",
                 "lat": homeAddressData.lat,
                 "long": homeAddressData.lon,
-                "zip_code": homeAddressData.zip??"",
+                "zip_code": homeAddressData.zip ?? "",
             },
             {
-                "country": homeAddressData?.country??"",
-                "state": workAddressData.state??"",
-                "city": workAddressData.city??"",
+                "country": homeAddressData?.country ?? "",
+                "state": workAddressData.state ?? "",
+                "city": workAddressData.city ?? "",
                 "address_line_1": workAddressData.address_line_1,
                 "address_line_2": workAddressData.address_line_2,
                 "address_type": "work",
                 "lat": workAddressData.lat,
                 "long": workAddressData.lon,
-                "zip_code": workAddressData.zip??"",
+                "zip_code": workAddressData.zip ?? "",
             }
         ]
         // alert(user.user_role)
@@ -715,7 +717,7 @@ const Profile = (props) => {
         formdata.append("first_name", userData.first_name);
         formdata.append("middle_name", userData.middle_name == "" ? "null" : userData.middle_name);
         formdata.append("last_name", userData.last_name);
-        formdata.append("dob", user?.dob !== userData.dob ? moment(userData.dob, "MM/DD/YYYY").format("YYYY-MM-DD") : userData.dob);
+        formdata.append("dob", moment(userData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"));
         formdata.append("phone_number", userData.phone_number.match(/\d/g).join(""));
 
         if (user.user_role == role.provider) {
@@ -989,7 +991,8 @@ const Profile = (props) => {
                         ImagePicker.openCamera({
                             width: 400,
                             height: 400,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
 
                             setPictures([...pictures, image])
@@ -1001,7 +1004,8 @@ const Profile = (props) => {
                 {
                     text: "Gallery", onPress: () => {
                         ImagePicker.openPicker({
-                            multiple: true
+                            multiple: true,
+                            forceJpg:true
                         }).then(image => {
                             if (Array.isArray(image)) {
                                 let images_length = image.length
@@ -1056,7 +1060,7 @@ const Profile = (props) => {
     }
     const handleConfirm = (date) => {
         setInitialDate(date)
-        setUserData({ ...userData, dob: moment(date).format("YYYY-MM-DD") })
+        setUserData({ ...userData, dob: moment(date).format("MM/DD/YYYY") })
         setDatePickerVisibility(false)
     }
 
@@ -1234,8 +1238,9 @@ const Profile = (props) => {
                                 />}
                                 <CustomTextInput
                                     title="Date of Birth *"
-                                    value={user?.dob !== "null" ? moment(userData?.dob, "YYYY-MM-DD").format("MM/DD/YYYY") : ""}
+                                    value={userData?.dob}
                                     onChangeText={(formatted, extracted) => {
+                                        console.log(formatted)
                                         setUserData({ ...userData, dob: formatted })
                                     }}
                                     containerStyle={{
@@ -1330,6 +1335,7 @@ const Profile = (props) => {
                                     inpuRef={emailRef}
                                     returnKeyType={Platform.OS == "ios" ? "done" : "default"}
                                     required={true}
+                                    editable={false}
                                 />
                                 <View style={{ height: 20 }}></View>
                                 <View style={{}}>

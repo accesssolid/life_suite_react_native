@@ -582,7 +582,8 @@ const SignUpScreen = (props) => {
                         ImagePicker.openCamera({
                             width: 400,
                             height: 400,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             console.log(image);
                             setProfilePic(image)
@@ -596,8 +597,8 @@ const SignUpScreen = (props) => {
                         ImagePicker.openPicker({
                             width: 400,
                             height: 400,
-                            cropping: true
-
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             console.log(image);
                             setProfilePic(image)
@@ -626,7 +627,8 @@ const SignUpScreen = (props) => {
                         ImagePicker.openCamera({
                             width: 400,
                             height: 400,
-                            cropping: true
+                            cropping: true,
+                            forceJpg:true
                         }).then(image => {
                             console.log(image);
                             setPictures([...pictures, image])
@@ -639,6 +641,7 @@ const SignUpScreen = (props) => {
                     text: "Gallery", onPress: () => {
                         ImagePicker.openPicker({
                             multiple: true,
+                            forceJpg:true
                         }).then(image => {
                             if (Array.isArray(image)) {
                                 let p = [...pictures, ...image]
