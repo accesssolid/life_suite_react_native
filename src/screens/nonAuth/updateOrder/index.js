@@ -39,7 +39,7 @@ const UpdateOrder = (props) => {
                 <ImageBackground
                     resizeMode="cover"
                     source={require("../../../assets/dj.png")}
-                    // source={{ uri: BASE_URL + subService.image }}
+                    // source={{ uri: BASE_URL + subService?.image }}
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>

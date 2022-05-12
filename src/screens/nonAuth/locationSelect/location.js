@@ -122,7 +122,7 @@ const SelectLocation = (props) => {
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="stretch"
-                    source={{ uri: BASE_URL + subService.image }}
+                    source={{ uri: BASE_URL + subService?.image }}
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -141,7 +141,7 @@ const SelectLocation = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
                             </View>
                         </SafeAreaView>
                     </View>

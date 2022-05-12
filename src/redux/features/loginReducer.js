@@ -1,10 +1,12 @@
 
 import { createSlice } from '@reduxjs/toolkit'
-import {clearBankModalData} from './bankModel'
-import {clearListChatUsers} from './chatUser'
-import {clearNotificationData} from './notification'
-import {clearMyJobs} from './provider'
-import {clearCleanData} from './services'
+import { state } from 'react-native-push-notification/component'
+import { removeItem } from '../../components/validators'
+import { clearBankModalData } from './bankModel'
+import { clearListChatUsers } from './chatUser'
+import { clearNotificationData } from './notification'
+import { clearMyJobs } from './provider'
+import { clearCleanData } from './services'
 const authenticateSlice = createSlice({
     name: "authenticate",
     initialState: {
@@ -18,7 +20,7 @@ const authenticateSlice = createSlice({
         user_role: 1,
         access_token: null,
         services: [],
-        type:"user"
+        type: "user"
     },
     reducers: {
         loadauthentication: (state, action) => {
@@ -51,13 +53,16 @@ const authenticateSlice = createSlice({
         setServices: (state, action) => {
             state.services = action.payload.data
         },
-        setUserType:(state,action)=>{
-            state.type=action.payload
+        setUserType: (state, action) => {
+            state.type = action.payload
+        },
+        changeStatus: (state, action) => {
+            state.user.user_status = action.payload
         }
     }
 })
 
-export const { logoutState,setUserType,loadauthentication, friendauthentication, fcmToken, modalState, loadInitial, setUserRole, setAuthToken, setServices } = authenticateSlice.actions
+export const { logoutState, setUserType, changeStatus, loadauthentication, friendauthentication, fcmToken, modalState, loadInitial, setUserRole, setAuthToken, setServices } = authenticateSlice.actions
 
 export const loginReducer = (data) => {
     return async (dispatch) => {
@@ -121,7 +126,10 @@ export const logoutAll = () => {
         dispatch(clearMyJobs())
         dispatch(clearNotificationData())
         dispatch(clearBankModalData())
+
         try {
+            await removeItem("user")
+            await removeItem("access_token")
             // PushNotification.setApplicationIconBadgeNumber(0)
         } catch (err) {
             console.log(err)

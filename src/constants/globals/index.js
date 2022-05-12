@@ -22,7 +22,8 @@ export const order_types = {
     suspend: 14,
     service_finished: 15,
     expired: 16,
-    declined: 17
+    declined: 17,
+    cancel_request:18
 }
 
 export const buttons_types = {
@@ -44,7 +45,8 @@ export const buttons_types = {
     "already_delay":16,
     "view_rating":17,
     "tip_rate":18,
-    "completed":19
+    "completed":19,
+    "cancel_update":20
 }
 
 
@@ -75,7 +77,7 @@ export const buttons_provider = {
     [order_types.pending]: [{ title: "Accept", type: buttons_types.accept }, { title: "Decline", type: buttons_types.decline }],
     [order_types.cancel]: [{ title: "Block", type: buttons_types.block }],
     [order_types.confirmed]: [{ title: "Start Order", type: buttons_types.start_order }, { title: "Cancel Order", type: buttons_types.cancel }, { title: "Delay Order", type: buttons_types.delay_order },{ title: "Update Order", type: buttons_types.update_order},{ title: "Chat", type: buttons_types.chat}],
-    [`${order_types.update_acceptance},${order_types.confirmed}`]: [{ title: "Start Order", type: buttons_types.start_order }, { title: "Cancel Order", type: buttons_types.cancel }, { title: "Delay Order", type: buttons_types.delay_order },{ title: "Update Order", type: buttons_types.update_order},{ title: "Chat", type: buttons_types.chat}],
+    [`${order_types.update_acceptance},${order_types.confirmed}`]: [{ title: "Start Order", type: buttons_types.start_order }, { title: "Cancel Order", type: buttons_types.cancel }, { title: "Delay Order", type: buttons_types.delay_order },{ title: "Update Order", type: buttons_types.update_order},{ title: "Cancel Update", type: buttons_types.cancel_update},{ title: "Chat", type: buttons_types.chat}],
     [`${order_types.update_accepted},${order_types.confirmed}`]: [{ title: "Start Order", type: buttons_types.start_order }, { title: "Cancel Order", type: buttons_types.cancel }, { title: "Delay Order", type: buttons_types.delay_order },{ title: "Update Order", type: buttons_types.update_order},{ title: "Chat", type: buttons_types.chat}],
     [`${order_types.update_reject},${order_types.confirmed}`]: [{ title: "Start Order", type: buttons_types.start_order }, { title: "Cancel Order", type: buttons_types.cancel }, { title: "Delay Order", type: buttons_types.delay_order },{ title: "Update Order", type: buttons_types.update_order},{ title: "Chat", type: buttons_types.chat}],
     [order_types.on_the_way]: [{ title: "Chat", type: buttons_types.chat }, { title: "Cancel Order", type: buttons_types.cancel }],
@@ -89,7 +91,7 @@ export const buttons_provider = {
     [order_types.completed]: [{ title: "Block", type: buttons_types.block },{ title: "View Rating", type: buttons_types.view_rating }],
     [order_types.processing]: [{ title: "Chat", type: buttons_types.chat },{ title: "Update Order", type: buttons_types.update_order},{ title: "Completed", type: buttons_types.completed }],
     [order_types.service_finished]: [{ title: "Chat", type: buttons_types.chat },{ title: "Update Order", type: buttons_types.update_order}],
-    [`${order_types.update_acceptance},${order_types.processing}`]: [{ title: "Chat", type: buttons_types.chat },{ title: "Update Order", type: buttons_types.update_order}],
+    [`${order_types.update_acceptance},${order_types.processing}`]: [{ title: "Chat", type: buttons_types.chat },{ title: "Cancel Update", type: buttons_types.cancel_update},{ title: "Update Order", type: buttons_types.update_order}],
     [`${order_types.update_accepted},${order_types.processing}`]: [{ title: "Chat", type: buttons_types.chat },{ title: "Update Order", type: buttons_types.update_order},{ title: "Completed", type: buttons_types.completed }],
     [`${order_types.update_reject},${order_types.processing}`]: [{ title: "Chat", type: buttons_types.chat },{ title: "Update Order", type: buttons_types.update_order},{ title: "Completed", type: buttons_types.completed }],
 }

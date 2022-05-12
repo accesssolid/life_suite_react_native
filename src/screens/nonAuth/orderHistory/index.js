@@ -219,6 +219,10 @@ const OrderHistory = (props) => {
                                 break
                             }
                         }
+                        if(item?.is_in_progress>0&&oType=="Upcoming"){
+                            backgroundColor = "#fdca0d"
+                            oType = "InProgress"
+                        }
                         let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
                         if (item?.hide_order > 0) {
                             return null

@@ -534,7 +534,7 @@ const Mechanics = (props) => {
 
                 <ImageBackground
                     resizeMode="cover"
-                    source={{ uri: BASE_URL + subService.image }}
+                    source={{ uri: BASE_URL + subService?.image }}
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -551,7 +551,7 @@ const Mechanics = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "60%" }}>
-                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
                             </View>
                         </SafeAreaView>
                     </View>
@@ -645,7 +645,7 @@ const Mechanics = (props) => {
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Pressable onPress={() => {
                                                 // props.navigation.navigate("AddCard1")
-                                                props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService.name })
+                                                props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService?.name })
                                             }} style={{ flexDirection: 'row' }}>
                                                 <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
                                                     <Image

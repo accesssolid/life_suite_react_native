@@ -222,7 +222,10 @@ const OrderHistory = (props) => {
                                 break
                             }
                         }
-
+                        if(item?.is_in_progress>0&&oType=="Upcoming"){
+                            backgroundColor = "#fdca0d"
+                            oType = "InProgress"
+                        }
                         return (<TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
                             props.navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item } })
                         }} style={{ height: 72, width: "95%", overflow: "hidden", marginTop: 15, padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>

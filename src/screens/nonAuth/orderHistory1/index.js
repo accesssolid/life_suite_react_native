@@ -8,7 +8,7 @@ import { globalStyles, showToast } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import {useFocusEffect} from '@react-navigation/native'
+import { useFocusEffect } from '@react-navigation/native'
 /* Components */
 import Header from '../../../components/header';
 import { Card, Container, Content } from 'native-base';
@@ -46,12 +46,12 @@ const notification_color = [
     },
     {
         title: "Upcoming",
-        ids: [3, 4, 6, 5, 12,10, 11],
+        ids: [3, 4, 6,9, 5, 12, 10, 11],
         color: "#02a4ea"
     },
     {
         title: "InProgress",
-        ids: [7,9,15],
+        ids: [7,  15],
         color: "#fdca0d"
     },
     {
@@ -94,9 +94,9 @@ const OrderHistory1 = (props) => {
 
 
 
-    function filterwithNameAndService(item){
-        let serviceNames=[...new Set(item.order_items?.map(x=>x.services_name))]
-        if(`${item.providers_first_name} ${item.providers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase())||String(item?.id)?.includes(searchData.text?.toLowerCase())||serviceNames.filter(x=>x?.toLowerCase()?.includes(searchData.text?.toLowerCase()))?.length>0){
+    function filterwithNameAndService(item) {
+        let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
+        if (`${item.providers_first_name} ${item.providers_last_name}`?.toLowerCase().includes(searchData.text?.toLowerCase()) || String(item?.id)?.includes(searchData.text?.toLowerCase()) || serviceNames.filter(x => x?.toLowerCase()?.includes(searchData.text?.toLowerCase()))?.length > 0) {
             return true
         }
         return false
@@ -108,7 +108,7 @@ const OrderHistory1 = (props) => {
         } else {
             setSearchData(state => ({ ...state, data: data }))
         }
-    }, [searchData.text,data])
+    }, [searchData.text, data])
 
     // useEffect(() => {
     //     setSearchData(state => ({ ...state, data: data }))
@@ -235,7 +235,7 @@ const OrderHistory1 = (props) => {
                 setLoader(false)
             })
     }
-  
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <CancelModal
@@ -286,86 +286,90 @@ const OrderHistory1 = (props) => {
                 action1={() => {
                     props.navigation.navigate("HomeScreen")
                 }}
-                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
             <Container style={styles.container}>
-                    <CustomTextInput
-                        placeholder="Search"
-                        value={searchData.text}
-                        onChangeText={t => { setSearchData(state => ({ ...state, text: t })) }}
-                        customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0, marginTop: 20 }}
-                        customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
-                    />
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
-                        <Text  maxFontSizeMultiplier={1.6} style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>Filter by</Text>
-                        <View style={{ flex: 0.8, alignSelf: "flex-end", marginRight: 20, alignItems: "flex-end" }}>
-                            <DropDown
-                                handleTextValue={true}
-                                item={order_types.map(x => x.title)}
-                                value={selected.title}
-                                onChangeValue={(index, value) => { setselected(order_types[index]) }}
-                                containerStyle={{ marginLeft: 20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
-                                dropdownStyle={{height:order_types.length*40}}
+                <CustomTextInput
+                    placeholder="Search"
+                    value={searchData.text}
+                    onChangeText={t => { setSearchData(state => ({ ...state, text: t })) }}
+                    customContainerStyle={{ marginHorizontal: '5%', marginBottom: 0, marginTop: 20 }}
+                    customInputStyle={{ borderRadius: 6, paddingHorizontal: '8%', }}
+                />
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
+                    <Text maxFontSizeMultiplier={1.6} style={{ fontSize: 16, marginLeft: 15, fontFamily: LS_FONTS.PoppinsMedium }}>Filter by</Text>
+                    <View style={{ flex: 0.8, alignSelf: "flex-end", marginRight: 20, alignItems: "flex-end" }}>
+                        <DropDown
+                            handleTextValue={true}
+                            item={order_types.map(x => x.title)}
+                            value={selected.title}
+                            onChangeValue={(index, value) => { setselected(order_types[index]) }}
+                            containerStyle={{ marginLeft: 20, borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginBottom: 10, borderWidth: 0 }}
+                            dropdownStyle={{ height: order_types.length * 40 }}
 
-                           />
-                        </View>
+                        />
                     </View>
-                    <FlatList
-                        data={searchData.data}
-                        ListFooterComponent={loading && <ActivityIndicator color={LS_COLORS.global.green} />}
-                        keyExtractor={(item, index) => item.id + "" + index}
-                        onEndReached={e => {
-                            if (data.length < pageData.total) {
-                                getOrders(selected.id, pageData.current_page + 1)
+                </View>
+                <FlatList
+                    data={searchData.data}
+                    ListFooterComponent={loading && <ActivityIndicator color={LS_COLORS.global.green} />}
+                    keyExtractor={(item, index) => item.id + "" + index}
+                    onEndReached={e => {
+                        if (data.length < pageData.total) {
+                            getOrders(selected.id, pageData.current_page + 1)
+                        }
+                    }}
+                    onEndReachedThreshold={0}
+                    renderItem={({ item, index }) => {
+                        let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
+                        let order_status = item.order_status
+                        let oType = ""
+                        let backgroundColor = "#5CBFBF"
+                        for (let c of notification_color) {
+                            if (c.ids.includes(item.order_status)) {
+                                backgroundColor = c.color
+                                oType = c.title
+                                break
                             }
-                        }}
-                        onEndReachedThreshold={0}
-                        renderItem={({ item, index }) => {
-                            let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]
-                            let order_status = item.order_status
-                            let oType=""
-                            let backgroundColor = "#5CBFBF"
-                            for (let c of notification_color) {
-                                if (c.ids.includes(item.order_status)) {
-                                    backgroundColor = c.color
-                                    oType=c.title
-                                    break
-                                }
-                            }
-                            if(item?.hide_order>0){
-                                return null
-                            }
-                            return (
-                                <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
-                                  props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item } })
-                                   
-                                }} style={{ width: "95%", marginTop: 15,overflow:"hidden", padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
-                                        <View style={{ width: 6,height:2000,position:"absolute", borderRadius: 12,left:0,backgroundColor: backgroundColor }}></View>
-                                        <View style={{ flexDirection: 'row',alignItems:"center", justifyContent: 'space-between' }}>
-                                            <View>
-                                                <Image
-                                                    style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 100 }}
-                                                    source={user.user_role === 3 ? item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image : item?.providers_profile_image ? { uri: BASE_URL + item?.providers_profile_image } : placeholder_image}
-                                                />
-                                            </View>
-                                            <View style={{ justifyContent: 'center', paddingLeft: 10 ,flex:1}}>
-                                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
-                                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
-                                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 10, fontFamily: LS_FONTS.PoppinsMedium }}>#{item.id}</Text>
-                                            </View>
-                                            <View style={{ justifyContent: 'center', alignItems: 'flex-end' , flex: 1}}>
-                                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
-                                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12,textAlign:"right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
-                                                <Text maxFontSizeMultiplier={1.2}  style={{ fontSize: 11,textAlign:"right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>Order Status: {oType}</Text>
-                                            </View>
-                                        </View>
-                                   
-                                </TouchableOpacity>
-                            )
-                        }}
-                    />
-                    {/* <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
+                        }
+                        if(item?.is_in_progress>0&&oType=="Upcoming"){
+                            backgroundColor = "#fdca0d"
+                            oType = "InProgress"
+                        }
+                        if (item?.hide_order > 0) {
+                            return null
+                        }
+                        return (
+                            <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
+                                props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item } })
+
+                            }} style={{ width: "95%", marginTop: 15, overflow: "hidden", padding: 10, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: '#F3F3F3' }}>
+                                <View style={{ width: 6, height: 2000, position: "absolute", borderRadius: 12, left: 0, backgroundColor: backgroundColor }}></View>
+                                <View style={{ flexDirection: 'row', alignItems: "center", justifyContent: 'space-between' }}>
+                                    <View>
+                                        <Image
+                                            style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 100 }}
+                                            source={user.user_role === 3 ? item?.customers_profile_image ? { uri: BASE_URL + item?.customers_profile_image } : placeholder_image : item?.providers_profile_image ? { uri: BASE_URL + item?.providers_profile_image } : placeholder_image}
+                                        />
+                                    </View>
+                                    <View style={{ justifyContent: 'center', paddingLeft: 10, flex: 1 }}>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{user.user_role === 3 ? item.customers_first_name : item.providers_first_name} {user.user_role === 3 ? item.customers_last_name : item.providers_last_name}</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium }}>{serviceNames}</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 10, fontFamily: LS_FONTS.PoppinsMedium }}>#{item.id}</Text>
+                                    </View>
+                                    <View style={{ justifyContent: 'center', alignItems: 'flex-end', flex: 1 }}>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, }}>Start Time</Text>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, textAlign: "right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>{moment(item.order_start_time).format("MMMM DD [at] hh:mm A")}</Text>
+                                        <Text maxFontSizeMultiplier={1.2} style={{ fontSize: 11, textAlign: "right", fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.darkBlack }}>Order Status: {oType}</Text>
+                                    </View>
+                                </View>
+
+                            </TouchableOpacity>
+                        )
+                    }}
+                />
+                {/* <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
                     <View style={{ height: 30 }}></View> */}
                 {loader && <Loader />}
             </Container>

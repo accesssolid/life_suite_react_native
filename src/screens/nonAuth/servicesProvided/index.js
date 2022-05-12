@@ -486,7 +486,7 @@ const ServicesProvided = (props) => {
             <View style={{ width: '100%', height: '14%' }}>
                 <ImageBackground
                     resizeMode="cover"
-                    source={{ uri: BASE_URL + subService.image }}
+                    source={{ uri: BASE_URL + subService?.image }}
                     style={styles.image}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -500,14 +500,14 @@ const ServicesProvided = (props) => {
                                     }
                                 }}
                                 titleStyle={{color:"white",fontSize:22}}
-                                title={subService.name}
+                                title={subService?.name}
                                 imageUrl1={require("../../../assets/homeWhite.png")}
                                 action1={() => {
                                     props.navigation.navigate("HomeScreen")
                                 }}
                             />
                             {/* <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService.name}</Text>
+                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
                             </View> */}
                         </SafeAreaView>
                     </View>

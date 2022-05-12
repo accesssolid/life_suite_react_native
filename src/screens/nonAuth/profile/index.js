@@ -32,7 +32,7 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ModalOTP from '../../../components/ModalOTP';
-
+import _ from 'lodash'
 
 
 const getMessage = (name) => {
@@ -149,7 +149,7 @@ const Profile = (props) => {
 
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
-    const [userData, setUserData] = useState({ ...user, dob: moment(user.dob,"YYYY-MM-DD").format("MM/DD/YYYY") })
+    const [userData, setUserData] = useState({ ...user, dob: moment(user.dob, "YYYY-MM-DD").format("MM/DD/YYYY") })
     const [loader, setLoader] = useState(false)
     const [cardDetails, setCardDetails] = useState({
         number: '',
@@ -249,7 +249,7 @@ const Profile = (props) => {
     }
 
     useEffect(() => {
-        setUserData({ ...user, dob: moment(user.dob,"YYYY-MM-DD").format("MM/DD/YYYY")  })
+        setUserData({ ...user, dob: moment(user.dob, "YYYY-MM-DD").format("MM/DD/YYYY") })
         setNotificationType(getNotificationType(user.notification_prefrence))
         homeAddressRef.current.setAddressText(homeAddressData.address_line_1)
         workAddressRef.current.setAddressText()
@@ -266,7 +266,7 @@ const Profile = (props) => {
     useFocusEffect(
         React.useCallback(() => {
             // getStates()
-            setUserData({ ...user , dob: moment(user.dob,"YYYY-MM-DD").format("MM/DD/YYYY") })
+            setUserData({ ...user, dob: moment(user.dob, "YYYY-MM-DD").format("MM/DD/YYYY") })
             setIsSameAddress(user.is_same_address == 1 ? true : false)
             setNotificationType(getNotificationType(user.notification_prefrence))
         }, [])
@@ -479,7 +479,7 @@ const Profile = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             updateProfilePic(image)
                         }).catch(err => {
@@ -493,7 +493,7 @@ const Profile = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             updateProfilePic(image)
                         }).catch(err => {
@@ -705,7 +705,11 @@ const Profile = (props) => {
     }, [user])
     const save = (addr) => {
         let notifType = getNotificationTypeNumber(notificationType)
-
+        if(!moment(userData.dob, "MM/DD/YYYY").isValid()){
+            showToast("Please enter valid date!", 'danger')
+            setLoader(false)
+            return
+        }
         let headers = {
             'Content-Type': 'multipart/form-data',
             "Authorization": `Bearer ${access_token}`
@@ -992,7 +996,7 @@ const Profile = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
 
                             setPictures([...pictures, image])
@@ -1005,7 +1009,7 @@ const Profile = (props) => {
                     text: "Gallery", onPress: () => {
                         ImagePicker.openPicker({
                             multiple: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             if (Array.isArray(image)) {
                                 let images_length = image.length
@@ -1584,7 +1588,7 @@ const Profile = (props) => {
                                             text="Certificates"
                                             value={x?.certificate != "null" ? x?.certificate : ""}
                                             onChangeText={(text) => {
-                                                let v = [...userData.certificate_data]
+                                                let v = _.cloneDeep([...userData.certificate_data])
                                                 v[i].certificate = text
                                                 setUserData({ ...userData, certificate_data: v })
                                             }}

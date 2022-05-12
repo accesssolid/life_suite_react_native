@@ -14,8 +14,8 @@ import { loginReducer, setAuthToken } from '../../redux/features/loginReducer';
 import { getApi } from '../../api/api';
 import { getJsonData, storeJsonData } from '../../asyncStorage/async'
 import { StackActions, NavigationActions, CommonActions } from '@react-navigation/native';
-import {role} from '../../constants/globals'
-
+import { role } from '../../constants/globals'
+import messaging from '@react-native-firebase/messaging';
 const Splash = (props) => {
     const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -31,6 +31,10 @@ const Splash = (props) => {
             getUser(user.id)
         }
     }, [access_token])
+
+    React.useEffect(() => {
+       
+    }, [])
 
     const getUser = (id) => {
         // alert()
@@ -48,12 +52,12 @@ const Splash = (props) => {
             endPoint: user.user_role == role.customer ? '/api/customer_detail' : '/api/provider_detail',
             type: 'post'
         }
-       
-        console.log("Config",config)
+
+        console.log("Config", config)
 
         getApi(config)
             .then((response) => {
-                
+
                 if (response.status == true) {
                     dispatch(loginReducer(response.data))
                     setTimeout(() => {

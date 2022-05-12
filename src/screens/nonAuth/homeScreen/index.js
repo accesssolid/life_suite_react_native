@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable, RefreshControl } from 'react-native'
 import messaging from '@react-native-firebase/messaging';
 import { getUniqueId, getManufacturer } from 'react-native-device-info';
 
@@ -16,10 +16,10 @@ import SortableGrid from 'react-native-sortable-grid-with-fixed'
 import Cards from '../../../components/cards';
 import UserCards from '../../../components/userCards';
 import { BASE_URL, getApi } from '../../../api/api';
-import { setServices } from '../../../redux/features/loginReducer';
+import { loginReducer, setServices } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
 import { setMyJobs } from '../../../redux/features/provider';
-import { showToast } from '../../../components/validators';
+import { retrieveItem, showToast } from '../../../components/validators';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { setAddServiceMode } from '../../../redux/features/services';
 import Geolocation from 'react-native-geolocation-service';
@@ -112,6 +112,8 @@ const HomeScreen = (props) => {
         }
     }, [])
     const [allowJobAdd, setAllowedJobAdd] = React.useState(false)
+    const [refreshload, setRefreshLoad] = React.useState(false)
+
     const getConnectAccountDetail = async () => {
         try {
             let headers = {
@@ -176,7 +178,7 @@ const HomeScreen = (props) => {
                 getServices(false)
             }
 
-        }, [props.route])
+        }, [props.route,])
     );
 
     const updateFCMToken = (token) => {
@@ -280,8 +282,10 @@ const HomeScreen = (props) => {
             }).catch(err => {
 
             }).finally(() => {
+
                 setTimeout(() => {
                     setLoading(false)
+                    setRefreshLoad(false)
                 }, 1500)
             })
     }
@@ -328,8 +332,11 @@ const HomeScreen = (props) => {
 
     }
 
-    const getMyJobs = () => {
-        setLoading(true)
+    const getMyJobs = (load = true) => {
+        if (load) {
+            setLoading(true)
+        }
+
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -484,6 +491,32 @@ const HomeScreen = (props) => {
             })
     }
 
+    const getUserData = async () => {
+        try {
+            let headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${access_token}`
+            }
+            let user_data = {
+                "user_id": user.id,
+            }
+            let config = {
+                headers: headers,
+                data: JSON.stringify(user_data),
+                endPoint: user.user_role == role.customer ? '/api/customer_detail' : '/api/provider_detail',
+                type: 'post'
+            }
+            const response = await getApi(config)
+            if (response.status == true) {
+                dispatch(loginReducer(response.data))
+            }
+        } catch (err) {
+            console.warn(err)
+        }
+
+    }
+
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
@@ -534,6 +567,16 @@ const HomeScreen = (props) => {
                         ?
                         <View style={{ flex: 1, paddingTop: '5%' }}>
                             <FlatList
+                                refreshControl={<RefreshControl
+                                    refreshing={refreshload}
+                                    onRefresh={() => {
+                                        setRefreshLoad(true)
+                                        getServices(false)
+                                        getConnectAccountDetail()
+                                        getUserData()
+                                        getMyJobs(false)
+                                    }}
+                                />}
                                 data={items}
                                 numColumns={2}
                                 columnWrapperStyle={{ justifyContent: 'space-between' }}
@@ -579,6 +622,16 @@ const HomeScreen = (props) => {
                             <FlatList
                                 data={[...myJobs]}
                                 numColumns={2}
+                                refreshControl={<RefreshControl
+                                    refreshing={refreshload}
+                                    onRefresh={() => {
+                                        setRefreshLoad(true)
+                                        getServices(false)
+                                        getConnectAccountDetail()
+                                        getMyJobs()
+                                        getUserData()
+                                    }}
+                                />}
                                 columnWrapperStyle={{ justifyContent: 'space-between' }}
                                 renderItem={({ item, index }) => {
                                     return (
@@ -607,7 +660,19 @@ const HomeScreen = (props) => {
                                 {!loading && <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Jobs Added Yet</Text>}
                             </View>
                     :
-                    <ScrollView scrollEnabled={scrollEnabled} showsVerticalScrollIndicator={false}>
+                    <ScrollView
+                        refreshControl={<RefreshControl refreshing={refreshload} onRefresh={() => {
+                            setRefreshLoad(true)
+                            if (userType != "guest") {
+                                getServices(false)
+                                getUserData()
+                            } else {
+                                getGuestServices(false)
+                                
+                            }
+                        }} />}
+                        scrollEnabled={scrollEnabled}
+                        showsVerticalScrollIndicator={false}>
                         <View style={{ flex: 1, paddingTop: '5%' }}>
                             <SortableGrid
                                 blockTransitionDuration={400}

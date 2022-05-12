@@ -334,6 +334,10 @@ const OrderHistory1 = (props) => {
                                     break
                                 }
                             }
+                            if(item?.is_in_progress>0&&oType=="Upcoming"){
+                                backgroundColor = "#fdca0d"
+                                oType = "InProgress"
+                            }
                             return (
                                 <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
                                     props.navigation.navigate("UserStack", { screen: "OrderDetailCustomer", params: { item } })

@@ -74,20 +74,7 @@ const notification_color = [
     }
 ]
 
-const OrderDateTime = ({ data }) => {
-    return (
-        <> {Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Order Start Date & Time</Text>
-            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_start_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
-        </View>}
-            {Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "" && <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 5 }}>
-                <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1, color: LS_COLORS.global.green }]}>Order End Date & Time </Text>
-                <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginLeft: 5, textAlign: "right" }]}>{moment(data?.provider_order_end_at, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a")}</Text>
-            </View>}
-        </>
 
-    )
-}
 
 
 const OrderClientDetail = (props) => {
@@ -128,7 +115,7 @@ const OrderClientDetail = (props) => {
             let logs = [...data?.order_logs]
             logs.reverse()
             let d = logs.find(x => x.order_status == data?.order_status)
-            if (d&&[2, 14, 16, 13, 17].includes(data?.order_status)) {
+            if (d && [2, 14, 16, 13, 17].includes(data?.order_status)) {
                 // setWhoCancelled()
                 if (d.status_change_by_role == 2) {
                     setWhoCancelled({ type: "Customer", name: `${data?.customers_first_name} ${data?.customers_last_name}` })
@@ -164,7 +151,15 @@ const OrderClientDetail = (props) => {
             setAvailableStartTimes(filteredDs)
             for (let c of notification_color) {
                 if (c.ids.includes(data.order_status)) {
-                    setNotificationData(c)
+                    if (data?.is_in_progress > 0&&c.title=="Upcoming") {
+                        setNotificationData({
+                            title: "InProgress",
+                            ids: [7, 15],
+                            color: "#fdca0d"
+                        })
+                    } else {
+                        setNotificationData(c)
+                    }
                     break
                 }
             }
@@ -604,11 +599,13 @@ const OrderClientDetail = (props) => {
                     <ScrollView contentContainerStyle={{ paddingVertical: 16 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, alignItems: "center" }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Client Info</Text>
-                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title} {data?.order_status==15&&" (Payment Pending)"}</Text>
+                            <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
+                        {data?.order_status == 15 &&<Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12,marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
+
                         <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
-                        {whoCancelled?.type!=undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By</Text>: {whoCancelled?.type} ({whoCancelled?.name})</Text>}
+                        {whoCancelled?.type != undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By</Text>: {whoCancelled?.type} ({whoCancelled?.name})</Text>}
                         <RenderAddressFromTO
                             fromShow={data?.order_items[0]?.services_location_type == 2}
                             toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
@@ -925,11 +922,11 @@ const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShow
                 </>
             }
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType!="Completed"&&"Estimated "}Total Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType!="Completed"&&"Estimated "}Total Time</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getDifferenceTime()}</Text>
             </View>
             <View style={{ position: "absolute", height: 1000, backgroundColor: noti_color, width: 4, left: -15, top: -20 }} />
@@ -1183,6 +1180,9 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
             case buttons_types.view_rating:
                 openRatingModal()
                 break
+            case buttons_types.cancel_update:
+                submit(order_types.cancel_request)
+                break
             // case buttons_types.accept:
 
         }
@@ -1190,7 +1190,7 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
 
     return (
         <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
-            {buttons.map(x => {
+            {buttons?.map(x => {
                 let title = x.title
                 if (x.type == buttons_types.block && data.blocked_to_user) {
                     title = "Unblock"
