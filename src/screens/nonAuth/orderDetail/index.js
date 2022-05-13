@@ -151,7 +151,7 @@ const OrderClientDetail = (props) => {
             setAvailableStartTimes(filteredDs)
             for (let c of notification_color) {
                 if (c.ids.includes(data.order_status)) {
-                    if (data?.is_in_progress > 0&&c.title=="Upcoming") {
+                    if (data?.is_in_progress > 0 && c.title == "Upcoming") {
                         setNotificationData({
                             title: "InProgress",
                             ids: [7, 15],
@@ -601,7 +601,7 @@ const OrderClientDetail = (props) => {
                             <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Client Info</Text>
                             <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
-                        {data?.order_status == 15 &&<Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12,marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
+                        {data?.order_status == 15 && <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
 
                         <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
@@ -1181,7 +1181,18 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
                 openRatingModal()
                 break
             case buttons_types.cancel_update:
-                submit(order_types.cancel_request)
+                Alert.alert("Cancel","Do you want to cancel order update request?",[
+                    {
+                        text:"No"
+                    },
+                    {
+                        text:"Yes",
+                        onPress:()=>{
+                            submit(order_types.cancel_request)
+                        }
+                    }
+                ])
+               
                 break
             // case buttons_types.accept:
 
