@@ -31,7 +31,7 @@ const placeholder_image = require("../../../assets/user.png")
 import _ from 'lodash'
 import { order_types, buttons_customer, buttons_provider, buttons_types } from '../../../constants/globals'
 import DelayModal from '../../../components/delayModal';
-import { Rating } from 'react-native-ratings'
+import messaging from '@react-native-firebase/messaging';
 
 function generate_series(step, start_time) {
     const dt = moment(start_time, 'YYYY-MM-DD HH:mm').toDate()
@@ -137,6 +137,15 @@ const OrderClientDetail = (props) => {
         }
 
     }, [order_id])
+
+    useFocusEffect(React.useCallback(()=>{
+        let unsubscribe=messaging().onMessage((remoteMessage)=>{
+            if(remoteMessage?.data?.link){
+                getOrderDetail(itemdata?.id)
+            }
+        })
+        return unsubscribe
+    },[itemdata]))
 
     React.useEffect(() => {
         if (data) {

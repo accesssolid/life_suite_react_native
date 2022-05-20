@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, Modal } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -24,9 +24,11 @@ import messaging from '@react-native-firebase/messaging';
 /* Icons */
 import Entypo from 'react-native-vector-icons/Entypo'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { CommonActions } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import * as RNLocalize from "react-native-localize";
 import { changeSwitched } from '../../../redux/features/switchTo';
+
+
 
 
 const LoginScreen = (props) => {
@@ -38,7 +40,9 @@ const LoginScreen = (props) => {
     const [password, setPassword] = useState("")
     const [loader, setLoader] = useState(false)
     const [passVisible, setPassVisible] = useState(false)
-
+    const [modalVisible, setModalVisible] = React.useState(false)
+    const [message, setMessage] = React.useState("")
+    const [user, setUser] = React.useState({})
     const switchRole = () => {
         dispatch(setUserRole({ data: role == 1 ? 2 : 1 }))
     }
@@ -74,7 +78,7 @@ const LoginScreen = (props) => {
             "fcm_token": fcmToken,
             device_id: getUniqueId(),
             login_type: "biometric",
-            timezone:RNLocalize.getTimeZone()
+            timezone: RNLocalize.getTimeZone()
         }
         let config = {
             headers: headers,
@@ -111,6 +115,11 @@ const LoginScreen = (props) => {
                 else {
                     setLoader(false)
                     showToast(response.message, 'danger')
+                    if (response?.data?.user_status == 2) {
+                        setMessage(response.message)
+                        setModalVisible(true)
+                        setUser(response?.data)
+                    }
                 }
             })
             .catch(err => {
@@ -221,7 +230,7 @@ const LoginScreen = (props) => {
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Root>
                 <Container style={styles.container}>
-                    <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
+                    <Ionicons onPress={() => props.navigation.goBack()} name='arrow-back' size={24} style={{ padding: 20 }} />
                     <Content showsVerticalScrollIndicator={false}>
                         <View style={styles.textContainer}>
                             <Text maxFontSizeMultiplier={1.7} style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
@@ -273,43 +282,74 @@ const LoginScreen = (props) => {
                             style={styles.forgotContainer}>
                             <Text maxFontSizeMultiplier={1.7} style={{ ...styles.forgot, alignSelf: 'center', textDecorationLine: 'underline' }}>Login as {role == 1 ? "Service Provider" : "Customer"}</Text>
                         </TouchableOpacity>
-
                         <View style={styles.alreadyContainer}>
-                            <Text maxFontSizeMultiplier={1.7} style={[styles.already,{textAlign:"center"}]}>Don't have account ?<Text maxFontSizeMultiplier={1.7} style={styles.already1} onPress={() => {
+                            <Text maxFontSizeMultiplier={1.7} style={[styles.already, { textAlign: "center" }]}>Don't have account ?<Text maxFontSizeMultiplier={1.7} style={styles.already1} onPress={() => {
                                 props.navigation.navigate("SignUpScreen")
                             }}> Sign Up</Text></Text>
                         </View>
-                        {/* <View style={styles.facecontainer}>
-                            {
-                                Platform.OS == 'ios' &&
-                                <TouchableOpacity onPress={() => on_press_touch()}>
-                                    <Card style={styles.card}>
-                                        <Image
-                                            style={styles.image}
-                                            source={require("../../../assets/face.png")}
-                                        />
-                                    </Card>
-                                </TouchableOpacity>
-                            }
-
-                            <TouchableOpacity onPress={() => on_press_touch()}>
-                                <Card style={styles.card}>
-                                    <Image
-                                        style={styles.image}
-                                        source={require("../../../assets/fingerPrint.png")}
-                                    />
-                                </Card>
-                            </TouchableOpacity>
-                        </View> */}
                         {loader == true && <Loader />}
                     </Content>
                 </Container>
             </Root>
+            <BlockMessageModal text={message} user={user} visible={modalVisible} setVisble={setModalVisible} />
         </SafeAreaView>
     )
 }
 
 export default LoginScreen;
+
+const BlockMessageModal = ({ text, visible, setVisble ,user}) => {
+    const navigation=useNavigation()
+    return (
+        <Modal
+            onBackButtonPress={() => {
+                if (setVisble) {
+                    setVisble(false)
+                }
+            }}
+            onBackdropPress={() => {
+                if (setVisble) {
+                    setVisble(false)
+                }
+            }}
+            hasBackdrop={true}
+            visible={visible}
+            transparent={true}
+        // animationType="slide"
+        >
+            <View style={{ flex: 1, backgroundColor: "#0005", justifyContent: "center" }}>
+                <View style={styles.container1}>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.title}></Text>
+                    <Image source={require('../../../assets/splash/logo.png')} resizeMode="contain" style={{ height: 100, width: 200, alignSelf: "center" }} />
+                    <Text maxFontSizeMultiplier={1.4} style={{ color: "black", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16, textAlign: "center" }}>{text}</Text>
+
+                    <View style={{ flexDirection: "row" ,justifyContent:"space-between"}}>
+                        <TouchableOpacity onPress={() => {
+                            if (setVisble) {
+                                setVisble(false)
+                            }
+                        }} style={{ backgroundColor: LS_COLORS.global.green, padding: 10, width: "40%", alignSelf: "center", borderRadius: 5, margin: 10 }} >
+                            <Text maxFontSizeMultiplier={1.4} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white", textAlign: "center" }}>Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                           navigation.navigate("ContactUs",{user})
+                           setVisble(false)
+                        }} style={{ backgroundColor: LS_COLORS.global.green, padding: 10, width: "40%", alignSelf: "center", borderRadius: 5, margin: 10 }} >
+                            <Text maxFontSizeMultiplier={1.4} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white", textAlign: "center" }}>Contact Us</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                        if (setVisble) {
+                            setVisble(false)
+                        }
+                    }} style={{ position: 'absolute', top: '3%', right: '3%' }}>
+                        <Image source={require('../../../assets/cancel.png')} resizeMode="contain" style={{ height: 25, width: 25 }} />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
+    )
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -386,4 +426,42 @@ const styles = StyleSheet.create({
         height: 43,
         resizeMode: 'contain'
     },
+    wrapper: {
+        position: 'absolute',
+        height: '100%',
+        width: '100%',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    container1: {
+        width: '95%',
+        alignSelf: 'center',
+        padding: '4%',
+        backgroundColor: LS_COLORS.global.white,
+        borderRadius: 10,
+        paddingVertical: 10,
+        overflow: 'hidden',
+    },
+    title: {
+        fontFamily: LS_FONTS.PoppinsBold,
+        fontSize: 16,
+        letterSpacing: 0.32,
+        color: LS_COLORS.global.darkBlack,
+        textTransform: 'uppercase',
+        textAlign: "center"
+    },
+    desc: {
+        marginTop: 25,
+        fontFamily: LS_FONTS.PoppinsRegular,
+        fontSize: 12,
+        letterSpacing: 0.24,
+        color: LS_COLORS.global.textInputText,
+        textAlign: 'left'
+    }
 })
+
+
+
+
+
+
+

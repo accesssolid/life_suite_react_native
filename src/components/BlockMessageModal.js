@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateBlockModal } from '../redux/features/blockModel';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 
-const BlockMessageModal = () => {
+const BlockMessageModal = ({ text, visible, setVisble }) => {
     const dispatch = useDispatch()
     const isVisible = useSelector(state => state.blockModel?.open)
     const user = useSelector(state => state.authenticate.user)
@@ -16,10 +16,20 @@ const BlockMessageModal = () => {
 
     return (
         <Modal
-            onBackButtonPress={() => dispatch(updateBlockModal(false))}
-            onBackdropPress={() => dispatch(updateBlockModal(false))}
+            onBackButtonPress={() => {
+                if (setVisble) {
+                    setVisble(false)
+                }
+                dispatch(updateBlockModal(false))
+            }}
+            onBackdropPress={() => {
+                if (setVisble) {
+                    setVisble(false)
+                }
+                dispatch(updateBlockModal(false))
+            }}
             hasBackdrop={true}
-            visible={isVisible}
+            visible={visible??isVisible}
             transparent={true}
         // animationType="slide"
         >
@@ -27,13 +37,19 @@ const BlockMessageModal = () => {
                 <View style={styles.container}>
                     <Text maxFontSizeMultiplier={1.5} style={styles.title}></Text>
                     <Image source={require('../assets/splash/logo.png')} resizeMode="contain" style={{ height: 100, width: 200, alignSelf: "center" }} />
-                    <Text maxFontSizeMultiplier={1.4} style={{ color: "black", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16, textAlign: "center" }}>{user?.block_message}</Text>
+                    <Text maxFontSizeMultiplier={1.4} style={{ color: "black", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16, textAlign: "center" }}>{text??user?.block_message}</Text>
                     <TouchableOpacity onPress={() => {
+                         if (setVisble) {
+                            setVisble(false)
+                        }
                         dispatch(updateBlockModal(false))
                     }} style={{ backgroundColor: LS_COLORS.global.green, padding: 10, width: "40%", alignSelf: "center", borderRadius: 5, margin: 10 }} >
                         <Text maxFontSizeMultiplier={1.4} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white", textAlign: "center" }}>Ok</Text>
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                         if (setVisble) {
+                            setVisble(false)
+                        }
                         dispatch(updateBlockModal(false))
                     }} style={{ position: 'absolute', top: '3%', right: '3%' }}>
                         <Image source={require('../assets/cancel.png')} resizeMode="contain" style={{ height: 25, width: 25 }} />

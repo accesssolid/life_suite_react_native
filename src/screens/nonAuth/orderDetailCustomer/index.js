@@ -33,6 +33,8 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import RateAndCommentModal from '../../../components/RateAndComment';
 import { updateBlockModal } from '../../../redux/features/blockModel'
 import BlockMessageModal from '../../../components/BlockMessageModal'
+import messaging from '@react-native-firebase/messaging';
+
 const notification_color = [
     {
         title: "Requesting",
@@ -113,7 +115,14 @@ export default function OrderDetailUpdateCustomer(props) {
 
         }
     }, [data])
-
+    useFocusEffect(React.useCallback(() => {
+        let unsubscribe = messaging().onMessage((remoteMessage) => {
+            if (remoteMessage?.data?.link) {
+                getOrderDetail(itemData?.id)
+            }
+        })
+        return unsubscribe
+    }, [itemData]))
     useEffect(() => {
         if (item?.id) {
             setItemData(item)
@@ -140,7 +149,7 @@ export default function OrderDetailUpdateCustomer(props) {
             }
             for (let c of notification_color) {
                 if (c.ids.includes(data.order_status)) {
-                    if (data?.is_in_progress > 0&&c.title=="Upcoming") {
+                    if (data?.is_in_progress > 0 && c.title == "Upcoming") {
                         setNotificationData({
                             title: "InProgress",
                             ids: [7, 15],
@@ -479,8 +488,9 @@ export default function OrderDetailUpdateCustomer(props) {
             dispatch(updateBlockModal(true))
         }
     }
+    const [showMessage,setShowMessage]=React.useState(false)
     const gotToForReorder = () => {
-        if (user?.user_status == 1) {
+        if (user?.user_status == 1 && data?.providers_user_status == 1) {
             props.navigation.navigate("MechanicLocation", {
                 servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
                 subService: {
@@ -493,8 +503,12 @@ export default function OrderDetailUpdateCustomer(props) {
                 orderData: data
             })
         } else {
-
-            dispatch(updateBlockModal(true))
+            if(user?.user_status != 1){
+                dispatch(updateBlockModal(true))
+            }else{
+                setShowMessage(true)
+            }
+            
         }
 
     }
@@ -629,7 +643,7 @@ export default function OrderDetailUpdateCustomer(props) {
                             <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left" }]}>Order Detail</Text>
                             <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
-                        {data?.order_status == 15 &&<Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12,marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
+                        {data?.order_status == 15 && <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
                         <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
                             setRateType(t)
                             setRateVisible(true)
@@ -653,18 +667,6 @@ export default function OrderDetailUpdateCustomer(props) {
                                 <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Job has been delayed </Text>
                                 <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>~{moment(data?.order_start_new_time).diff(moment(data?.order_start_time), "minutes")} minutes</Text>
                             </View>
-                                {/* <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
-                                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Est. Old Start Time </Text>
-                                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>{moment(data?.order_start_time).format("hh:mm a")}</Text>
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
-                                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Est. New Start Time</Text>
-                                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>{moment(data?.order_start_new_time).format("hh:mm a")}</Text>
-                                </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: 10 }}>
-                                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium }]}>Est. New End Time</Text>
-                                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { color: LS_COLORS.global.green }]}>{moment(data?.order_end_new_time).format("hh:mm a")}</Text>
-                                </View> */}
                             </>
                         }
 
@@ -756,6 +758,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 handleDelete={handleDeleteRate}
             />
             <BlockMessageModal />
+            <BlockMessageModal visible={showMessage} setVisble={setShowMessage} text={data?.providers_block_message}  />
             {loading && <Loader />}
 
         </View>

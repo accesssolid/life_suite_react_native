@@ -21,6 +21,7 @@ import ServiceItemUser from '../../../components/serviceItemUser';
 
 import _ from 'lodash'
 import { updateSignupModal } from '../../../redux/features/signupModal';
+import { setVariantData } from '../../../redux/features/variantData';
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -53,6 +54,17 @@ const ServicesProvided = (props) => {
     const [selectedYear, setSelectedYear] = React.useState("")
     const [vehicle_types, setVehicleTypes] = React.useState([])
 
+    React.useEffect(() => {
+        let data = {
+            "variant_title": vehicleType?.service_variants_name,
+            "variant": vehicleType?.name,
+            "make": selectedMake,
+            "model": selectedModel,
+            "Year": selectedYear
+        }
+        dispatch(setVariantData(data))
+    }, [selectedMake, selectedModel, selectedYear, vehicleType])
+
     const getMakeList = () => {
         setLoading(true)
         let headers = {
@@ -72,7 +84,7 @@ const ServicesProvided = (props) => {
             .then((response) => {
                 console.log("reponse makelist", response)
                 if (response.status == true) {
-                    setMakeList(response.data?.filter(x=>x.status=="1"))
+                    setMakeList(response.data?.filter(x => x.status == "1"))
                 }
                 else {
                     setMakeList([])
@@ -125,9 +137,9 @@ const ServicesProvided = (props) => {
         getMakeList()
     }, [vehicleType])
 
-    useEffect(()=>{
+    useEffect(() => {
         getVariantData()
-    },[])
+    }, [])
 
     React.useEffect(() => {
         if (selectedMake && selectedMake != "") {
@@ -156,8 +168,8 @@ const ServicesProvided = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    console.log("Make LISt",response.data)
-                    setModelList(response.data?.filter(x=>x.status=="1"))
+                    console.log("Make LISt", response.data)
+                    setModelList(response.data?.filter(x => x.status == "1"))
                     // setSelectedModel(response.data)
                 }
                 else {
@@ -214,21 +226,21 @@ const ServicesProvided = (props) => {
 
 
     useEffect(() => {
-        if (subService.id == 14||vehicle_types?.length>0) {
+        if (subService.id == 14 || vehicle_types?.length > 0) {
             filterServices()
         }
     }, [vehicleType, itemListMaster])
 
     useEffect(() => {
-        if (subService.id == 14||vehicle_types?.length>0) {
+        if (subService.id == 14 || vehicle_types?.length > 0) {
             filterServices()
         }
-        if(userType=="guest"){
+        if (userType == "guest") {
             getGuestServiceItems()
-        }else{
+        } else {
             getServiceItems()
         }
-       
+
     }, [])
 
     const getGuestServiceItems = () => {
@@ -256,7 +268,7 @@ const ServicesProvided = (props) => {
                     setLoading(false)
                     setItemList([...response.data])
                     setItemListMaster([...response.data])
-                    if (subService.id == 14||vehicle_types?.length>0) {
+                    if (subService.id == 14 || vehicle_types?.length > 0) {
                         filterServices()
                     }
                 }
@@ -293,7 +305,7 @@ const ServicesProvided = (props) => {
                     setLoading(false)
                     setItemList([...response.data])
                     setItemListMaster([...response.data])
-                    if (subService.id == 14||vehicle_types?.length>0) {
+                    if (subService.id == 14 || vehicle_types?.length > 0) {
                         filterServices()
                     }
                 }
@@ -327,7 +339,7 @@ const ServicesProvided = (props) => {
     }
 
     const next = () => {
-        if(userType=="guest"){
+        if (userType == "guest") {
             dispatch(updateSignupModal(true))
             return
         }
@@ -379,7 +391,7 @@ const ServicesProvided = (props) => {
     const saveRequest = () => {
         console.log(activeItem)
         console.log(extraData)
-     
+
         let isSelected = false
 
         activeItem.products.forEach(element => {
@@ -394,10 +406,10 @@ const ServicesProvided = (props) => {
         if (activeItem.is_product_mandatory == "0") {
             isSelected = true
         }
-        let extra_product=extraData.find(x=>x?.parent_id==activeItem.id)
-        if(extra_product){
-            if(extra_product?.need_recommendation||String(extra_product?.have_own).trim()!=""||String(extra_product?.other).trim()!=""){
-                isSelected=true
+        let extra_product = extraData.find(x => x?.parent_id == activeItem.id)
+        if (extra_product) {
+            if (extra_product?.need_recommendation || String(extra_product?.have_own).trim() != "" || String(extra_product?.other).trim() != "") {
+                isSelected = true
             }
         }
         if (isSelected) {
@@ -478,11 +490,11 @@ const ServicesProvided = (props) => {
 
     return (
         <>
-            <StatusBar 
-            // translucent={true} 
-            // backgroundColor="transparent"
-            backgroundColor={LS_COLORS.global.green}
-             barStyle="light-content" />
+            <StatusBar
+                // translucent={true} 
+                // backgroundColor="transparent"
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <View style={{ width: '100%', height: '14%' }}>
                 <ImageBackground
                     resizeMode="cover"
@@ -499,7 +511,7 @@ const ServicesProvided = (props) => {
                                         props.navigation.goBack()
                                     }
                                 }}
-                                titleStyle={{color:"white",fontSize:22}}
+                                titleStyle={{ color: "white", fontSize: 22 }}
                                 title={subService?.name}
                                 imageUrl1={require("../../../assets/homeWhite.png")}
                                 action1={() => {
@@ -515,22 +527,22 @@ const ServicesProvided = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    { activeItem == null&&vehicle_types?.length>0&&<View style={{}}>
+                    {activeItem == null && vehicle_types?.length > 0 && <View style={{}}>
                         <DropDown
-                           handleTextValue={true}
-                            title={subService.id == 14?"Vehicle Type":"Variant Type"}
+                            handleTextValue={true}
+                            title={subService.id == 14 ? "Vehicle Type" : "Variant Type"}
                             item={vehicle_types.map(x => x.name)}
                             value={vehicleType.name}
                             onChangeValue={(index, value) => onChangeVehicleType(vehicle_types[index])}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                             dropdownStyle={{ maxHeight: 300 }}
                         />
-                        {subService.id == 14&&<View style={{ flexDirection: 'row', paddingHorizontal:"2.5%"}}>
+                        {subService.id == 14 && <View style={{ flexDirection: 'row', paddingHorizontal: "2.5%" }}>
                             <View style={{ flex: 1 }}>
                                 <DropDown
                                     title="Make"
                                     handleTextValue={true}
-                                    handleTextValueStyle={{paddingLeft:5}}
+                                    handleTextValueStyle={{ paddingLeft: 5 }}
                                     item={makeList.map(x => x.title) ?? []}
                                     onChangeValue={(index, value) => {
                                         setSelectedMake(makeList[index].id)
@@ -539,7 +551,7 @@ const ServicesProvided = (props) => {
                                     containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
                                     dropdownStyle={{ maxHeight: 300 }}
                                     textValueProps={{
-                                        maxFontSizeMultiplier:1.3
+                                        maxFontSizeMultiplier: 1.3
                                     }}
                                 />
                             </View>
@@ -547,7 +559,7 @@ const ServicesProvided = (props) => {
                                 <DropDown
                                     handleTextValue={true}
                                     title="Model"
-                                    handleTextValueStyle={{paddingLeft:5}}
+                                    handleTextValueStyle={{ paddingLeft: 5 }}
                                     item={modelList.map(x => x.title) ?? []}
                                     value={modelList.find(x => x.id == selectedModel)?.title ?? "Model"}
                                     onChangeValue={(index, value) => {
@@ -556,7 +568,7 @@ const ServicesProvided = (props) => {
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                                     dropdownStyle={{ maxHeight: 300 }}
                                     textValueProps={{
-                                        maxFontSizeMultiplier:1.3
+                                        maxFontSizeMultiplier: 1.3
                                     }}
                                 />
                             </View>
@@ -564,7 +576,7 @@ const ServicesProvided = (props) => {
                                 <DropDown
                                     title="Year"
                                     handleTextValue={true}
-                                    handleTextValueStyle={{paddingLeft:5}}
+                                    handleTextValueStyle={{ paddingLeft: 5 }}
                                     item={yearList.map(x => "\t" + x.title + "\t") ?? []}
                                     value={yearList.find(x => x.id == selectedYear)?.title ?? "Year"}
                                     onChangeValue={(index, value) => {
@@ -573,25 +585,25 @@ const ServicesProvided = (props) => {
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                                     dropdownStyle={{ maxHeight: 300 }}
                                     textValueProps={{
-                                        maxFontSizeMultiplier:1.3
+                                        maxFontSizeMultiplier: 1.3
                                     }}
                                 />
                             </View>
                         </View>}
-                    </View> 
-                    // :<View style={{maxHeight:60}}>
-                    //     <ScrollView showsHorizontalScrollIndicator={false} horizontal >
-                    //     {vehicle_types.map(x=>{
-                    //         let isSelected=vehicleType.id==x.id
-                    //         return(
-                    //         <TouchableOpacity onPress={()=>setVehicleType(x)} style={{marginLeft:10,backgroundColor:isSelected?LS_COLORS.global.green:"white",borderColor:LS_COLORS.global.green,padding:5,margin:5,borderWidth:1,borderRadius:10}}>
-                    //             <Text style={{color:isSelected?"white":"black",fontFamily:LS_FONTS.PoppinsRegular}}>{x.name}</Text>
-                    //         </TouchableOpacity>
-                    //         )
-                    //     })}
-                    //     </ScrollView>
-                    //     </View>)
-                        }
+                    </View>
+                        // :<View style={{maxHeight:60}}>
+                        //     <ScrollView showsHorizontalScrollIndicator={false} horizontal >
+                        //     {vehicle_types.map(x=>{
+                        //         let isSelected=vehicleType.id==x.id
+                        //         return(
+                        //         <TouchableOpacity onPress={()=>setVehicleType(x)} style={{marginLeft:10,backgroundColor:isSelected?LS_COLORS.global.green:"white",borderColor:LS_COLORS.global.green,padding:5,margin:5,borderWidth:1,borderRadius:10}}>
+                        //             <Text style={{color:isSelected?"white":"black",fontFamily:LS_FONTS.PoppinsRegular}}>{x.name}</Text>
+                        //         </TouchableOpacity>
+                        //         )
+                        //     })}
+                        //     </ScrollView>
+                        //     </View>)
+                    }
                     <Text maxFontSizeMultiplier={1.4} style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
                     <Container>
                         <Content>
@@ -643,7 +655,7 @@ const ServicesProvided = (props) => {
                         style={styles.save}
                         activeOpacity={0.7}
                         onPress={() => {
-                           
+
                             activeItem !== null
                                 ?
                                 saveRequest()

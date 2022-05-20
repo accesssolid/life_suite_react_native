@@ -15,6 +15,7 @@ import ResetPassword from '../screens/auth/resetPassword';
 import CovidScreen from '../screens/auth/CovidScreen';
 import CustomWebView from '../screens/auth/signUp/CustomWebView';
 import Welcomescreen from '../screens/auth/welcomeScreen';
+import ContactUs from '../screens/auth/ContactUs/contactus';
 
 const Stack = createStackNavigator();
 
@@ -30,6 +31,7 @@ const AuthStack = () => {
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
             <Stack.Screen name="CovidScreen" component={CovidScreen} />
             <Stack.Screen name="CustomWebView" component={CustomWebView} />
+            <Stack.Screen name="ContactUs" component={ContactUs} />
         </Stack.Navigator>
     )
 }

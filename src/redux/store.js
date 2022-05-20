@@ -11,20 +11,22 @@ import faq from './features/faq'
 import signupModal from './features/signupModal'
 import blockModel from './features/blockModel'
 import dot from './features/showDot'
+import variant from './features/variantData'
 const store = configureStore({
     reducer: {
         authenticate: AuthenticateReducer,
         services: ServiceReducer,
         provider: ProviderReducer,
-        total : TotalReducer,
-        chat_users:ChatUsersReducer,
-        bank_model:BankModelReducer,
-        notification:NotificationReducer,
+        total: TotalReducer,
+        chat_users: ChatUsersReducer,
+        bank_model: BankModelReducer,
+        notification: NotificationReducer,
         switchTo,
         faq,
         signupModal,
         blockModel,
-        dot
+        dot,
+        variant
     },
 })
 

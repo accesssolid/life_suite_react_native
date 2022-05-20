@@ -46,7 +46,6 @@ const ServicesProvided = (props) => {
     const [activeItem, setActiveItem] = useState(null)
     const [newServices, setNewServices] = useState([])
     const [newServicesMaster, setNewServicesMaster] = useState([])
-
     const [openModal, setOpenModal] = useState(false)
     const itemRef = useRef(null)
 
@@ -726,6 +725,36 @@ const ServicesProvided = (props) => {
         setNewServices(z)
     }
 
+    const removeServiceData = async (id) => {
+        let data = itemListMaster.filter(item => item.id != id)
+        setItemListMaster(data)
+        try {
+            setLoading(true)
+            let headers = {
+                "Authorization": `Bearer ${access_token}`
+            }
+            let formdata = new FormData()
+            formdata.append("service_id", id)
+            const config = {
+                headers: headers,
+                data: formdata,
+                type: "post",
+                endPoint: "/api/deleteAddedServices"
+            }
+            let res = await getApi(config)
+            alert(JSON.stringify(res))
+            if (res.status) {
+                showToast(res.message)
+            } else {
+                showToast(res.message)
+            }
+        } catch (err) {
+
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
         let data1 = newServicesMaster.filter(item => item.variant_data == selectedVariant)
         setNewServices([...data1])
@@ -1003,13 +1032,13 @@ const ServicesProvided = (props) => {
                         </ScrollView>
                     </View>}
                     {activeItem !== null && <View style={{ flexDirection: 'row', width: '98%', alignSelf: "center", marginBottom: '2%' }}>
-                        <View style={{ flex:1 }} />
-                        <View style={{  flexDirection: "row", justifyContent: 'flex-end' }}>
-                            <View style={{ alignItems: 'center',marginRight:15}}>
-                                <Text  maxFontSizeMultiplier={1.2} style={{ ...styles.priceTime, }}>Estimated Time</Text>
+                        <View style={{ flex: 1 }} />
+                        <View style={{ flexDirection: "row", justifyContent: 'flex-end' }}>
+                            <View style={{ alignItems: 'center', marginRight: 15 }}>
+                                <Text maxFontSizeMultiplier={1.2} style={{ ...styles.priceTime, }}>Estimated Time</Text>
                             </View>
-                            <View style={{alignItems:"center",marginRight:10}}>
-                                <Text  maxFontSizeMultiplier={1.2} style={styles.priceTime}>Price</Text>
+                            <View style={{ alignItems: "center", marginRight: 10 }}>
+                                <Text maxFontSizeMultiplier={1.2} style={styles.priceTime}>Price</Text>
                             </View>
                         </View>
                     </View>}
@@ -1041,29 +1070,37 @@ const ServicesProvided = (props) => {
                         {activeItem == null && itemList && itemList.length > 0 &&
                             <>
                                 {itemList.map(((item, index) => {
+                                    console.log("data", item)
                                     return (
-                                        <ServiceItem
-                                            key={index}
-                                            item={item}
-                                            index={index}
-                                            onCheckPress={() => { onPressItem(index, item) }}
-                                            isSelected={selectedItems.includes(item.id)}
-                                        />
+                                        <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
+                                            <View style={{ width: width * 0.70 }}>
+                                                <ServiceItem
+                                                    key={index}
+                                                    item={item}
+                                                    index={index}
+                                                    onCheckPress={() => { onPressItem(index, item) }}
+                                                    isSelected={selectedItems.includes(item.id)}
+                                                />
+                                            </View>
+                                            {/* {user?.id == item?.added_by_provider && <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
+                                                removeServiceData(item.id)
+                                            }}>Remove</Text>} */}
+                                        </View>
                                     )
                                 }))}
                                 {newServices.map((item, index) => {
                                     return (
                                         <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
-                                            <View style={{width: width * 0.70}}>
-                                            <ServiceItem
-                                                key={index}
-                                                item={item}
-                                                index={index}
-                                                onCheckPress={() => { onPressItem(index, item) }}
-                                                isSelected={selectedItems.includes(item.id)}
-                                            />
+                                            <View style={{ width: width * 0.70 }}>
+                                                <ServiceItem
+                                                    key={index}
+                                                    item={item}
+                                                    index={index}
+                                                    onCheckPress={() => { onPressItem(index, item) }}
+                                                    isSelected={selectedItems.includes(item.id)}
+                                                />
                                             </View>
-                                            <Text  maxFontSizeMultiplier={1.2} style={{fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
+                                            <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
                                                 removeNewService(item)
                                             }}>Remove</Text>
                                         </View>
@@ -1094,10 +1131,10 @@ const ServicesProvided = (props) => {
                             ?
                             selectedItems.length > 0 && (isAddServiceMode ? <CustomButton title={"Next"} action={() => next()} /> : <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                                 <CustomButton maxFont={1.2} title={"Save"} action={() => { saveData() }} customStyles={{ width: width * 0.45 }} />
-                                <CustomButton  maxFont={1.2} title={"Next"} action={() => next()} customStyles={{ width: width * 0.45 }} />
+                                <CustomButton maxFont={1.2} title={"Next"} action={() => next()} customStyles={{ width: width * 0.45 }} />
                             </View>)
                             :
-                            <CustomButton  maxFont={1.2} title={"Save"} action={() => saveRequest()} />
+                            <CustomButton maxFont={1.2} title={"Save"} action={() => saveRequest()} />
                         }
                     </View>
                 </Container>
@@ -1135,7 +1172,7 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService }) => {
                             addNewService(service_name)
                             setVisible(false)
                         }}
-                        customStyles={{  width: "35%", borderRadius: 5, marginTop: 20 }}
+                        customStyles={{ width: "35%", borderRadius: 5, marginTop: 20 }}
                         customTextStyles={{ fontSize: 12 }}
                     />
                 </Pressable>

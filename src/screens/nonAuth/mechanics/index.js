@@ -42,6 +42,7 @@ const Mechanics = (props) => {
     const [open1, setOpen1] = useState(false)
     const [open2, setOpen2] = useState(false)
     const [selectedItemsWithProviders, setSelectedItemsWithProviders] = useState([])
+    const ordered_variant=useSelector(state=>state.variant)
     const [mycords, setMyCords] = useState({
         latitude: 37.785834,
         longitude: -122.406417
@@ -345,7 +346,10 @@ const Mechanics = (props) => {
         formdata.append("country", current_address.country)
         formdata.append("state", current_address.state)
         formdata.append("city", current_address.city)
-
+        formdata.append("ordered_variant", JSON.stringify(ordered_variant))
+        console.log("ordered_variant",ordered_variant)
+        // setLoading(false)
+        // return
         if (continuous_order) {
             formdata.append("continuous_order", continuous_order)
         }

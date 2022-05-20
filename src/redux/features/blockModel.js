@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    open: false
+    open: false,
 }
 const blockSlice = createSlice({
     name: "block_modal",
