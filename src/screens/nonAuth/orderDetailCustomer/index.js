@@ -34,6 +34,7 @@ import RateAndCommentModal from '../../../components/RateAndComment';
 import { updateBlockModal } from '../../../redux/features/blockModel'
 import BlockMessageModal from '../../../components/BlockMessageModal'
 import messaging from '@react-native-firebase/messaging';
+import { setVariantData } from '../../../redux/features/variantData';
 
 const notification_color = [
     {
@@ -82,6 +83,7 @@ export default function OrderDetailUpdateCustomer(props) {
     const [cancelOrderText, setCancelOrderText] = React.useState("Remaining cancellation requests: 10")
     const [textShowWithRed, settextShowWithRed] = React.useState("")
     const [rateVisible, setRateVisible] = React.useState(false)
+    const [totalSettingData, settotalSettingData] = React.useState([])
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -97,8 +99,10 @@ export default function OrderDetailUpdateCustomer(props) {
     })
 
     const [whoCancelled, setWhoCancelled] = React.useState({})
+    const [order_variant, setOrderVariant] = React.useState({})
 
     React.useEffect(() => {
+        // props.navigation.navigate("OrderSuspend", { item: data })
         if (data?.order_logs?.length > 0) {
             let logs = [...data?.order_logs]
             logs.reverse()
@@ -114,7 +118,20 @@ export default function OrderDetailUpdateCustomer(props) {
 
 
         }
+        checkOrderVariant()
     }, [data])
+    const checkOrderVariant = () => {
+        try {
+            let variant = JSON.parse(data?.ordered_variant)
+            console.log("Variant", variant, data?.ordered_variant)
+
+            setOrderVariant(variant)
+        } catch (err) {
+            console.log(err)
+        } finally {
+
+        }
+    }
     useFocusEffect(React.useCallback(() => {
         let unsubscribe = messaging().onMessage((remoteMessage) => {
             if (remoteMessage?.data?.link) {
@@ -199,11 +216,11 @@ export default function OrderDetailUpdateCustomer(props) {
 
                     }
                     if (response.cancel_charge_ranges) {
-                        setCancelRanges(response.cancel_charge_ranges)
+                        setCancelRanges(response.cancel_charge_ranges.filter(x => x.status == "1"))
                     }
                     if (response.totalSettingData) {
                         let key_value = response.totalSettingData.find(x => x.key == "cancel_order_by_customer")
-                        if (key_value) {
+                        if (key_value && key_value?.status == "1") {
                             setCancelOrderText(`Remaining cancellation requests: ${key_value.value}.`)
                             if (response.totalUserAction) {
                                 let filteredValues = response.totalUserAction.filter(x => x.key == "cancel_order_by_customer")
@@ -212,6 +229,8 @@ export default function OrderDetailUpdateCustomer(props) {
                                     setCancelOrderText(`Remaining cancellation requests: ${total_remains}`)
                                 }
                             }
+                        } else {
+                            setCancelOrderText(``)
                         }
                     }
                 } else {
@@ -474,6 +493,7 @@ export default function OrderDetailUpdateCustomer(props) {
 
     const searchAgain = () => {
         if (user?.user_status == 1) {
+            dispatch(setVariantData(order_variant))
             props.navigation.navigate("MechanicLocation", {
                 servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
                 subService: {
@@ -488,9 +508,10 @@ export default function OrderDetailUpdateCustomer(props) {
             dispatch(updateBlockModal(true))
         }
     }
-    const [showMessage,setShowMessage]=React.useState(false)
+    const [showMessage, setShowMessage] = React.useState(false)
     const gotToForReorder = () => {
         if (user?.user_status == 1 && data?.providers_user_status == 1) {
+            dispatch(setVariantData(order_variant))
             props.navigation.navigate("MechanicLocation", {
                 servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
                 subService: {
@@ -503,12 +524,13 @@ export default function OrderDetailUpdateCustomer(props) {
                 orderData: data
             })
         } else {
-            if(user?.user_status != 1){
+            console.log(data?.providers_user_status)
+            if (user?.user_status != 1) {
                 dispatch(updateBlockModal(true))
-            }else{
+            } else {
                 setShowMessage(true)
             }
-            
+
         }
 
     }
@@ -644,7 +666,7 @@ export default function OrderDetailUpdateCustomer(props) {
                             <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
                         {data?.order_status == 15 && <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
-                        <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
+                        <CardClientInfo order_variant={order_variant} orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
                             setRateType(t)
                             setRateVisible(true)
                         }} virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
@@ -758,7 +780,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 handleDelete={handleDeleteRate}
             />
             <BlockMessageModal />
-            <BlockMessageModal visible={showMessage} setVisble={setShowMessage} text={data?.providers_block_message}  />
+            <BlockMessageModal visible={showMessage} setVisble={setShowMessage} text={`This service provider account is ${data?.providers_user_status == 2 ? "inactive" : "blocked"}. Please look for some another provider for getting service`} />
             {loading && <Loader />}
 
         </View>
@@ -767,7 +789,7 @@ export default function OrderDetailUpdateCustomer(props) {
 
 
 //items && virtual order items manage screens
-const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
+const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_data, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
@@ -795,6 +817,8 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
     useEffect(() => {
         if (virtual_data?.id) {
             setVirtualOrdersItems(virtual_data.order_items)
+        } else {
+            setVirtualOrdersItems([])
         }
     }, [virtual_data])
 
@@ -803,6 +827,9 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
             let t = virtualOrdersItems.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalVirtualTime(total)
+        } else {
+            setTotalVirtualTime(0)
+
         }
     }, [virtualOrdersItems])
 
@@ -826,6 +853,8 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
 
             if (data.order_status == order_types.update_acceptance) {
                 setShowVirtualData(true)
+            } else {
+                setShowVirtualData(false)
             }
 
             if (data.order_items) {
@@ -972,6 +1001,14 @@ const CardClientInfo = ({ data, orderType, noti_color, virtual_data, setTotalWor
                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text style={styles.greenTextStyle}># {data?.id}</Text></Text>
                     <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right", width: "90%", alignSelf: "flex-end" }, styles.greenTextStyle]}><Text style={{ color: "black" }}>Requested Service Date : </Text>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
 
+                </View>
+            </View>
+            <View >
+                {Boolean(order_variant?.variant_title) && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>{order_variant?.variant_title}</Text>: {order_variant?.variant}</Text>}
+                <View style={{}}>
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Make</Text>: {order_variant?.make}</Text>}
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Model</Text>: {order_variant?.model}</Text>}
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Year</Text>: {order_variant?.year}</Text>}
                 </View>
             </View>
             {/* request data */}

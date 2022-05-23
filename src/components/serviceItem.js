@@ -64,10 +64,10 @@ const ServiceItem = React.forwardRef((props, ref) => {
                     }}>{props.item.name}</Text>
                 </View>
 
-                {props.showInputs && <View style={{ flexDirection: 'row',alignItems:"center", justifyContent: 'flex-end' }}>
-                    <View style={{alignItems:"center",marginRight: 10 }}> 
+                {props.showInputs && <View style={{ flexDirection: 'row', alignItems: "center", justifyContent: 'flex-end' }}>
+                    <View style={{ alignItems: "center", marginRight: 10 }}>
                         <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", marginBottom: 5, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Hour</Text>
-                        <View style={{ ...styles.fromContainer}}>
+                        <View style={{ ...styles.fromContainer }}>
                             <TextInputMask
                                 onChangeText={(formatted, extracted) => {
                                     props.setText("time_duration_h", extracted, props.index, props.serviceItem)
@@ -86,9 +86,9 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             />
                         </View>
                     </View>
-                    <View style={{alignItems:"center",marginRight: 10 }}>
-                        <Text maxFontSizeMultiplier={1.2} numberOfLines={1.} style={{ textAlign: "center", marginBottom: 5,  fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Minutes</Text>
-                        <View style={{ ...styles.fromContainer}}>
+                    <View style={{ alignItems: "center", marginRight: 10 }}>
+                        <Text maxFontSizeMultiplier={1.2} numberOfLines={1.} style={{ textAlign: "center", marginBottom: 5, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Minutes</Text>
+                        <View style={{ ...styles.fromContainer }}>
                             <TextInputMask
                                 onChangeText={(formatted, extracted) => {
                                     props.setText("time_duration_m", extracted, props.index, props.serviceItem)
@@ -107,8 +107,8 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             />
                         </View>
                     </View>
-                    <View style={{marginRight:5}}>
-                        <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", color: "white", marginBottom: 5,  fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>dd</Text>
+                    <View style={{ marginRight: 5 }}>
+                        <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", color: "white", marginBottom: 5, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>dd</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
                                 style={styles.inputStyle}
@@ -153,6 +153,15 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             maxFontSizeMultiplier={1.2}
                         />
                     </View>
+                    {item.list_type == "private" &&
+                        <TouchableOpacity onPress={() => {
+                            if (props.removeNonGlobalItem) {
+                                props.removeNonGlobalItem(item.id)
+                            }
+                        }} activeOpacity={0.7} style={{ height: 40, aspectRatio: 1, padding: 10, }}>
+                            <Image source={require('../assets/cancel.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
+                        </TouchableOpacity>
+                    }
                 </View>
             })}
             {props.showInputs && <View style={{ flexDirection: 'row', width: '85%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>

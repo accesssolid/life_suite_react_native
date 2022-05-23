@@ -38,7 +38,7 @@ const CancelModal = props => {
                     {/* <Container style={{ flex: 1, backgroundColor: 'white' }}> */}
                         {/* <Content> */}
                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.title}</Text>
-                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.subCancelText}</Text>
+                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 13, fontFamily: LS_FONTS.PoppinsSemiBold,textAlign:"center", marginTop: "4%", color: 'black' }}>{props.subCancelText==""?"Confirmation":props.subCancelText}</Text>
                             <View  maxFontSizeMultiplier={1.5} style={{ height: 2, width: 42, backgroundColor: LS_COLORS.global.green, alignSelf: 'center', marginTop: 4 }}></View>
                             <Card style={{ marginTop:20 }}>
                                 <TextInput

@@ -323,14 +323,14 @@ const BlockMessageModal = ({ text, visible, setVisble ,user}) => {
                     <Image source={require('../../../assets/splash/logo.png')} resizeMode="contain" style={{ height: 100, width: 200, alignSelf: "center" }} />
                     <Text maxFontSizeMultiplier={1.4} style={{ color: "black", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16, textAlign: "center" }}>{text}</Text>
 
-                    <View style={{ flexDirection: "row" ,justifyContent:"space-between"}}>
-                        <TouchableOpacity onPress={() => {
+                    <View style={{ flexDirection: "row" ,justifyContent:"center"}}>
+                        {/* <TouchableOpacity onPress={() => {
                             if (setVisble) {
                                 setVisble(false)
                             }
                         }} style={{ backgroundColor: LS_COLORS.global.green, padding: 10, width: "40%", alignSelf: "center", borderRadius: 5, margin: 10 }} >
                             <Text maxFontSizeMultiplier={1.4} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white", textAlign: "center" }}>Cancel</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <TouchableOpacity onPress={() => {
                            navigation.navigate("ContactUs",{user})
                            setVisble(false)

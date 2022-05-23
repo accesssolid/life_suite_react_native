@@ -109,7 +109,7 @@ const OrderClientDetail = (props) => {
     // books data from  modal
     const [booked, setBooked] = React.useState([])
     const [whoCancelled, setWhoCancelled] = React.useState({})
-
+    const [order_variant, setOrderVariant] = React.useState({})
     React.useEffect(() => {
         if (data?.order_logs?.length > 0) {
             let logs = [...data?.order_logs]
@@ -123,10 +123,23 @@ const OrderClientDetail = (props) => {
                     setWhoCancelled({ type: "Provider", name: `${data?.providers_first_name} ${data?.providers_last_name}` })
                 }
             }
+        }
+        checkOrderVariant()
+        
+    }, [data])
 
+    const checkOrderVariant = () => {
+        try {
+            let variant = JSON.parse(data?.ordered_variant)
+            console.log("Variant", variant, data?.ordered_variant)
+
+            setOrderVariant(variant)
+        } catch (err) {
+            console.log(err)
+        } finally {
 
         }
-    }, [data])
+    }
 
     useEffect(() => {
         if (item) {
@@ -138,14 +151,14 @@ const OrderClientDetail = (props) => {
 
     }, [order_id])
 
-    useFocusEffect(React.useCallback(()=>{
-        let unsubscribe=messaging().onMessage((remoteMessage)=>{
-            if(remoteMessage?.data?.link){
+    useFocusEffect(React.useCallback(() => {
+        let unsubscribe = messaging().onMessage((remoteMessage) => {
+            if (remoteMessage?.data?.link) {
                 getOrderDetail(itemdata?.id)
             }
         })
         return unsubscribe
-    },[itemdata]))
+    }, [itemdata]))
 
     React.useEffect(() => {
         if (data) {
@@ -418,12 +431,13 @@ const OrderClientDetail = (props) => {
             })
         }
 
-        console.log(config.data)
 
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     setData(response.data)
+                    setVirtualData(response.data.virtual_order)
                 } else {
                     showToast(response.message)
                 }
@@ -611,8 +625,8 @@ const OrderClientDetail = (props) => {
                             <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
                         {data?.order_status == 15 && <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
-
-                        <CardClientInfo orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        {/* {Boolean(order_variant?.variant)&& <Text style={{marginHorizontal: 20}}>{order_variant?.variant}</Text>} */}
+                        <CardClientInfo order_variant={order_variant} orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
                         {whoCancelled?.type != undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By</Text>: {whoCancelled?.type} ({whoCancelled?.name})</Text>}
                         <RenderAddressFromTO
@@ -759,7 +773,7 @@ const OrderClientDetail = (props) => {
 
 export default OrderClientDetail;
 
-const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShowWithRed, setTotalWorkingMinutes }) => {
+const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_data, settextShowWithRed, setTotalWorkingMinutes }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
@@ -787,6 +801,8 @@ const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShow
     useEffect(() => {
         if (virtual_data?.id) {
             setVirtualOrdersItems(virtual_data.order_items)
+        }else{
+            setVirtualOrdersItems([])
         }
     }, [virtual_data])
 
@@ -796,6 +812,8 @@ const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShow
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalVirtualTime(total)
             // setTotalWorkingMinutes(total)
+        }else{
+            setTotalVirtualTime(0)
         }
     }, [virtualOrdersItems])
 
@@ -818,6 +836,8 @@ const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShow
 
             if (data.order_status == order_types.update_acceptance) {
                 setShowVirtualData(true)
+            }else{
+                setShowVirtualData(false)
             }
 
             if (data.order_items) {
@@ -904,6 +924,14 @@ const CardClientInfo = ({ data, noti_color, orderType, virtual_data, settextShow
                     <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "right" }]}><Text style={{ color: "black" }}>Requested :</Text> {moment(data?.created_at).fromNow()}</Text>
                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }}>Order<Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}># {data?.id}</Text></Text>
                     <Text maxFontSizeMultiplier={1.5} style={[{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right" }, styles.greenTextStyle]}><Text style={{ color: "black" }}>Requested Service Date : </Text>{moment(data?.order_start_time).format("MMMM DD[,] YYYY")}</Text>
+                </View>
+            </View>
+            <View >
+                {Boolean(order_variant?.variant_title) && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>{order_variant?.variant_title}</Text>: {order_variant?.variant}</Text>}
+                <View style={{}}>
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Make</Text>: {order_variant?.make}</Text>}
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Model</Text>: {order_variant?.model}</Text>}
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Year</Text>: {order_variant?.year}</Text>}
                 </View>
             </View>
             {/* request data */}
@@ -1190,18 +1218,18 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
                 openRatingModal()
                 break
             case buttons_types.cancel_update:
-                Alert.alert("Cancel","Do you want to cancel order update request?",[
+                Alert.alert("Cancel", "Do you want to cancel order update request?", [
                     {
-                        text:"No"
+                        text: "No"
                     },
                     {
-                        text:"Yes",
-                        onPress:()=>{
+                        text: "Yes",
+                        onPress: () => {
                             submit(order_types.cancel_request)
                         }
                     }
                 ])
-               
+
                 break
             // case buttons_types.accept:
 

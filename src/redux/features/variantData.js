@@ -7,7 +7,7 @@ const varinatSlice = createSlice({
         "variant": "",
         "make": "",
         "model": "",
-        "Year": ""
+        "year": ""
     },
     reducers: {
         setVariantData: (state, action) => {

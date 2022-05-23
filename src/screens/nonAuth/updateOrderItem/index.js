@@ -152,7 +152,7 @@ const OrderClientDetail = (props) => {
                     estimated_reached_time: data.estimated_reached_time,
                     order_start_time: data.order_start_time,
                     order_end_time: moment(data.order_start_time).add(newTimeNeeded, "minutes").format("YYYY-MM-DD HH:mm:[00]"),
-                    items: selectedItems.filter(x => !String(x).startsWith("new")),
+                    items: [...new Set(selectedItems.filter(x => !String(x).startsWith("new")))],
                     products: selectedProducts,
                     requested_start_time: data.requested_start_time,
                     requested_end_time: checkTimeFrameIncrease(),
@@ -173,6 +173,7 @@ const OrderClientDetail = (props) => {
             endPoint: '/api/providerOrderUpdate',
             type: 'post'
         }
+
         getApi(config)
             .then((response) => {
 
@@ -436,7 +437,7 @@ const ItemView = ({
                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                     />
-                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle,{flex:1}]}>{item?.name}</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { flex: 1 }]}>{item?.name}</Text>
                 </View>
                 {String(item?.id)?.startsWith("new") && productShow ? <View style={{ flexDirection: "row", justifyContent: "space-around", flex: 1, paddingHorizontal: 20 }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -450,7 +451,7 @@ const ItemView = ({
                             placeholder="hh"
                             keyboardType="numeric"
                             maxFontSizeMultiplier={1.1}
-                            style={[styles.itemTextStyle, {height: 40,minWidth:35,maxWidth:40,  paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
+                            style={[styles.itemTextStyle, { height: 40, minWidth: 35, maxWidth: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                         <TextInput value={item?.time_duration_m}
                             onChangeText={t => {
                                 setItems(state => {
@@ -461,7 +462,7 @@ const ItemView = ({
                             placeholder="mm"
                             keyboardType="numeric"
                             maxFontSizeMultiplier={1.1}
-                            style={[styles.itemTextStyle, {minWidth:37,maxWidth:40,  height: 40, marginLeft: 5, marginRight: 10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
+                            style={[styles.itemTextStyle, { minWidth: 37, maxWidth: 40, height: 40, marginLeft: 5, marginRight: 10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                     </View>
                     <TextInput
                         value={"$" + (item?.price == 0 ? "" : item?.price)}
@@ -475,7 +476,7 @@ const ItemView = ({
                         placeholder="$"
                         maxFontSizeMultiplier={1.1}
                         keyboardType="numeric"
-                        style={[styles.itemTextStyle, { minWidth:35,maxWidth:40, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
+                        style={[styles.itemTextStyle, { minWidth: 35, maxWidth: 40, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                 </View> : <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
                     <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{checkNewOrNot(item?.time_duration_h, item?.time_duration_m, item?.time_duration)}</Text>
                     <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${item.price}</Text>
@@ -509,7 +510,7 @@ const ItemView = ({
                                         checkedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/checked.png")} />}
                                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
                                     />
-                                    <Text maxFontSizeMultiplier={1.2}  style={[styles.itemTextStyle,{flex:1}]}>{product?.name}</Text>
+                                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { flex: 1 }]}>{product?.name}</Text>
                                 </View>
                                 <View style={{ flexDirection: "row", flex: 1, justifyContent: "flex-end", paddingHorizontal: 20 }}>
                                     <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${product.price}</Text>

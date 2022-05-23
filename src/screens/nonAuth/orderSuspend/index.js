@@ -34,10 +34,10 @@ export default function OrderSuspend(props) {
     const [totalWorkingMinutes, setTotalWorkingMinutes] = React.useState(0)
     const [reason, setReason] = React.useState("")
     const [reasonCheck, setReasonCheck] = React.useState("No Show")
-    const [cancelOrderText, setCancelOrderText] = React.useState("Remaining suspend requests: 10")
+    const [cancelOrderText, setCancelOrderText] = React.useState("")
     const [virtualdata, setVirtualData] = React.useState({})
     const [extraTime, setExtraTime] = React.useState("1 hour")
-    const scrollRef=React.useRef(null)
+    const scrollRef = React.useRef(null)
     const getOrderDetail = (order_id) => {
         setLoading(true)
         let headers = {
@@ -62,7 +62,7 @@ export default function OrderSuspend(props) {
                         setVirtualData(response.data.virtual_order)
                         if (response.totalSettingData) {
                             let key_value = response.totalSettingData.find(x => x.key == "suspend_order_by_customer_inprogress")
-                            if (key_value) {
+                            if (key_value && key_value?.status == "1") {
                                 setCancelOrderText(`Remaining suspend requests: ${key_value.value}.`)
                                 if (response.totalUserAction) {
                                     let filteredValues = response.totalUserAction.filter(x => x.key == "suspend_order_by_customer_inprogress")
@@ -71,6 +71,9 @@ export default function OrderSuspend(props) {
                                         setCancelOrderText(`Remaining suspend requests: ${total_remains}`)
                                     }
                                 }
+                            } else {
+                                setCancelOrderText(``)
+
                             }
                         }
                     } else {
@@ -130,11 +133,11 @@ export default function OrderSuspend(props) {
 
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
-            <StatusBar 
-             // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-            barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             {/* header start */}
             <View style={{ width: '100%', height: '20%', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, overflow: "hidden" }}>
                 <ImageBackground
@@ -169,8 +172,8 @@ export default function OrderSuspend(props) {
                     <ScrollView ref={scrollRef} contentContainerStyle={{ paddingVertical: 16 }}>
                         <Text style={[styles.client_info_text]}>Suspend in progress</Text>
                         <CardClientInfo virtual_data={virtualdata} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5,color:"red"}]}>{cancelOrderText}</Text>
-                         <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5 }]}>Reason</Text>
+                        <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5, color: "red" }]}>{cancelOrderText}</Text>
+                        <Text style={[styles.client_info_text, { fontSize: 13, marginVertical: 5 }]}>Reason</Text>
                         {["No Show", "Tasks not performed", "Incorrect Products", "Other"].map(x => {
                             return (
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -186,12 +189,12 @@ export default function OrderSuspend(props) {
                                     <Text style={styles.baseTextStyle}>{x}</Text>
                                 </View>)
                         })}
-                        <Input onFocus={()=>{
+                        <Input onFocus={() => {
                             // scrollRef?.current?.scrollTo({y:2000})
-                            setTimeout(()=>{
-                                scrollRef?.current?.scrollTo({y:2000})
-                            },200)
-                        }} maxFontSizeMultiplier={1.4} disabled={reasonCheck != "Other"} value={reason} onChangeText={t => setReason(t)} multiline={true} containerStyle={{ height: 100, borderWidth: 1, width: "90%", alignSelf: "center", borderColor: "gray", borderRadius: 5 }} inputContainerStyle={{ borderBottomWidth: 0 }} inputStyle={[styles.baseTextStyle,{ borderWidth: 0 }]} />
+                            setTimeout(() => {
+                                scrollRef?.current?.scrollTo({ y: 2000 })
+                            }, 200)
+                        }} maxFontSizeMultiplier={1.4} disabled={reasonCheck != "Other"} value={reason} onChangeText={t => setReason(t)} multiline={true} containerStyle={{ height: 100, borderWidth: 1, width: "90%", alignSelf: "center", borderColor: "gray", borderRadius: 5 }} inputContainerStyle={{ borderBottomWidth: 0 }} inputStyle={[styles.baseTextStyle, { borderWidth: 0 }]} />
                     </ScrollView>
                     {/* lowerButton */}
                     <View style={{ flexDirection: "row", marginBottom: 10, justifyContent: "space-evenly" }}>

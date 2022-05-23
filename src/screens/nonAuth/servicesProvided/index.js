@@ -56,12 +56,14 @@ const ServicesProvided = (props) => {
 
     React.useEffect(() => {
         let data = {
-            "variant_title": vehicleType?.service_variants_name,
-            "variant": vehicleType?.name,
-            "make": selectedMake,
-            "model": selectedModel,
-            "Year": selectedYear
+            "variant_title": vehicleType?.service_variants_name??"",
+            "variant": vehicleType?.name??"",
+            "variant_id": vehicleType?.variant_id??"",
+            "make": makeList.find(x => x.id == selectedMake)?.title??"",
+            "model":  modelList.find(x => x.id == selectedModel)?.title??"",
+            "year":  yearList.find(x => x.id == selectedYear)?.title??""
         }
+        console.log(data)
         dispatch(setVariantData(data))
     }, [selectedMake, selectedModel, selectedYear, vehicleType])
 

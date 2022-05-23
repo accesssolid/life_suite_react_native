@@ -92,6 +92,7 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
+                console.log(response)
                 if (response.status == true) {
                     setLoading(false)
                     setItemListMaster([...response.data])
@@ -234,17 +235,21 @@ const ServicesProvided = (props) => {
 
     }
 
+
+
     const setInitialProductsData = () => {
         if (!selectedProducts.length > 0 && !selectedNewProducts.length > 0) {
             let newArr = []
             let selected = []
             itemListMaster.map((item, index) => {
                 item.products.forEach(element => {
+                    console.log("New Array", element)
                     newArr.push({
                         "id": element.id,
                         "name": element.name,
                         "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
-                        "item_id": element.item_id
+                        "item_id": element.item_id,
+                        list_type: element?.list_type
                     })
                     if (getPrice(element.item_id, element.id) !== "") {
                         selected.push({
@@ -549,14 +554,16 @@ const ServicesProvided = (props) => {
                         "id": element.id,
                         "name": element.name,
                         "price": element.price ?? "",
-                        "item_id": element.item_id
+                        "item_id": element.item_id,
+                        list_type: element?.list_type ?? "private"
                     })
                 } else {
                     newArr.push({
                         "id": element.id,
                         "name": element.name,
                         "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
-                        "item_id": element.item_id
+                        "item_id": element.item_id,
+                        list_type: element?.list_type ?? "private"
                     })
                 }
             });
@@ -734,15 +741,75 @@ const ServicesProvided = (props) => {
                 "Authorization": `Bearer ${access_token}`
             }
             let formdata = new FormData()
-            formdata.append("service_id", id)
+            formdata.append("item_id", id)
             const config = {
                 headers: headers,
                 data: formdata,
                 type: "post",
-                endPoint: "/api/deleteAddedServices"
+                endPoint: "/api/deleteNotGlobalItem"
             }
             let res = await getApi(config)
-            alert(JSON.stringify(res))
+            if (res.status) {
+                showToast(res.message)
+                getServiceItems()
+            } else {
+                showToast(res.message)
+            }
+        } catch (err) {
+
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const removeNonGlobalItem = async (id) => {
+        // let data = itemListMaster.filter(item => item.id != id)
+        // setItemListMaster(data)
+        let newArr = []
+        let newData = []
+        itemListMaster.map((item, index) => {
+           let products=item.products.map(element => {
+                if (element.item_id == item.id) {
+                    newArr.push({
+                        "id": element.id,
+                        "name": element.name,
+                        "price": element.price ?? "",
+                        "item_id": element.item_id,
+                        list_type: element?.list_type ?? "private"
+                    })
+                } else {
+                    newArr.push({
+                        "id": element.id,
+                        "name": element.name,
+                        "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
+                        "item_id": element.item_id,
+                        list_type: element?.list_type ?? "private"
+                    })
+                }
+                return element
+            });
+            newData.push({...item,products:products.filter(x=>x.id!=id)})
+        })
+        
+        setProductsData([...newArr].filter(x=>x.id!==id))
+        setItemListMaster(newData)
+        try {
+            setLoading(true)
+            let headers = {
+                "Authorization": `Bearer ${access_token}`
+            }
+            let formdata = new FormData()
+            formdata.append("product_id", id)
+
+            const config = {
+                headers: headers,
+                data: formdata,
+                type: "post",
+                endPoint: "/api/deleteNotGlobalProduct"
+            }
+            console.log(id)
+            let res = await getApi(config)
+            console.log(res)
             if (res.status) {
                 showToast(res.message)
             } else {
@@ -751,6 +818,7 @@ const ServicesProvided = (props) => {
         } catch (err) {
 
         } finally {
+            getServiceItems()
             setLoading(false)
         }
     }
@@ -1066,6 +1134,7 @@ const ServicesProvided = (props) => {
                                 isOtherSelected={isOtherSelected}
                                 removeNewproduct={removeNewproduct}
                                 addNewProduct={addNewProduct}
+                                removeNonGlobalItem={removeNonGlobalItem}
                             />}
                         {activeItem == null && itemList && itemList.length > 0 &&
                             <>
@@ -1082,9 +1151,9 @@ const ServicesProvided = (props) => {
                                                     isSelected={selectedItems.includes(item.id)}
                                                 />
                                             </View>
-                                            {/* {user?.id == item?.added_by_provider && <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
+                                            {item.list_type == "private" && <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
                                                 removeServiceData(item.id)
-                                            }}>Remove</Text>} */}
+                                            }}>Remove</Text>}
                                         </View>
                                     )
                                 }))}

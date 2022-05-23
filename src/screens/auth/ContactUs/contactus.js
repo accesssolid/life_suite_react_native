@@ -19,11 +19,12 @@ export default function ContactUs({ navigation, route }) {
     const emailRef = useRef(null)
     const messageRef = useRef(null)
     const scrollRef = React.useRef(null)
-    
+    const [editable,setEditable]=React.useState(true)
 
     React.useEffect(() => {
         let user=route?.params?.user
         if (user?.email) {
+            setEditable(false)
             setData({ ...data, name: user?.first_name + " " + user?.last_name, email: user?.email })
         }
     }, [route?.params])
@@ -95,6 +96,7 @@ export default function ContactUs({ navigation, route }) {
                                         scrollRef?.current?.scrollTo({ y: 1000 })
                                     }, 200)
                                 }}
+                                editable={editable}
                                 onSubmitEditing={() => {
                                     emailRef?.current?.focus()
                                 }}
@@ -108,6 +110,7 @@ export default function ContactUs({ navigation, route }) {
                                 }}
                                 value={data.email}
                                 ref={emailRef}
+                                editable={editable}
                                 onFocus={d => {
                                     setTimeout(() => {
                                         scrollRef?.current?.scrollTo({ y: 1000 })

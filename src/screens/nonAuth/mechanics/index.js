@@ -42,7 +42,7 @@ const Mechanics = (props) => {
     const [open1, setOpen1] = useState(false)
     const [open2, setOpen2] = useState(false)
     const [selectedItemsWithProviders, setSelectedItemsWithProviders] = useState([])
-    const ordered_variant=useSelector(state=>state.variant)
+    const ordered_variant = useSelector(state => state.variant)
     const [mycords, setMyCords] = useState({
         latitude: 37.785834,
         longitude: -122.406417
@@ -250,9 +250,9 @@ const Mechanics = (props) => {
 
 
     const locationMileDistanceUpdate = async () => {
-        let d = {...mile_distanceP}
+        let d = { ...mile_distanceP }
         for (let provider of dupProviders) {
-            let x = await getMilesBetweenCords({ latitude: provider?.address?.lat, longitude: provider?.address?.long }, {latitude: data.order_placed_lat, longitude: data.order_placed_long})
+            let x = await getMilesBetweenCords({ latitude: provider?.address?.lat, longitude: provider?.address?.long }, { latitude: data.order_placed_lat, longitude: data.order_placed_long })
             d[`${provider._id}`] = x
         }
         setMileDistanceP(d)
@@ -347,7 +347,7 @@ const Mechanics = (props) => {
         formdata.append("state", current_address.state)
         formdata.append("city", current_address.city)
         formdata.append("ordered_variant", JSON.stringify(ordered_variant))
-        console.log("ordered_variant",ordered_variant)
+        console.log("ordered_variant", ordered_variant)
         // setLoading(false)
         // return
         if (continuous_order) {
@@ -704,7 +704,21 @@ const Mechanics = (props) => {
                                             />
                                         </View>
                                         {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Services will be provided at this address : <Text style={{ textAlign: "right" }}>{item?.address?.address_line_1}</Text></Text>}
-                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {checkShowAddress(Number(item?.service_is_at_address)) ? lodash.round(mile_distanceP[`${item?._id}`] ?? 0,2) : lodash.round(data.mile_distance, 2)} miles</Text>}
+                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {checkShowAddress(Number(item?.service_is_at_address)) ? lodash.round(mile_distanceP[`${item?._id}`] ?? 0, 2) : lodash.round(data.mile_distance, 2)} miles</Text>}
+
+                                        <View style={{ marginLeft: 10 }}>
+                                            {Boolean(ordered_variant?.variant_title) && <Text maxFontSizeMultiplier={1.5}
+                                                style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>{ordered_variant?.variant_title}</Text>: {ordered_variant?.variant}</Text>}
+                                            <View style={{}}>
+                                                {ordered_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5}
+                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Make</Text>: {ordered_variant?.make}</Text>}
+                                                {ordered_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5}
+                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Model</Text>: {ordered_variant?.model}</Text>}
+                                                {ordered_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5}
+                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Year</Text>: {ordered_variant?.year}</Text>}
+                                            </View>
+                                        </View>
+
                                         {/* <Text  maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text> */}
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
@@ -719,8 +733,8 @@ const Mechanics = (props) => {
                                             let extra = extraData.find(x => x.parent_id == service_id)
                                             return (
                                                 <>
-                                                    <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 ,alignItems:"center"}}>
-                                                        <Text maxFontSizeMultiplier={1.4} style={{ fontSize: 12,flex:1, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>{i.service_items_name + "(Service)"}</Text>
+                                                    <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10, alignItems: "center" }}>
+                                                        <Text maxFontSizeMultiplier={1.4} style={{ fontSize: 12, flex: 1, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>{i.service_items_name + "(Service)"}</Text>
                                                         <View style={{ height: 25, flexDirection: "row", }}>
                                                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.price}</Text>
                                                             <CheckBox
