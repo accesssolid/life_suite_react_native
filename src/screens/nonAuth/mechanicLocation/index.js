@@ -227,7 +227,7 @@ const MechanicLocation = (props) => {
     const [total_distance,setTotalDistance]=React.useState(0)
 
     React.useEffect(() => {
-        fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyBtDBhUzqiZRbcFQezVwgfB9I6Wr4TkJkE`).then(res => {
+        fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyA8vPYceBJX2Mt43IKubB1Gpa2EcZ6Mg_g`).then(res => {
             return res.json()
         }).then(res => {
             if (res?.rows[0]) {

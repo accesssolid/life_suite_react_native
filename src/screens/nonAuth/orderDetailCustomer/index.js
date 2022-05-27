@@ -509,8 +509,9 @@ export default function OrderDetailUpdateCustomer(props) {
         }
     }
     const [showMessage, setShowMessage] = React.useState(false)
+    const [showMessage1, setShowMessage1] = React.useState(false)
     const gotToForReorder = () => {
-        if (user?.user_status == 1 && data?.providers_user_status == 1) {
+        if (user?.user_status == 1 && data?.providers_user_status == 1&&data?.provider_provide_service>0) {
             dispatch(setVariantData(order_variant))
             props.navigation.navigate("MechanicLocation", {
                 servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
@@ -527,8 +528,10 @@ export default function OrderDetailUpdateCustomer(props) {
             console.log(data?.providers_user_status)
             if (user?.user_status != 1) {
                 dispatch(updateBlockModal(true))
-            } else {
+            } else if(data?.providers_user_status != 1) {
                 setShowMessage(true)
+            }else if(data?.provider_provide_service==0){
+                setShowMessage1(true)
             }
 
         }
@@ -780,6 +783,7 @@ export default function OrderDetailUpdateCustomer(props) {
                 handleDelete={handleDeleteRate}
             />
             <BlockMessageModal />
+            <BlockMessageModal visible={showMessage1} setVisble={setShowMessage1} text={`Provider is no longer providing this Service.`} />
             <BlockMessageModal visible={showMessage} setVisble={setShowMessage} text={`This service provider account is ${data?.providers_user_status == 2 ? "inactive" : "blocked"}. Please look for some another provider for getting service`} />
             {loading && <Loader />}
 

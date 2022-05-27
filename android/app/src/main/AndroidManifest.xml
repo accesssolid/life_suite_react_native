@@ -47,7 +47,7 @@
       </intent-filter>
     </activity>
     <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.provider" android:exported="false" android:grantUriPermissions="true"/>
-    <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDY5JgaWK8EK2TC6Zm6460Qwo0G4NbWM-I"/>
+    <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA3ClIUCbJebadWhRD6mW6new4R7ORdcoc"/>
     <uses-library android:name="org.apache.http.legacy" android:required="false"/>
   </application>
 </manifest>

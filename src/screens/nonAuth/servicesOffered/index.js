@@ -23,6 +23,7 @@ import _, { remove } from 'lodash';
 import { getMyJobsThunk } from '../../../redux/features/provider';
 const { width } = Dimensions.get("window")
 import CustomInput from '../../../components/textInput'
+import messagging from '@react-native-firebase/messaging'
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -50,10 +51,22 @@ const ServicesProvided = (props) => {
     const itemRef = useRef(null)
 
     useEffect(() => {
+        console.log("subService",subService)
         setServicesData([])
         getServiceItems()
     }, [])
 
+    useEffect(() => {
+        let unsubscriber = messagging().onMessage((remoteMessage) => {
+            console.log("Remote Message", remoteMessage,subService.id)
+            if (remoteMessage?.data?.refresh_sub_service == subService.id) {
+                getServiceItems()
+            }
+        })
+        return () => {
+            unsubscriber()
+        }
+    }, [])
 
     useEffect(() => {
         setInitialServiceData()
@@ -733,8 +746,6 @@ const ServicesProvided = (props) => {
     }
 
     const removeServiceData = async (id) => {
-        let data = itemListMaster.filter(item => item.id != id)
-        setItemListMaster(data)
         try {
             setLoading(true)
             let headers = {
@@ -750,6 +761,8 @@ const ServicesProvided = (props) => {
             }
             let res = await getApi(config)
             if (res.status) {
+                let data = itemListMaster.filter(item => item.id != id)
+                setItemListMaster(data)
                 showToast(res.message)
                 getServiceItems()
             } else {
@@ -763,36 +776,6 @@ const ServicesProvided = (props) => {
     }
 
     const removeNonGlobalItem = async (id) => {
-        // let data = itemListMaster.filter(item => item.id != id)
-        // setItemListMaster(data)
-        let newArr = []
-        let newData = []
-        itemListMaster.map((item, index) => {
-           let products=item.products.map(element => {
-                if (element.item_id == item.id) {
-                    newArr.push({
-                        "id": element.id,
-                        "name": element.name,
-                        "price": element.price ?? "",
-                        "item_id": element.item_id,
-                        list_type: element?.list_type ?? "private"
-                    })
-                } else {
-                    newArr.push({
-                        "id": element.id,
-                        "name": element.name,
-                        "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
-                        "item_id": element.item_id,
-                        list_type: element?.list_type ?? "private"
-                    })
-                }
-                return element
-            });
-            newData.push({...item,products:products.filter(x=>x.id!=id)})
-        })
-        
-        setProductsData([...newArr].filter(x=>x.id!==id))
-        setItemListMaster(newData)
         try {
             setLoading(true)
             let headers = {
@@ -812,11 +795,39 @@ const ServicesProvided = (props) => {
             console.log(res)
             if (res.status) {
                 showToast(res.message)
+                let newArr = []
+                let newData = []
+                itemListMaster.map((item, index) => {
+                    let products = item.products.map(element => {
+                        if (element.item_id == item.id) {
+                            newArr.push({
+                                "id": element.id,
+                                "name": element.name,
+                                "price": element.price ?? "",
+                                "item_id": element.item_id,
+                                list_type: element?.list_type ?? "private"
+                            })
+                        } else {
+                            newArr.push({
+                                "id": element.id,
+                                "name": element.name,
+                                "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
+                                "item_id": element.item_id,
+                                list_type: element?.list_type ?? "private"
+                            })
+                        }
+                        return element
+                    });
+                    newData.push({ ...item, products: products.filter(x => x.id != id) })
+                })
+
+                setProductsData([...newArr].filter(x => x.id !== id))
+                setItemListMaster(newData)
             } else {
                 showToast(res.message)
             }
         } catch (err) {
-
+            console.log(err)
         } finally {
             getServiceItems()
             setLoading(false)

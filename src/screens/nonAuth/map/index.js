@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid ,Text} from 'react-native'
+import { View, StyleSheet, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, Text } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -126,7 +126,7 @@ const MapScreen = (props) => {
         }
         try {
             let params = {
-                key: 'AIzaSyBoK4icaIuqCEWdbq-D4LdrsbK4X_Fa1Fg',
+                key: 'AIzaSyDEp_Z3O5caWT2DmzxNtjBaoFvo7nzm9sM',
                 latlng: `${lat},${lng}`,
             };
             let qs = queryString.stringify(params);
@@ -153,15 +153,15 @@ const MapScreen = (props) => {
             map?.current?.animateCamera(cam);
         });
     };
-    
+
     return (
         <>
-            <StatusBar 
-            // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-             barStyle="light-content" 
-             />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content"
+            />
             <SafeAreaView style={styles.safeArea}>
                 <Container>
                     <TouchableOpacity
@@ -205,12 +205,12 @@ const MapScreen = (props) => {
                         textInputProps={{
                             onFocus: () => setFocused(true),
                             onblur: () => setFocused(false),
-                            maxFontSizeMultiplier:1.4,
+                            maxFontSizeMultiplier: 1.4,
                             blurOnSubmit: true,
                             onSubmitEditing: () => setFocused(false),
                         }}
                         query={{
-                            key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                            key: 'AIzaSyCqBdweD7WqRWXNUUC0sYMWnXG1jfnPCRk',
                             language: 'en',
                         }}
                     />
@@ -229,7 +229,7 @@ const MapScreen = (props) => {
                                 action={() => {
                                     // #liahs checked to permaned to true
                                     // setIsPermanetClicked(true)
-                                   
+
                                     setCoordinates({
                                         ...coordinates,
                                         latitude: Number(user?.address[0]?.lat),
@@ -256,7 +256,7 @@ const MapScreen = (props) => {
                                 action={() => {
                                     // #liahs checked to permaned to true
                                     // setIsPermanetClicked(true)
-                                   
+
                                     setCoordinates({
                                         ...coordinates,
                                         latitude: Number(user?.address[1]?.lat),
@@ -279,13 +279,13 @@ const MapScreen = (props) => {
                                 latitudeDelta: 0.0922,
                                 longitudeDelta: 0.0421,
                             }}
-                            
+
                             // camera={{ ...coordinates,
                             //     latitudeDelta: 0.0922,
                             //     longitudeDelta: 0.0421,
                             //  }}
                             onRegionChange={(reg) => {
-                             
+
                             }}
                             onRegionChangeComplete={(reg) => {
                                 setCoordinates({ ...reg })
@@ -309,11 +309,11 @@ const MapScreen = (props) => {
                         <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}>
                             <Image pointerEvents="none" style={{ height: 40, aspectRatio: 1 }} source={require('../../../assets/pin.png')} />
                         </View>
-                        <TouchableOpacity onPress={()=>{
+                        <TouchableOpacity onPress={() => {
                             onZoomInPress()
                         }}>
                             {/* <Text>+</Text> */}
-                            </TouchableOpacity>
+                        </TouchableOpacity>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => {
                             // setIsPermanetClicked(true)
                             getLocationPermission()

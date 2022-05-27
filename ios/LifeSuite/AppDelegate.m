@@ -66,8 +66,8 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 #ifdef FB_SONARKIT_ENABLED
   InitializeFlipper(application);
 #endif
-  [GMSPlacesClient provideAPIKey:@"AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM"];
-  [GMSServices provideAPIKey:@"AIzaSyCc3QRE15PpM9OUIJ81Pd3sLAiV_4y0a9k"];
+  [GMSPlacesClient provideAPIKey:@"AIzaSyCqBdweD7WqRWXNUUC0sYMWnXG1jfnPCRk"];
+  [GMSServices provideAPIKey:@"AIzaSyB5d--ow70_ZQqfsDdp2XSGX6AFg2tjhfU"];
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"LifeSuite"

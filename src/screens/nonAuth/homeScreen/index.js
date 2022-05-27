@@ -389,6 +389,7 @@ const HomeScreen = (props) => {
                     getMyJobs()
                 }
                 else {
+                    showToast(response.message,"error")
                     setLoading(false)
                 }
             }).catch(err => {
@@ -668,7 +669,7 @@ const HomeScreen = (props) => {
                                 getUserData()
                             } else {
                                 getGuestServices(false)
-                                
+
                             }
                         }} />}
                         scrollEnabled={scrollEnabled}

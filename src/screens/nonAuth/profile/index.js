@@ -1465,7 +1465,7 @@ const Profile = (props) => {
                                             onFocus: () => { setSelection({ start: homeAddressData?.address_line_1?.length }) }
                                         }}
                                         query={{
-                                            key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                            key: 'AIzaSyCqBdweD7WqRWXNUUC0sYMWnXG1jfnPCRk',
                                             language: 'en'
                                         }}
                                     />
@@ -1574,7 +1574,7 @@ const Profile = (props) => {
                                             onFocus: () => { setSelection1({ start: workAddressData?.address_line_1?.length }) }
                                         }}
                                         query={{
-                                            key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                            key: 'AIzaSyCqBdweD7WqRWXNUUC0sYMWnXG1jfnPCRk',
                                             language: 'en',
                                         }}
                                     />

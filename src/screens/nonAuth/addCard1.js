@@ -381,7 +381,7 @@ export default function AddCard1({ navigation, route }) {
                                     }
                                 }}
                                 query={{
-                                    key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                    key: 'AIzaSyCqBdweD7WqRWXNUUC0sYMWnXG1jfnPCRk',
                                     language: 'en',
                                 }}
                             />

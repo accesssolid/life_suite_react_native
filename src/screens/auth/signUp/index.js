@@ -83,16 +83,14 @@ const getKeyName = (key) => {
 const getNotificationType = (type) => {
     switch (type) {
         case 1:
-            return "Email"
-
+            return "All"
         case 2:
             return "Push Notification"
-
         case 3:
-            return "Text"
-
+            return "Email"
         case 4:
-            return "All"
+            return "Text"
+            
     }
 }
 const getNotiPref = (text) => {
@@ -1070,7 +1068,7 @@ const SignUpScreen = (props) => {
                             <View style={{}}>
                                 <DropDown
                                     title="Notification type"
-                                    item={["Email", "Push Notification", "Text", "All"]}
+                                    item={[ "All", "Push Notification","Email","Text"]}
                                     value={notificationType}
                                     onChangeValue={(index, value) => { setNotificationType(value) }}
                                     handleTextValue={true}
@@ -1163,7 +1161,7 @@ const SignUpScreen = (props) => {
                                         onFocus: () => { setSelection(null) }
                                     }}
                                     query={{
-                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        key: 'AIzaSyCqBdweD7WqRWXNUUC0sYMWnXG1jfnPCRk',
                                         language: 'en',
                                     }}
                                 />
@@ -1267,7 +1265,7 @@ const SignUpScreen = (props) => {
                                         },
                                     }}
                                     query={{
-                                        key: 'AIzaSyBRpW8iA1sYpuNb_gzYKKVtvaVbI-wZpTM',
+                                        key: 'AIzaSyCqBdweD7WqRWXNUUC0sYMWnXG1jfnPCRk',
                                         language: 'en',
                                     }}
                                 />
