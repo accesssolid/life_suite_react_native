@@ -127,6 +127,7 @@ const HomeScreen = (props) => {
                 type: 'post'
             }
             let response = await getApi(config)
+            console.log("REsponse Account details",response)
             if (response.status == true) {
                 if (response.data) {
                     if (response.data.email && response.data.details_submitted) {
@@ -140,9 +141,11 @@ const HomeScreen = (props) => {
             }
             else {
                 // showToast(response.message, 'danger')
+                setAllowedJobAdd(false)
             }
             // setAllowedJobAdd(false)
         } catch (err) {
+            setAllowedJobAdd(false)
             // return false
         }
     }

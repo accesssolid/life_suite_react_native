@@ -126,7 +126,7 @@ export default function CardList({ navigation, route }) {
                     Accept: 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded',
                     // Use the Stripe publishable key as Bearer
-                    Authorization: `Bearer pk_test_51JKvYmBlfwj1B9UxRZugpwJP7OSpAw22SqDhkvjaIR5Lz78NAwAiOU8SirA3Z3AGUJC8P5Uy0fqeETeWBxRgGyyr00ySqSSS3c`
+                    Authorization: `Bearer pk_live_51L1hXKK6emhk5Kqu1z5wm9SIx5X2aeAwiGgti3kY45ei2vdfhVlir4IyIOWWV1dlRDV8yrIeSCmbhe2u9OfA2o4N00HaTni0ov`
                 },
                 method: 'post',
                 body: card
