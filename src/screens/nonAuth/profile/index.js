@@ -684,12 +684,15 @@ const Profile = (props) => {
                 type: 'post'
             }
             let response = await getApi(config)
+            console.log(response)
             if (response.status) {
                 if (response.data) {
                     props.navigation.navigate("UserStack", { screen: "CustomWebView", params: { uri: response.data.url, change: true, connect_account_id: response.connect_account_id } })
                 } else {
                     showToast(response.message, 'danger')
                 }
+            }else{
+                showToast(response.message, 'danger')
             }
 
         } catch (err) {

@@ -36,10 +36,10 @@ const ServicesProvided = (props) => {
     const [activeItem, setActiveItem] = useState(null)
     const [extraData, setExtraDataa] = useState([])
     const [vehicleType, setVehicleType] = useState({
-        "created_at": "2021-11-29 08:24:07",
+        "created_at": "",
         "id": 3,
-        "name": "Car",
-        "service_variants_name": "Vehicle Type",
+        "name": "",
+        "service_variants_name": "",
         "status": 1,
         "updated_at": "2021-11-29 08:24:07",
         "variant_id": 4
@@ -532,7 +532,7 @@ const ServicesProvided = (props) => {
                     {activeItem == null && vehicle_types?.length > 0 && <View style={{}}>
                         <DropDown
                             handleTextValue={true}
-                            title={subService.id == 14 ? "Vehicle Type" : "Variant Type"}
+                            title={vehicleType?.service_variants_name}
                             item={vehicle_types.map(x => x.name)}
                             value={vehicleType.name}
                             onChangeValue={(index, value) => onChangeVehicleType(vehicle_types[index])}

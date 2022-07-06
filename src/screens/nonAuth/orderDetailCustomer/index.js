@@ -801,7 +801,7 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
     const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
     const [showVirtualData, setShowVirtualData] = React.useState(false)
     const navigation = useNavigation()
-
+    console.log(data)
     useEffect(() => {
         if (showVirtualData) {
             if (totalTime && totalVirtualTime) {
@@ -1007,14 +1007,14 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
 
                 </View>
             </View>
-            <View >
-                {Boolean(order_variant?.variant_title) && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>{order_variant?.variant_title}</Text>: {order_variant?.variant}</Text>}
+           {<View>
+                {Boolean(order_variant?.variant_title)&&order_variant?.variant_title!=""&& <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>{order_variant?.variant_title}</Text>: {order_variant?.variant}</Text>}
                 <View style={{}}>
                     {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Make</Text>: {order_variant?.make}</Text>}
                     {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Model</Text>: {order_variant?.model}</Text>}
                     {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Year</Text>: {order_variant?.year}</Text>}
                 </View>
-            </View>
+            </View>}
             {/* request data */}
             {showVirtualData && <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left", fontSize: 14, marginTop: 10 }]}>User Requested Order</Text>}
             {items?.map((i) => {

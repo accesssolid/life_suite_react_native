@@ -79,7 +79,7 @@ const ServiceItemUser = (props) => {
                                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                                 />
-                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{product.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12,flex:1, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{product.name}</Text>
                             </View>
                         )
                     })}

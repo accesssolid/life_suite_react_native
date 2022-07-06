@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, Modal, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TextInput, Modal, TouchableOpacity, Pressable, Keyboard } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -46,7 +46,7 @@ export default function RateAndCommentModal({ data, visible, setVisible, handleA
             transparent={true}
 
         >
-            <View style={{ flex: 1, backgroundColor: "#0005", justifyContent: "center" }}>
+            <Pressable onPress={()=>{Keyboard.dismiss() }} style={{ flex: 1, backgroundColor: "#0005", justifyContent: "center" }}>
                 <View style={{ paddingVertical: 10, backgroundColor: "white", marginHorizontal: 20, borderRadius: 20 }}>
                     <Text  maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 15, marginVertical: 10 }}>{id ? "Update" : "Add"} Rate and Comment</Text>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20 }}>
@@ -91,7 +91,7 @@ export default function RateAndCommentModal({ data, visible, setVisible, handleA
                         </TouchableOpacity>
                     </View>}
                 </View>
-            </View>
+            </Pressable>
         </Modal>
 
     )

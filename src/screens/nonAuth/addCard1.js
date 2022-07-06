@@ -116,7 +116,7 @@ export default function AddCard1({ navigation, route }) {
                     Accept: 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded',
                     // Use the Stripe publishable key as Bearer
-                    Authorization: `Bearer pk_live_51L1hXKK6emhk5Kqu1z5wm9SIx5X2aeAwiGgti3kY45ei2vdfhVlir4IyIOWWV1dlRDV8yrIeSCmbhe2u9OfA2o4N00HaTni0ov`
+                    Authorization: `Bearer pk_test_51L1hXKK6emhk5Kqu2a13gwkFzJ9RAb5CqyIJZg8CAUfS9fxl4zK8adMYXA3vA9vEGbhOh07X3Nsp1sFvn3UgxGWX00sGOgFYhw`
                 },
                 method: 'post',
                 body: card
