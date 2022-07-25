@@ -37,6 +37,13 @@
             {
               "client_id": "143754571862-nadjs9odve6p8agprpj62shcgih4ff83.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "143754571862-ebc5aom20noh1qdnrld87scblu09u8pd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.LifeSuite"
+              }
             }
           ]
         }

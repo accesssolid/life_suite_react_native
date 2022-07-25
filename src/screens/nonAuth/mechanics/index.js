@@ -265,15 +265,17 @@ const Mechanics = (props) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${access_token}`
         }
-
         let config = {
             headers: headers,
             data: JSON.stringify({ ...data, ...rangeData }),
             endPoint: '/api/providerListOrder',
             type: 'post'
         }
+       
         getApi(config)
             .then((response) => {
+                
+                console.log("Response",response)
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -293,6 +295,8 @@ const Mechanics = (props) => {
                     setLoading(false)
                 }
             }).catch(err => {
+                setLoading(false)
+            }).finally(()=>{
                 setLoading(false)
             })
     }
@@ -613,7 +617,7 @@ const Mechanics = (props) => {
                             {/* providers changed to dupProviders */}
                             {dupProviders.length > 0 ?
                                 dupProviders.map((item, index) => {
-                                    console.log(item)
+                                    console.log(JSON.stringify(item))
                                     let country = item?.current_address?.split(",")
                                     let countryName = country && country.length > 0 ? country[country.length - 1] : ""
                                     let x = item.timeDuration / 60
@@ -628,12 +632,12 @@ const Mechanics = (props) => {
                                     let showDistanceOrNot = false
                                     for (let z of item.item_list) {
                                         for (let p of z.products) {
-                                            if (p.item_products_name == "Per Mile") {
+                                            if (p.item_products_is_per_mile=="1") {
                                                 showDistanceOrNot = true
                                             }
                                             if (p.checked) {
                                                 let p_price = p.price
-                                                if (p.item_products_name == "Per Mile") {
+                                                if (p.item_products_is_per_mile=="1") {
                                                     p_price = Number(p.price) * lodash.round(Number(data.mile_distance), 2)
                                                 }
                                                 totalProductPrice = lodash.round(totalProductPrice, 2) + lodash.round(p_price, 2)
@@ -750,7 +754,7 @@ const Mechanics = (props) => {
                                                     {i.products.map((itemData, prIndex) => {
                                                         let productTitle = "(Product)"
                                                         let price = itemData?.price
-                                                        if (itemData.item_products_name == "Per Mile") {
+                                                        if (itemData.item_products_is_per_mile=="1") {
                                                             productTitle = `(Product) $${price}/Mile`
                                                             let m = 0
                                                             m = lodash.round(Number(data?.mile_distance), 2)

@@ -48,7 +48,7 @@ const Calendar = (props) => {
                 containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
-            <ScrollView contentContainerStyle={{ flexGrow: 1, flex: 1, backgroundColor: "white" }}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: "white" }}>
                 <View
                     style={styles.container}>
 

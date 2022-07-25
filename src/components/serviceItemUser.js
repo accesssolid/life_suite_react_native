@@ -66,7 +66,7 @@ const ServiceItemUser = (props) => {
                     checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
                     uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
                 />
-                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, right: 10, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{props.item.name}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, right: 10,flex:1, fontFamily: LS_FONTS.PoppinsRegular, alignSelf: 'center', marginLeft: '4%' }}>{props.item.name}</Text>
             </View>
             {props.activeMode && <View style={{ flex: 1 }}>
                 <ScrollView removeClippedSubviews={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>

@@ -110,8 +110,9 @@ const App = () => {
 
   useEffect(() => {
     // PushNotification.setApplicationIconBadgeNumber(10)
-    // getToken()
+    getToken()
     const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log(remoteMessage)
       try {
         console.log(typeof remoteMessage?.data?.is_blocked)
         if (remoteMessage?.data?.is_blocked == "true") {

@@ -185,7 +185,7 @@ const TimeFrame = props => {
                                                 estimated_price += Number(item.price)
                                                 for (let product of item?.products) {
                                                     if (product.checked) {
-                                                        if (product.item_products_name == "Per Mile") {
+                                                        if (product?.item_products_is_per_mile=="1") {
                                                             estimated_price += Number(product.price) * lodash.round(Number(orderPreviousData?.mile_distance), 2)
                                                         } else {
                                                             estimated_price += Number(product.price)

@@ -22,7 +22,6 @@ const Splash = (props) => {
     const user = useSelector(state => state.authenticate.user)
 
     useEffect(() => {
-        // checkAuth()
         BiometricsAuth()
     }, [])
 
@@ -37,7 +36,6 @@ const Splash = (props) => {
     }, [])
 
     const getUser = (id) => {
-        // alert()
         let headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -69,30 +67,20 @@ const Splash = (props) => {
                                 ],
                             })
                         );
-
-                        // props.navigation.navigate("MainDrawer")
-                        // if (response.data.user_role == 2) {
-                        //     props.navigation.navigate("UserStack")
-                        // } else {
-                        //     props.navigation.navigate("ProviderStack")
-                        // }
                     }, 2000);
                 }
                 else {
                     if (response.message !== "The user id field is required.") {
-                        // showToast(response.message, 'danger')
                     }
                     setLoader(false)
                 }
             })
             .catch(err => {
-                // setLoader(false)
-                // props.navigation.navigate('WelcomeScreen')
-
             })
     }
 
     const checkAuth = () => {
+       
         retrieveItem('user').then((data) => {
             if (data) {
                 dispatch(loginReducer(data))

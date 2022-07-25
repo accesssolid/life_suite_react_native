@@ -124,6 +124,8 @@ const LoginScreen = (props) => {
             })
             .catch(err => {
                 console.error(err)
+            }).finally(()=>{
+                setLoader(false)
             })
     }
 
