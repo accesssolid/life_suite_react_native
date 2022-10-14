@@ -35,7 +35,7 @@ import { updateBlockModal } from '../../../redux/features/blockModel'
 import BlockMessageModal from '../../../components/BlockMessageModal'
 import messaging from '@react-native-firebase/messaging';
 import { setVariantData } from '../../../redux/features/variantData';
-
+import lodash from 'lodash'
 const notification_color = [
     {
         title: "Requesting",
@@ -511,7 +511,7 @@ export default function OrderDetailUpdateCustomer(props) {
     const [showMessage, setShowMessage] = React.useState(false)
     const [showMessage1, setShowMessage1] = React.useState(false)
     const gotToForReorder = () => {
-        if (user?.user_status == 1 && data?.providers_user_status == 1&&data?.provider_provide_service>0) {
+        if (user?.user_status == 1 && data?.providers_user_status == 1 && data?.provider_provide_service > 0) {
             dispatch(setVariantData(order_variant))
             props.navigation.navigate("MechanicLocation", {
                 servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
@@ -528,9 +528,9 @@ export default function OrderDetailUpdateCustomer(props) {
             console.log(data?.providers_user_status)
             if (user?.user_status != 1) {
                 dispatch(updateBlockModal(true))
-            } else if(data?.providers_user_status != 1) {
+            } else if (data?.providers_user_status != 1) {
                 setShowMessage(true)
-            }else if(data?.provider_provide_service==0){
+            } else if (data?.provider_provide_service == 0) {
                 setShowMessage1(true)
             }
 
@@ -889,15 +889,14 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return return_value
+                return lodash.round(return_value,4)
             }
         } else {
             let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return return_value
-
+                return lodash.round(return_value,4)
             }
         }
     }
@@ -971,11 +970,25 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
         }
         return getTimeInHours(totalTime)
     }
+    const [showDistance, setShowDistance] = React.useState(false)
+    React.useEffect(() => {
+        console.log("Items", items.map(x => x.product))
+        for (let i of items) {
+            for (let p of i.product) {
+                if (p.item_products_is_per_mile == "1") {
+                    setShowDistance(true)
+                    break
+                }
+            }
+        }
+    }, [items])
+    // React.useEffect(()=>{
+    //     if(data?.)
+    // },[data])
     return (
         <Card containerStyle={{ borderRadius: 10, overflow: "hidden" }}>
             <View style={{ flexDirection: "row" }}>
                 <Pressable onPress={() => {
-                    console.log(data)
                     navigation.navigate("ProviderDetail", { providerId: data.provider_id, service: data?.order_items && (data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name) })
                 }} style={{ flex: 1, flexDirection: "row" }}>
                     <Avatar
@@ -988,7 +1001,7 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                         <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle]}>{country}</Text>
                         <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, {}]}>Rating: {data?.providers_rating} </Text>
-                            <Rating
+                            {Number(data?.providers_rating) > 0 ? <Rating
                                 readonly={true}
                                 imageSize={12}
                                 type="custom"
@@ -996,7 +1009,7 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                                 ratingColor="#04BFBF"
                                 tintColor="white"
                                 startingValue={1}
-                            />
+                            /> : <Text style={{ color: "#04BFBF" }}>-</Text>}
                         </View>
                     </View>
                 </Pressable>
@@ -1007,8 +1020,8 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
 
                 </View>
             </View>
-           {<View>
-                {Boolean(order_variant?.variant_title)&&order_variant?.variant_title!=""&& <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>{order_variant?.variant_title}</Text>: {order_variant?.variant}</Text>}
+            {<View>
+                {Boolean(order_variant?.variant_title) && order_variant?.variant_title != "" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>{order_variant?.variant_title}</Text>: {order_variant?.variant}</Text>}
                 <View style={{}}>
                     {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Make</Text>: {order_variant?.make}</Text>}
                     {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Model</Text>: {order_variant?.model}</Text>}
@@ -1039,6 +1052,10 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                     </View>
                 </>
             }
+            {showDistance && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Distance : </Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{data?.mile_distance ? lodash.round(data?.mile_distance, 2) : 0} miles</Text>
+            </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>

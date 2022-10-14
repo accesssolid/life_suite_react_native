@@ -32,7 +32,7 @@ import _ from 'lodash'
 import { order_types, buttons_customer, buttons_provider, buttons_types } from '../../../constants/globals'
 import DelayModal from '../../../components/delayModal';
 import messaging from '@react-native-firebase/messaging';
-
+import lodash from 'lodash'
 function generate_series(step, start_time) {
     const dt = moment(start_time, 'YYYY-MM-DD HH:mm').toDate()
     const dt_another = moment(start_time, 'YYYY-MM-DD').add(1, "day").toDate()
@@ -866,14 +866,14 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return return_value
+                return lodash.round(return_value,4)
             }
         } else {
             let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return return_value
+                return lodash.round(return_value,4)
 
             }
         }
@@ -905,7 +905,18 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
         }
         return getTimeInHours(totalTime)
     }
-
+    const [showDistance, setShowDistance] = React.useState(false)
+    React.useEffect(() => {
+        console.log("Items", items.map(x => x.product))
+        for (let i of items) {
+            for (let p of i.product) {
+                if (p.item_products_is_per_mile == "1") {
+                    setShowDistance(true)
+                    break
+                }
+            }
+        }
+    }, [items])
     return (
         <Card containerStyle={{ borderRadius: 10, overflow: "hidden" }}>
             <View style={{ flexDirection: "row" }}>
@@ -945,6 +956,10 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
                 {virtualOrdersItems?.map((i) => {
                     return (<OrderItemsDetail i={i} />)
                 })}
+            </View>}
+            {showDistance && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Distance : </Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{data?.mile_distance ? lodash.round(data?.mile_distance, 2) : 0} miles</Text>
             </View>}
             {checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Discount</Text>

@@ -284,11 +284,10 @@ const MechanicLocation = (props) => {
             "order_from_address": fromAddress,
             "mile_distance":total_distance
         }
-        
-        if (subService.location_type == 2 && data.order_placed_address.trim() == "") {
-            showToast("Please add to address")
-        } else if (data.order_from_address.trim() == "") {
+        if (subService.location_type == 2 && data.order_from_address.trim() == "") {
             showToast("Please add from address")
+        } else if (data.order_placed_address.trim() == "") {
+            showToast("Please add to address")
         } 
         else if (date.trim() == "") {
             setTimeout(() => {
