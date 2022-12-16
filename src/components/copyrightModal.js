@@ -82,14 +82,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     container: {
-        width: '90%',
+        width: '80%',
         alignSelf: 'center',
         padding: '4%',
         backgroundColor: LS_COLORS.global.white,
         borderRadius: 10,
         paddingVertical: 10,
         overflow: 'hidden',
-        height: '75%'
+        height: '50%'
     },
     title: {
         fontFamily: LS_FONTS.PoppinsBold,

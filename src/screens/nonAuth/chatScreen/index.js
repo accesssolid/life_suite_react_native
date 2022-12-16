@@ -467,7 +467,7 @@ const ChatScreen = (props) => {
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
                                                     }}>
-                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12,flex:1, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
+                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12,flex:1, color: "black", fontFamily: LS_FONTS.PoppinsRegular, }}>
                                                         {itemData.item.message}
                                                     </Text>
                                                 </View>
@@ -535,7 +535,7 @@ const ChatScreen = (props) => {
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
                                                     }}>
-                                                    <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, color: "white", fontFamily: LS_FONTS.PoppinsRegular, }}>
+                                                    <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, color: "black", fontFamily: LS_FONTS.PoppinsRegular, }}>
                                                         {itemData.item.message}
                                                     </Text>
                                                 </View>
@@ -601,7 +601,8 @@ const ChatScreen = (props) => {
                                                         width: '90%',
                                                         fontFamily: LS_FONTS.PoppinsRegular,
                                                         fontSize: 10,
-                                                        marginLeft: 5
+                                                        marginLeft: 5,
+                                                        color:"black"
                                                     }}>
                                                     {itemData.item.message}
                                                 </Text>
@@ -657,7 +658,8 @@ const ChatScreen = (props) => {
                                                         width: '90%',
                                                         fontFamily: LS_FONTS.PoppinsRegular,
                                                         fontSize: 10,
-                                                        marginLeft: 5
+                                                        marginLeft: 5,
+                                                        color:"black"
                                                     }}>
                                                     {itemData.item.message}
                                                 </Text>
@@ -793,10 +795,9 @@ const ChatScreen = (props) => {
                             <Image style={{ height: 30, width: 30,tintColor:LS_COLORS.global.green }} source={require('../../../assets/addChat.png')} />
                         </TouchableOpacity>
                         <TextInput
-                            style={styles.inputStyle}
+                            style={[styles.inputStyle,{color:"#9A9CA4"}]}
                             placeholder="Type your message"
                             autoCapitalize={'none'}
-                            color="#9A9CA4"
                             placeholderTextColor="#9A9CA4"
                             maxFontSizeMultiplier={1.5} 
                             autoCorrect={false}

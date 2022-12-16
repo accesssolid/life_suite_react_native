@@ -72,13 +72,15 @@ const Search = (props) => {
             })
     }
 
+
     const navigate = (item) => {
         if (item.data_type == "service") {
             props.navigation.navigate("SubServices", { service: { ...item, name: item.search_title, id: item.search_id } });
         } else if (item.data_type == "sub_service") {
-            props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.search_title, id: item.search_id, items: [], image: item.search_image, service_parent_id: item.search_parent_id } });
+            console.log(item)
+            props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.search_title,location_type:item.services_location_type, id: item.search_id, items: [], image: item.search_image, service_parent_id: item.search_parent_id } });
         } else if (item.data_type == "service_item") {
-            props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.parent_name, id: item.search_parent_id, items: [], image: item.parent_image, service_parent_id: item.search_parent_id } });
+            props.navigation.navigate("ServicesProvided", { subService: { ...item, name: item.parent_name,location_type:item.services_location_type, id: item.search_parent_id, items: [], image: item.parent_image, service_parent_id: item.search_parent_id } });
         } else {
         }
     }
@@ -98,7 +100,7 @@ const Search = (props) => {
                 containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
             />
             <View style={styles.container}>
-                <CustomTextInput placeholder="Search..." value={search} onChangeText={onChange} />
+                <CustomTextInput placeholder="I need help with" value={search} onChangeText={onChange} />
                 {
                     loading && <View style={{ height: 50 }}>
                         <Loader />

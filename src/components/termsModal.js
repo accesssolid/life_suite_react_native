@@ -9,21 +9,17 @@ import { getApi } from '../api/api';
 import { setAddServiceData } from '../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
 import { WebView } from "react-native-webview"
+import { role } from '../constants/globals';
 
 const TermsModal = (props) => {
     const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
     const [data, setData] = useState("")
+    const user = useSelector(state => state.authenticate?.user)
 
     useEffect(() => {
         getTerms()
-    }, [])
-
-    // var regex = /(<([^>]+)>)/ig
-    // const rename = data.replace(regex, "");
-    // console.log(rename)
-
-
+    }, [props])
     const getTerms = () => {
         let headers = {
             // Accept: "application/json",
@@ -32,11 +28,11 @@ const TermsModal = (props) => {
         }
         let formdata= new FormData()
        
-        // if(props.type){
-        //     formdata.append("type",props.type)
-        // }else{
+        if(user?.user_role==role.provider){
+            formdata.append("type","provider")
+        }else{
             formdata.append("type","customer")
-        // }
+        }
         let config = {
             headers: headers,
             endPoint: '/api/termsCondition',
@@ -104,8 +100,8 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.white,
         borderRadius: 10,
         paddingVertical: 10,
-        height: '75%',
-        width:"90%"
+        height: '50%',
+        width:"80%"
     },
     title: {
         fontFamily: LS_FONTS.PoppinsBold,

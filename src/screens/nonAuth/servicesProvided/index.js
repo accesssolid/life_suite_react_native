@@ -355,6 +355,7 @@ const ServicesProvided = (props) => {
             }
         });
 
+        console.log(subService)
         props.navigation.navigate("MechanicLocation", { servicedata: servicedata, subService: subService, extraData: extraData })
     }
 

@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const CustomButton = props => {
     return (
-        <TouchableOpacity activeOpacity={0.7} onPress={props.action}>
+        <TouchableOpacity activeOpacity={0.7} onPress={props.action} style={[props.containerStyle]}>
             <View style={{...styles.screen, ...props.customStyles}}>
                 <Text maxFontSizeMultiplier={props?.maxFont??1.6} style={{...styles.text, ...props.customTextStyles}} {...props.textProps}>{props.title}</Text>
             </View>

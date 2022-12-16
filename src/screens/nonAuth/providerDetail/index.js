@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react'
-import { View, Text, Dimensions, ScrollView, Image, Modal, Pressable, Linking } from 'react-native'
+import { View, Text, Dimensions, ScrollView, Image, Modal, Pressable, Linking, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../../components/header';
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
 const { width, height } = Dimensions.get("window")
-import { AirbnbRating } from 'react-native-ratings';
-import { useSelector } from 'react-redux';
+import { AirbnbRating, Rating } from 'react-native-ratings';
+import { useDispatch, useSelector } from 'react-redux';
 import { BASE_URL, getApi } from '../../../api/api';
 import Loader from '../../../components/loader';
 import moment from 'moment';
 import { FlatList } from 'react-native-gesture-handler';
 import DropDown from '../../../components/dropDown';
-const lodash = require("lodash")
+import { setFavList } from '../../../redux/features/favorites';
+
 export default function ProviderDetail(props) {
     const { providerId, service } = props.route?.params
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -26,6 +27,7 @@ export default function ProviderDetail(props) {
     const [currentSelectedImage, setCurrentSelectedImage] = React.useState(0)
     const [currentRating, setCurrentRating] = React.useState(0)
     const [sortBy, setSortBy] = React.useState(0)
+    const [is_fav, setIsFav] = React.useState(false)
     useEffect(() => {
         getProviderDetail()
         getRatings()
@@ -75,6 +77,7 @@ export default function ProviderDetail(props) {
         if (ratings.length > 0) {
             let ratingCopy = ratings.map(x => x.rating).filter(x => x != "null").map(Number)
             let totalAverage = ratingCopy.reduce((a, b) => a + b, 0) / ratingCopy.length
+            console.log(totalAverage)
             setAverageRating(totalAverage)
         }
     }, [ratings])
@@ -140,6 +143,75 @@ export default function ProviderDetail(props) {
         }
     }
 
+    const like = () => {
+        setLoader(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let user_data = {
+            "provider_id": providerId,
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: '/api/favouriteProviderAdd',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setIsFav(!is_fav)
+                }
+                else {
+                }
+
+            }).catch(err => {
+                console.log("error", err)
+            }).finally(() => {
+                setLoader(true)
+                getFavProvider()
+            })
+    }
+    const dispatch = useDispatch()
+    const favs = useSelector(state => state.favorites)?.list
+
+    useEffect(() => {
+        console.log("FAVS", favs)
+        if(favs.map(x=>x.id)?.includes(providerId)){
+            setIsFav(true)
+        }
+
+    }, [favs])
+ 
+    useEffect(()=>{
+        getFavProvider()
+    },[])
+    const getFavProvider = () => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let config = {
+            headers: headers,
+            endPoint: '/api/favouriteProviders',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    dispatch(setFavList([...response.data]))
+                }   
+                else {
+                    dispatch(setFavList([]))
+                }
+            }).catch(err => {
+            }).finally(()=>{
+                setLoader(false)
+            })
+    }
     function formatPhoneNumber(phoneNumberString) {
         if (phoneNumberString) {
             var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
@@ -176,7 +248,15 @@ export default function ProviderDetail(props) {
                 source={{ uri: BASE_URL + provider?.profile_image }}
                 style={{ width: 90, height: 90, borderWidth: 1, borderColor: LS_COLORS.global.green, zIndex: 1000, elevation: 10, top: -45, left: (width / 2) - 45, borderRadius: 45, backgroundColor: "gray" }}
             />
-            <View style={{ marginTop: -40 }}>
+            <TouchableOpacity onPress={() => { like(provider.id) }} style={{ height: 20, width: 25, marginTop: -40, justifyContent: "center", alignSelf: 'center' }}>
+                {is_fav
+                    ?
+                    <Image style={{ height: 18, width: 21 }} source={require('../../../assets/heartGreen.png')} resizeMode="cover" />
+                    :
+                    <Image style={{ height: 18, width: 21 }} source={require('../../../assets/whiteHeart.png')} resizeMode="cover" />
+                }
+            </TouchableOpacity>
+            <View style={{ marginTop: -0 }}>
                 <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: LS_COLORS.global.green }}>{provider?.first_name}</Text>
                 <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black }}>{provider?.tagline}</Text>
             </View>
@@ -289,14 +369,15 @@ export default function ProviderDetail(props) {
 
                         </View>
                     </View>
-                    <AirbnbRating
+                    <Rating
                         count={5}
-                        defaultRating={average_rating}
-                        selectedColor={LS_COLORS.global.green}
+                        startingValue={average_rating}
+                        type="custom"
+                        ratingColor={LS_COLORS.global.green}
+                        // tintColor={LS_COLORS.global.green}
                         showRating={false}
-                        size={20}
-
-                        isDisabled={true}
+                        imageSize={30}
+                        readonly={true}
                     />
 
                     {(ratings.length == 0 || ratings.filter(rate => {
@@ -316,8 +397,8 @@ export default function ProviderDetail(props) {
                         }
                         return (
                             <View style={{ marginTop: 20 }}>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" ,width:"100%"}}>
-                                    <View style={{ flexDirection: "row", alignItems: "center",width:"50%" }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                                    <View style={{ flexDirection: "row", alignItems: "center", width: "50%" }}>
                                         <Text maxFontSizeMultiplier={1.3} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: "black" }}>{x.customers_first_name} {x.customers_last_name}</Text>
                                         <AirbnbRating
                                             count={1}

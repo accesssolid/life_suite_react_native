@@ -51,14 +51,14 @@ const ServicesProvided = (props) => {
     const itemRef = useRef(null)
 
     useEffect(() => {
-        console.log("subService",subService)
+        console.log("subService", subService)
         setServicesData([])
         getServiceItems()
     }, [])
 
     useEffect(() => {
         let unsubscriber = messagging().onMessage((remoteMessage) => {
-            console.log("Remote Message", remoteMessage,subService.id)
+            console.log("Remote Message", remoteMessage, subService.id)
             if (remoteMessage?.data?.refresh_sub_service == subService.id) {
                 getServiceItems()
             }
@@ -146,16 +146,16 @@ const ServicesProvided = (props) => {
                     return {
                         "item_id": item.id,
                         "price": "",
-                        "time_duration_h": "",
-                        "time_duration_m": "",
+                        "time_duration_h": "00",
+                        "time_duration_m": "00",
                         "variant_data": item.variant_data
                     }
                 } else {
                     return {
                         "item_id": item.id,
                         "price": "",
-                        "time_duration_h": "",
-                        "time_duration_m": "",
+                        "time_duration_h": "00",
+                        "time_duration_m": "00",
                     }
                 }
             })
@@ -195,8 +195,8 @@ const ServicesProvided = (props) => {
                     arr.push({
                         "item_id": item.id,
                         "price": "",
-                        "time_duration_h": "",
-                        "time_duration_m": "",
+                        "time_duration_h": "00",
+                        "time_duration_m": "00",
                         "variant_data": item.variant_data
                     })
                 }
@@ -222,8 +222,8 @@ const ServicesProvided = (props) => {
                     arr.push({
                         "item_id": item.id,
                         "price": item.price ?? "",
-                        "time_duration_h": "",
-                        "time_duration_m": "",
+                        "time_duration_h": "00",
+                        "time_duration_m": "00",
                     })
                 }
             })
@@ -637,70 +637,96 @@ const ServicesProvided = (props) => {
     }
     const saveRequest = () => {
         let hasSubProducts = false
-        const selectedItemsss = itemListMaster.filter(item => selectedItems.includes(item.id))
-        console.log(selectedItemsss)
+        const selectedItemsss = itemListMaster?.filter(item => selectedItems?.includes(item.id))
+        let isLessThan=false
         selectedItemsss.forEach(element => {
-            if (element.products.length > 0 && String(element?.is_product_mandatory) == "1") {
+            if (element?.products?.length > 0 && String(element?.is_product_mandatory) == "1") {
                 hasSubProducts = true
             }
         });
 
-        if (hasSubProducts && selectedProducts.length == 0 && selectedNewProducts.length == 0) {
+        if (hasSubProducts && selectedProducts?.length == 0 && selectedNewProducts?.length == 0) {
             return showToast("Please select at least one item")
         }
 
         let isValidData = false
+        let validhrmm=true
         if (variants.length > 0) {
-            servicesData.filter(item => item.variant_data == selectedVariant).forEach((itemm, index) => {
-                if (selectedItems.includes(itemm.item_id)) {
-                    if (itemm.price.trim() !== ""
+            servicesData?.filter(item => item?.variant_data == selectedVariant).forEach((itemm, index) => {
+                if (selectedItems?.includes(itemm?.item_id)) {
+                    if (itemm?.price?.trim() !== ""
                         // && itemm.time_duration_h.trim() !== "" 
-                        && itemm.time_duration_m.trim() !== "") {
+                        && itemm?.time_duration_m?.trim() !== "") {
                         isValidData = true
                     } else {
                         isValidData = false
+                    }
+                    if((itemm?.time_duration_m?.trim()=="00"||itemm?.time_duration_m?.trim()=="")&&(itemm?.time_duration_h?.trim()=="00"||itemm?.time_duration_h?.trim()=="")){
+                        validhrmm = false
+                    }
+                    if(Number(String(itemm?.price)?.match(/[\d.]+/,""))<0.5){
+                        isLessThan=true
                     }
                 }
             })
 
         } else {
-            servicesData.forEach((itemm, index) => {
-                if (selectedItems.includes(itemm.item_id)) {
+            servicesData?.forEach((itemm, index) => {
+                if (selectedItems?.includes(itemm?.item_id)) {
                     console.log("itemm =>> ", itemm)
-                    if (itemm.price.trim() !== ""
+                    if (itemm?.price.trim() !== ""
                         // && itemm.time_duration_h.trim() !== "" 
-                        && itemm.time_duration_m.trim() !== "") {
+                        && itemm?.time_duration_m.trim() !== "") {
                         isValidData = true
                     } else {
                         isValidData = false
                     }
+                    if((itemm?.time_duration_m?.trim()=="00"||itemm?.time_duration_m?.trim()=="")&&(itemm?.time_duration_h?.trim()=="00"||itemm?.time_duration_h?.trim()=="")){
+                        validhrmm = false
+                    }
+                    if(Number(String(itemm?.price).match(/[\d.]+/,""))<0.5){
+                        isLessThan=true
+                    }
                 }
             })
         }
-        setServicesData(servicesData.map(item => {
-            if (item?.time_duration_h.trim() == "" && selectedItems.includes(item.item_id)) {
+        setServicesData(servicesData?.map(item => {
+            if (item?.time_duration_h?.trim() == "" && selectedItems?.includes(item?.item_id)) {
                 return ({
                     ...item,
-                    time_duration_h: "0"
+                    time_duration_h: "00",
+                    
                 })
             }
             return item
         }))
         let selected = getSelectedProducts()
-        productsData.filter(item => selected.includes(item.id)).forEach(element => {
-            if (element.price.trim() == "") {
+        productsData?.filter(item => selected?.includes(item?.id))?.forEach(element => {
+            if (element?.price?.trim() == "") {
                 isValidData = false
+            }
+            if(Number(String(element?.price).match(/[\d.]+/,""))<0.5){
+                isLessThan=true
             }
         });
 
         let selectedNew = getSelectedNewProducts()
-
-        newProductsData.filter(item => selectedNew.includes(item.id)).forEach(element => {
-            if (element.price.trim() == "" || element.name.trim() == "") {
+       
+        newProductsData?.filter(item => selectedNew?.includes(item?.id))?.forEach(element => {
+            if (element?.price?.trim() == "" || element?.name?.trim() == "") {
                 isValidData = false
+            }
+            if(Number(String(element?.price)?.match(/[\d.]+/,""))<0.5){
+                isLessThan=true
             }
         });
 
+        if(isLessThan){
+            return showToast("Minimum be at least $.50")
+        }
+        if(!validhrmm){
+            return showToast("please enter time")
+        }
         if (!isValidData) {
             return showToast("Please enter data for selected services")
         } else {
@@ -1013,14 +1039,13 @@ const ServicesProvided = (props) => {
 
                 }
             })
-            console.log("New SErvices", productsData, newProductsData)
             let json_data = {
                 products: [...productsData].filter(x => x.name != "" && x.price != "" && x.price != "$").map(x => ({ item_product_id: x.id, price: x.price })),
                 new_products: [...newProductsData].filter(x => !String(x?.item_id).startsWith("new")).filter(x => x.name != "" && x.price != "" && x.price != "$"),
                 services: [...services],
                 new_services: [...new_services]
             }
-            console.log(JSON.stringify(json_data))
+            // console.log(JSON.stringify(json_data))
             // setLoading(false)
             // return 
 
@@ -1122,35 +1147,33 @@ const ServicesProvided = (props) => {
                         </View>
                     </View>}
                     <Content showsVerticalScrollIndicator={false}>
-                        {activeItem !== null &&
-                            <ServiceItem
-                                ref={itemRef}
-                                item={activeItem}
-                                index={activeIndex}
-                                onCheckPress={() => onPressItem(activeIndex, activeItem)}
-                                isSelected={selectedItems.includes(activeItem.id)}
-                                setText={setText}
-                                setProductText={setProductText}
-                                setNewProductText={setNewProductText}
-                                serviceItem={variants.length > 0 ? servicesData.find(item => item.variant_data == selectedVariant && item.item_id == activeItem.id) : servicesData.find(item => item.item_id == activeItem.id)}
-                                subService={subService}
-                                showInputs
-                                products={productsData.filter(item => item.item_id == activeItem.id)}
-                                newProducts={newProductsData.filter(item => item.item_id == activeItem.id)}
-                                selectedProducts={getSelectedProducts()}
-                                selectedNewProducts={getSelectedNewProducts()}
-                                onPressProduct={(item) => onPressProduct(item)}
-                                onPressNewProduct={(item) => onPressNewProduct(item)}
-                                onSelectOther={onSelectOther}
-                                isOtherSelected={isOtherSelected}
-                                removeNewproduct={removeNewproduct}
-                                addNewProduct={addNewProduct}
-                                removeNonGlobalItem={removeNonGlobalItem}
-                            />}
+                        {activeItem !== null && <ServiceItem
+                            ref={itemRef}
+                            item={activeItem}
+                            index={activeIndex}
+                            onCheckPress={() => onPressItem(activeIndex, activeItem)}
+                            isSelected={selectedItems.includes(activeItem.id)}
+                            setText={setText}
+                            setProductText={setProductText}
+                            setNewProductText={setNewProductText}
+                            serviceItem={variants.length > 0 ? servicesData.find(item => item?.variant_data == selectedVariant && item?.item_id == activeItem?.id) : servicesData.find(item => item?.item_id == activeItem?.id)}
+                            subService={subService}
+                            showInputs
+                            products={productsData?.filter(item => item?.item_id == activeItem?.id)}
+                            newProducts={newProductsData?.filter(item => item?.item_id == activeItem?.id)}
+                            selectedProducts={getSelectedProducts()}
+                            selectedNewProducts={getSelectedNewProducts()}
+                            onPressProduct={(item) => onPressProduct(item)}
+                            onPressNewProduct={(item) => onPressNewProduct(item)}
+                            onSelectOther={onSelectOther}
+                            isOtherSelected={isOtherSelected}
+                            removeNewproduct={removeNewproduct}
+                            addNewProduct={addNewProduct}
+                            removeNonGlobalItem={removeNonGlobalItem}
+                        />}
                         {activeItem == null && itemList && itemList.length > 0 &&
                             <>
                                 {itemList.map(((item, index) => {
-                                    console.log("data", item)
                                     return (
                                         <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
                                             <View style={{ width: width * 0.70 }}>
@@ -1158,15 +1181,19 @@ const ServicesProvided = (props) => {
                                                     key={index}
                                                     item={item}
                                                     index={index}
-                                                    onCheckPress={() => { onPressItem(index, item) }}
+                                                    onCheckPress={() => {
+                                                        onPressItem(index, item)
+                                                    }}
                                                     isSelected={selectedItems.includes(item.id)}
                                                 />
                                             </View>
-                                            {item.list_type == "private" && <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
-                                                removeServiceData(item.id)
-                                            }}>Remove</Text>}
-                                        </View>
-                                    )
+                                            {item.list_type == "private" && <Text
+                                                maxFontSizeMultiplier={1.2}
+                                                style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }}
+                                                onPress={() => {
+                                                    removeServiceData(item.id)
+                                                }}>Remove</Text>}
+                                        </View>)
                                 }))}
                                 {newServices.map((item, index) => {
                                     return (
@@ -1176,7 +1203,9 @@ const ServicesProvided = (props) => {
                                                     key={index}
                                                     item={item}
                                                     index={index}
-                                                    onCheckPress={() => { onPressItem(index, item) }}
+                                                    onCheckPress={() => {
+                                                        onPressItem(index, item)
+                                                    }}
                                                     isSelected={selectedItems.includes(item.id)}
                                                 />
                                             </View>

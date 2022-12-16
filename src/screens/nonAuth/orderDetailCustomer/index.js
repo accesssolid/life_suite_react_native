@@ -36,6 +36,7 @@ import BlockMessageModal from '../../../components/BlockMessageModal'
 import messaging from '@react-native-firebase/messaging';
 import { setVariantData } from '../../../redux/features/variantData';
 import lodash from 'lodash'
+import { setFavList } from '../../../redux/features/favorites';
 const notification_color = [
     {
         title: "Requesting",
@@ -100,7 +101,7 @@ export default function OrderDetailUpdateCustomer(props) {
 
     const [whoCancelled, setWhoCancelled] = React.useState({})
     const [order_variant, setOrderVariant] = React.useState({})
-
+    
     React.useEffect(() => {
         // props.navigation.navigate("OrderSuspend", { item: data })
         if (data?.order_logs?.length > 0) {
@@ -625,6 +626,75 @@ export default function OrderDetailUpdateCustomer(props) {
         return text
     }
     const [rateType, setRateType] = React.useState("rate")
+    const [is_fav,setIsFav]=React.useState(false)
+    const like = () => {
+        setLoading(true)
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let user_data = {
+            "provider_id": data?.provider_id,
+        }
+        let config = {
+            headers: headers,
+            data: JSON.stringify({ ...user_data }),
+            endPoint: '/api/favouriteProviderAdd',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    setIsFav(!is_fav)
+                }
+                else {
+                }
+
+            }).catch(err => {
+                console.log("error", err)
+            }).finally(() => {
+                setLoading(true)
+                getFavProvider()
+            })
+    }
+    const favs = useSelector(state => state.favorites)?.list
+    
+    useEffect(() => {
+        console.log("FAVS", favs)
+        if(favs.map(x=>x.id)?.includes(data?.provider_id)){
+            setIsFav(true)
+        }
+
+    }, [favs,data])
+ 
+    useEffect(()=>{
+        getFavProvider()
+    },[])
+    const getFavProvider = () => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let config = {
+            headers: headers,
+            endPoint: '/api/favouriteProviders',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+                    dispatch(setFavList([...response.data]))
+                }   
+                else {
+                    dispatch(setFavList([]))
+                }
+            }).catch(err => {
+            }).finally(()=>{
+                setLoading(false)
+            })
+    }
     return (
         <View style={{ flex: 1, backgroundColor: LS_COLORS.global.white }}>
             <StatusBar
@@ -697,6 +767,13 @@ export default function OrderDetailUpdateCustomer(props) {
 
                         {/* <TextReasonForCancel data= /> */}
                         {textShowWithRed !== "" && <Text maxFontSizeMultiplier={1.5} style={[styles.saveText, { color: "red", marginTop: 10 }]}>{textShowWithRed}</Text>}
+                        <TouchableOpacity
+                        onPress={() => {
+                            like()
+                        }}
+                        style={[styles.save, { marginTop: 10,width:"90%"}]}>
+                        <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>{is_fav?"Remove Provider from Favorites":"Add Provider to Favorites"}</Text>
+                    </TouchableOpacity>
                     </ScrollView>
                     {/* lowerButton */}
                     <GetButtons
@@ -709,6 +786,7 @@ export default function OrderDetailUpdateCustomer(props) {
                         openReorderModal={() => setReorderModal(true)}
                         openBlockModal={() => setBlockModal(true)}
                     />
+                  
                 </View>
             </SafeAreaView >
             <CancelModal
@@ -872,6 +950,9 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
         if (minute % 60 !== 0) {
             d += ` ${parseInt(minute % 60)} Mins`
         }
+        if(Number(minute)==0){
+            return("--")
+        }
         return `${d}`
     }
 
@@ -889,14 +970,14 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return lodash.round(return_value,4)
+                return lodash.round(return_value,2)
             }
         } else {
             let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return lodash.round(return_value,4)
+                return lodash.round(return_value,2)
             }
         }
     }
@@ -998,6 +1079,8 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                     />
                     <View style={{ marginLeft: 10, justifyContent: "center", flex: 1.3 }}>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
+                        {Boolean(data?.providers_business_name)&&<Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 12 }]}>{data?.providers_business_name}</Text>}
+
                         <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle]}>{country}</Text>
                         <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
                             <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, {}]}>Rating: {data?.providers_rating} </Text>
@@ -1320,7 +1403,16 @@ const GetButtons = ({ data, openCancelModal, openCancelSearchModal, submit, open
                 submit(order_types.update_accepted)
                 break
             case buttons_types.reject:
-                submit(order_types.update_reject)
+                Alert.alert("Cancel","Do you want to cancel the update order?",[
+                    {
+                        text:"No"
+                    },{
+                    text:"Yes",
+                    onPress:()=>{
+                        submit(order_types.update_reject)
+                    }
+                }])
+                //
                 break
             case buttons_types.delay_accept:
                 submit(order_types.delay_request_accept)

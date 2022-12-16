@@ -851,6 +851,9 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
         if (minute % 60 !== 0) {
             d += ` ${parseInt(minute % 60)} Mins`
         }
+        if(Number(minute)==0){
+            return("--")
+        }
         return `${d}`
     }
     const user = useSelector(state => state.authenticate.user)
@@ -866,14 +869,14 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return lodash.round(return_value,4)
+                return lodash.round(return_value,2)
             }
         } else {
             let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return lodash.round(return_value,4)
+                return lodash.round(return_value,2)
 
             }
         }
@@ -1233,7 +1236,7 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
                 openRatingModal()
                 break
             case buttons_types.cancel_update:
-                Alert.alert("Cancel", "Do you want to cancel order update request?", [
+                Alert.alert("Cancel", "Do you want to cancel update order?", [
                     {
                         text: "No"
                     },

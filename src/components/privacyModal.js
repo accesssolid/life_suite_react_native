@@ -9,14 +9,16 @@ import { getApi } from '../api/api';
 import { setAddServiceData } from '../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
 import { WebView} from "react-native-webview"
+import { role } from '../constants/globals';
 const PrivacyModal = (props) => {
     const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
     const [data, setData] = useState("")
+    const user = useSelector(state => state.authenticate?.user)
 
     useEffect(() => {
         getPrivacy()
-    }, [])
+    }, [props])
 
     // var regex = /(<([^>]+)>)/ig
     // const rename = data.replace(regex, "");
@@ -30,8 +32,8 @@ const PrivacyModal = (props) => {
             // "Authorization": `Bearer ${access_token}`
         }
         let formdata= new FormData()
-        if(props.type){
-            formdata.append("type",props.type)
+        if(user?.user_role==role.provider){
+            formdata.append("type","provider")
         }else{
             formdata.append("type","customer")
         }
@@ -95,14 +97,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     container: {
-        width: '90%',
+        width: '80%',
         alignSelf: 'center',
         padding: '4%',
         backgroundColor: LS_COLORS.global.white,
         borderRadius: 10,
         paddingVertical: 10,
         overflow: 'hidden',
-        height: '75%'
+        height: '50%'
     },
     title: {
         fontFamily: LS_FONTS.PoppinsBold,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, FlatList, Dimensions } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, FlatList, Dimensions, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -20,6 +20,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/core';
 import { setAddServiceMode } from '../../../redux/features/services';
 import { role } from '../../../constants/globals';
+import { setFavList } from '../../../redux/features/favorites';
 
 const Favourites = (props) => {
     const dispatch = useDispatch()
@@ -141,6 +142,7 @@ const Favourites = (props) => {
                 if (response.status == true) {
                     setLoading(false)
                     setProvider([...response.data])
+                    dispatch(setFavList([...response.data]))
                 }
                 else {
                     setLoading(false)
@@ -238,14 +240,27 @@ const Favourites = (props) => {
                     <Content showsVerticalScrollIndicator={false} >
                         {provider.map((item, index) => {
                             return (
-                                <Card key={index} style={{ flexDirection: 'row', marginBottom: 20, alignItems: 'center', height: 70, paddingHorizontal: 10, borderRadius: 12 }}>
-                                    <View style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
+                                <Pressable key={index+""+item?.id} onPress={()=>{
+                                    // navigation.navigate("UserStack",{screen:"ProviderDetail",params:{providerId:item.id}})
+                                    navigation.navigate("OrderHistoryCustomer", { user1: item.id })
+
+                                }}>
+                                <Card  style={{ flexDirection: 'row', marginBottom: 20, alignItems: 'center', height: 70, paddingHorizontal: 10, borderRadius: 12 }}>
+                                    <Pressable onPress={()=>{
+                                        navigation.navigate("UserStack",{screen:"ProviderDetail",params:{providerId:item.id}})
+                                    }} style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
                                         <Image source={item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
-                                    </View>
-                                    <View style={{ flex: 1, paddingLeft: 10, justifyContent: 'center' }}>
+                                    </Pressable>
+                                    <Pressable 
+                                    onPress={()=>{
+                                        navigation.navigate("UserStack",{screen:"ProviderDetail",params:{providerId:item.id}})
+
+                                    }}
+                                    style={{  paddingLeft: 10, justifyContent: 'center' }}>
                                         <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
                                         <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>{item.last_name}</Text>
-                                    </View>
+                                    </Pressable>
+                                    <View style={{flex:1}} />
                                     <View>
                                         {/* <Text maxFontSizeMultiplier={1.5}>Price: $25/hr</Text> */}
                                         <Text maxFontSizeMultiplier={1.5}>Rating: {parseInt(item.rating)}</Text>
@@ -254,6 +269,7 @@ const Favourites = (props) => {
                                         <Image source={require('../../../assets/heartGreen.png')} style={{ height: 25, width: 25 }} resizeMode="contain" />
                                     </TouchableOpacity>
                                 </Card>
+                                </Pressable>
                             )
                         })}
                     </Content>

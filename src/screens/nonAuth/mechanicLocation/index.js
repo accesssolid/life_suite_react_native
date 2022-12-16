@@ -26,7 +26,7 @@ import moment from 'moment';
 import SureModal from '../../../components/sureModal';
 import Loader from '../../../components/loader';
 import * as RNLocalize from "react-native-localize";
-
+import lodash from 'lodash'
 // #liahs_before_providers
 
 const MechanicLocation = (props) => {
@@ -48,31 +48,10 @@ const MechanicLocation = (props) => {
         console.log("Params", props.route.params)
     }, [props.route.params])
 
-    React.useEffect(() => {
-        if (orderData) {
-            setIsLoadCurrentLocation(false)
-            if (orderData.order_from_address) {
-                setFromAddress(orderData.order_from_address)
-            }
-            if (orderData.order_from_lat && orderData.order_from_long) {
-                setFromCoordinates({
-                    latitude: Number(orderData.order_from_lat),
-                    longitude: Number(orderData.order_from_long),
-                })
-            }
-            if (orderData.order_placed_address) {
-                setToAddress(orderData.order_placed_address)
-            }
-            if (orderData.order_placed_lat && orderData.order_placed_long) {
-                setToCoordinates({
-                    latitude: Number(orderData.order_placed_lat),
-                    longitude: Number(orderData.order_placed_long),
-                })
-            }
-        } else {
-            setIsLoadCurrentLocation(true)
-        }
-    }, [orderData])
+    const [currentLocation,setCurrentLocation]=React.useState({
+        latitude: 37.78825,
+        longitude: -122.4324,
+    })
 
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
@@ -89,21 +68,56 @@ const MechanicLocation = (props) => {
         longitude: -122.4324,
     })
 
-    useEffect(() => {
-        setActiveCoordinates(fromCoordinates)
-    }, [fromCoordinates])
+    // useEffect(() => {
+    //     setActiveCoordinates(fromCoordinates)
+    // }, [fromCoordinates])
 
     useEffect(() => {
-        setActiveCoordinates(toCoordinates)
-    }, [toCoordinates])
+        if(toCoordinates?.latitude==37.78825&&toCoordinates.longitude==-122.4324){
+            setActiveCoordinates(currentLocation)
+        }else{
+            setActiveCoordinates(toCoordinates)
+        }
+        
+    }, [toCoordinates,currentLocation])
 
     useEffect(() => {
         // subService.location_type : 2 - Both , 1 - From only
-        if (isLoadCurrentLocation) {
+        if(isLoadCurrentLocation){
             getLocationPermission()
         }
+           
+        
 
     }, [isLoadCurrentLocation])
+
+
+    React.useEffect(() => {
+        if (orderData) {
+            // alert( orderData.order_from_long)
+            setIsLoadCurrentLocation(false)
+            if (orderData.order_from_address) {
+                setFromAddress(orderData.order_from_address)
+            }
+            if (orderData.order_from_lat|| orderData.order_from_long) {
+                setFromCoordinates({
+                    latitude: Number(orderData.order_from_lat),
+                    longitude: Number(orderData.order_from_long),
+                })
+            }
+            if (orderData.order_placed_address) {
+                setToAddress(orderData.order_placed_address)
+            }
+            if (orderData.order_placed_lat|| orderData.order_placed_long) {
+                setToCoordinates({
+                    latitude: Number(orderData.order_placed_lat),
+                    longitude: Number(orderData.order_placed_long),
+                })
+            }
+        } else {
+            setIsLoadCurrentLocation(true)
+        }
+    }, [orderData])
 
     var rad = function(x) {
         return x * Math.PI / 180;
@@ -178,11 +192,18 @@ const MechanicLocation = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-                setFromAddress(results[0].address)
-                setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                 setFromAddress(results[0].address)
+                    setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                    setCurrentLocation({latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+             
+             
+               
             })
             .catch((error) => console.log(error.message));
     }
+
+    const [total_distance,setTotalDistance]=React.useState(0)
+
 
     const reOrder = async (start_time, end_time) => {
         setLoading(true)
@@ -203,7 +224,8 @@ const MechanicLocation = (props) => {
                 "order_from_lat": fromCoordinates.latitude,
                 "order_from_long": fromCoordinates.longitude,
                 "order_from_address": fromAddress,
-                "timezone":RNLocalize.getTimeZone()
+                "timezone":RNLocalize.getTimeZone(),
+                "mile_distance": lodash.round(total_distance,2)
             }),
             endPoint: "/api/reorderCreate",
             type: 'post'
@@ -224,15 +246,15 @@ const MechanicLocation = (props) => {
 
             })
     }
-    const [total_distance,setTotalDistance]=React.useState(0)
 
-    React.useEffect(() => {
-        fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyA8vPYceBJX2Mt43IKubB1Gpa2EcZ6Mg_g`).then(res => {
+    const getDistanceApi=(to,from)=>{
+        fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${to.latitude}%2C${to.longitude}&origins=${from.latitude}%2C${from.longitude}&key=AIzaSyA8vPYceBJX2Mt43IKubB1Gpa2EcZ6Mg_g`).then(res => {
             return res.json()
         }).then(res => {
             if (res?.rows[0]) {
                 let element = res.rows[0].elements[0]
-                if(element?.distance?.value){
+                // alert(element?.distance?.value)
+                if(element?.distance?.value>=0){
                     setTotalDistance(element?.distance?.value*0.000621371)
                 }
                console.log("Element",element)
@@ -240,6 +262,12 @@ const MechanicLocation = (props) => {
         }).catch(err => {
             console.error(err)
         })
+    }
+
+
+    React.useEffect(() => {
+        // alert(JSON.stringify(toCoordinates))
+        getDistanceApi(toCoordinates,fromCoordinates)
     }, [toCoordinates, fromCoordinates])
 
     const submit = () => {
@@ -261,6 +289,7 @@ const MechanicLocation = (props) => {
             //     showToast("Start Time and End Time Cannot Be Same")
             //     return
             // }
+            
             reOrder(moment(date).format("YYYY-MM-DD") + " " + moment(startTime).format('HH:mm') + ":00", moment(date).format("YYYY-MM-DD") + " " + moment(endTime).format('HH:mm') + ":00")
             return
         }
@@ -449,7 +478,7 @@ const MechanicLocation = (props) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <Text  maxFontSizeMultiplier={1.5} style={{marginTop: "5%",marginLeft:24, fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>My available time</Text>
+                    <Text  maxFontSizeMultiplier={1.5} style={{marginTop: "5%",marginLeft:24, fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>My available start time between:</Text>
                     <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "1%" }}>
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>

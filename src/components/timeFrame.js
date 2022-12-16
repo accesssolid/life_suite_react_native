@@ -7,7 +7,10 @@ import {
     TouchableOpacity,
     Text,
     Image,
-    TextInput
+    TextInput,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform
 } from 'react-native';
 import { Card } from 'native-base';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -213,7 +216,7 @@ const TimeFrame = props => {
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Time: {time_format}</Text>
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Location: {location}</Text>
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${lodash.round(estimated_price, 2)}</Text>
-                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 13, marginTop: "5%" }}>My Available Time</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 13, marginTop: "5%" }}>My available start time between:</Text>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "100%" }}>
                                     <View style={{ width: "50%", minHeight: 60 }} >
                                         <Text maxFontSizeMultiplier={1.5}>From</Text>
@@ -305,7 +308,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
     })
     const [my_location, setMyLocation] = React.useState(false)
     const handleSave = () => {
-        getFilteredData({ ...rating, ...time }, my_location)
+        getFilteredData({ ...rating, ...time,...price }, my_location)
         setVisible(false)
     }
     return (
@@ -314,14 +317,17 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
             animationType="fade"
             transparent={true}
         >
-            <Pressable onPress={() => setVisible(false)} style={styles.modalScreen}>
+            <Pressable onPress={() => setVisible(false)}  style={{flex:1}}>
+            <KeyboardAvoidingView behavior={Platform.OS=="android"?"none":"padding"} style={styles.modalScreen}>
                 <Card style={{
                     backgroundColor: 'white',
                     width: "95%",
                     borderRadius: 10,
                     padding: 10,
+                    // maxHeight:"80%"
                 }}>
                     <Pressable>
+                        <ScrollView>
                         <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Filter</Text>
                         <View style={{ marginTop: "10%" }}>
                             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -376,7 +382,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                             range_start_price: t,
                                             range_end_price: price.range_end_price
                                         })
-                                    }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
+                                    }} keyboardType="numeric" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
                                 </View>
                                 <Text maxFontSizeMultiplier={1.5}>  -  </Text>
                                 <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
@@ -386,7 +392,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                             range_start_price: price.range_start_price,
                                             range_end_price: t
                                         })
-                                    }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
+                                    }} keyboardType="numeric" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
                                 </View>
                             </View>
                             <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10, marginBottom: 5 }}>Time (minute): </Text>
@@ -397,7 +403,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                             range_start_time: t,
                                             range_end_time: time.range_end_time
                                         })
-                                    }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
+                                    }} keyboardType="number-pad" returnKeyType='done' style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
                                 </View>
                                 <Text maxFontSizeMultiplier={1.5}>  -  </Text>
                                 <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
@@ -406,7 +412,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                             range_start_time: time.range_start_time,
                                             range_end_time: t
                                         })
-                                    }} keyboardType="number-pad" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
+                                    }} keyboardType="number-pad" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
 
                                 </View>
 
@@ -443,8 +449,12 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                                 <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Save</Text>
                             </TouchableOpacity>
                         </View>
+                        </ScrollView>
+
                     </Pressable>
                 </Card>
+
+            </KeyboardAvoidingView>
             </Pressable>
         </Modal>
     )

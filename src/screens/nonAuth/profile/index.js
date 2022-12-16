@@ -33,6 +33,7 @@ import moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ModalOTP from '../../../components/ModalOTP';
 import _ from 'lodash'
+import { Rating } from 'react-native-ratings';
 
 
 const getMessage = (name) => {
@@ -202,7 +203,7 @@ const Profile = (props) => {
     const [otpModal, setOTPModal] = useState(false)
     // 
     const [experience, setExperince] = React.useState("")
-
+    const [gender,setGender]=React.useState("Male")
     React.useEffect(() => {
         if (user.user_role == role.provider) {
             let exp = user.experience
@@ -214,6 +215,9 @@ const Profile = (props) => {
                 }
             }
             setExperince(exp)
+        }
+        if(user?.gender){
+            setGender(String(user?.gender))
         }
     }, [user])
 
@@ -691,7 +695,7 @@ const Profile = (props) => {
                 } else {
                     showToast(response.message, 'danger')
                 }
-            }else{
+            } else {
                 showToast(response.message, 'danger')
             }
 
@@ -708,7 +712,7 @@ const Profile = (props) => {
     }, [user])
     const save = (addr) => {
         let notifType = getNotificationTypeNumber(notificationType)
-        if(!moment(userData.dob, "MM/DD/YYYY").isValid()){
+        if (!moment(userData.dob, "MM/DD/YYYY").isValid()) {
             showToast("Please enter valid date!", 'danger')
             setLoader(false)
             return
@@ -752,7 +756,7 @@ const Profile = (props) => {
         formdata.append("notification_prefrence", notifType);
         formdata.append("is_same_address", isSameAddress ? 1 : 0);
         formdata.append("address", JSON.stringify(addr));
-
+        formdata.append("gender",String(gender).toLowerCase())
         let config = {
             headers: headers,
             data: formdata,
@@ -1146,6 +1150,15 @@ const Profile = (props) => {
                     <View style={{ marginTop: '0%', }}>
                         <Text maxFontSizeMultiplier={1.5} style={styles.text}>{user.user_role == role.provider ? "Service Provider Profile" : "Customer Profile"}</Text>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.text1, { marginTop: 0 }]}>{userData.first_name}</Text>
+                        {user.user_role==role.provider?<Rating
+                                                readonly={true}
+                                                imageSize={15}
+                                                type="custom"
+                                                // ratingBackgroundColor="white"
+                                                ratingColor="#04BFBF"
+                                                // tintColor="white"
+                                                startingValue={Number(userData?.rating ?? 0)}
+                                            />:null}
                         <Text maxFontSizeMultiplier={1.5} style={styles.text2}>Profile ID : {userData.id}</Text>
                     </View>
                     <ScrollView
@@ -1214,6 +1227,16 @@ const Profile = (props) => {
 
                                 // }}
                                 />
+                                <View style={{marginHorizontal:20}}>
+                                    <DropDown
+                                        title="Gender"
+                                        item={["Male", "Female", "Non-Binary "]}
+                                        value={gender}
+                                        onChangeValue={(index, value) => { setGender(value) }}
+                                        handleTextValue={true}
+                                        containerStyle={{borderColor:LS_COLORS.global.textInutBorderColor,}}
+                                    />
+                                </View>
                                 {user.user_role == role.provider && <CustomInput
                                     text="Tagline"
                                     value={userData?.tagline === "null" ? "" : userData.tagline}
@@ -1706,7 +1729,7 @@ const Profile = (props) => {
                                             }}>
                                             {isConnectedToAccount ? <View>
                                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11 }}>Connected ({connectedDetail?.email})</Text>
-                                            </View> : <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Join Account</Text>}
+                                            </View> : <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular }}>Add Account</Text>}
                                         </TouchableOpacity>
                                         {isConnectedToAccount && <Text maxFontSizeMultiplier={1.5} onPress={() => {
                                             createNewConnect()

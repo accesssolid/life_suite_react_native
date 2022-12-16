@@ -146,7 +146,7 @@ const SignUpScreen = (props) => {
     const homeAddressRef = useRef(null)
     const workAddressRef = useRef(null)
     const [notificationType, setNotificationType] = useState(getNotificationType(1))
-
+    const [gender,setGender]=useState("Male")
     /* State Drop Down */
     const [dropStateValue, setDropStateValue] = useState("State")
     const [dropStateData, setDropStateData] = useState([])
@@ -494,9 +494,10 @@ const SignUpScreen = (props) => {
             dob: moment(signUpData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"),
             notification_prefrence: getNotiPref(notificationType),
             timezone: getTimeZone(),
+            gender:String(gender).toLowerCase()
 
         }
-
+        console.log(user_data)
         if (profile_pic?.path) {
             user_data.profile = {
                 uri: Platform.OS == "ios" ? profile_pic.path.replace('file:///', '') : profile_pic.path,
@@ -924,6 +925,15 @@ const SignUpScreen = (props) => {
 
                                 }}
                             />
+                             <View style={{}}>
+                                <DropDown
+                                    title="Gender"
+                                    item={["Male","Female","Non-Binary "]}
+                                    value={gender}
+                                    onChangeValue={(index, value) => { setGender(value) }}
+                                    handleTextValue={true}
+                                />
+                            </View>
                             {role !== 1 && <CustomTextInput
                                 placeholder="Taglines"
                                 title="Tag Line"

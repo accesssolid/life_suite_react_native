@@ -27,6 +27,7 @@ import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import { useFocusEffect } from '@react-navigation/native';
 import lodash from 'lodash'
+import { setFavList } from '../../../redux/features/favorites';
 // #liahs_provider_list
 
 const Mechanics = (props) => {
@@ -57,9 +58,9 @@ const Mechanics = (props) => {
     const [dupProviders, setDupProviders] = React.useState([])
     const [filterModal, setFilterModal] = React.useState(false)
 
-    React.useEffect(() => {
-        console.log("data===>", data)
-    }, [data])
+    useFocusEffect(useCallback(() => {
+        getFavProvider()
+    }, []))
 
     React.useEffect(() => {
         let z = []
@@ -259,6 +260,8 @@ const Mechanics = (props) => {
     }
 
     const getProviders = (rangeData = {}, showRangeResult = false, my_location = false) => {
+        // console.log("Data",rangeData)
+        // return
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -271,11 +274,10 @@ const Mechanics = (props) => {
             endPoint: '/api/providerListOrder',
             type: 'post'
         }
-       
+
         getApi(config)
             .then((response) => {
-                
-                console.log("Response",response)
+
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -296,7 +298,7 @@ const Mechanics = (props) => {
                 }
             }).catch(err => {
                 setLoading(false)
-            }).finally(()=>{
+            }).finally(() => {
                 setLoading(false)
             })
     }
@@ -351,7 +353,6 @@ const Mechanics = (props) => {
         formdata.append("state", current_address.state)
         formdata.append("city", current_address.city)
         formdata.append("ordered_variant", JSON.stringify(ordered_variant))
-        console.log("ordered_variant", ordered_variant)
         // setLoading(false)
         // return
         if (continuous_order) {
@@ -473,8 +474,49 @@ const Mechanics = (props) => {
                 }
                 else {
                 }
+
             }).catch(err => {
                 console.log("error", err)
+            }).finally(() => {
+                getFavProvider()
+            })
+    }
+    const dispatch = useDispatch()
+    const favs = useSelector(state => state.favorites)?.list
+    useEffect(() => {
+        console.log("FAVS", favs)
+        let d = _.cloneDeep(dupProviders)
+        let fvs = favs?.map(x => x.id)
+        d = d.map(x => {
+            if (fvs.includes(x.id)) {
+                return { ...x, is_favourite: 1 }
+            } else {
+                return { ...x, is_favourite: 0 }
+            }
+        })
+        setDupProviders(d)
+    }, [favs])
+    const getFavProvider = () => {
+        let headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}`
+        }
+        let config = {
+            headers: headers,
+            endPoint: '/api/favouriteProviders',
+            type: 'post'
+        }
+        getApi(config)
+            .then((response) => {
+                if (response.status == true) {
+
+                    dispatch(setFavList([...response.data]))
+                }
+                else {
+                    dispatch(setFavList([]))
+                }
+            }).catch(err => {
             })
     }
     const checkShowAddress = (d) => {
@@ -617,7 +659,6 @@ const Mechanics = (props) => {
                             {/* providers changed to dupProviders */}
                             {dupProviders.length > 0 ?
                                 dupProviders.map((item, index) => {
-                                    console.log(JSON.stringify(item))
                                     let country = item?.current_address?.split(",")
                                     let countryName = country && country.length > 0 ? country[country.length - 1] : ""
                                     let x = item.timeDuration / 60
@@ -632,12 +673,12 @@ const Mechanics = (props) => {
                                     let showDistanceOrNot = false
                                     for (let z of item.item_list) {
                                         for (let p of z.products) {
-                                            if (p.item_products_is_per_mile=="1") {
+                                            if (p.item_products_is_per_mile == "1") {
                                                 showDistanceOrNot = true
                                             }
                                             if (p.checked) {
                                                 let p_price = p.price
-                                                if (p.item_products_is_per_mile=="1") {
+                                                if (p.item_products_is_per_mile == "1") {
                                                     p_price = Number(p.price) * lodash.round(Number(data.mile_distance), 2)
                                                 }
                                                 totalProductPrice = lodash.round(totalProductPrice, 2) + lodash.round(p_price, 2)
@@ -664,6 +705,7 @@ const Mechanics = (props) => {
                                                 </View>
                                                 <View style={{ flexDirection: 'column', marginLeft: "5%", }}>
                                                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item.first_name}</Text>
+                                                    {Boolean(item?.business_name) && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16,fontStyle:"italic", color: LS_COLORS.global.black }}>{item?.business_name}</Text>}
                                                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>{countryName.trim()}</Text>
                                                 </View>
                                             </Pressable>
@@ -701,10 +743,10 @@ const Mechanics = (props) => {
                                                 readonly={true}
                                                 imageSize={10}
                                                 type="custom"
-                                                ratingBackgroundColor="white"
+                                                // ratingBackgroundColor="white"
                                                 ratingColor="#04BFBF"
-                                                tintColor="white"
-                                                startingValue={parseInt(item.rating ?? 0)}
+                                                // tintColor="white"
+                                                startingValue={Number(item.rating ?? 0)}
                                             />
                                         </View>
                                         {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Services will be provided at this address : <Text style={{ textAlign: "right" }}>{item?.address?.address_line_1}</Text></Text>}
@@ -754,12 +796,12 @@ const Mechanics = (props) => {
                                                     {i.products.map((itemData, prIndex) => {
                                                         let productTitle = "(Product)"
                                                         let price = itemData?.price
-                                                        if (itemData.item_products_is_per_mile=="1") {
+                                                        if (itemData.item_products_is_per_mile == "1") {
                                                             productTitle = `(Product) $${price}/Mile`
                                                             let m = 0
                                                             m = lodash.round(Number(data?.mile_distance), 2)
                                                             price = lodash.round(lodash.round(Number(itemData?.price), 2) * m, 2)
-                                                            console.log(price)
+
                                                         }
                                                         let type = itemData.type
                                                         let isPriced = true

@@ -244,6 +244,21 @@ const MapScreen = (props) => {
                                     placesRef.current.setAddressText(`${user.address[0].address_line_1}`)
                                 }}
                             />}
+                              <CustomButton
+                                title={"My Location"}
+                                customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
+                                customStyles={{
+                                    width: '100%',
+                                    height: 40,
+                                    paddingHorizontal: '5%',
+                                    backgroundColor: LS_COLORS.global.green,
+                                }}
+                                containerStyle={{marginHorizontal:20}}
+                                action={() => {
+                                    // #liahs checked to permaned to true
+                                    getLocationPermission()
+                                }}
+                            />
                             {user?.address[1]?.address_line_1 !== '' && <CustomButton
                                 title={user.user_role == 2 ? "Work" : "Mailing"}
                                 customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
@@ -314,12 +329,19 @@ const MapScreen = (props) => {
                         }}>
                             {/* <Text>+</Text> */}
                         </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                        {/* <TouchableOpacity activeOpacity={0.7} onPress={() => {
                             // setIsPermanetClicked(true)
                             getLocationPermission()
-                        }} style={{ position: 'absolute', height: 30, aspectRatio: 1, bottom: '15%', right: '10%' }}>
-                            <Image style={{ height: '100%', aspectRatio: 1, tintColor: LS_COLORS.global.green }} source={require('../../../assets/gps.png')} resizeMode="contain" />
-                        </TouchableOpacity>
+                        }} style={{ position: 'absolute',backgroundColor:"", aspectRatio: 1, bottom: '15%', right: '10%' }}>
+                            <Text>My Location</Text> */}
+                        {/* <Image style={{ height: '100%', aspectRatio: 1, tintColor: LS_COLORS.global.green }} source={require('../../../assets/gps.png')} resizeMode="contain" /> */}
+                        {/* </TouchableOpacity> */}
+                        {/* <CustomButton
+                            title={"My Location"}
+                            customStyles={{ width:80,borderRadius: 6 }}
+                            containerStyle={{ position: 'absolute', bottom: '15%', right: '10%' }}
+                            action={() => { onConfirm(address, coordinates), props.navigation.goBack() }}
+                        /> */}
                         <View style={{ paddingBottom: '5%', position: 'absolute', bottom: 0, width: '100%' }}>
                             <CustomButton
                                 title={"Submit"}

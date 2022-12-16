@@ -22,7 +22,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
 
     // from #liahs data check for the service item
     useEffect(() => {
-        console.log(props.serviceItem, "Service Items")
+        console.log(props.serviceItem?.time_duration_m)
     }, [props.serviceItem])
 
     useEffect(() => {
@@ -70,15 +70,22 @@ const ServiceItem = React.forwardRef((props, ref) => {
                         <View style={{ ...styles.fromContainer }}>
                             <TextInputMask
                                 onChangeText={(formatted, extracted) => {
-                                    props.setText("time_duration_h", extracted, props.index, props.serviceItem)
+                                    if(extracted?.trim()==""){
+                                        props.setText("time_duration_h", "00", props.index, props.serviceItem)
+
+                                    }else{
+                                        props.setText("time_duration_h", extracted, props.index, props.serviceItem)
+
+                                    }
                                 }}
                                 mask={"[00]"}
                                 color="black"
                                 placeholder="HH"
                                 keyboardType="numeric"
+                                textAlign='right'
                                 editable={props.isSelected}
                                 style={styles.inputStyle}
-                                value={props.serviceItem?.time_duration_h}
+                                value={(props.serviceItem?.time_duration_h=="00"||props?.serviceItem?.time_duration_h=="0")?"":props?.serviceItem?.time_duration_h}
                                 ref={hourRef}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
@@ -91,15 +98,22 @@ const ServiceItem = React.forwardRef((props, ref) => {
                         <View style={{ ...styles.fromContainer }}>
                             <TextInputMask
                                 onChangeText={(formatted, extracted) => {
-                                    props.setText("time_duration_m", extracted, props.index, props.serviceItem)
+                                    if(extracted?.trim()==""){
+                                        props.setText("time_duration_m", "00", props.index, props.serviceItem)
+
+                                    }else{
+                                        props.setText("time_duration_m", extracted, props.index, props.serviceItem)
+
+                                    }
                                 }}
                                 mask={"[00]"}
                                 color="black"
                                 placeholder="MM"
                                 keyboardType="numeric"
+                                textAlign='right'
                                 editable={props.isSelected}
                                 style={styles.inputStyle}
-                                value={props.serviceItem?.time_duration_m}
+                                value={(props.serviceItem?.time_duration_m=="00"||props?.serviceItem?.time_duration_m=="0")?"":props?.serviceItem?.time_duration_m}
                                 ref={minRef}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
@@ -111,14 +125,16 @@ const ServiceItem = React.forwardRef((props, ref) => {
                         <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", color: "white", marginBottom: 5, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>dd</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
-                                style={styles.inputStyle}
+                                style={[styles.inputStyle,{minWidth:40}]}
                                 color="black"
                                 placeholder="$000"
+                                textAlign="right"
                                 editable={props.isSelected}
                                 onChangeText={(text) => props.setText("price", text, props.index, props.serviceItem)}
                                 keyboardType="numeric"
                                 value={props.serviceItem?.price}
                                 ref={priceRef}
+                                
                                 numberOfLines={1}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
@@ -144,6 +160,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             style={styles.inputStyle}
                             color="black"
                             placeholder="$00"
+                            textAlign='right'
                             editable={props.selectedProducts.includes(item.id)}
                             onChangeText={(text) => props.setProductText(item, text)}
                             keyboardType="numeric"
@@ -193,6 +210,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             editable={props.selectedNewProducts.includes(item.temp_id)}
                             onChangeText={(text) => props.setNewProductText(item, text, "name")}
                             value={item.name}
+                            textAlign="right"
                             ref={nameRef}
                             returnKeyType={"default"}
                             placeholderTextColor={LS_COLORS.global.placeholder}
@@ -207,6 +225,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             editable={props.selectedNewProducts.includes(item.temp_id)}
                             onChangeText={(text) => props.setNewProductText(item, text, "price")}
                             keyboardType="numeric"
+                            textAlign='right'
                             value={item.price}
                             ref={priceNewRef}
                             returnKeyType={'done'}

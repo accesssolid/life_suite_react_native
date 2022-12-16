@@ -12,6 +12,7 @@ import signupModal from './features/signupModal'
 import blockModel from './features/blockModel'
 import dot from './features/showDot'
 import variant from './features/variantData'
+import favorites from './features/favorites'
 const store = configureStore({
     reducer: {
         authenticate: AuthenticateReducer,
@@ -26,7 +27,8 @@ const store = configureStore({
         signupModal,
         blockModel,
         dot,
-        variant
+        variant,
+        favorites
     },
 })
 
