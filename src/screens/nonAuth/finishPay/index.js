@@ -14,8 +14,9 @@ import DropDown from '../../../components/dropDown';
 import { Rating, AirbnbRating } from 'react-native-ratings';
 import Loader from '../../../components/loader';
 import { order_types } from '../../../constants/globals';
-const types = ["Flat Amount", "Percentage"]
+import lodash from 'lodash'
 
+const types = ["Flat Amount", "Percentage"]
 export default function FinishPay({ navigation, route }) {
     const [type, setType] = React.useState(types[0])
     const { item } = route.params ?? {}
@@ -50,7 +51,7 @@ export default function FinishPay({ navigation, route }) {
             order_status: order_types.completed,
             rating_comment: reason,
             rating: rating,
-            tip: type == types[0] ? flat_amount : (Number(per_amount) * Number(totalPrice) / 100)
+            tip: type == types[0] ? lodash.round(flat_amount,2) : lodash.round((Number(per_amount) * Number(totalPrice) / 100),2)
         }
         console.log(datac)
         let config = {

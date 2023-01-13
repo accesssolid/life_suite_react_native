@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, FlatList, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Pressable } from 'react-native'
+import { View, StyleSheet, Text, FlatList, StatusBar, Pressable } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -20,7 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native'
 import { role } from '../../../constants/globals';
-import { loadNotificaitonsThunk ,updateReadNotification} from '../../../redux/features/notification';
+import { loadNotificaitonsThunk, updateReadNotification } from '../../../redux/features/notification';
 
 const notification_color = [
     {
@@ -54,9 +54,10 @@ const Notification = (props) => {
     const dispatch = useDispatch()
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
-    const notifications = useSelector(state => state.notification)?.data
+    const notificationsg = useSelector(state => state.notification)?.data
     console.log("Notifications", JSON.stringify(notifications))
-    // const [notifications, setNotifications] = useState([])
+    const [showUnread, setShowUnread] = useState(false)
+    const [notifications, setNotifications] = useState([])
 
     const seenNotification = async (data) => {
         if (data.is_read == "0") {
@@ -101,51 +102,28 @@ const Notification = (props) => {
                 }
             }
         }
-
-    }
-
-
-    const getNotifications = async () => {
-        let headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${access_token}`
-        }
-        let config = {
-            headers: headers,
-            data: JSON.stringify({ notification_type: "all" }),
-            endPoint: user.user_role == role.provider ? '/api/providerNotificationList' : "/api/customerNotificationList",
-            type: 'post'
-        }
-
-        getApi(config)
-            .then((response) => {
-                if (response.status == true) {
-                    setNotifications(response.data)
-                }
-                else {
-                    showToast(response.message)
-                }
-            }).catch(err => {
-            }).finally(() => {
-                setLoading(false)
-            })
     }
 
     useFocusEffect(React.useCallback(() => {
-        // getNotifications()
         dispatch(loadNotificaitonsThunk())
-
     }, []))
 
+    useEffect(()=>{
+        if(showUnread){
+            let notis=notificationsg.filter(x=>x?.is_read=="0")
+            setNotifications(notis)
+        }else{
+            setNotifications(notificationsg)
+        }
+    },[notificationsg,showUnread])
     const renderData = ({ item }) => {
         let backgroundColor = "#5CBFBF"
-        let orderType=""
+        let orderType = ""
         if (item.type == "order") {
             for (let c of notification_color) {
                 if (c.ids.includes(item.service_orders_order_status)) {
                     // backgroundColor = c.color
-                    orderType=c.title
+                    orderType = c.title
                     break
                 }
             }
@@ -180,7 +158,7 @@ const Notification = (props) => {
                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, color: '#707070' }}>{item.description}</Text>
                         </View>
                         <View style={{ width: "20%", justifyContent: "space-evenly", alignItems: "flex-end" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular,textAlign:"right", fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, textAlign: "right", fontSize: 12 }}>{moment(item.created_at).format("hh:mm a")}</Text>
                             {/* <Text maxFontSizeMultiplier={1.5} style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{orderType}</Text> */}
                         </View>
                     </View>
@@ -190,11 +168,11 @@ const Notification = (props) => {
     }
     return (
         <>
-            <StatusBar 
-    // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-             barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <SafeAreaView style={{ flex: 1, backgroundColor: LS_COLORS.global.green }} edges={["top"]}>
                 <Header
                     title="Notification"
@@ -202,10 +180,15 @@ const Notification = (props) => {
                     action={() => {
                         props.navigation.goBack()
                     }}
-                    containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                    containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
+                    <Pressable onPress={() => {
+                        setShowUnread(!showUnread)
+                    }} style={{ flexDirection: "row", alignItems: "center", marginTop: 10, marginLeft: 20, justifyContent: "flex-end", marginRight: 20 }}>
+                        <Text maxFontSizeMultiplier={1.5} style={{ color: LS_COLORS.global.cyan, fontFamily: LS_FONTS.PoppinsRegular, textDecorationLine: "underline" }}>Show {showUnread ? "All" : "Unread"} ({notifications?.length})</Text>
+                    </Pressable>
                     {
                         notifications?.length === 0 ?
                             <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: "center", marginTop: 10 }}>

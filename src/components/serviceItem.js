@@ -87,6 +87,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 style={styles.inputStyle}
                                 value={(props.serviceItem?.time_duration_h=="00"||props?.serviceItem?.time_duration_h=="0")?"":props?.serviceItem?.time_duration_h}
                                 ref={hourRef}
+                                selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_h?.length??0,start:props.serviceItem?.time_duration_h?.length??0}}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
                                 maxFontSizeMultiplier={1.2}
@@ -115,6 +116,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 style={styles.inputStyle}
                                 value={(props.serviceItem?.time_duration_m=="00"||props?.serviceItem?.time_duration_m=="0")?"":props?.serviceItem?.time_duration_m}
                                 ref={minRef}
+                                selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_m?.length??0,start:props.serviceItem?.time_duration_m?.length??0}}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
                                 maxFontSizeMultiplier={1.2}
@@ -134,7 +136,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 keyboardType="numeric"
                                 value={props.serviceItem?.price}
                                 ref={priceRef}
-                                
+                                selection={{end:props.serviceItem?.price?.length??0,start:props.serviceItem?.price?.length??0}}
                                 numberOfLines={1}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
@@ -165,6 +167,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             onChangeText={(text) => props.setProductText(item, text)}
                             keyboardType="numeric"
                             value={item.price}
+                            selection={{end:item.price?.length??0,start:item.price?.length??0}}
                             returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
                             placeholderTextColor={LS_COLORS.global.placeholder}
                             maxFontSizeMultiplier={1.2}
@@ -227,6 +230,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             keyboardType="numeric"
                             textAlign='right'
                             value={item.price}
+                            selection={{end:item.price?.length??0,start:item.price?.length??0}}
                             ref={priceNewRef}
                             returnKeyType={'done'}
                             placeholderTextColor={LS_COLORS.global.placeholder}

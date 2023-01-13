@@ -21,12 +21,13 @@ import { TextInput } from 'react-native-gesture-handler';
 import { Dimensions } from 'react-native';
 import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import SureModal from '../../../components/sureModal';
 import Loader from '../../../components/loader';
 import * as RNLocalize from "react-native-localize";
 import lodash from 'lodash'
+import { setCurrentLocationData } from '../../../redux/features/currentlocation';
 // #liahs_before_providers
 
 const MechanicLocation = (props) => {
@@ -40,6 +41,7 @@ const MechanicLocation = (props) => {
     const [toAddress, setToAddress] = useState("")
     const [date, setDate] = useState("")
     const [open, setOpen] = useState(false)
+    const dispatch=useDispatch()
     const [loading, setLoading] = React.useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
 
@@ -47,11 +49,10 @@ const MechanicLocation = (props) => {
     React.useEffect(() => {
         console.log("Params", props.route.params)
     }, [props.route.params])
-
-    const [currentLocation,setCurrentLocation]=React.useState({
-        latitude: 37.78825,
-        longitude: -122.4324,
-    })
+    const currentLocation=useSelector(state=>state.currentLocation)?.current
+    // const [currentLocation, setCurrentLocation] = React.useState({
+        
+    // })
 
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
@@ -73,21 +74,21 @@ const MechanicLocation = (props) => {
     // }, [fromCoordinates])
 
     useEffect(() => {
-        if(toCoordinates?.latitude==37.78825&&toCoordinates.longitude==-122.4324){
+        if (toCoordinates?.latitude == 37.78825 && toCoordinates.longitude == -122.4324) {
             setActiveCoordinates(currentLocation)
-        }else{
+        } else {
             setActiveCoordinates(toCoordinates)
         }
-        
-    }, [toCoordinates,currentLocation])
+
+    }, [toCoordinates, currentLocation])
 
     useEffect(() => {
         // subService.location_type : 2 - Both , 1 - From only
-        if(isLoadCurrentLocation){
+        if (isLoadCurrentLocation) {
             getLocationPermission()
         }
-           
-        
+
+
 
     }, [isLoadCurrentLocation])
 
@@ -99,7 +100,7 @@ const MechanicLocation = (props) => {
             if (orderData.order_from_address) {
                 setFromAddress(orderData.order_from_address)
             }
-            if (orderData.order_from_lat|| orderData.order_from_long) {
+            if (orderData.order_from_lat || orderData.order_from_long) {
                 setFromCoordinates({
                     latitude: Number(orderData.order_from_lat),
                     longitude: Number(orderData.order_from_long),
@@ -108,7 +109,7 @@ const MechanicLocation = (props) => {
             if (orderData.order_placed_address) {
                 setToAddress(orderData.order_placed_address)
             }
-            if (orderData.order_placed_lat|| orderData.order_placed_long) {
+            if (orderData.order_placed_lat || orderData.order_placed_long) {
                 setToCoordinates({
                     latitude: Number(orderData.order_placed_lat),
                     longitude: Number(orderData.order_placed_long),
@@ -119,21 +120,21 @@ const MechanicLocation = (props) => {
         }
     }, [orderData])
 
-    var rad = function(x) {
+    var rad = function (x) {
         return x * Math.PI / 180;
-      };
-      
-      var getDistance = function(p1, p2) {
+    };
+
+    var getDistance = function (p1, p2) {
         var R = 6378137; // Earth’s mean radius in meter
         var dLat = rad(p2.latitude - p1.latitude);
         var dLong = rad(p2.longitude - p1.longitude);
         var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(rad(p1.latitude)) * Math.cos(rad(p2.latitude)) *
-          Math.sin(dLong / 2) * Math.sin(dLong / 2);
+            Math.cos(rad(p1.latitude)) * Math.cos(rad(p2.latitude)) *
+            Math.sin(dLong / 2) * Math.sin(dLong / 2);
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         var d = R * c;
-        return d*0.000621371; // returns the distance in meter
-      };
+        return d * 0.000621371; // returns the distance in meter
+    };
 
     const getLocationPermission = async () => {
         let hasLocationPermission = false
@@ -192,17 +193,17 @@ const MechanicLocation = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-                 setFromAddress(results[0].address)
-                    setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
-                    setCurrentLocation({latitude: results[0].location.latitude, longitude: results[0].location.longitude })
-             
-             
-               
+
+                setFromAddress(results[0].address)
+                setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
+                dispatch(setCurrentLocationData({ latitude: results[0].location.latitude, longitude: results[0].location.longitude }))
+                setToAddress(results[0].address)
+                setToCoordinates({ ...toCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
             })
             .catch((error) => console.log(error.message));
     }
 
-    const [total_distance,setTotalDistance]=React.useState(0)
+    const [total_distance, setTotalDistance] = React.useState(0)
 
 
     const reOrder = async (start_time, end_time) => {
@@ -224,17 +225,19 @@ const MechanicLocation = (props) => {
                 "order_from_lat": fromCoordinates.latitude,
                 "order_from_long": fromCoordinates.longitude,
                 "order_from_address": fromAddress,
-                "timezone":RNLocalize.getTimeZone(),
-                "mile_distance": lodash.round(total_distance,2)
+                "timezone": RNLocalize.getTimeZone(),
+                "mile_distance": lodash.round(total_distance, 2)
             }),
             endPoint: "/api/reorderCreate",
             type: 'post'
         }
+        console.log(orderData)
+        console.log(JSON.parse(config.data))
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     showToast(response.message)
-                    props.navigation.navigate("MainDrawer",{screen:"HomeScreen"})
+                    props.navigation.navigate("MainDrawer", { screen: "HomeScreen" })
                 } else {
                     console.log("Error", response)
                     showToast(response.message)
@@ -247,17 +250,17 @@ const MechanicLocation = (props) => {
             })
     }
 
-    const getDistanceApi=(to,from)=>{
+    const getDistanceApi = (to, from) => {
         fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${to.latitude}%2C${to.longitude}&origins=${from.latitude}%2C${from.longitude}&key=AIzaSyA8vPYceBJX2Mt43IKubB1Gpa2EcZ6Mg_g`).then(res => {
             return res.json()
         }).then(res => {
             if (res?.rows[0]) {
                 let element = res.rows[0].elements[0]
                 // alert(element?.distance?.value)
-                if(element?.distance?.value>=0){
-                    setTotalDistance(element?.distance?.value*0.000621371)
+                if (element?.distance?.value >= 0) {
+                    setTotalDistance(element?.distance?.value * 0.000621371)
                 }
-               console.log("Element",element)
+                console.log("Element", element)
             }
         }).catch(err => {
             console.error(err)
@@ -267,29 +270,29 @@ const MechanicLocation = (props) => {
 
     React.useEffect(() => {
         // alert(JSON.stringify(toCoordinates))
-        getDistanceApi(toCoordinates,fromCoordinates)
+        getDistanceApi(toCoordinates, fromCoordinates)
     }, [toCoordinates, fromCoordinates])
 
     const submit = () => {
         if (reorder) {
             if (date.trim() == "") {
-                setTimeout(()=>{
+                setTimeout(() => {
                     showToast("Please select date")
-                },100)
-                
+                }, 100)
+
                 return
             } else if (moment(startTime).toString() === moment(endTime).toString()) {
-                setTimeout(()=>{
+                setTimeout(() => {
                     showToast("Start Time and End Time Cannot Be Same")
-                },100)
-                
+                }, 100)
+
                 return
             }
             // else if (moment(startTime).date() >  moment(endTime).date()) {
             //     showToast("Start Time and End Time Cannot Be Same")
             //     return
             // }
-            
+
             reOrder(moment(date).format("YYYY-MM-DD") + " " + moment(startTime).format('HH:mm') + ":00", moment(date).format("YYYY-MM-DD") + " " + moment(endTime).format('HH:mm') + ":00")
             return
         }
@@ -311,13 +314,13 @@ const MechanicLocation = (props) => {
             "order_from_lat": fromCoordinates.latitude,
             "order_from_long": fromCoordinates.longitude,
             "order_from_address": fromAddress,
-            "mile_distance":total_distance
+            "mile_distance": total_distance
         }
         if (subService.location_type == 2 && data.order_from_address.trim() == "") {
             showToast("Please add from address")
         } else if (data.order_placed_address.trim() == "") {
             showToast("Please add to address")
-        } 
+        }
         else if (date.trim() == "") {
             setTimeout(() => {
                 showToast("Please select date")
@@ -336,20 +339,20 @@ const MechanicLocation = (props) => {
     }
 
     const handleConfirm = (d) => {
-        const moment1=moment(d).format("HH:mm")
+        const moment1 = moment(d).format("HH:mm")
         // const dateNow=new Date()
         // if(date1<dateNow){
         //     showToast("Please choose valid start time") 
         //     setDatePickerVisibility(false);
         //     return
         // }
-        if(date==""){
+        if (date == "") {
             showToast("Please select date first.")
             setDatePickerVisibility(false);
             return
 
         }
-        if(moment().toDate()>moment(moment(date).format("MM-DD-YYYY")+" "+moment1,"MM-DD-YYYY HH:mm").toDate()){
+        if (moment().toDate() > moment(moment(date).format("MM-DD-YYYY") + " " + moment1, "MM-DD-YYYY HH:mm").toDate()) {
             showToast("Please select valid start time")
             setDatePickerVisibility(false);
             return
@@ -365,7 +368,6 @@ const MechanicLocation = (props) => {
             setEndTime(d)
         } else {
             showToast("End time must be greater than start time.")
-            
         }
         setDatePickerVisibility1(false);
 
@@ -388,6 +390,17 @@ const MechanicLocation = (props) => {
             longitudeDelta: 0.012134,
         })
     }
+
+    useEffect(()=>{
+        if(date!=""){
+            if(startTime){
+                if (moment().toDate() > moment(moment(date).format("MM-DD-YYYY") + " " + moment(startTime).format("HH:mm"), "MM-DD-YYYY HH:mm").toDate()) {
+                    setStartTime(moment())
+                    setEndTime(moment())
+                }
+            }
+        }    
+    },[date])
 
     const renderView = () => {
         return (
@@ -419,7 +432,7 @@ const MechanicLocation = (props) => {
                         <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Other Location</Text>
                     </View> */}
                     <View style={{ marginTop: 20 }}>
-                        {subService.location_type == 2 && <Text maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>}
+                        {subService.location_type == 2 && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>}
                         {subService.location_type == 2 && <TouchableOpacity
                             onPress={() => {
                                 props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })
@@ -456,7 +469,7 @@ const MechanicLocation = (props) => {
                         <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>Add Date</Text>
                         <View style={styles.fromContainer}>
                             <TextInput
-                             maxFontSizeMultiplier={1.5}
+                                maxFontSizeMultiplier={1.5}
                                 style={styles.inputStyle}
                                 color="black"
                                 value={date != "" ? moment(date).format("MM-DD-YYYY") : "Select Date"}
@@ -478,18 +491,18 @@ const MechanicLocation = (props) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <Text  maxFontSizeMultiplier={1.5} style={{marginTop: "5%",marginLeft:24, fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>My available start time between:</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={{ marginTop: "5%", marginLeft: 24, fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>My available start time between:</Text>
                     <View style={{ flexDirection: 'row', justifyContent: "space-around", marginTop: "1%" }}>
                         <View style={{ flex: 1, alignItems: 'center' }}>
-                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>Start Time</Text>
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility(true)} >
-                                <Text  maxFontSizeMultiplier={1.5}>{moment(startTime).format('hh:mm A')}</Text>
+                                <Text maxFontSizeMultiplier={1.5}>{moment(startTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={{ flex: 1, alignItems: 'center' }} >
-                            <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsMedium, marginBottom: 10 }}>End Time</Text>
                             <TouchableOpacity style={{ padding: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, borderColor: LS_COLORS.global.grey }} activeOpacity={0.7} onPress={() => setDatePickerVisibility1(true)} >
-                                <Text  maxFontSizeMultiplier={1.5}>{moment(endTime).format('hh:mm A')}</Text>
+                                <Text maxFontSizeMultiplier={1.5}>{moment(endTime).format('hh:mm A')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -514,7 +527,7 @@ const MechanicLocation = (props) => {
                     style={styles.save}
                     activeOpacity={0.7}
                     onPress={() => submit()}>
-                    <Text  maxFontSizeMultiplier={1.5} style={styles.saveText}>Submit</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Submit</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -522,11 +535,11 @@ const MechanicLocation = (props) => {
 
     return (
         <>
-            <StatusBar 
-           // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-            barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="cover"
@@ -547,7 +560,7 @@ const MechanicLocation = (props) => {
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                                <Text  maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
                             </View>
                         </SafeAreaView>
                     </View>

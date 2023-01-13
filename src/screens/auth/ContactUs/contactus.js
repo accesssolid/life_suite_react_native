@@ -16,8 +16,12 @@ export default function ContactUs({ navigation, route }) {
         email: '',
         message: '',
     })
+    const [id,setId]=React.useState(null)
+    const [user_role,setRole]=React.useState(null)
+
     const emailRef = useRef(null)
     const messageRef = useRef(null)
+
     const scrollRef = React.useRef(null)
     const [editable,setEditable]=React.useState(true)
 
@@ -26,6 +30,8 @@ export default function ContactUs({ navigation, route }) {
         if (user?.email) {
             setEditable(false)
             setData({ ...data, name: user?.first_name + " " + user?.last_name, email: user?.email })
+            setRole(user?.user_role)
+            setId(user?.id)
         }
     }, [route?.params])
 
@@ -36,6 +42,10 @@ export default function ContactUs({ navigation, route }) {
         formdata.append("email", data.email)
         formdata.append("message", data.message)
         formdata.append("submit_from", "mobile")
+        if(user_role&&id){
+            formdata.append("user_role",user_role)
+            formdata.append("user_id",id)
+        }
         let config = {
             data: formdata,
             endPoint: '/api/contactUsAdd',

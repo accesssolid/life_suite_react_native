@@ -30,6 +30,8 @@ import moment from 'moment';
 import { updateBankModelData } from '../../../redux/features/bankModel';
 import { updateSignupModal } from '../../../redux/features/signupModal';
 import { updateBlockModal } from '../../../redux/features/blockModel';
+import ReviewBusiness from '../../../components/ReviewBusiness';
+import { setQOpen, setQService, setQuestionTypes } from '../../../redux/features/questionaire.model';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
@@ -127,7 +129,7 @@ const HomeScreen = (props) => {
                 type: 'post'
             }
             let response = await getApi(config)
-            console.log("REsponse Account details",response)
+            console.log("REsponse Account details", response)
             if (response.status == true) {
                 if (response.data) {
                     if (response.data.email && response.data.details_submitted) {
@@ -392,7 +394,7 @@ const HomeScreen = (props) => {
                     getMyJobs()
                 }
                 else {
-                    showToast(response.message,"error")
+                    showToast(response.message, "error")
                     setLoading(false)
                 }
             }).catch(err => {
@@ -402,7 +404,7 @@ const HomeScreen = (props) => {
 
     const goToItems = (item) => {
         dispatch(setAddServiceMode({ data: true })),
-            props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
+        props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
     }
 
     const getLocationPermission = async () => {
@@ -520,7 +522,7 @@ const HomeScreen = (props) => {
         }
 
     }
-
+    const [selectedItem, setSelectedItem] = useState(null)
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <View style={styles.container}>
@@ -643,10 +645,19 @@ const HomeScreen = (props) => {
                                             title1={item.name}
                                             imageUrl={{ uri: BASE_URL + item.image }}
                                             action={() => {
+                                                // console.log()
+                                                console.log(item)
                                                 if (user?.user_status == 3) {
                                                     dispatch(updateBlockModal(true))
                                                 } else {
-                                                    props.navigation.navigate("ServicesProvided", { subService: item });
+                                                    setSelectedItem(item)
+                                                    if (item?.is_certified == "1" || item?.is_insauranced == "1" || item?.is_business_licensed == "1") {
+                                                        dispatch(setQService(item?.id))
+                                                        dispatch(setQuestionTypes({ is_certified: Number(item?.is_certified), is_insauranced: Number(item?.is_insauranced), is_business_licensed: Number(item?.is_business_licensed) }))
+                                                        dispatch(setQOpen(true))
+                                                    } else {
+                                                        props.navigation.navigate("ServicesProvided", { subService: item });
+                                                    }
                                                 }
 
                                             }}
@@ -776,6 +787,14 @@ const HomeScreen = (props) => {
                 </View>}
             </View>
             {loading && <Loader />}
+            <ReviewBusiness
+                pressHandler={() => {
+                    dispatch(setQOpen(false))
+                }}
+                onPressNext={() => {
+                    dispatch(setQOpen(false))
+                    props.navigation.navigate("ServicesProvided", { subService: selectedItem });
+                }} />
         </SafeAreaView>
     )
 }

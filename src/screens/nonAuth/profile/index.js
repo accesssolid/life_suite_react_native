@@ -302,72 +302,72 @@ const Profile = (props) => {
     }, [dropStateDataMaster])
 
     const [homeAddressData, setHomeAddressData] = useState({
-        address_line_1: userData?.address[0]?.address_line_1,
-        address_line_2: userData?.address[0]?.address_line_2,
-        city: userData?.address[0]?.city,
-        state: userData?.address[0]?.state,
-        country: userData?.address[0]?.country,
-        zip_code: userData?.address[0]?.zip_code,
-        lat: userData?.address[0]?.lat,
-        lon: userData?.address[0]?.long
+        address_line_1: userData?.address[0]?.address_line_1??"",
+        address_line_2: userData?.address[0]?.address_line_2??"",
+        city: userData?.address[0]?.city??"",
+        state: userData?.address[0]?.state??"",
+        country: userData?.address[0]?.country??"",
+        zip_code: userData?.address[0]?.zip_code??"",
+        lat: userData?.address[0]?.lat??0,
+        lon: userData?.address[0]?.long??0
     })
 
     const [workAddressData, setWorkAddressData] = useState({
-        address_line_1: userData?.address[1]?.address_line_1,
-        address_line_2: userData?.address[1]?.address_line_2,
-        city: userData?.address[1]?.city,
-        state: userData?.address[1]?.state,
-        zip_code: userData?.address[1]?.zip_code,
-        country: userData?.address[1]?.country,
-        lat: userData?.address[1]?.lat,
-        lon: userData?.address[1]?.long
+        address_line_1: userData?.address[1]?.address_line_1??"",
+        address_line_2: userData?.address[1]?.address_line_2??"",
+        city: userData?.address[1]?.city??"",
+        state: userData?.address[1]?.state??"",
+        zip_code: userData?.address[1]?.zip_code??"",
+        country: userData?.address[1]?.country??"",
+        lat: userData?.address[1]?.lat??0,
+        lon: userData?.address[1]?.long??0
     })
     useEffect(() => {
         if (userData?.address) {
             if (userData[0]?.type == "home") {
                 setHomeAddressData({
-                    address_line_1: userData?.address[0]?.address_line_1,
-                    address_line_2: userData?.address[0]?.address_line_2,
-                    city: userData?.address[0]?.city,
-                    state: userData?.address[0]?.state,
-                    country: userData?.address[0]?.country,
-                    zip_code: userData?.address[0]?.zip_code,
-                    lat: userData?.address[0]?.lat,
-                    lon: userData?.address[0]?.long,
+                    address_line_1: userData?.address[0]?.address_line_1??"",
+                    address_line_2: userData?.address[0]?.address_line_2??"",
+                    city: userData?.address[0]?.city??"",
+                    state: userData?.address[0]?.state??"",
+                    country: userData?.address[0]?.country??"",
+                    zip_code: userData?.address[0]?.zip_code??"",
+                    lat: userData?.address[0]?.lat??0,
+                    lon: userData?.address[0]?.long??0,
                 })
             } else {
                 setWorkAddressData({
-                    address_line_1: userData?.address[0]?.address_line_1,
-                    address_line_2: userData?.address[0]?.address_line_2,
-                    city: userData?.address[0]?.city,
-                    state: userData?.address[0]?.state,
-                    country: userData?.address[0]?.country,
-                    zip_code: userData?.address[0]?.zip_code,
-                    lat: userData?.address[0]?.lat,
-                    lon: userData?.address[0]?.long
+                    address_line_1: userData?.address[0]?.address_line_1??"",
+                    address_line_2: userData?.address[0]?.address_line_2??"",
+                    city: userData?.address[0]?.city??"",
+                    state: userData?.address[0]?.state??"",
+                    country: userData?.address[0]?.country??"",
+                    zip_code: userData?.address[0]?.zip_code??"",
+                    lat: userData?.address[0]?.lat??0,
+                    lon: userData?.address[0]?.long??0
                 })
             }
             if (userData[1]?.type == "work") {
                 setWorkAddressData({
-                    address_line_1: userData?.address[1]?.address_line_1,
-                    address_line_2: userData?.address[1]?.address_line_2,
-                    city: userData?.address[1]?.city,
-                    state: userData?.address[1]?.state,
-                    country: userData?.address[1]?.country,
-                    zip_code: userData?.address[1]?.zip_code,
-                    lat: userData?.address[1]?.lat,
-                    lon: userData?.address[1]?.long
+                    address_line_1: userData?.address[1]?.address_line_1??"",
+                    address_line_2: userData?.address[1]?.address_line_2??"",
+                    city: userData?.address[1]?.city??"",
+                    state: userData?.address[1]?.state??"",
+                    country: userData?.address[1]?.country??"",
+                    zip_code: userData?.address[1]?.zip_code??"",
+                    lat: userData?.address[1]?.lat??0,
+                    lon: userData?.address[1]?.long??0
                 })
             } else {
                 setHomeAddressData({
-                    address_line_1: userData?.address[1]?.address_line_1,
-                    address_line_2: userData?.address[1]?.address_line_2,
-                    city: userData?.address[1]?.city,
-                    state: userData?.address[1]?.state,
-                    country: userData?.address[1]?.country,
-                    zip_code: userData?.address[1]?.zip_code,
-                    lat: userData?.address[1]?.lat,
-                    lon: userData?.address[1]?.long
+                    address_line_1: userData?.address[1]?.address_line_1??"",
+                    address_line_2: userData?.address[1]?.address_line_2??"",
+                    city: userData?.address[1]?.city??"",
+                    state: userData?.address[1]?.state??"",
+                    country: userData?.address[1]?.country??"",
+                    zip_code: userData?.address[1]?.zip_code??"",
+                    lat: userData?.address[1]?.lat??0,
+                    lon: userData?.address[1]?.long??0
                 })
             }
         }
@@ -376,14 +376,14 @@ const Profile = (props) => {
         if (isSameAddress) {
             setWorkAddressData({
                 ...workAddressData,
-                address_line_1: homeAddressData.address_line_1,
-                address_line_2: homeAddressData.address_line_2,
-                city: homeAddressData?.city,
-                state: homeAddressData?.state,
-                country: homeAddressData?.country,
-                zip_code: homeAddressData?.zip_code,
-                lat: homeAddressData.lat,
-                lon: homeAddressData.lon
+                address_line_1: homeAddressData.address_line_1??"",
+                address_line_2: homeAddressData.address_line_2??"",
+                city: homeAddressData?.city??"",
+                state: homeAddressData?.state??"",
+                country: homeAddressData?.country??"",
+                zip_code: homeAddressData?.zip_code??"",
+                lat: homeAddressData.lat??0,
+                lon: homeAddressData.lon??0
             })
             // workAddressRef.current.setAddressText(homeAddressData.address_line_1)
             // setDropStateValueWork(dropStateValue)
@@ -391,14 +391,14 @@ const Profile = (props) => {
         } else {
             if (userData?.address[1]) {
                 setWorkAddressData({
-                    address_line_1: userData.address[1]?.address_line_1,
-                    address_line_2: userData.address[1]?.address_line_2,
-                    city: userData?.address[1]?.city,
-                    state: userData?.address[1]?.state,
-                    country: userData?.address[1]?.country,
-                    zip_code: userData?.address[1]?.zip_code,
-                    lat: userData.address[1]?.lat,
-                    lon: userData.address[1]?.long
+                    address_line_1: userData.address[1]?.address_line_1??"",
+                    address_line_2: userData.address[1]?.address_line_2??"",
+                    city: userData?.address[1]?.city??"",
+                    state: userData?.address[1]?.state??"",
+                    country: userData?.address[1]?.country??"",
+                    zip_code: userData?.address[1]?.zip_code??"",
+                    lat: userData.address[1]?.lat??0,
+                    lon: userData.address[1]?.long??0
                 })
             }
 
@@ -414,14 +414,14 @@ const Profile = (props) => {
         if (isSameAddress) {
             setWorkAddressData({
                 ...workAddressData,
-                address_line_1: homeAddressData.address_line_1,
-                address_line_2: homeAddressData.address_line_2,
-                city: homeAddressData?.city,
-                state: homeAddressData?.state,
-                country: homeAddressData?.country,
-                zip_code: homeAddressData?.zip_code,
-                lat: homeAddressData.lat,
-                lon: homeAddressData.lon
+                address_line_1: homeAddressData.address_line_1??"",
+                address_line_2: homeAddressData.address_line_2??"",
+                city: homeAddressData?.city??"",
+                state: homeAddressData?.state??"",
+                country: homeAddressData?.country??"",
+                zip_code: homeAddressData?.zip_code??"",
+                lat: homeAddressData.lat??0,
+                lon: homeAddressData.lon??0
             })
             workAddressRef.current.setAddressText(homeAddressData.address_line_1)
             // setDropStateValueWork(dropStateValue)
@@ -483,7 +483,8 @@ const Profile = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg: true
+                            forceJpg: true,
+                            compressImageQuality:.7,
                         }).then(image => {
                             updateProfilePic(image)
                         }).catch(err => {
@@ -497,7 +498,8 @@ const Profile = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg: true
+                            forceJpg: true,
+                            compressImageQuality:.7,
                         }).then(image => {
                             updateProfilePic(image)
                         }).catch(err => {
@@ -1003,7 +1005,8 @@ const Profile = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg: true
+                            forceJpg: true,
+                            compressImageQuality:.7,
                         }).then(image => {
 
                             setPictures([...pictures, image])
@@ -1016,7 +1019,7 @@ const Profile = (props) => {
                     text: "Gallery", onPress: () => {
                         ImagePicker.openPicker({
                             multiple: true,
-                            forceJpg: true
+                            forceJpg: true,
                         }).then(image => {
                             if (Array.isArray(image)) {
                                 let images_length = image.length
@@ -1244,7 +1247,17 @@ const Profile = (props) => {
                                         setUserData({ ...userData, tagline: text })
                                     }}
                                     inpuRef={prefNameRef}
-                                    returnKeyType={Platform.OS == "ios" ? "done" : "default"}
+                                    customContainerStyles={{ paddingVertical: '2.5%' }}
+                                    customInputStyles={{ height: 75 }}
+                                    multiline
+                                    maxLength={255}
+                                    numberOfLines={3}
+                                    onSubmitEditing={() => {
+                                        // bioRef?.current?.blur()
+                                    }}
+                                    returnKeyType="done"
+                                    bottomText={userData?.tagline?.length + "/255"}
+                                    blurOnSubmit={true}
                                 />}
                                 {user.user_role == role.provider && <CustomInput
                                     // required

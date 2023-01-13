@@ -125,7 +125,7 @@ const OrderClientDetail = (props) => {
             }
         }
         checkOrderVariant()
-        
+
     }, [data])
 
     const checkOrderVariant = () => {
@@ -556,6 +556,13 @@ const OrderClientDetail = (props) => {
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a"),
                 end_date: moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
             })
+        } else if (notificationData?.title == "Upcoming" && data?.ordered_sub_services == 12) {
+            return ({
+                start: "Estimated Start Date/Time",
+                end: "Estimated End Date/Time",
+                start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: "---"
+            })
         } else if (notificationData.title == "Completed") {
             return ({
                 start: "Start Date/Time",
@@ -801,7 +808,7 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
     useEffect(() => {
         if (virtual_data?.id) {
             setVirtualOrdersItems(virtual_data.order_items)
-        }else{
+        } else {
             setVirtualOrdersItems([])
         }
     }, [virtual_data])
@@ -812,7 +819,7 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalVirtualTime(total)
             // setTotalWorkingMinutes(total)
-        }else{
+        } else {
             setTotalVirtualTime(0)
         }
     }, [virtualOrdersItems])
@@ -836,7 +843,7 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
 
             if (data.order_status == order_types.update_acceptance) {
                 setShowVirtualData(true)
-            }else{
+            } else {
                 setShowVirtualData(false)
             }
 
@@ -847,12 +854,15 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
     }, [data])
 
     const getTimeInHours = (minute) => {
+        if ((orderType == "Upcoming" && data?.ordered_sub_services == 12) || (orderType == "InProgress" && data?.ordered_sub_services == 12)) {
+            return "---"
+        }
         let d = parseInt(minute / 60) + " Hr"
         if (minute % 60 !== 0) {
             d += ` ${parseInt(minute % 60)} Mins`
         }
-        if(Number(minute)==0){
-            return("--")
+        if (Number(minute) == 0) {
+            return ("--")
         }
         return `${d}`
     }
@@ -869,14 +879,14 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return lodash.round(return_value,2)
+                return lodash.round(return_value, 2)
             }
         } else {
             let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
                 return 0
             } else {
-                return lodash.round(return_value,2)
+                return lodash.round(return_value, 2)
 
             }
         }
@@ -1209,9 +1219,13 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
                 break
             case buttons_types.start_order:
                 let current = Date.now()
-                let job_start = moment(data?.requested_start_time, "YYYY-MM-DD HH:mm:[00]").unix() * 1000
+                let startD =data?.order_start_time
+                if (data?.order_status == order_types.will_be_delayed) {
+                    startD= data?.order_start_new_time
+                }
+                let job_start = moment(startD, "YYYY-MM-DD HH:mm:[00]").unix() * 1000
                 if (current < job_start) {
-                    Alert.alert('Start Order', `Customer requested job start time is ${moment(data?.requested_start_time).format("MM/DD/YYYY, hh:mm a")}. Do you still want to start the job right now?`, [
+                    Alert.alert('Start Order', `Customer requested job start time is ${moment(startD, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY, hh:mm a")}. Do you still want to start the job right now?`, [
                         { text: "No", onPress: () => { } },
                         {
                             text: "Yes", onPress: () => {
@@ -1236,7 +1250,7 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
                 openRatingModal()
                 break
             case buttons_types.cancel_update:
-                Alert.alert("Cancel", "Do you want to cancel update order?", [
+                Alert.alert("Cancel", "Do you want to cancel the update request?", [
                     {
                         text: "No"
                     },

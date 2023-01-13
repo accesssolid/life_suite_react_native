@@ -10,6 +10,7 @@ import { setAddServiceData } from '../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
 import { WebView } from "react-native-webview"
 import { role } from '../constants/globals';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 const TermsModal = (props) => {
     const dispatch = useDispatch()
@@ -71,7 +72,7 @@ const TermsModal = (props) => {
                         html: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
                             <HTML>
                             <HEAD></HEAD>                            
-                            <BODY style="font-size:30px">
+                            <BODY style="font-size:5vw">
                             ${data}
                             </BODY>
                             </HTML>`
@@ -100,12 +101,12 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.white,
         borderRadius: 10,
         paddingVertical: 10,
-        height: '50%',
-        width:"80%"
+        height: '60%',
+        width:"90%"
     },
     title: {
         fontFamily: LS_FONTS.PoppinsBold,
-        fontSize: 16,
+        fontSize: widthPercentageToDP(4),
         letterSpacing: 0.32,
         color: LS_COLORS.global.darkBlack,
         textTransform: 'uppercase',

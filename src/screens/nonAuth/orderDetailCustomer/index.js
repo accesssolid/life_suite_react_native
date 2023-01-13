@@ -101,9 +101,10 @@ export default function OrderDetailUpdateCustomer(props) {
 
     const [whoCancelled, setWhoCancelled] = React.useState({})
     const [order_variant, setOrderVariant] = React.useState({})
-    
+   
     React.useEffect(() => {
         // props.navigation.navigate("OrderSuspend", { item: data })
+        console.log(data)
         if (data?.order_logs?.length > 0) {
             let logs = [...data?.order_logs]
             logs.reverse()
@@ -747,6 +748,7 @@ export default function OrderDetailUpdateCustomer(props) {
                         {whoCancelled?.type != undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By</Text>: {whoCancelled?.type} ({whoCancelled?.name})</Text>}
 
                         <RenderAddressFromTO
+                            service_is_at_address={data?.service_is_at_address}
                             fromShow={data?.order_items[0]?.services_location_type == 2}
                             toShow={(data?.order_items[0]?.services_location_type == 2 || data?.order_items[0]?.services_location_type == 1)}
                             currentAddress={fromCoordinates}
@@ -946,6 +948,9 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
     }, [data])
 
     const getTimeInHours = (minute) => {
+        if((orderType=="Upcoming"&&data?.ordered_sub_services==12)||(orderType=="InProgress"&&data?.ordered_sub_services==12)){
+            return "---"
+        }
         let d = parseInt(minute / 60) + " Hr"
         if (minute % 60 !== 0) {
             d += ` ${parseInt(minute % 60)} Mins`
@@ -1027,7 +1032,15 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a"),
                 end_date: moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
             })
-        } else if (orderType == "Completed") {
+        }else if (orderType == "Upcoming"&&data?.ordered_sub_services==12) {
+            return ({
+                start: "Start Date/Time",
+                end: "End Date/Time",
+                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: "---"
+            })
+        }
+         else if (orderType == "Completed") {
             return ({
                 start: "Start Date/Time",
                 end: "End Date/Time",
@@ -1070,7 +1083,8 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
         <Card containerStyle={{ borderRadius: 10, overflow: "hidden" }}>
             <View style={{ flexDirection: "row" }}>
                 <Pressable onPress={() => {
-                    navigation.navigate("ProviderDetail", { providerId: data.provider_id, service: data?.order_items && (data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name) })
+                    console.log(data)
+                    navigation.navigate("ProviderDetail", { providerId: data.provider_id, service: data?.order_items && (data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name),service_id:data?.ordered_sub_services })
                 }} style={{ flex: 1, flexDirection: "row" }}>
                     <Avatar
                         size="large"
@@ -1079,11 +1093,11 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                     />
                     <View style={{ marginLeft: 10, justifyContent: "center", flex: 1.3 }}>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontSize: 16 }]}>{user.user_role === 3 ? data?.customers_first_name : data?.providers_first_name}</Text>
-                        {Boolean(data?.providers_business_name)&&<Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 12 }]}>{data?.providers_business_name}</Text>}
+                        {Boolean(data?.providers_business_name)&&<Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 12 ,fontStyle:"italic"}]}>{data?.providers_business_name}</Text>}
 
                         <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle]}>{country}</Text>
                         <View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", alignItems: "center" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, {}]}>Rating: {data?.providers_rating} </Text>
+                            <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, {}]}>Rating: {lodash.round(data?.providers_rating??0,2)} </Text>
                             {Number(data?.providers_rating) > 0 ? <Rating
                                 readonly={true}
                                 imageSize={12}
@@ -1266,7 +1280,7 @@ const OrderItemsDetail = ({ i }) => {
 }
 
 
-const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) => {
+const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow ,service_is_at_address}) => {
     const navigation = useNavigation()
     return (
         <View style={{ marginHorizontal: 20, marginTop: 0 }}>
@@ -1309,7 +1323,7 @@ const RenderAddressFromTO = ({ addresses, currentAddress, fromShow, toShow }) =>
             }
             {toShow &&
                 <>
-                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginTop: 16, marginBottom: 8 }]}>Requested To</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { marginTop: 16, marginBottom: 8 }]}>{Boolean(Number(service_is_at_address))?"Provider Address":"Requested To"}</Text>
                     <TouchableOpacity
                         onPress={() => {
                             if (addresses.toCoordinates?.latitude && addresses.toCoordinates?.longitude) {

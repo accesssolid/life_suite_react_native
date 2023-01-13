@@ -9,6 +9,7 @@ import { getApi } from '../api/api';
 import { setAddServiceData } from '../redux/features/services';
 import { ScrollView } from 'react-native-gesture-handler';
 import {WebView} from "react-native-webview"
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 const AboutUsModal = (props) => {
     const dispatch = useDispatch()
@@ -63,7 +64,7 @@ const AboutUsModal = (props) => {
                         html: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
                             <HTML>
                             <HEAD></HEAD>                            
-                            <BODY style="font-size:30px">
+                            <BODY style="font-size:5vw">
                             ${data}
                             </BODY>
                             </HTML>`
@@ -87,18 +88,18 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     container: {
-        width: '80%',
+        width: '90%',
         alignSelf: 'center',
         padding: '4%',
         backgroundColor: LS_COLORS.global.white,
         borderRadius: 10,
         paddingVertical: 10,
         overflow: 'hidden',
-        height: '50%'
+        height: '60%'
     },
     title: {
         fontFamily: LS_FONTS.PoppinsBold,
-        fontSize: 16,
+        fontSize: widthPercentageToDP(4),
         letterSpacing: 0.32,
         color: LS_COLORS.global.darkBlack,
         textTransform: 'uppercase',

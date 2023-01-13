@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     Modal,
     StyleSheet,
@@ -32,7 +32,7 @@ const TimeFrame = props => {
     const [selectedDate, setSelectedDate] = React.useState(new Date())
     const [type, setType] = React.useState("start")
     const [selectedIndex, setSelectedIndex] = React.useState(null)
-
+    const [mile_distanceP, setMileDistanceP] = React.useState({})
     // const 
     const handleConfirm = (date) => {
         console.log(date, selectedIndex, type)
@@ -77,6 +77,9 @@ const TimeFrame = props => {
         if (props.data && props.orderPreviousData) {
             setData(props.data)
             setOrderPreviousData(props.orderPreviousData)
+        }
+        if (props.mile_distanceP) {
+            setMileDistanceP(props.mile_distanceP)
         }
     }, [props])
 
@@ -135,13 +138,20 @@ const TimeFrame = props => {
                         "items": [...new Set(selectedServices)],
                         "itemsName": [...selectedServicesName], //need to removed when order hited
                         "products": [...new Set(selectedProducts)],
-                        "other_options": otherOptions
+                        "other_options": otherOptions,
+                        "service_is_at_address": p.service_is_at_address,
+                        "mile_distance": Boolean(Number(p?.service_is_at_address)) ? mile_distanceP[`${p.id}`] : orderPreviousData?.mile_distance,
+                        "order_placed_address": Boolean(Number(p?.service_is_at_address)) ? p?.address?.address_line_1 : orderPreviousData?.order_placed_address,
+                        "order_placed_lat": Boolean(Number(p?.service_is_at_address)) ? p?.address?.lat : orderPreviousData?.order_placed_lat,
+                        "order_placed_long": Boolean(Number(p?.service_is_at_address)) ? p?.address?.long : orderPreviousData?.order_placed_long,
                     })
                 }
             }
+            console.log("JSON", z)
+
             setJsonData(_.cloneDeep(z))
         }
-    }, [data])
+    }, [data, mile_distanceP])
 
     return (
         <Modal
@@ -188,7 +198,7 @@ const TimeFrame = props => {
                                                 estimated_price += Number(item.price)
                                                 for (let product of item?.products) {
                                                     if (product.checked) {
-                                                        if (product?.item_products_is_per_mile=="1") {
+                                                        if (product?.item_products_is_per_mile == "1") {
                                                             estimated_price += Number(product.price) * lodash.round(Number(orderPreviousData?.mile_distance), 2)
                                                         } else {
                                                             estimated_price += Number(product.price)
@@ -202,7 +212,6 @@ const TimeFrame = props => {
                             }
                             let p_obj = data?.find(x => x.id == i.provider_id)
                             let location = props?.location
-
                             if (p_obj) {
                                 if (p_obj?.service_is_at_address == "1") {
                                     location = p_obj?.address?.address_line_1
@@ -216,6 +225,8 @@ const TimeFrame = props => {
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Time: {time_format}</Text>
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Location: {location}</Text>
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${lodash.round(estimated_price, 2)}</Text>
+                                {/* <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Distance: {lodash.round(orderPreviousData?.mile_distance, 2)}</Text> */}
+
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 13, marginTop: "5%" }}>My available start time between:</Text>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "100%" }}>
                                     <View style={{ width: "50%", minHeight: 60 }} >
@@ -272,7 +283,15 @@ const TimeFrame = props => {
                                             "order_end_time": x.order_end_time,
                                             "items": x.items.map(String),
                                             "products": x.products.map(String),
-                                            "other_options": x.other_options
+                                            "other_options": x.other_options,
+                                            "order_placed_address": x?.order_placed_address,
+                                            "order_placed_lat": x?.order_placed_lat,
+                                            "order_placed_long": x?.order_placed_long,
+                                            "order_from_address": orderPreviousData?.order_from_address,
+                                            "order_from_lat": orderPreviousData?.order_from_lat,
+                                            "order_from_long": orderPreviousData?.order_from_long,
+                                            "mile_distance": x?.mile_distance,
+                                            "service_is_at_address": x?.service_is_at_address
                                         })
                                     }))
                                 }}>
@@ -308,153 +327,178 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
     })
     const [my_location, setMyLocation] = React.useState(false)
     const handleSave = () => {
-        getFilteredData({ ...rating, ...time,...price }, my_location)
+        getFilteredData({ ...rating, ...time, ...price }, my_location)
         setVisible(false)
     }
+    const scrollRef = useRef(null)
     return (
         <Modal
             visible={visible}
             animationType="fade"
             transparent={true}
         >
-            <Pressable onPress={() => setVisible(false)}  style={{flex:1}}>
-            <KeyboardAvoidingView behavior={Platform.OS=="android"?"none":"padding"} style={styles.modalScreen}>
-                <Card style={{
-                    backgroundColor: 'white',
-                    width: "95%",
-                    borderRadius: 10,
-                    padding: 10,
-                    // maxHeight:"80%"
-                }}>
-                    <Pressable>
-                        <ScrollView>
-                        <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Filter</Text>
-                        <View style={{ marginTop: "10%" }}>
-                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>I want services at my location:</Text>
-                                <CheckBox
-                                    checked={my_location}
-                                    onPress={() => {
-                                        setMyLocation(!my_location)
-                                    }}
-                                    checkedIcon='dot-circle-o'
-                                    uncheckedIcon='circle-o'
-                                />
-                            </View>
-                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>Rating:</Text>
-                            {[4, 3, 2, 1].map(x => <TouchableOpacity onPress={() => {
-                                setRating({
-                                    range_start_rating: "" + x,
-                                    range_end_rating: ""
-                                })
-                            }} style={{ flexDirection: "row", justifyContent: "space-between" }} ><View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
-                                    <Rating
-                                        type='custom'
-                                        ratingColor='gold'
-                                        ratingBackgroundColor='white'
-                                        ratingCount={5}
-                                        imageSize={20}
-                                        startingValue={x ?? 0}
-                                        readonly={true}
-                                    />
-                                    <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black }}> & Up</Text>
-                                </View>
-                                <CheckBox
-                                    checked={x == Number(rating.range_start_rating)}
-                                    onPress={() => {
+            <Pressable onPress={() => setVisible(false)} style={{ flex: 1 }}>
+                <KeyboardAvoidingView behavior={Platform.OS == "android" ? "none" : "padding"} style={styles.modalScreen}>
+                    <Card style={{
+                        backgroundColor: 'white',
+                        width: "95%",
+                        borderRadius: 10,
+                        padding: 10,
+                        // maxHeight:"80%"
+                    }}>
+                        <Pressable>
+                            <ScrollView ref={scrollRef}>
+                                <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Filter</Text>
+                                <View style={{ marginTop: "10%" }}>
+                                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                                        <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>I want services at my location:</Text>
+                                        <CheckBox
+                                            checked={my_location}
+                                            onPress={() => {
+                                                setMyLocation(!my_location)
+                                            }}
+                                            checkedIcon='dot-circle-o'
+                                            uncheckedIcon='circle-o'
+                                        />
+                                    </View>
+                                    <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green }}>Rating:</Text>
+                                    {[4, 3, 2, 1].map(x => <TouchableOpacity onPress={() => {
                                         setRating({
                                             range_start_rating: "" + x,
                                             range_end_rating: ""
                                         })
-                                    }}
-                                    checkedIcon='dot-circle-o'
-                                    uncheckedIcon='circle-o'
-                                // checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
-                                // uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
-                                />
-                            </TouchableOpacity>)}
-                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10 }}>Price : </Text>
-                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
-                                    <Text maxFontSizeMultiplier={1.5}>$</Text>
-                                    <TextInput maxFontSizeMultiplier={1.5} value={price.range_start_price} onChangeText={t => {
-                                        setPrice({
-                                            range_start_price: t,
-                                            range_end_price: price.range_end_price
-                                        })
-                                    }} keyboardType="numeric" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
+                                    }} style={{ flexDirection: "row", justifyContent: "space-between" }} ><View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
+                                            <Rating
+                                                type='custom'
+                                                ratingColor='gold'
+                                                ratingBackgroundColor='white'
+                                                ratingCount={5}
+                                                imageSize={20}
+                                                startingValue={x ?? 0}
+                                                readonly={true}
+                                            />
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black }}> & Up</Text>
+                                        </View>
+                                        <CheckBox
+                                            checked={x == Number(rating.range_start_rating)}
+                                            onPress={() => {
+                                                setRating({
+                                                    range_start_rating: "" + x,
+                                                    range_end_rating: ""
+                                                })
+                                            }}
+                                            checkedIcon='dot-circle-o'
+                                            uncheckedIcon='circle-o'
+                                        // checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/checked.png")} />}
+                                        // uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../assets/unchecked.png")} />}
+                                        />
+                                    </TouchableOpacity>)}
+                                    <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10 }}>Price : </Text>
+                                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                        <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
+                                            <Text maxFontSizeMultiplier={1.5}>$</Text>
+                                            <TextInput maxFontSizeMultiplier={1.5} value={price.range_start_price} onChangeText={t => {
+                                                setPrice({
+                                                    range_start_price: t,
+                                                    range_end_price: price.range_end_price
+                                                })
+                                            }} onFocus={() => {
+                                                scrollRef?.current?.scrollToEnd({ animated: true })
+                                                setTimeout(() => {
+                                                    scrollRef?.current?.scrollToEnd({ animated: true })
+                                                }, 1000)
+
+                                            }} keyboardType="numeric" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
+                                        </View>
+                                        <Text maxFontSizeMultiplier={1.5}>  -  </Text>
+                                        <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
+                                            <Text maxFontSizeMultiplier={1.5}>$</Text>
+                                            <TextInput onFocus={() => {
+                                                scrollRef?.current?.scrollToEnd({ animated: true })
+                                                setTimeout(() => {
+                                                    scrollRef?.current?.scrollToEnd({ animated: true })
+                                                }, 1000)
+
+                                            }} maxFontSizeMultiplier={1.5} value={price.range_end_price} onChangeText={t => {
+                                                setPrice({
+                                                    range_start_price: price.range_start_price,
+                                                    range_end_price: t
+                                                })
+                                            }} keyboardType="numeric" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
+                                        </View>
+                                    </View>
+                                    <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10, marginBottom: 5 }}>Time (minute): </Text>
+                                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                        <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
+                                            <TextInput onFocus={() => {
+                                                scrollRef?.current?.scrollToEnd({ animated: true })
+                                                setTimeout(() => {
+                                                    scrollRef?.current?.scrollToEnd({ animated: true })
+                                                }, 1000)
+
+                                            }} maxFontSizeMultiplier={1.5} value={time.range_start_time} onChangeText={t => {
+                                                setTime({
+                                                    range_start_time: t,
+                                                    range_end_time: time.range_end_time
+                                                })
+                                            }} keyboardType="number-pad" returnKeyType='done' style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
+                                        </View>
+                                        <Text maxFontSizeMultiplier={1.5}>  -  </Text>
+                                        <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
+                                            <TextInput onFocus={() => {
+                                                scrollRef?.current?.scrollToEnd({ animated: true })
+                                                setTimeout(() => {
+                                                    scrollRef?.current?.scrollToEnd({ animated: true })
+                                                }, 1000)
+
+                                            }} maxFontSizeMultiplier={1.5} value={time.range_end_time} onChangeText={t => {
+                                                setTime({
+                                                    range_start_time: time.range_start_time,
+                                                    range_end_time: t
+                                                })
+                                            }} keyboardType="number-pad" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
+
+                                        </View>
+
+                                    </View>
                                 </View>
-                                <Text maxFontSizeMultiplier={1.5}>  -  </Text>
-                                <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
-                                    <Text maxFontSizeMultiplier={1.5}>$</Text>
-                                    <TextInput maxFontSizeMultiplier={1.5} value={price.range_end_price} onChangeText={t => {
-                                        setPrice({
-                                            range_start_price: price.range_start_price,
-                                            range_end_price: t
-                                        })
-                                    }} keyboardType="numeric" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
+
+                                <View style={{ marginTop: '10%', flexDirection: "row", justifyContent: "space-between" }}>
+                                    <TouchableOpacity
+                                        style={styles.save}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+                                            setRating({
+                                                "range_start_rating": "",
+                                                "range_end_rating": ""
+                                            })
+                                            setPrice({
+                                                "range_start_price": "",
+                                                "range_end_price": ""
+                                            })
+                                            setTime({
+                                                "range_start_time": "",
+                                                "range_end_time": ""
+                                            })
+                                            setMyLocation(false)
+                                        }}>
+                                        <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Clear</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.save}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+                                            handleSave()
+                                        }}>
+                                        <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Save</Text>
+                                    </TouchableOpacity>
                                 </View>
-                            </View>
-                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.green, marginTop: 10, marginBottom: 5 }}>Time (minute): </Text>
-                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
-                                    <TextInput maxFontSizeMultiplier={1.5} value={time.range_start_time} onChangeText={t => {
-                                        setTime({
-                                            range_start_time: t,
-                                            range_end_time: time.range_end_time
-                                        })
-                                    }} keyboardType="number-pad" returnKeyType='done' style={{ color: "black", paddingVertical: 5 }} placeholder="Min" placeholderTextColor="gray" />
-                                </View>
-                                <Text maxFontSizeMultiplier={1.5}>  -  </Text>
-                                <View style={{ flexDirection: "row", alignItems: "center", borderColor: "gray", borderRadius: 5, borderWidth: 1, paddingHorizontal: 10 }}>
-                                    <TextInput maxFontSizeMultiplier={1.5} value={time.range_end_time} onChangeText={t => {
-                                        setTime({
-                                            range_start_time: time.range_start_time,
-                                            range_end_time: t
-                                        })
-                                    }} keyboardType="number-pad" returnKeyType="done" style={{ color: "black", paddingVertical: 5 }} placeholder="Max" placeholderTextColor="gray" />
+                            </ScrollView>
 
-                                </View>
+                        </Pressable>
+                    </Card>
 
-                            </View>
-                        </View>
-
-                        <View style={{ marginTop: '10%', flexDirection: "row", justifyContent: "space-between" }}>
-                            <TouchableOpacity
-                                style={styles.save}
-                                activeOpacity={0.7}
-                                onPress={() => {
-                                    setRating({
-                                        "range_start_rating": "",
-                                        "range_end_rating": ""
-                                    })
-                                    setPrice({
-                                        "range_start_price": "",
-                                        "range_end_price": ""
-                                    })
-                                    setTime({
-                                        "range_start_time": "",
-                                        "range_end_time": ""
-                                    })
-                                    setMyLocation(false)
-                                }}>
-                                <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Clear</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.save}
-                                activeOpacity={0.7}
-                                onPress={() => {
-                                    handleSave()
-                                }}>
-                                <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Save</Text>
-                            </TouchableOpacity>
-                        </View>
-                        </ScrollView>
-
-                    </Pressable>
-                </Card>
-
-            </KeyboardAvoidingView>
+                </KeyboardAvoidingView>
             </Pressable>
         </Modal>
     )

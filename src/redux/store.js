@@ -13,6 +13,9 @@ import blockModel from './features/blockModel'
 import dot from './features/showDot'
 import variant from './features/variantData'
 import favorites from './features/favorites'
+import questionaireModel from './features/questionaire.model'
+import currentlocation from './features/currentlocation'
+
 const store = configureStore({
     reducer: {
         authenticate: AuthenticateReducer,
@@ -28,7 +31,9 @@ const store = configureStore({
         blockModel,
         dot,
         variant,
-        favorites
+        favorites,
+        questionaireModel,
+        currentlocation
     },
 })
 

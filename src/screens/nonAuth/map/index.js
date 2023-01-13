@@ -42,7 +42,7 @@ const MapScreen = (props) => {
     })
 
     useEffect(() => {
-        if (coords == null) {
+        if (coords?.latitude ==  37.78825&&coords?.longitude==-122.4324) {
             getLocationPermission()
         } else {
             setCoordinates(coords)

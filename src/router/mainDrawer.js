@@ -31,6 +31,8 @@ import MapScreen from '../screens/nonAuth/map';
 import AddTimeFrame from '../screens/nonAuth/addTimeFrame';
 import OrderHistory1 from '../screens/nonAuth/orderHistory1';
 import UpdateCertificateStack from './updateCertificateStack';
+import UpdateQuestionaireStack from './updateQuestionaireStack';
+
 import { getApi } from '../api/api';
 import { role } from '../constants/globals';
 import { useDispatch } from 'react-redux';
@@ -437,6 +439,14 @@ const MainDrawer = (props) => {
                         drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
                     }}
                 />
+                 <Drawer.Screen
+                    name="UpdateQuestionaireStack"
+                    component={UpdateQuestionaireStack}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <View style={{ height: 0 }} />,
+                        drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
+                    }}
+                />
             </Drawer.Navigator>
             <TermsModal
                 isVisible={termsVisible}
@@ -755,11 +765,27 @@ const CustomDrawerContent = (props) => {
                         color: LS_COLORS.global.darkBlack,
                     }}
                     maxFontSizeMultiplier={1.7}
-                >Update Certificate
+                >Update Certificate/License
                 </Text>}
                 icon={({ focused, color }) => <Image resizeMode="cover" source={require('../assets/certs.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
                     navigation.navigate("UpdateCertificateStack", { screen: "UpdateCertificateServiceList" })
+                }}
+            />}
+            {user?.user_role == role.provider && <DrawerItem
+                style={{ marginTop: 0 }}
+                label={(props) => <Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >Update Questionaire
+                </Text>}
+                icon={({ focused, color }) => <Image resizeMode="cover" source={require('../assets/q.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    navigation.navigate("UpdateQuestionaireStack", { screen: "UpdateQServiceList" })
                 }}
             />}
             <DrawerItem

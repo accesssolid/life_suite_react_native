@@ -21,7 +21,7 @@ import { useNavigation } from '@react-navigation/core';
 import { setAddServiceMode } from '../../../redux/features/services';
 import { role } from '../../../constants/globals';
 import { setFavList } from '../../../redux/features/favorites';
-
+import lodash from 'lodash'
 const Favourites = (props) => {
     const dispatch = useDispatch()
     const [selected, setselected] = useState(null)
@@ -263,7 +263,7 @@ const Favourites = (props) => {
                                     <View style={{flex:1}} />
                                     <View>
                                         {/* <Text maxFontSizeMultiplier={1.5}>Price: $25/hr</Text> */}
-                                        <Text maxFontSizeMultiplier={1.5}>Rating: {parseInt(item.rating)}</Text>
+                                        <Text maxFontSizeMultiplier={1.5}>Rating: {lodash.round(item.rating,2)}</Text>
                                     </View>
                                     <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: 50, justifyContent: 'center', alignItems: "center", marginLeft: 10 }}>
                                         <Image source={require('../../../assets/heartGreen.png')} style={{ height: 25, width: 25 }} resizeMode="contain" />

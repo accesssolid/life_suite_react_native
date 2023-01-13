@@ -134,7 +134,7 @@ const OrderHistory = (props) => {
                         if (page == 1) {
                             setData(response.data.data)
                         } else {
-                            setData(state => ([...state, ...response.data.data]))
+                            setData(state => ([...state, ...response.data.data]).filter((v,i,a)=>a.findIndex(v2=>(v2.id===v.id))===i))
                         }
                         setPageData({
                             current_page: response.data?.current_page,

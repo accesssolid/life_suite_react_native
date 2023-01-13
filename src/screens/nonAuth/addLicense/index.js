@@ -20,6 +20,7 @@ import { getMyJobsThunk, setMyJobs } from '../../../redux/features/provider';
 import { setAddServiceData, setAddServiceMode } from '../../../redux/features/services';
 import { Alert } from 'react-native';
 import { Dimensions } from 'react-native';
+import { addUpdateQuestionaire } from '../../../redux/features/questionaire.model';
 
 const { width } = Dimensions.get("window")
 const upload_types = [
@@ -454,6 +455,7 @@ const AddLicense = (props) => {
                 showToast(res.message)
                 dispatch(getMyJobsThunk(user.id,access_token))
                 props.navigation.navigate("HomeScreen")
+                dispatch(addUpdateQuestionaire())
             }else{
                 showToast(res.message)
 

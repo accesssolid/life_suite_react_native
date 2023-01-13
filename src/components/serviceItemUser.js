@@ -39,6 +39,7 @@ const ServiceItemUser = (props) => {
     }, [otherText, haveOwnText, isNeedRecommendationSelected, isOtherSelected, isHaveOwnSelected])
 
     React.useEffect(()=>{
+        console.log(props.item)
         if(props.item&&props.extraData){
             let data=props.extraData.find(x=>x.parent_id==props.item.id)
             if(data){
@@ -84,7 +85,7 @@ const ServiceItemUser = (props) => {
                         )
                     })}
 
-                    <View style={{ flexDirection: 'row', width: '90%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {props?.item?.service_id!=12&&<><View style={{ flexDirection: 'row', width: '90%', alignSelf: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
                         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'flex-start' }}>
                             <CheckBox
                                 checked={isOtherSelected}
@@ -142,7 +143,7 @@ const ServiceItemUser = (props) => {
                             />
                             <Text  maxFontSizeMultiplier={1.5}  style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsMedium, alignSelf: 'center', width: '55%', }}>Need recommendation</Text>
                         </View>
-                    </View>
+                    </View></>}
                 </ScrollView>
             </View>}
         </>

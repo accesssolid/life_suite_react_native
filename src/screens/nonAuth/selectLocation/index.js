@@ -21,6 +21,7 @@ import { showToast } from '../../../components/validators';
 import { Dimensions } from 'react-native';
 import CustomTextInput from '../../../components/customTextInput';
 import { getMyJobsThunk } from '../../../redux/features/provider';
+import { addUpdateQuestionaire } from '../../../redux/features/questionaire.model';
 const { width } = Dimensions.get("window")
 
 const SelectLocation = (props) => {
@@ -298,6 +299,8 @@ const SelectLocation = (props) => {
                 showToast(response.message)
                 dispatch(getMyJobsThunk(user.id, access_token))
                 props.navigation.navigate("HomeScreen")
+                dispatch(addUpdateQuestionaire())
+
             } else {
                 showToast(response.message, 'danger')
             }

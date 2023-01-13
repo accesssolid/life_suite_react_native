@@ -15,6 +15,8 @@ import { BASE_URL, getApi } from '../../../api/api';
 import Loader from '../../../components/loader';
 import LS_FONTS from '../../../constants/fonts';
 import { setAddServiceMode } from '../../../redux/features/services';
+import { setQOpen, setQService, setQuestionTypes } from '../../../redux/features/questionaire.model';
+import ReviewBusiness from '../../../components/ReviewBusiness';
 
 const SubServices = (props) => {
     const { service } = props.route.params
@@ -27,12 +29,12 @@ const SubServices = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
 
     useEffect(() => {
-        if(userType=="guest"){
+        if (userType == "guest") {
             getGuestSubServices()
-        }else{
+        } else {
             getSubServices()
         }
-        
+
     }, [userType])
 
     const getSubServices = () => {
@@ -68,7 +70,7 @@ const SubServices = (props) => {
                 setLoading(false)
             })
     }
-    
+
     const getGuestSubServices = () => {
         setLoading(true)
         let headers = {
@@ -83,7 +85,7 @@ const SubServices = (props) => {
         let config = {
             headers: headers,
             data: JSON.stringify({ ...user_data }),
-            endPoint:'/api/guestCustomerSubServicesList' ,
+            endPoint: '/api/guestCustomerSubServicesList',
             type: 'post'
         }
 
@@ -128,12 +130,12 @@ const SubServices = (props) => {
                     getSubServices()
                 }
                 else {
-                    
+
                 }
             }).catch(err => {
             })
     }
-
+const [selectedItem,setSelectedItem]=useState(null)
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -144,10 +146,10 @@ const SubServices = (props) => {
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
-                 
-                    props.navigation.navigate("HomeScreen",{screen:"HomeScreen"})
+
+                    props.navigation.navigate("HomeScreen", { screen: "HomeScreen" })
                 }}
-                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
             <View style={styles.container}>
@@ -166,11 +168,18 @@ const SubServices = (props) => {
                                             if (user.user_role == 3) {
                                                 dispatch(setAddServiceMode({ data: true }))
                                             }
-                                            console.log("Items",item)
-                                            props.navigation.navigate("ServicesProvided", { subService: item, items: [] })
+                                            setSelectedItem(item)
+                                            if (user.user_role == 3&&(item?.is_certified == "1" || item?.is_insauranced == "1" || item?.is_business_licensed == "1")) {
+                                                dispatch(setQService(item?.id))
+                                                dispatch(setQuestionTypes({ is_certified: Number(item?.is_certified), is_insauranced: Number(item?.is_insauranced), is_business_licensed: Number(item?.is_business_licensed) }))
+                                                dispatch(setQOpen(true))
+                                            } else {
+                                                props.navigation.navigate("ServicesProvided", { subService: item , items: []});
+                                            }
+                                            // props.navigation.navigate("ServicesProvided", { subService: item, items: [] })
                                         }}
-                                        favorite = {() => {like(item.id)}}
-                                        favStatus = {item.isFavourite}
+                                        favorite={() => { like(item.id) }}
+                                        favStatus={item.isFavourite}
                                     />
                                 )
                             }}
@@ -183,6 +192,14 @@ const SubServices = (props) => {
                 }
             </View>
             {loading && <Loader />}
+            <ReviewBusiness
+                pressHandler={() => {
+                    dispatch(setQOpen(false))
+                }}
+                onPressNext={() => {
+                    dispatch(setQOpen(false))
+                    props.navigation.navigate("ServicesProvided", { subService: selectedItem , items: []});
+                }} />
         </SafeAreaView>
     )
 }

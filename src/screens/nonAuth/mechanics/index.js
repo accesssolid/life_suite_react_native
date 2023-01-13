@@ -252,10 +252,12 @@ const Mechanics = (props) => {
 
     const locationMileDistanceUpdate = async () => {
         let d = { ...mile_distanceP }
+        console.log("Data",data)
         for (let provider of dupProviders) {
             let x = await getMilesBetweenCords({ latitude: provider?.address?.lat, longitude: provider?.address?.long }, { latitude: data.order_placed_lat, longitude: data.order_placed_long })
-            d[`${provider._id}`] = x
+            d[`${provider.id}`] = x
         }
+        console.log(d)
         setMileDistanceP(d)
     }
 
@@ -274,7 +276,6 @@ const Mechanics = (props) => {
             endPoint: '/api/providerListOrder',
             type: 'post'
         }
-
         getApi(config)
             .then((response) => {
 
@@ -341,14 +342,7 @@ const Mechanics = (props) => {
         setLoading(true)
         var formdata = new FormData();
         formdata.append("items_data", JSON.stringify(jsonData))
-        formdata.append("order_placed_address", data.order_placed_address)
-        formdata.append("order_placed_lat", data.order_placed_lat.toString())
-        formdata.append("order_placed_long", data.order_placed_long.toString())
-        formdata.append("order_from_address", data.order_from_address)
-        formdata.append("order_from_lat", data.order_from_lat.toString())
-        formdata.append("order_from_long", data.order_from_long.toString())
         formdata.append("timezone", RNLocalize.getTimeZone())
-        formdata.append("mile_distance", data.mile_distance)
         formdata.append("country", current_address.country)
         formdata.append("state", current_address.state)
         formdata.append("city", current_address.city)
@@ -484,7 +478,6 @@ const Mechanics = (props) => {
     const dispatch = useDispatch()
     const favs = useSelector(state => state.favorites)?.list
     useEffect(() => {
-        console.log("FAVS", favs)
         let d = _.cloneDeep(dupProviders)
         let fvs = favs?.map(x => x.id)
         d = d.map(x => {
@@ -570,6 +563,7 @@ const Mechanics = (props) => {
                     starting_time={data.order_start_time}
                     ending_time={data.order_end_time}
                     orderPreviousData={data}
+                    mile_distanceP={mile_distanceP}
                     provider_prices={provider_prices}
                     location={data?.order_placed_address}
                     action={(jsonData) => {
@@ -666,7 +660,11 @@ const Mechanics = (props) => {
                                     if (x > 1) {
                                         time_format = parseInt(x) + " hr " + item.timeDuration % 60 + " min"
                                     } else {
-                                        time_format = item.timeDuration + " min"
+                                        if(item.timeDuration==0){
+                                            time_format="To be determined"
+                                        }else{
+                                            time_format = item.timeDuration + " min"
+                                        }
                                     }
                                     let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
                                     let totalProductPrice = 0
@@ -688,13 +686,19 @@ const Mechanics = (props) => {
                                     }
                                     let totalPrice = 0
                                     totalPrice = Number(totalServicePrice) + Number(totalProductPrice)
-
+                                    let is_business_licensed=false
+                                    let is_certified=false
+                                    let is_insauranced=false
+                                    if(item?.questionnaire_data?.length>0){
+                                        is_business_licensed=item?.questionnaire_data[0]?.is_business_licensed=="1"
+                                        is_certified=item?.questionnaire_data[0]?.is_certified=="1"
+                                        is_insauranced=item?.questionnaire_data[0]?.is_insauranced=="1"
+                                    }
 
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Pressable onPress={() => {
-                                                // props.navigation.navigate("AddCard1")
-                                                props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService?.name })
+                                                props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService?.name, service_id: subService?.id ,list:true})
                                             }} style={{ flexDirection: 'row' }}>
                                                 <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
                                                     <Image
@@ -705,7 +709,7 @@ const Mechanics = (props) => {
                                                 </View>
                                                 <View style={{ flexDirection: 'column', marginLeft: "5%", }}>
                                                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{item.first_name}</Text>
-                                                    {Boolean(item?.business_name) && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16,fontStyle:"italic", color: LS_COLORS.global.black }}>{item?.business_name}</Text>}
+                                                    {Boolean(item?.business_name) && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontStyle: "italic", color: LS_COLORS.global.black }}>{item?.business_name}</Text>}
                                                     <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular }}>{countryName.trim()}</Text>
                                                 </View>
                                             </Pressable>
@@ -737,8 +741,23 @@ const Mechanics = (props) => {
                                             :
                                             <Text maxFontSizeMultiplier={1.5} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
                                         }
+                                        <View style={{  flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 10 }}>
+                                            {is_certified&&<View style={{ flexDirection: "row", alignItems: "center" ,marginVertical: 5,}}>
+                                                <Image source={require("../../../assets/profile/certify.png")} style={{ height: 15, width: 12 }} resizeMode="contain" />
+                                                <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black, marginLeft: 5 }}>Certified</Text>
+                                            </View>}
+                                            {is_business_licensed&&<View style={{ flexDirection: "row", alignItems: "center",marginVertical: 5, }}>
+                                                <Image source={require("../../../assets/profile/license.png")} style={{ height: 15, width: 15 }} resizeMode="contain" />
+                                                <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black, marginLeft: 5 }}>Licensed</Text>
+                                            </View>}
+                                            {is_insauranced&&<View style={{ flexDirection: "row", alignItems: "center",marginVertical: 5, }}>
+                                                <Image source={require("../../../assets/profile/insured.png")} style={{ height: 15, width: 15 }} resizeMode="contain" />
+                                                <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black, marginLeft: 5 }}>Insured</Text>
+                                            </View>}
+                                        </View>
                                         <View style={{ width: 120, flexDirection: "row", overflow: "hidden", justifyContent: "space-evenly", alignItems: "center" }}>
                                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green, }}> {"Rating"}</Text>
+
                                             <Rating
                                                 readonly={true}
                                                 imageSize={10}
@@ -750,7 +769,7 @@ const Mechanics = (props) => {
                                             />
                                         </View>
                                         {checkShowAddress(Number(item?.address_is_public) && Number(item?.service_is_at_address)) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Services will be provided at this address : <Text style={{ textAlign: "right" }}>{item?.address?.address_line_1}</Text></Text>}
-                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {checkShowAddress(Number(item?.service_is_at_address)) ? lodash.round(mile_distanceP[`${item?._id}`] ?? 0, 2) : lodash.round(data.mile_distance, 2)} miles</Text>}
+                                        {(checkShowAddress(Number(item?.service_is_at_address)) || showDistanceOrNot) && <Text maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {checkShowAddress(Number(item?.service_is_at_address)) ? lodash.round(mile_distanceP[`${item?.id}`] ?? 0, 2) : lodash.round(data.mile_distance, 2)} miles</Text>}
 
                                         <View style={{ marginLeft: 10 }}>
                                             {Boolean(ordered_variant?.variant_title) && <Text maxFontSizeMultiplier={1.5}

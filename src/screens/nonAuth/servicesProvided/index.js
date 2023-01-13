@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, KeyboardAvoidingView, TouchableOpacity, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, KeyboardAvoidingView, TouchableOpacity, ScrollView, Alert, PermissionsAndroid } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -8,6 +8,7 @@ import LS_FONTS from '../../../constants/fonts';
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Geolocation from 'react-native-geolocation-service';
 
 /* Components */;
 import Header from '../../../components/header';
@@ -22,6 +23,7 @@ import ServiceItemUser from '../../../components/serviceItemUser';
 import _ from 'lodash'
 import { updateSignupModal } from '../../../redux/features/signupModal';
 import { setVariantData } from '../../../redux/features/variantData';
+import { setCurrentLocationData } from '../../../redux/features/currentlocation';
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -56,12 +58,12 @@ const ServicesProvided = (props) => {
 
     React.useEffect(() => {
         let data = {
-            "variant_title": vehicleType?.service_variants_name??"",
-            "variant": vehicleType?.name??"",
-            "variant_id": vehicleType?.variant_id??"",
-            "make": makeList.find(x => x.id == selectedMake)?.title??"",
-            "model":  modelList.find(x => x.id == selectedModel)?.title??"",
-            "year":  yearList.find(x => x.id == selectedYear)?.title??""
+            "variant_title": vehicleType?.service_variants_name ?? "",
+            "variant": vehicleType?.name ?? "",
+            "variant_id": vehicleType?.variant_id ?? "",
+            "make": makeList.find(x => x.id == selectedMake)?.title ?? "",
+            "model": modelList.find(x => x.id == selectedModel)?.title ?? "",
+            "year": yearList.find(x => x.id == selectedYear)?.title ?? ""
         }
         console.log(data)
         dispatch(setVariantData(data))
@@ -193,7 +195,62 @@ const ServicesProvided = (props) => {
             setSelectedYear("")
         }
     }, [selectedModel])
+    useEffect(() => {
+        getLocationPermission()
+    }, [])
+    const getLocationPermission = async () => {
+        if (Platform.OS == "ios") {
+            Geolocation.requestAuthorization('always').then((res) => {
+                if (res == "granted") {
+                    Geolocation.getCurrentPosition(
+                        (position) => {
+                            dispatch(setCurrentLocationData({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                            }))
+                        },
+                        (error) => {
+                            console.log(error.code, error.message);
+                        },
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                    );
+                } else {
+                }
+            })
+        } else {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        title: "Lifesuite Location Permission",
+                        message:
+                            "Lifesuite needs to access your location ",
+                        buttonNeutral: "Ask Me Later",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK"
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    Geolocation.getCurrentPosition(
+                        (position) => {
+                            dispatch(setCurrentLocationData({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                            }))
+                        },
+                        (error) => {
+                            console.log(error.code, error.message);
+                        },
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                    );
+                } else {
 
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+    }
     const getYear = async (id) => {
         setLoading(true)
         let headers = {

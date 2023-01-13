@@ -27,6 +27,7 @@ import { setAddServiceMode, clearCleanData } from '../../../redux/features/servi
 import { ScrollView } from 'react-native-gesture-handler';
 import { CheckBox, Toast } from 'native-base'
 import { indexOf } from 'lodash';
+import { addUpdateQuestionaire } from '../../../redux/features/questionaire.model';
 const Moment = require("moment")
 const MomentRange = require("moment-range")
 const moment = MomentRange.extendMoment(Moment)
@@ -208,6 +209,7 @@ const AddTimeFrame = (props) => {
                     showToast(response.message, 'success')
                     data = []
                     getMyJobs(true)
+                    dispatch(addUpdateQuestionaire())
                 }
                 else {
                     setLoading(false)

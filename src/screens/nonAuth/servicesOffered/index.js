@@ -24,6 +24,7 @@ import { getMyJobsThunk } from '../../../redux/features/provider';
 const { width } = Dimensions.get("window")
 import CustomInput from '../../../components/textInput'
 import messagging from '@react-native-firebase/messaging'
+import { addUpdateQuestionaire } from '../../../redux/features/questionaire.model';
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -1063,6 +1064,7 @@ const ServicesProvided = (props) => {
                 dispatch(getMyJobsThunk(user.id, access_token))
                 showToast(res.message)
                 props.navigation.navigate("HomeScreen")
+                dispatch(addUpdateQuestionaire())
             } else {
                 showToast(res.message)
             }
