@@ -1250,7 +1250,7 @@ const GetButtons = ({ data, openDeclineModal, openCancelModal, submit, openBlock
                 openRatingModal()
                 break
             case buttons_types.cancel_update:
-                Alert.alert("Cancel", "Do you want to cancel the update request?", [
+                Alert.alert("Cancel", "Do you want to cancel the Update Request?", [
                     {
                         text: "No"
                     },

@@ -329,7 +329,7 @@ export default function ProviderDetail(props) {
                         <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black, marginLeft: 5 }}>Insured</Text>
                     </View>}
                 </View>
-                <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center",marginTop:10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black,marginHorizontal:10 }}>{provider?.tagline}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 14, color: LS_COLORS.global.black, marginHorizontal: 10 }}>{provider?.tagline}</Text>
             </View>
 
             <ScrollView style={{ paddingBottom: 50 }}>
@@ -442,17 +442,19 @@ export default function ProviderDetail(props) {
 
                         </View>
                     </View>
-                    <Rating
-                        count={5}
-                        startingValue={average_rating}
-                        type="custom"
-                        ratingColor={LS_COLORS.global.green}
-                        // tintColor={LS_COLORS.global.green}
-                        showRating={false}
-                        imageSize={24}
-                        readonly={true}
-                    />
-
+                    <View style={{justifyContent:"center",flexDirection:"row",alignItems:"center"}}>
+                        <Rating
+                            count={5}
+                            startingValue={average_rating}
+                            type="custom"
+                            ratingColor={LS_COLORS.global.green}
+                            // tintColor={LS_COLORS.global.green}
+                            showRating={false}
+                            imageSize={24}
+                            readonly={true}
+                        />
+                        <Text maxFontSizeMultiplier={1.3} style={{marginLeft:5,fontFamily:LS_FONTS.PoppinsRegular,fontSize:16,color:LS_COLORS.global.black}}>({average_rating})</Text>
+                    </View>
                     {(ratings.length == 0 || ratings.filter(rate => {
                         if (currentRating != 0) {
                             if (Number(rate.rating) == currentRating) {

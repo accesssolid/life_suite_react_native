@@ -419,12 +419,16 @@ const MechanicLocation = (props) => {
                         <MapView
                             style={styles.map}
                             region={{
-                                ...activeCoordinates,
+                                latitude:activeCoordinates?.latitude??0,
+                                longitude:activeCoordinates?.longitude??0,
                                 latitudeDelta: 0.015,
                                 longitudeDelta: 0.0121,
                             }}>
                             <Marker
-                                coordinate={{ ...activeCoordinates }}
+                                coordinate={{
+                                    latitude:activeCoordinates?.latitude??0,
+                                longitude:activeCoordinates?.longitude??0,
+                                 }}
                             />
                         </MapView>
                     </View>
@@ -555,7 +559,7 @@ const MechanicLocation = (props) => {
                                     }}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
-                                        props.navigation.navigate("HomeScreen")
+                                        props.navigation.navigate("MainDrawer", { screen: "HomeScreen" ,params:{screen:"HomeScreen"}})
                                     }}
                                 />
                             </View>

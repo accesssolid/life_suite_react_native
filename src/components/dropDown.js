@@ -86,7 +86,7 @@ const DropDown1 = (props) => {
 
 export const DropDown = (props) => {
     return (
-        <View style={{position:"relative",borderWidth:1,marginBottom:30,marginHorizontal:10,borderColor:LS_COLORS.global.lightTextColor,borderRadius:7}}>
+        <View style={[{position:"relative",borderWidth:1,marginBottom:30,marginHorizontal:10,borderColor:LS_COLORS.global.lightTextColor,borderRadius:7},props.containerStyle1]}>
             <View style={[styles.container,{marginHorizontal:0,marginBottom:0,borderWidth:0}, props.containerStyle]}>
                 <View style={styles.arrow}>
                     <AntDesign name="down" color={LS_COLORS.global.green} />

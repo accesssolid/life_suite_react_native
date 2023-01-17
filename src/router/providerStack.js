@@ -52,7 +52,7 @@ const ProviderStack = () => {
             <Stack.Screen name="SetPassCode" component={SetPassCode} />
             <Stack.Screen name="ConfirmSetPassCode" component={ConfirmSetPassCode} />
             <Stack.Screen name="SelectLocation" component={SelectLocation} />
-            <Stack.Screen name="MechanicLocation" component={MechanicLocation} />
+            {/* <Stack.Screen name="MechanicLocation" component={MechanicLocation} /> */}
             <Stack.Screen name="MapScreen" component={MapScreen} />
             <Stack.Screen name="OrderDetail" component={OrderClientDetail} />
             <Stack.Screen name="CustomWebView" component={CustomWebView} />

@@ -21,6 +21,7 @@ import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native'
 import { role } from '../../../constants/globals';
 import { loadNotificaitonsThunk, updateReadNotification } from '../../../redux/features/notification';
+import { DropDown } from '../../../components/dropDown';
 
 const notification_color = [
     {
@@ -108,14 +109,14 @@ const Notification = (props) => {
         dispatch(loadNotificaitonsThunk())
     }, []))
 
-    useEffect(()=>{
-        if(showUnread){
-            let notis=notificationsg.filter(x=>x?.is_read=="0")
+    useEffect(() => {
+        if (showUnread) {
+            let notis = notificationsg.filter(x => x?.is_read == "0")
             setNotifications(notis)
-        }else{
+        } else {
             setNotifications(notificationsg)
         }
-    },[notificationsg,showUnread])
+    }, [notificationsg, showUnread])
     const renderData = ({ item }) => {
         let backgroundColor = "#5CBFBF"
         let orderType = ""
@@ -166,6 +167,7 @@ const Notification = (props) => {
             </Pressable>
         )
     }
+    const [selected, setSelected] = React.useState("Show All")
     return (
         <>
             <StatusBar
@@ -184,11 +186,24 @@ const Notification = (props) => {
 
                 />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
-                    <Pressable onPress={() => {
-                        setShowUnread(!showUnread)
-                    }} style={{ flexDirection: "row", alignItems: "center", marginTop: 10, marginLeft: 20, justifyContent: "flex-end", marginRight: 20 }}>
-                        <Text maxFontSizeMultiplier={1.5} style={{ color: LS_COLORS.global.cyan, fontFamily: LS_FONTS.PoppinsRegular, textDecorationLine: "underline" }}>Show {showUnread ? "All" : "Unread"} ({notifications?.length})</Text>
-                    </Pressable>
+                    <DropDown
+                        handleTextValue={true}
+                        item={["Show All", "Show Unread"]}
+                        value={selected}
+                        onChangeValue={(index, value) => {
+                            if (index == 0) {
+                                setSelected("Show All")
+                                setShowUnread(false)
+                            } else {
+                                setShowUnread(true)
+                                setSelected("Show Unread")
+
+                            }
+                        }}
+                        containerStyle1={{ borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginTop: 10, marginBottom: 0,marginRight:20, borderWidth: 0 ,width:200,alignSelf:"flex-end"}}
+                        containerStyle={{ borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginTop: 0,minHeight:40, borderWidth: 0 }}
+                        dropdownStyle={{ height: 2 * 40 }}
+                    />
                     {
                         notifications?.length === 0 ?
                             <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: "center", marginTop: 10 }}>
@@ -196,6 +211,7 @@ const Notification = (props) => {
                             </View>
                             : <FlatList
                                 data={notifications}
+                                // style={{marginTop:80}}
                                 renderData={renderData}
                                 renderItem={(itemData) => renderData(itemData)}
                             />
