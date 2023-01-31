@@ -1012,7 +1012,7 @@ const OrderItemsDetail = ({ i }) => {
             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} >{i.service_items_name + "  (Service Charge)"}</Text>
                 <View style={{ height: 20, flexDirection: "row" }}>
-                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + i.price}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (i.price==""?0:i?.price)}</Text>
                 </View>
             </View>
             {i.product.map((itemData, index) => {
@@ -1024,7 +1024,7 @@ const OrderItemsDetail = ({ i }) => {
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + itemData.price}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (itemData.price==""?0:itemData?.price)}</Text>
                         </View>
                     </View>
                 )
@@ -1039,7 +1039,7 @@ const OrderItemsDetail = ({ i }) => {
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + itemData.product_price}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (itemData.product_price==""?0:itemData?.product_price)}</Text>
                         </View>
                     </View>
                 )

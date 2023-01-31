@@ -119,6 +119,20 @@ const OrderClientDetail = (props) => {
         return false
     }
 
+const convertHHMMToMinutes=(h,m)=>{
+    let h1=0
+    let m1=0
+    if(String(h)?.trim()!=""){
+        h1=String(h)?.trim()
+    }
+    if(String(m)?.trim()!=""){
+        m1=String(m)?.trim()
+    }
+    let hNumber=Number(h1)*60
+    let mNumber=Number(m1)
+    return hNumber+mNumber 
+}
+
     const submitOrderUpdateDetail = () => {
 
         if (checkforUpdate()) {
@@ -143,6 +157,33 @@ const OrderClientDetail = (props) => {
                 }
             )
         })
+        let productsC=[]
+        let itemsC = [...new Set(selectedItems.filter(x => !String(x).startsWith("new")))].map(x => {
+            let f = items.find(z => z.id == x)
+            if (f) {
+                let productsC1=f?.products
+                if(productsC1){
+                    for(let p of productsC1){
+                        if(selectedProducts?.includes(p.id)){
+                            productsC.push({ "product_id":p.id,
+                            "price":p.price})
+                        }
+                    }
+                }
+                return ({
+                    "item_id": x,
+                    "time_duration": convertHHMMToMinutes(f?.time_duration_h,f?.time_duration_m),
+                    "price": f?.price
+                })
+            }
+            return null
+        }).filter(x=>x!=null)
+
+        // console.log(itemsC)
+        // console.log(productsC)
+        // setLoading(false)
+        // return
+        
 
         let config = {
             headers: headers,
@@ -152,8 +193,8 @@ const OrderClientDetail = (props) => {
                     estimated_reached_time: data.estimated_reached_time,
                     order_start_time: data.order_start_time,
                     order_end_time: moment(data.order_start_time).add(newTimeNeeded, "minutes").format("YYYY-MM-DD HH:mm:[00]"),
-                    items: [...new Set(selectedItems.filter(x => !String(x).startsWith("new")))],
-                    products: selectedProducts,
+                    items: itemsC,
+                    products: productsC,
                     requested_start_time: data.requested_start_time,
                     requested_end_time: checkTimeFrameIncrease(),
                     other_options: [],
@@ -189,7 +230,22 @@ const OrderClientDetail = (props) => {
             })
     }
 
+    function minutes_to_hhmm(numberOfMinutes) {
+        //create duration object from moment.duration  
+        var duration = moment.duration(numberOfMinutes, 'minutes');
 
+        //calculate hours
+        var hh = (duration.years() * (365 * 24)) + (duration.months() * (30 * 24)) + (duration.days() * 24) + (duration.hours());
+
+        //get minutes
+        var mm = duration.minutes();
+
+        //return total time in hh:mm format
+        return ({
+            hh,
+            mm
+        })
+    }
     const getOrderDetail = (order_id) => {
 
         setLoading(true)
@@ -221,7 +277,12 @@ const OrderClientDetail = (props) => {
                                     unselected.push(s)
                                 }
                             }
-                            setItems(selected.concat(unselected))
+                            console.log("Selected", selected)
+                            console.log("Unselected", unselected)
+                            setItems(selected.concat(unselected).map(x => ({
+                                ...x, time_duration_h: minutes_to_hhmm(Number(x.time_duration ?? 0)).hh,
+                                time_duration_m: minutes_to_hhmm(Number(x.time_duration ?? 0)).mm,
+                            })))
                         }
                     } else {
 
@@ -423,7 +484,6 @@ const ItemView = ({
                                 if (productShow) {
                                     setSelectedItems(state => state.filter(x => x != item.id))
                                     setOtherProducts(state => state.filter(x => x.item_id != item.id))
-
                                     if (item?.products) {
                                         item.products.forEach(p => {
                                             setSelectedProducts(state => state.filter(x => p.id != x))
@@ -439,9 +499,9 @@ const ItemView = ({
                     />
                     <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { flex: 1 }]}>{item?.name}</Text>
                 </View>
-                {String(item?.id)?.startsWith("new") && productShow ? <View style={{ flexDirection: "row", justifyContent: "space-around", flex: 1, paddingHorizontal: 20 }}>
+                {productShow ? <View style={{ flexDirection: "row", justifyContent: "space-around", flex: 1, paddingHorizontal: 20 }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <TextInput value={item?.time_duration_h}
+                        <TextInput value={String(item?.time_duration_h)}
                             onChangeText={t => {
                                 setItems(state => {
                                     let d = _.cloneDeep(state).filter(x => x.id != item.id)
@@ -452,7 +512,7 @@ const ItemView = ({
                             keyboardType="numeric"
                             maxFontSizeMultiplier={1.1}
                             style={[styles.itemTextStyle, { height: 40, minWidth: 35, maxWidth: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
-                        <TextInput value={item?.time_duration_m}
+                        <TextInput value={String(item?.time_duration_m)}
                             onChangeText={t => {
                                 setItems(state => {
                                     let d = _.cloneDeep(state).filter(x => x.id != item.id)
@@ -479,7 +539,7 @@ const ItemView = ({
                         style={[styles.itemTextStyle, { minWidth: 35, maxWidth: 40, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                 </View> : <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
                     <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{checkNewOrNot(item?.time_duration_h, item?.time_duration_m, item?.time_duration)}</Text>
-                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${item.price}</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${String(item.price)?.trim()==""?0:item.price}</Text>
                 </View>
                 }
             </View>
@@ -513,7 +573,25 @@ const ItemView = ({
                                     <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { flex: 1 }]}>{product?.name}</Text>
                                 </View>
                                 <View style={{ flexDirection: "row", flex: 1, justifyContent: "flex-end", paddingHorizontal: 20 }}>
-                                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${product.price}</Text>
+                                    <TextInput
+                                        style={[styles.itemTextStyle, { width: 60, height: 40, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]}
+                                        color="black"
+                                        placeholder="$000"
+                                        onChangeText={(text) => {
+                                            let d = text.replace(/\$/g, "")
+                                            setItems(state => {
+                                                let z = _.cloneDeep(state).filter(x => x.id != item.id)
+                                                let products = _.cloneDeep(item?.products).filter(x => x.id != product.id)
+                                                return ([...z, { ...item, products: [...products, { ...product, price: d }] }])
+                                            })
+                                        }}
+                                        keyboardType="numeric"
+                                        value={"$" + product?.price}
+                                        returnKeyType={'done'}
+                                        editable={isSelected1}
+                                        placeholderTextColor={LS_COLORS.global.placeholder}
+                                        maxFontSizeMultiplier={1.2}
+                                    />
                                 </View>
                             </View>
                         )

@@ -830,12 +830,14 @@ useEffect(()=>{
                 let newArr = []
                 let newData = []
                 itemListMaster.map((item, index) => {
+                    
                     let products = item.products.map(element => {
+                        let prods=productsData.find(x=>x.id==element.id)
                         if (element.item_id == item.id) {
                             newArr.push({
                                 "id": element.id,
                                 "name": element.name,
-                                "price": element.price ?? "",
+                                "price":prods?prods?.price:(element.price ?? ""),
                                 "item_id": element.item_id,
                                 list_type: element?.list_type ?? "private"
                             })
