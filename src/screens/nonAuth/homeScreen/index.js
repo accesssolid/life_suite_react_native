@@ -651,13 +651,13 @@ const HomeScreen = (props) => {
                                                     dispatch(updateBlockModal(true))
                                                 } else {
                                                     setSelectedItem(item)
-                                                    if (item?.is_certified == "1" || item?.is_insauranced == "1" || item?.is_business_licensed == "1") {
-                                                        dispatch(setQService(item?.id))
-                                                        dispatch(setQuestionTypes({ is_certified: Number(item?.is_certified), is_insauranced: Number(item?.is_insauranced), is_business_licensed: Number(item?.is_business_licensed) }))
-                                                        dispatch(setQOpen(true))
-                                                    } else {
+                                                    // if (item?.is_certified == "1" || item?.is_insauranced == "1" || item?.is_business_licensed == "1") {
+                                                    //     dispatch(setQService(item?.id))
+                                                    //     dispatch(setQuestionTypes({ is_certified: Number(item?.is_certified), is_insauranced: Number(item?.is_insauranced), is_business_licensed: Number(item?.is_business_licensed) }))
+                                                    //     dispatch(setQOpen(true))
+                                                    // } else {
                                                         props.navigation.navigate("ServicesProvided", { subService: item });
-                                                    }
+                                                    // }
                                                 }
 
                                             }}

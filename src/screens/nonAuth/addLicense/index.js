@@ -145,7 +145,7 @@ const AddLicense = (props) => {
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             let data = [...images]
                             if (upload_type.id == 1) {
@@ -179,7 +179,7 @@ const AddLicense = (props) => {
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             let data = [...images]
                             if (upload_type.id == 1) {
@@ -231,7 +231,7 @@ const AddLicense = (props) => {
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             imagesData[index] = {
                                 uri: image.path,
@@ -253,7 +253,7 @@ const AddLicense = (props) => {
                             width: Dimensions.get('screen').width,
                             height: Dimensions.get('screen').width,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             imagesData[index] = {
                                 uri: image.path,
@@ -404,23 +404,23 @@ const AddLicense = (props) => {
 
     }
 
-    const saveData=async()=>{
-        try{
+    const saveData = async () => {
+        try {
             setLoading(true)
 
-            let headers={
+            let headers = {
                 "Authorization": `Bearer ${access_token}`
             }
-            let formdata=new FormData()
-            formdata.append("service_id",subService.id)
-            let json_data={
-                products: addServiceData?.json_data?.products?.map(x=>({item_product_id:x.id,price:x.price})),
-                new_products:addServiceData?.json_data?.new_products,
-                services:addServiceData?.json_data?.services,
-                new_services:addServiceData?.json_data?.new_services
+            let formdata = new FormData()
+            formdata.append("service_id", subService.id)
+            let json_data = {
+                products: addServiceData?.json_data?.products?.map(x => ({ item_product_id: x.id, price: x.price })),
+                new_products: addServiceData?.json_data?.new_products,
+                services: addServiceData?.json_data?.services,
+                new_services: addServiceData?.json_data?.new_services
             }
-            formdata.append("json_data",JSON.stringify(json_data))
-            for(let i of images){
+            formdata.append("json_data", JSON.stringify(json_data))
+            for (let i of images) {
                 if (i.name != "") {
                     let PATH_TO_THE_FILE = Platform.OS == "ios" ? i.uri.replace('file:///', '') : i.uri
                     if (!String(i.uri).startsWith(BASE_URL)) {
@@ -432,7 +432,7 @@ const AddLicense = (props) => {
                     }
                 }
             }
-            for(let item of images1){
+            for (let item of images1) {
                 if (item.name != "") {
                     let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
                     if (!String(item.uri).startsWith(BASE_URL)) {
@@ -444,35 +444,39 @@ const AddLicense = (props) => {
                     }
                 }
             }
-            const config={
+            const config = {
                 headers,
-                data:formdata,
+                data: formdata,
                 endPoint: '/api/providerServicesLicenseSaveIndividually',
                 type: 'post'
             }
-            let res=await getApi(config)
-            if(res.status){
+            let res = await getApi(config)
+            if (res.status) {
                 showToast(res.message)
-                dispatch(getMyJobsThunk(user.id,access_token))
-                props.navigation.navigate("HomeScreen")
-                dispatch(addUpdateQuestionaire())
-            }else{
+                dispatch(getMyJobsThunk(user.id, access_token))
+                setTimeout(() => {
+                    props.navigation.navigate("HomeScreen")
+                    dispatch(addUpdateQuestionaire())
+                    setLoading(false)
+                }, 1500)
+
+            } else {
                 showToast(res.message)
 
             }
-        }catch(err){
+        } catch (err) {
             console.error(err)
-        }finally{
+        } finally {
             setLoading(false)
         }
     }
     return (
         <>
-            <StatusBar 
-             // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-            barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="stretch"
@@ -490,7 +494,7 @@ const AddLicense = (props) => {
                                     action1={() => {
                                         props.navigation.navigate("HomeScreen")
                                     }}
-                                    // containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                                // containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
                                 />
                             </View>
@@ -566,7 +570,7 @@ const AddLicense = (props) => {
                         /> :
                             <View style={{ flexDirection: "row", justifyContent: "space-around", marginBottom: 10, marginHorizontal: 10 }}>
                                 <CustomButton title={"Save"} action={() => {
-                                        saveData()
+                                    saveData()
                                 }} customStyles={{ width: width * 0.45, borderRadius: 6 }} />
                                 <CustomButton title={"Next"} action={() => next()} customStyles={{ width: width * 0.45, borderRadius: 6 }} />
                             </View>

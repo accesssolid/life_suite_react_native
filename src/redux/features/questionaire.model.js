@@ -62,8 +62,8 @@ export const addUpdateQuestionaire = () => async (dispatch, getState) => {
             endPoint: "/api/addUpdateQuestionnaire",
             type: 'post'
         }
-
-        getApi(config)
+        if(questionaireModel?.service_id){
+            getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     dispatch(clearQuestionTypes())
@@ -75,6 +75,8 @@ export const addUpdateQuestionaire = () => async (dispatch, getState) => {
             }).finally(() => {
 
             })
+        }
+        
 
     } catch (Err) {
         console.log(Err)

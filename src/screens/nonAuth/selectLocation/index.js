@@ -298,9 +298,11 @@ const SelectLocation = (props) => {
             if (response.status) {
                 showToast(response.message)
                 dispatch(getMyJobsThunk(user.id, access_token))
-                props.navigation.navigate("HomeScreen")
-                dispatch(addUpdateQuestionaire())
-
+                setTimeout(()=>{
+                    props.navigation.navigate("HomeScreen")
+                    dispatch(addUpdateQuestionaire())
+                    setLoading(false)
+                },1500)
             } else {
                 showToast(response.message, 'danger')
             }

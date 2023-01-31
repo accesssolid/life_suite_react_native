@@ -113,7 +113,9 @@ const ServicesProvided = (props) => {
                     console.log("checking", response.data)
                     if (response.variant_data) {
                         setVariants(response.variant_data)
-                        setSelectedVariant(response.variant_data[0].id)
+                        if(!selectedVariant){
+                            setSelectedVariant(response.variant_data[0].id)
+                        }
                     }
                 }
                 else {
@@ -249,7 +251,9 @@ const ServicesProvided = (props) => {
 
     }
 
-
+useEffect(()=>{
+    console.log("ITemListMast",itemListMaster)
+},[itemListMaster])
 
     const setInitialProductsData = () => {
         if (!selectedProducts.length > 0 && !selectedNewProducts.length > 0) {
@@ -804,6 +808,7 @@ const ServicesProvided = (props) => {
 
     const removeNonGlobalItem = async (id) => {
         try {
+            // return
             setLoading(true)
             let headers = {
                 "Authorization": `Bearer ${access_token}`
@@ -834,7 +839,7 @@ const ServicesProvided = (props) => {
                                 "item_id": element.item_id,
                                 list_type: element?.list_type ?? "private"
                             })
-                        } else {
+                        } else  {
                             newArr.push({
                                 "id": element.id,
                                 "name": element.name,
@@ -845,9 +850,11 @@ const ServicesProvided = (props) => {
                         }
                         return element
                     });
+
                     newData.push({ ...item, products: products.filter(x => x.id != id) })
                 })
 
+                console.log(newArr)
                 setProductsData([...newArr].filter(x => x.id !== id))
                 setItemListMaster(newData)
             } else {
@@ -967,19 +974,18 @@ const ServicesProvided = (props) => {
 
     const removeNewproduct = (item) => {
         let temp = _.cloneDeep(newProductsData)
-
         temp.forEach((element, index) => {
             if (element.temp_id == item.temp_id && element.item_id == item.item_id) {
                 temp.splice(index, 1)
             }
         })
-
         if (temp.length == 0) {
             setIsOtherSelected(false)
         }
         setNewProductsData([...temp])
     }
 
+    
     const addNewProduct = () => {
         let arr = [...newProductsData]
         arr.push({
@@ -1063,15 +1069,21 @@ const ServicesProvided = (props) => {
             if (res.status) {
                 dispatch(getMyJobsThunk(user.id, access_token))
                 showToast(res.message)
-                props.navigation.navigate("HomeScreen")
-                dispatch(addUpdateQuestionaire())
+                setTimeout(()=>{
+                    props.navigation.navigate("HomeScreen")
+                    dispatch(addUpdateQuestionaire())
+                    setLoading(false)
+                },1500)
+               
             } else {
                 showToast(res.message)
+                setLoading(false)
             }
         } catch (err) {
             console.error(err)
-        } finally {
             setLoading(false)
+        } finally {
+           
         }
     }
 

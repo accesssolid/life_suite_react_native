@@ -88,8 +88,15 @@ const OrderHistory1 = (props) => {
         current_page: 1,
         total: 0
     })
+    const [showMore,setShowMore]=useState(false)
+
     useFocusEffect(React.useCallback(() => {
-        getOrders(selected.id)
+        setShowMore(false)
+        if(selected.id==8||selected.id==undefined){
+            getOrders(selected.id,1,20)
+        }else{
+            getOrders(selected.id)
+        }
     }, [selected]))
 
 
@@ -110,11 +117,9 @@ const OrderHistory1 = (props) => {
         }
     }, [searchData.text, data])
 
-    // useEffect(() => {
-    //     setSearchData(state => ({ ...state, data: data }))
-    // }, [data])
 
-    const getOrders = async (order_status, page = 1) => {
+
+    const getOrders = async (order_status, page = 1,limit=10) => {
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -123,7 +128,7 @@ const OrderHistory1 = (props) => {
         }
         let config = {
             headers: headers,
-            data: JSON.stringify({ order_status, page }),
+            data: JSON.stringify({ order_status, page ,limit}),
             endPoint: user.user_role == 3 ? '/api/providerOrderHistory' : "/api/customerOrderHistory",
             type: 'post'
         }
@@ -313,13 +318,29 @@ const OrderHistory1 = (props) => {
                 </View>
                 <FlatList
                     data={searchData.data}
-                    ListFooterComponent={loading && <ActivityIndicator color={LS_COLORS.global.green} />}
-                    keyExtractor={(item, index) => item.id + "" + index}
-                    onEndReached={e => {
-                        if (data.length < pageData.total) {
-                            getOrders(selected.id, pageData.current_page + 1)
+                    ListFooterComponent={loading ?<ActivityIndicator color={LS_COLORS.global.green} />: (((selected.id==8||selected.id==undefined)&&pageData?.total>20)&&
+                    <Text onPress={()=>{
+                        setShowMore(!showMore)
+                        if(showMore){
+                            setData(data?.slice(0,20))
+                            setPageData({
+                                current_page:1,
+                                total:pageData.total
+                            })
+                        }else{
+                            getOrders(selected.id, pageData.current_page + 1,pageData.total-20)
                         }
-                    }}
+                        
+                    }} style={{textAlign:"center",fontFamily:LS_FONTS.PoppinsMedium,color:LS_COLORS.global.black,fontSize:14,padding:10}}>Show {showMore?"Less":"More"}</Text>)}
+                keyExtractor={(item, index) => item.id + "" + index}
+                onEndReached={e => {
+                    if(selected.id==8||selected.id==undefined){
+                        return
+                    }
+                    if (data.length < pageData.total) {
+                        getOrders(selected.id, pageData.current_page + 1)
+                    }
+                }}
                     onEndReachedThreshold={0}
                     renderItem={({ item, index }) => {
                         let serviceNames = [...new Set(item.order_items?.map(x => x.services_name))]

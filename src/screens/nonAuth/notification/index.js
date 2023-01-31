@@ -201,8 +201,8 @@ const Notification = (props) => {
                             }
                         }}
                         containerStyle1={{ borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginTop: 10, marginBottom: 0,marginRight:20, borderWidth: 0 ,width:200,alignSelf:"flex-end"}}
-                        containerStyle={{ borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, marginTop: 0,minHeight:40, borderWidth: 0 }}
-                        dropdownStyle={{ height: 2 * 40 }}
+                        containerStyle={{ borderRadius: 6,width:200, backgroundColor: LS_COLORS.global.lightGrey, marginTop: 0,minHeight:40, borderWidth: 0 }}
+                        dropdownStyle={{ height: 2 * 40 ,width:200}}
                     />
                     {
                         notifications?.length === 0 ?

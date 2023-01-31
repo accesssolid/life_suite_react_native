@@ -55,6 +55,7 @@ import BlockModal from '../components/blockModal';
 import BlockModel, { updateBlockModal } from '../redux/features/blockModel';
 import BlockMessageModal from '../components/BlockMessageModal';
 import { updateDot } from '../redux/features/showDot';
+import CDCModal from '../components/cdcModal';
 
 const Drawer = createDrawerNavigator();
 
@@ -66,6 +67,8 @@ const MainDrawer = (props) => {
     const [copyVisible, setCopyVisible] = useState(false)
     const [softwareVisible, setSoftwareVisible] = useState(false)
     const [softwareVisible1, setSoftwareVisible1] = useState(false)
+    const [cdcVisible, setCDCVisible] = useState(false)
+
     const navigation = useNavigation()
     const access_token = useSelector(state => state.authenticate.access_token)
     const authenticate = useSelector(state => state.authenticate)?.authenticate
@@ -272,7 +275,7 @@ const MainDrawer = (props) => {
     return (
         <>
             <Drawer.Navigator
-                drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} setPrivacyVisible={setPrivacyVisible} setCopyVisible={setCopyVisible} setSoftwareVisible={setSoftwareVisible} unSeen={unSeen} notifications={notifications} setSoftwareVisible1={setSoftwareVisible1} />}
+                drawerContent={(props) => <CustomDrawerContent {...props} setTermsVisible={setTermsVisible} setPrivacyVisible={setPrivacyVisible} setCopyVisible={setCopyVisible} setSoftwareVisible={setSoftwareVisible} unSeen={unSeen} notifications={notifications} setCDCVisible={setCDCVisible} setSoftwareVisible1={setSoftwareVisible1} />}
                 drawerStyle={{
                     width: Dimensions.get('screen').width / 1.3
                 }}
@@ -467,6 +470,14 @@ const MainDrawer = (props) => {
             <AboutUsModal
                 isVisible={softwareVisible1}
                 setVisible={setSoftwareVisible1}
+            />
+             <AboutUsModal
+                isVisible={softwareVisible1}
+                setVisible={setSoftwareVisible1}
+            />
+             <CDCModal
+                isVisible={cdcVisible}
+                setVisible={setCDCVisible}
             />
             <BankModal />
             <SignUpModal />
@@ -857,6 +868,20 @@ const CustomDrawerContent = (props) => {
                     </Text>}
                     icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/licenceIcon.png')} style={{ height: 15, width: 15 }} />}
                     onPress={() => { props.navigation.toggleDrawer(), props.setSoftwareVisible(true) }}
+                />
+                <DrawerItem
+                    label={(props) => <Text
+                        style={{
+                            fontFamily: LS_FONTS.PoppinsMedium,
+                            fontSize: 11,
+                            color: LS_COLORS.global.darkBlack,
+                            marginLeft: -20
+                        }}
+                        maxFontSizeMultiplier={1.7}
+                    >CDC Guidelines
+                    </Text>}
+                    icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/licenceIcon.png')} style={{ height: 15, width: 15 }} />}
+                    onPress={() => { props.navigation.toggleDrawer(), props.setCDCVisible(true) }}
                 />
             </View>
         </DrawerContentScrollView>

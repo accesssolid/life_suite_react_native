@@ -72,7 +72,6 @@ const OrderHistory = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)
     const [data, setData] = useState([])
-    console.log(data)
     const [searchData, setSearchData] = useState({
         text: "",
         data: []
@@ -85,7 +84,12 @@ const OrderHistory = (props) => {
     })
 
     useFocusEffect(React.useCallback(() => {
-        getOrders(selected.id)
+        setShowMore(false)
+        if(selected.id==8||selected.id==undefined){
+            getOrders(selected.id,1,20)
+        }else{
+            getOrders(selected.id)
+        }
     }, [selected]))
 
 
@@ -107,7 +111,9 @@ const OrderHistory = (props) => {
     }, [searchData.text, data])
 
 
-    const getOrders = async (order_status, page = 1) => {
+    const getOrders = async (order_status, page = 1,limit=10) => {
+        console.log(order_status,page,limit)
+        // return
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -116,15 +122,15 @@ const OrderHistory = (props) => {
         }
         let config = {
             headers: headers,
-            data: JSON.stringify({ order_status, page }),
+            data: JSON.stringify({ order_status, page ,limit}),
             endPoint: user.user_role == 3 ? '/api/providerOrderHistory' : "/api/customerOrderHistory",
             type: 'post'
         }
 
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
+                    console.log(response.data)
                     if (response.data?.data) {
                         if (page == 1) {
                             setData(response.data.data)
@@ -156,7 +162,7 @@ const OrderHistory = (props) => {
                 setLoading(false)
             })
     }
-
+    const [showMore,setShowMore]=useState(false)
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <Header
@@ -199,9 +205,25 @@ const OrderHistory = (props) => {
                 </View>
                 <FlatList
                     data={searchData.data}
-                    ListFooterComponent={loading && <ActivityIndicator color={LS_COLORS.global.green} />}
+                    ListFooterComponent={loading ?<ActivityIndicator color={LS_COLORS.global.green} />: (((selected.id==8||selected.id==undefined)&&pageData?.total>20)&&
+                        <Text onPress={()=>{
+                            setShowMore(!showMore)
+                            if(showMore){
+                                setData(data?.slice(0,20))
+                                setPageData({
+                                    current_page:1,
+                                    total:pageData.total
+                                })
+                            }else{
+                                getOrders(selected.id, pageData.current_page + 1,pageData.total-20)
+                            }
+                            
+                        }} style={{textAlign:"center",fontFamily:LS_FONTS.PoppinsMedium,color:LS_COLORS.global.black,fontSize:14,padding:10}}>Show {showMore?"Less":"More"}</Text>)}
                     keyExtractor={(item, index) => item.id + "" + index}
                     onEndReached={e => {
+                        if(selected.id==8||selected.id==undefined){
+                            return
+                        }
                         if (data.length < pageData.total) {
                             getOrders(selected.id, pageData.current_page + 1)
                         }
@@ -250,9 +272,6 @@ const OrderHistory = (props) => {
                         </TouchableOpacity>)
                     }}
                 />
-                {/* <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
-                    <View style={{ height: 30 }}></View> */}
-                {/* </Content> */}
             </Container>
         </SafeAreaView>
     )
