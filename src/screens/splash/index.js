@@ -70,14 +70,14 @@ const Splash = (props) => {
                     }, 2000);
                 }
                 else {
-                    props.navigation.navigate('WelcomeScreen')
+                    // props.navigation.navigate('WelcomeScreen')
                     if (response.message !== "The user id field is required.") {
                     }
                     setLoader(false)
                 }
             })
             .catch(err => {
-                props.navigation.navigate('WelcomeScreen')
+                // props.navigation.navigate('WelcomeScreen')
             })
     }
 

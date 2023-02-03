@@ -30,7 +30,6 @@ import CustomButton from '../../../components/customButton';
 
 const OrderClientDetail = (props) => {
     const { subService, item } = props.route.params
-
     const [data, setData] = useState(null)
     const user = useSelector(state => state.authenticate.user)
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -49,6 +48,7 @@ const OrderClientDetail = (props) => {
     const [selectedItems1, setSelectedItems1] = React.useState([])
     const [selectedProducts1, setSelectedProducts1] = React.useState([])
     // 
+    const [selectedData, setSelectedData] = React.useState(null)
     const [openModal, setOpenModal] = React.useState(false)
     useEffect(() => {
         setOrderId(item.id)
@@ -61,6 +61,10 @@ const OrderClientDetail = (props) => {
     const [totalPrice, setTotalPrice] = React.useState(0)
     const [newTimeNeeded, setTimeNeeded] = React.useState("")
 
+    useEffect(() => {
+        console.log(items)
+    }, [items])
+
     React.useEffect(() => {
         let otherProductPrice = otherProducts.reduce((a, b) => a + Number(b.product_price), 0)
         let productsPrice = 0
@@ -69,13 +73,13 @@ const OrderClientDetail = (props) => {
         for (let item of items) {
             if (selectedItems.includes(item.id)) {
                 itemsPrice += Number(item.price)
-                timesNeeded += Number(item.time_duration)
-                productsPrice += item.products.reduce((a, b) => a + Number(b.price), 0)
+                timesNeeded += Number(item?.time_duration_h != "" ? item?.time_duration_h : 0) * 60 + Number(item?.time_duration_m != "" ? item?.time_duration_m : 0),
+                    productsPrice += item.products.reduce((a, b) => a + Number(b.price), 0)
             }
         }
         setTimeNeeded(timesNeeded)
         setTotalPrice(otherProductPrice + productsPrice + itemsPrice)
-    }, [selectedProducts, selectedItems, otherProducts])
+    }, [selectedProducts, selectedItems, otherProducts, items])
 
     React.useEffect(() => {
         if (data?.order_items) {
@@ -108,6 +112,8 @@ const OrderClientDetail = (props) => {
         }
     }
 
+    const [updated, setUpdated] = useState(false)
+
     const checkforUpdate = () => {
         let si = [...selectedItems].sort((a, b) => Number(a) - Number(b)).join("")
         let si1 = [...selectedItems1].sort((a, b) => Number(a) - Number(b)).join("")
@@ -119,23 +125,23 @@ const OrderClientDetail = (props) => {
         return false
     }
 
-const convertHHMMToMinutes=(h,m)=>{
-    let h1=0
-    let m1=0
-    if(String(h)?.trim()!=""){
-        h1=String(h)?.trim()
+    const convertHHMMToMinutes = (h, m) => {
+        let h1 = 0
+        let m1 = 0
+        if (String(h)?.trim() != "") {
+            h1 = String(h)?.trim()
+        }
+        if (String(m)?.trim() != "") {
+            m1 = String(m)?.trim()
+        }
+        let hNumber = Number(h1) * 60
+        let mNumber = Number(m1)
+        return hNumber + mNumber
     }
-    if(String(m)?.trim()!=""){
-        m1=String(m)?.trim()
-    }
-    let hNumber=Number(h1)*60
-    let mNumber=Number(m1)
-    return hNumber+mNumber 
-}
 
     const submitOrderUpdateDetail = () => {
 
-        if (checkforUpdate()) {
+        if (checkforUpdate() && !updated) {
             return
         }
         setLoading(true)
@@ -151,40 +157,35 @@ const convertHHMMToMinutes=(h,m)=>{
                 {
                     item_name: x.name,
                     price: x.price,
-                    time_duration: Number(x?.time_duration_h) * 60 + Number(x?.time_duration_m),
+                    time_duration: Number(x?.time_duration_h != "" ? x?.time_duration_h : 0) * 60 + Number(x?.time_duration_m != "" ? x?.time_duration_m : 0),
                     variant_data: x.variant_data,
                     products: otherProducts.filter(p => String(p.item_id).startsWith("new"))
                 }
             )
         })
-        let productsC=[]
+        let productsC = []
         let itemsC = [...new Set(selectedItems.filter(x => !String(x).startsWith("new")))].map(x => {
             let f = items.find(z => z.id == x)
             if (f) {
-                let productsC1=f?.products
-                if(productsC1){
-                    for(let p of productsC1){
-                        if(selectedProducts?.includes(p.id)){
-                            productsC.push({ "product_id":p.id,
-                            "price":p.price})
+                let productsC1 = f?.products
+                if (productsC1) {
+                    for (let p of productsC1) {
+                        if (selectedProducts?.includes(p.id)) {
+                            productsC.push({
+                                "product_id": p.id,
+                                "price": p.price
+                            })
                         }
                     }
                 }
                 return ({
                     "item_id": x,
-                    "time_duration": convertHHMMToMinutes(f?.time_duration_h,f?.time_duration_m),
+                    "time_duration": convertHHMMToMinutes(f?.time_duration_h, f?.time_duration_m),
                     "price": f?.price
                 })
             }
             return null
-        }).filter(x=>x!=null)
-
-        // console.log(itemsC)
-        // console.log(productsC)
-        // setLoading(false)
-        // return
-        
-
+        }).filter(x => x != null)
         let config = {
             headers: headers,
             data: JSON.stringify({
@@ -209,7 +210,6 @@ const convertHHMMToMinutes=(h,m)=>{
                 order_from_address: data.order_from_address,
                 // discount_type: discount.discount_type,
                 // discount_amount: discount.discount_amount,
-
             }),
             endPoint: '/api/providerOrderUpdate',
             type: 'post'
@@ -265,23 +265,53 @@ const convertHHMMToMinutes=(h,m)=>{
             .then((response) => {
                 if (response.status == true) {
                     if (response.data) {
+                        console.log(JSON.stringify(response))
                         setData(response.data)
                         if (response?.added_services_list[0]) {
                             let o_is = response.data.order_items
+                            console.log(o_is)
                             let selected = []
                             let unselected = []
                             for (let s of response?.added_services_list[0].items) {
                                 if (o_is.map(i => i.item_id).includes(s.id)) {
-                                    selected.push(s)
+                                    let omg = o_is.find(x => x.item_id == s.id)
+                                    let d = _.cloneDeep(s)
+                                    if (omg) {
+                                        d.time_duration = omg.duration_time
+                                        d.price = omg.price
+                                        d.products = d?.products?.map(x => {
+                                            let p = _.cloneDeep(x)
+                                            let oproduct = omg?.products?.find(o => o.product_id == x.id)
+                                            if (oproduct) {
+                                                p.price = oproduct.price
+                                            }
+                                            if(x?.list_type=="orders"&&x?.request_status!="accept"){
+                                                return null
+                                            }
+                                            return p
+                                        })
+                                        d.products=d?.products?.filter(x=>x!=null)
+                                    }
+                                    if (d?.list_type!="orders") {
+                                        selected.push(d)
+                                    }else{
+                                        if(d?.request_status=="accept"){
+                                            selected.push(d)
+                                        }
+                                    }
                                 } else {
-                                    unselected.push(s)
+                                    if (s?.list_type!="orders" ) {
+                                        unselected.push(s)
+                                    }else{
+                                        if(s?.request_status=="accept"){
+                                            selected.push(s)
+                                        }
+                                    }
                                 }
                             }
-                            console.log("Selected", selected)
-                            console.log("Unselected", unselected)
                             setItems(selected.concat(unselected).map(x => ({
-                                ...x, time_duration_h: minutes_to_hhmm(Number(x.time_duration ?? 0)).hh,
-                                time_duration_m: minutes_to_hhmm(Number(x.time_duration ?? 0)).mm,
+                                ...x, time_duration_h: (x.time_duration == "" || x.time_duration == null || x.time_duration == "0") ? "" : (minutes_to_hhmm(Number(x.time_duration ?? 0)).hh ?? ""),
+                                time_duration_m: (x.time_duration == "" || x.time_duration == null || x.time_duration == "0") ? "" : (minutes_to_hhmm(Number(x.time_duration ?? 0)).mm ?? ""),
                             })))
                         }
                     } else {
@@ -344,6 +374,8 @@ const convertHHMMToMinutes=(h,m)=>{
                             items={items}
                             selectedItems={selectedItems}
                             selectedProducts={selectedProducts}
+                            selectedData={selectedData}
+                            setSelectedData={setSelectedData}
                             otherProducts={otherProducts}
                             selectedItem={selectedItem}
                             productShow={productShow}
@@ -388,8 +420,16 @@ const convertHHMMToMinutes=(h,m)=>{
                                     showToast("Don't leave other product name and price empty!")
                                     return
                                 }
+                                setUpdated(true)
                                 setProductShow(false)
                                 setSelectedItem(null)
+                                setItems(state => {
+                                    let d = _.cloneDeep(state)
+                                    let indext = d.findIndex(x => x?.id == selectedData.id)
+                                    d[indext] = selectedData
+                                    return d
+                                })
+                                setSelectedData(null)
                             }}>
                             <Text maxFontSizeMultiplier={1.2} style={styles.saveText}>Save</Text>
                         </TouchableOpacity>}
@@ -407,8 +447,8 @@ export default OrderClientDetail;
 
 
 
-const ItemsView = ({ items, selectedItem, setItems, productShow, setProductShow, setSelectedItem, selectedItems, selectedProducts, otherProducts, setSelectedItems, setSelectedProducts, setOtherProducts }) => {
-
+const ItemsView = ({ items, selectedItem, selectedData,
+    setSelectedData, setItems, productShow, setProductShow, setSelectedItem, selectedItems, selectedProducts, otherProducts, setSelectedItems, setSelectedProducts, setOtherProducts }) => {
     const [showItems, setShowItems] = React.useState([])
 
     React.useEffect(() => {
@@ -428,11 +468,10 @@ const ItemsView = ({ items, selectedItem, setItems, productShow, setProductShow,
                     <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "45%" }]}>Price</Text>
                 </View>
             </View>
-            {showItems.map(x => {
+            {showItems.map((x, indexx) => {
                 let isSelected = selectedItems.includes(x.id)
                 const otherProductsForItem = otherProducts.map((oth, index) => ({ ...oth, index })).filter(other => other.item_id == x.id)
                 const totalSelectedProductForItem = x.products.filter(p => selectedProducts.includes(p.id))
-
                 return (<ItemView
                     otherProductsForItem={otherProductsForItem}
                     setSelectedItems={setSelectedItems}
@@ -441,12 +480,15 @@ const ItemsView = ({ items, selectedItem, setItems, productShow, setProductShow,
                     selectedItem={selectedItem}
                     setSelectedItem={setSelectedItem}
                     item={x}
+                    selectedData={selectedData}
+                    setSelectedData={setSelectedData}
                     isSelected={isSelected}
                     setItems={setItems}
                     productShow={productShow}
                     setProductShow={setProductShow}
                     totalSelectedProductForItem={totalSelectedProductForItem}
-                    selectedProducts={selectedProducts} />)
+                    selectedProducts={selectedProducts}
+                />)
             })}
 
         </>
@@ -470,7 +512,10 @@ const ItemView = ({
     setItems,
     productShow,
     setProductShow,
-    setOtherProducts }) => {
+    itemIndex,
+    setOtherProducts, selectedData,
+    setSelectedData, }) => {
+
     return (
         <>
             <View style={styles.itemViewContainerStyle}>
@@ -480,6 +525,7 @@ const ItemView = ({
                         onPress={() => {
                             setSelectedItem(item.id)
                             setProductShow(true)
+                            setSelectedData(item)
                             if (isSelected) {
                                 if (productShow) {
                                     setSelectedItems(state => state.filter(x => x != item.id))
@@ -501,22 +547,20 @@ const ItemView = ({
                 </View>
                 {productShow ? <View style={{ flexDirection: "row", justifyContent: "space-around", flex: 1, paddingHorizontal: 20 }}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <TextInput value={String(item?.time_duration_h)}
+                        <TextInput value={String(selectedData?.time_duration_h)}
                             onChangeText={t => {
-                                setItems(state => {
-                                    let d = _.cloneDeep(state).filter(x => x.id != item.id)
-                                    return ([...d, { ...item, time_duration_h: t }])
+                                setSelectedData(state => {
+                                    return ({ ...state, time_duration_h: t })
                                 })
                             }}
                             placeholder="hh"
                             keyboardType="numeric"
                             maxFontSizeMultiplier={1.1}
                             style={[styles.itemTextStyle, { height: 40, minWidth: 35, maxWidth: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
-                        <TextInput value={String(item?.time_duration_m)}
+                        <TextInput value={String(selectedData?.time_duration_m)}
                             onChangeText={t => {
-                                setItems(state => {
-                                    let d = _.cloneDeep(state).filter(x => x.id != item.id)
-                                    return ([...d, { ...item, time_duration_m: t }])
+                                setSelectedData(state => {
+                                    return ({ ...state, time_duration_m: t })
                                 })
                             }}
                             placeholder="mm"
@@ -525,12 +569,11 @@ const ItemView = ({
                             style={[styles.itemTextStyle, { minWidth: 37, maxWidth: 40, height: 40, marginLeft: 5, marginRight: 10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                     </View>
                     <TextInput
-                        value={"$" + (item?.price == 0 ? "" : item?.price)}
+                        value={"$" + selectedData?.price}
                         onChangeText={t => {
                             let textD = t.replace(/\$/g, "")
-                            setItems(state => {
-                                let d = _.cloneDeep(state).filter(x => x.id != item.id)
-                                return ([...d, { ...item, price: textD }])
+                            setSelectedData(state => {
+                                return ({ ...state, price: textD })
                             })
                         }}
                         placeholder="$"
@@ -539,14 +582,14 @@ const ItemView = ({
                         style={[styles.itemTextStyle, { minWidth: 35, maxWidth: 40, height: 40, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                 </View> : <View style={{ flexDirection: "row", flex: 1, paddingHorizontal: 20 }}>
                     <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{checkNewOrNot(item?.time_duration_h, item?.time_duration_m, item?.time_duration)}</Text>
-                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>${String(item.price)?.trim()==""?0:item.price}</Text>
+                    <Text maxFontSizeMultiplier={1.2} style={[styles.itemTextStyle, { width: "50%", color: LS_COLORS.global.green }]}>{String(item.price)?.trim() == "" ? "TBD" : "$" + item.price}</Text>
                 </View>
                 }
             </View>
             {/* products */}
             {productShow &&
                 <><View style={{ marginLeft: 20 }}>
-                    {item?.products.map(product => {
+                    {selectedData?.products.map((product, index) => {
                         let isSelected1 = selectedProducts.includes(product.id)
                         return (
                             <View style={styles.itemViewContainerStyle}>
@@ -579,10 +622,10 @@ const ItemView = ({
                                         placeholder="$000"
                                         onChangeText={(text) => {
                                             let d = text.replace(/\$/g, "")
-                                            setItems(state => {
-                                                let z = _.cloneDeep(state).filter(x => x.id != item.id)
-                                                let products = _.cloneDeep(item?.products).filter(x => x.id != product.id)
-                                                return ([...z, { ...item, products: [...products, { ...product, price: d }] }])
+                                            setSelectedData(state => {
+                                                let products = _.cloneDeep(selectedData?.products)
+                                                products[index] = { ...product, price: d }
+                                                return { ...state, products }
                                             })
                                         }}
                                         keyboardType="numeric"
@@ -715,7 +758,10 @@ const convertMinsToHrsMins = (mins) => {
 }
 
 const checkNewOrNot = (hour, mins, duration) => {
-    if (Boolean(Number(hour)) || Boolean(Number(mins))) {
+    if (hour == "" && mins == "") {
+        return "TBD"
+    }
+    if (Boolean(Number(hour)) || Boolean(Number(mins)) || Number(hour) >= 0 || Number(mins) >= 0) {
         return convertMinsToHrsMins(Number(mins) + Number(hour) * 60)
     } else {
         return convertMinsToHrsMins(Number(duration))
@@ -803,10 +849,10 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setL
                     {
                         id: "new-" + Date.now(),
                         "name": service_name,
-                        "price": 0,
+                        "price": "",
                         "time_duration": 0,
-                        time_duration_h: 0,
-                        time_duration_m: 0,
+                        time_duration_h: "",
+                        time_duration_m: "",
                         "variant_data": variant_id,
                         "is_product_mandatory": "0",
                         "service_id": 14,

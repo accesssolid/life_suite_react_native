@@ -269,9 +269,6 @@ const MapScreen = (props) => {
                                     backgroundColor: LS_COLORS.global.green,
                                 }}
                                 action={() => {
-                                    // #liahs checked to permaned to true
-                                    // setIsPermanetClicked(true)
-
                                     setCoordinates({
                                         ...coordinates,
                                         latitude: Number(user?.address[1]?.lat),

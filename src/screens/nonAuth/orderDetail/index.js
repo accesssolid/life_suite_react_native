@@ -547,23 +547,23 @@ const OrderClientDetail = (props) => {
                 start: "Start Date/Time",
                 end: "End Date/Time",
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-                end_date:data?.order_status == order_types.update_acceptance? moment(virtualdata?.order_end_time).format("MM/DD/YYYY hh:mm a"): "---"
+                end_date: data?.order_status == order_types.update_acceptance ? moment(virtualdata?.order_end_time).format("MM/DD/YYYY hh:mm a") : "---"
             })
-        }  else if (data?.order_status == order_types.suspend) {
+        } else if (data?.order_status == order_types.suspend) {
             return ({
                 start: "Start Date/Time",
                 end: "End Date/Time",
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a"),
                 end_date: moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
             })
-        }  else if (notificationData?.title == "Upcoming" && data?.ordered_sub_services == 12) {
+        } else if (notificationData?.title == "Upcoming" && data?.ordered_sub_services == 12) {
             return ({
                 start: "Estimated Start Date/Time",
                 end: "Estimated End Date/Time",
                 start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
                 end_date: "---"
             })
-        }else if (data?.order_status == order_types.update_acceptance) {
+        } else if (data?.order_status == order_types.update_acceptance) {
             return ({
                 start: "Estimated Start Date/Time",
                 end: "Estimated End Date/Time",
@@ -681,7 +681,7 @@ const OrderClientDetail = (props) => {
                                                 setSelectedStartTime(availableStartTimes[index])
                                             }}
                                             containerStyle={{ width: 150, alignSelf: 'center', borderRadius: 6, backgroundColor: LS_COLORS.global.lightGrey, borderWidth: 0, }}
-                                            dropdownStyle={{ height: availableStartTimes?.length * 40 < 160 ? availableStartTimes?.length * 40 : 160, width: 150 }}
+                                            dropdownStyle={{ height: availableStartTimes?.length == 0 ? 10 : (availableStartTimes?.length * 40 < 160 ? availableStartTimes?.length * 40 : 160), width: 150 }}
                                         />
                                     </View>
                                 </View>
@@ -1012,7 +1012,7 @@ const OrderItemsDetail = ({ i }) => {
             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} >{i.service_items_name + "  (Service Charge)"}</Text>
                 <View style={{ height: 20, flexDirection: "row" }}>
-                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (i.price==""?0:i?.price)}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(i.price == "" ? "To be determine" : ("$" + i?.price))}</Text>
                 </View>
             </View>
             {i.product.map((itemData, index) => {
@@ -1024,7 +1024,7 @@ const OrderItemsDetail = ({ i }) => {
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (itemData.price==""?0:itemData?.price)}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(itemData.price == "" ? "To be determine" : ("$" + itemData?.price))}</Text>
                         </View>
                     </View>
                 )
@@ -1039,7 +1039,7 @@ const OrderItemsDetail = ({ i }) => {
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (itemData.product_price==""?0:itemData?.product_price)}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(itemData.product_price == "" ? "To be determine" : ("$" + itemData?.product_price))}</Text>
                         </View>
                     </View>
                 )
