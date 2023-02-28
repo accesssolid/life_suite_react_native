@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Text, Image, TouchableOpacity, Platform } from 'react-native'
 import Modal from 'react-native-modal';
 import { getInfoDescription } from '../utils';
 import LS_COLORS from "../constants/colors";
@@ -59,7 +59,7 @@ const CopyRightModal = (props) => {
                         html: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
                             <HTML>
                             <HEAD></HEAD>                            
-                            <BODY style="font-size:4.5vw">
+                            <BODY style="font-size:${Platform.isPad?"20px":"4.5vw"}">
                             ${data}
                             </BODY>
                             </HTML>`
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: LS_FONTS.PoppinsBold,
-        fontSize: widthPercentageToDP(4),
+        fontSize:Platform?.isPad?26: widthPercentageToDP(3.7),
         letterSpacing: 0.32,
         color: LS_COLORS.global.darkBlack,
         textTransform: 'uppercase',

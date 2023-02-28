@@ -1238,6 +1238,7 @@ const Profile = (props) => {
                                         onChangeValue={(index, value) => { setGender(value) }}
                                         handleTextValue={true}
                                         containerStyle={{borderColor:LS_COLORS.global.textInutBorderColor,}}
+                                        dropdownStyle={{height:120}}
                                     />
                                 </View>
                                 {user.user_role == role.provider && <CustomInput

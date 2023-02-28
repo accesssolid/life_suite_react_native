@@ -932,6 +932,7 @@ const SignUpScreen = (props) => {
                                     value={gender}
                                     onChangeValue={(index, value) => { setGender(value) }}
                                     handleTextValue={true}
+                                    dropdownStyle={{height:120}}
                                 />
                             </View>
                             {role !== 1 && <CustomTextInput

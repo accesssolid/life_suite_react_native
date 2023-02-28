@@ -149,16 +149,16 @@ const ServicesProvided = (props) => {
                     return {
                         "item_id": item.id,
                         "price": "",
-                        "time_duration_h": "00",
-                        "time_duration_m": "00",
+                        "time_duration_h": "",
+                        "time_duration_m": "",
                         "variant_data": item.variant_data
                     }
                 } else {
                     return {
                         "item_id": item.id,
                         "price": "",
-                        "time_duration_h": "00",
-                        "time_duration_m": "00",
+                        "time_duration_h": "",
+                        "time_duration_m": "",
                     }
                 }
             })
@@ -179,11 +179,11 @@ const ServicesProvided = (props) => {
             itemListMaster.concat(newServicesMaster).forEach((item, index) => {
                 subService?.items?.forEach((ele, ind) => {
                     if (item.id == ele.id && item.variant_data == ele.variant_data) {
-                        let hours = toHoursAndMinutes(ele.time_duration, 'hours')
-                        let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
+                        let hours =ele.time_duration==""?"": toHoursAndMinutes(ele.time_duration, 'hours')
+                        let minutes =ele.time_duration==""?"": toHoursAndMinutes(ele.time_duration, 'minutes')
                         arr.push({
                             "item_id": item.id,
-                            "price": "$" + ele.price,
+                            "price": ele.price==""?"":("$" + ele.price),
                             "time_duration_h": String(hours),
                             "time_duration_m": String(minutes),
                             "variant_data": item.variant_data
@@ -198,8 +198,8 @@ const ServicesProvided = (props) => {
                     arr.push({
                         "item_id": item.id,
                         "price": "",
-                        "time_duration_h": "00",
-                        "time_duration_m": "00",
+                        "time_duration_h": "",
+                        "time_duration_m": "",
                         "variant_data": item.variant_data
                     })
                 }
@@ -208,11 +208,11 @@ const ServicesProvided = (props) => {
             itemListMaster.concat(newServicesMaster).forEach((item, index) => {
                 subService?.items?.forEach((ele, ind) => {
                     if (item.id == ele.id) {
-                        let hours = toHoursAndMinutes(ele.time_duration, 'hours')
-                        let minutes = toHoursAndMinutes(ele.time_duration, 'minutes')
+                        let hours = ele.time_duration==""?"":toHoursAndMinutes(ele.time_duration, 'hours')
+                        let minutes =ele.time_duration==""?"": toHoursAndMinutes(ele.time_duration, 'minutes')
                         arr.push({
                             "item_id": item.id,
-                            "price": "$" + ele.price,
+                            "price": ele.price==""?"":("$" + ele.price),
                             "time_duration_h": String(hours),
                             "time_duration_m": String(minutes),
                         })
@@ -225,8 +225,8 @@ const ServicesProvided = (props) => {
                     arr.push({
                         "item_id": item.id,
                         "price": item.price ?? "",
-                        "time_duration_h": "00",
-                        "time_duration_m": "00",
+                        "time_duration_h": "",
+                        "time_duration_m": "",
                     })
                 }
             })
@@ -265,7 +265,7 @@ useEffect(()=>{
                     newArr.push({
                         "id": element.id,
                         "name": element.name,
-                        "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
+                        "price": !isAddServiceMode ? (getPrice(element.item_id, element.id)=="$"?"":getPrice(element.item_id, element.id) ): "",
                         "item_id": element.item_id,
                         list_type: element?.list_type
                     })
@@ -273,8 +273,9 @@ useEffect(()=>{
                         selected.push({
                             "id": element.id,
                             "name": element.name,
-                            "price": !isAddServiceMode ? getPrice(element.item_id, element.id) : "",
-                            "item_id": element.item_id
+                            "price": !isAddServiceMode ? (getPrice(element.item_id, element.id)=="$"?"":getPrice(element.item_id, element.id) ): "",
+                            "item_id": element.item_id,
+                            list_type: element?.list_type
                         })
                     }
                 });
@@ -322,15 +323,15 @@ useEffect(()=>{
             if (selectedItems.includes(itemm.item_id)) {
                 var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
                 var fieldArray = hoursDotMinutes.split(":");
-                var minutes = Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
+                var minutes =(itemm.time_duration_m==""&&itemm.time_duration_h=="")?"": Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
                 let obj = {
                     "item_id": itemm.item_id,
-                    "price": Number(itemm.price.replace('$', '')),
+                    "price":(itemm.price?.trim()==""||itemm.price=="$")?"": Number(itemm.price.replace('$', '')),
                     "time_duration": minutes
                 }
                 if (String(itemm.item_id).startsWith("new")) {
                     let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
-                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).filter(x => x.name != "" && x.price != "" && x.price != "$")
+                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).filter(x => x.name != "").map(x=>({...x,price:x?.price=="$"?"":x?.price}))
                     new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                 } else {
                     services.push(obj)
@@ -346,8 +347,8 @@ useEffect(()=>{
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    products: [...productsData].filter(x => x.name != "" && x.price != "" && x.price != "$"),
-                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "" && x.price != "" && x.price != "$"),
+                    products: [...productsData].filter(x => x.name != "").map(x=>({...x,price:x?.price=="$"?"":x?.price})).filter(x=>selectedProducts?.map(x=>x.id)?.includes(x.id)),
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "")?.map(x=>({...x,price:x?.price=="$"?"":x?.price})),
                     services: [...services],
                     new_services: [...new_services]
                 }
@@ -360,8 +361,8 @@ useEffect(()=>{
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    products: [...productsData].filter(x => x.name != "" && x.price != "" && x.price != "$"),
-                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "" && x.price != "" && x.price != "$"),
+                    products: [...productsData].filter(x => x.name != "").map(x=>({...x,price:x?.price=="$"?"":x?.price})).filter(x=>selectedProducts?.map(x=>x.id)?.includes(x.id)),
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "").map(x=>({...x,price:x?.price=="$"?"":x?.price})),
                     services: [...services],
                     new_services: [...new_services]
                 }
@@ -664,7 +665,7 @@ useEffect(()=>{
                         && itemm?.time_duration_m?.trim() !== "") {
                         isValidData = true
                     } else {
-                        isValidData = false
+                        isValidData = true
                     }
                     if((itemm?.time_duration_m?.trim()=="00"||itemm?.time_duration_m?.trim()=="")&&(itemm?.time_duration_h?.trim()=="00"||itemm?.time_duration_h?.trim()=="")){
                         validhrmm = false
@@ -684,7 +685,7 @@ useEffect(()=>{
                         && itemm?.time_duration_m.trim() !== "") {
                         isValidData = true
                     } else {
-                        isValidData = false
+                        isValidData = true
                     }
                     if((itemm?.time_duration_m?.trim()=="00"||itemm?.time_duration_m?.trim()=="")&&(itemm?.time_duration_h?.trim()=="00"||itemm?.time_duration_h?.trim()=="")){
                         validhrmm = false
@@ -699,7 +700,7 @@ useEffect(()=>{
             if (item?.time_duration_h?.trim() == "" && selectedItems?.includes(item?.item_id)) {
                 return ({
                     ...item,
-                    time_duration_h: "00",
+                    time_duration_h: "",
                     
                 })
             }
@@ -708,7 +709,7 @@ useEffect(()=>{
         let selected = getSelectedProducts()
         productsData?.filter(item => selected?.includes(item?.id))?.forEach(element => {
             if (element?.price?.trim() == "") {
-                isValidData = false
+                // isValidData = false
             }
             if(Number(String(element?.price).match(/[\d.]+/,""))<0.5){
                 isLessThan=true
@@ -719,19 +720,19 @@ useEffect(()=>{
        
         newProductsData?.filter(item => selectedNew?.includes(item?.id))?.forEach(element => {
             if (element?.price?.trim() == "" || element?.name?.trim() == "") {
-                isValidData = false
+                // isValidData = false
             }
             if(Number(String(element?.price)?.match(/[\d.]+/,""))<0.5){
                 isLessThan=true
             }
         });
 
-        if(isLessThan){
-            return showToast("Minimum be at least $.50")
-        }
-        if(!validhrmm){
-            return showToast("please enter time")
-        }
+        // if(isLessThan){
+        //     return showToast("Minimum be at least $.50")
+        // }
+        // if(!validhrmm){
+        //     return showToast("please enter time")
+        // }
         if (!isValidData) {
             return showToast("Please enter data for selected services")
         } else {
@@ -1029,18 +1030,18 @@ useEffect(()=>{
                 if (selectedItems.includes(itemm.item_id)) {
                     var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
                     var fieldArray = hoursDotMinutes.split(":");
-                    var minutes = Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
+                    var minutes =(itemm.time_duration_m==""&&itemm.time_duration_h=="")?"":Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
                     let obj = {
                         "item_id": itemm.item_id,
-                        "price": Number(itemm.price.replace('$', '')),
+                        "price":(itemm.price?.trim()==""||itemm.price=="$")?"": Number(itemm.price.replace('$', '')),
                         "time_duration": minutes
                     }
                     if (String(itemm.item_id).startsWith("new")) {
                         let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
                         let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).map(x => ({
                             name: x.name,
-                            price: x.price
-                        })).filter(x => x.name != "" && x.price != "" && x.price != "$")
+                            price:x.price=="$"?"":x.price
+                        })).filter(x => x.name != "")
                         new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                     } else {
                         services.push(obj)
@@ -1048,15 +1049,17 @@ useEffect(()=>{
 
                 }
             })
+            console.log(selectedProducts)
             let json_data = {
-                products: [...productsData].filter(x => x.name != "" && x.price != "" && x.price != "$").map(x => ({ item_product_id: x.id, price: x.price })),
-                new_products: [...newProductsData].filter(x => !String(x?.item_id).startsWith("new")).filter(x => x.name != "" && x.price != "" && x.price != "$"),
+                products: [...productsData].filter(x => x.name != "").map(x => ({ item_product_id: x.id, price:x.price=="$"?"":x.price })).filter(x=>selectedProducts?.map(x=>x.id).includes(x.item_product_id)),
+                new_products: [...newProductsData].filter(x => !String(x?.item_id).startsWith("new")).filter(x => x.name != "").map(x=>({...x,price:x.price=="$"?"":x.price})),
                 services: [...services],
                 new_services: [...new_services]
             }
             // console.log(JSON.stringify(json_data))
             // setLoading(false)
             // return 
+
 
             formdata.append("service_id", subService.id)
             formdata.append("json_data", JSON.stringify(json_data))

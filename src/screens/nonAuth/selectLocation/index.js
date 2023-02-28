@@ -181,7 +181,7 @@ const SelectLocation = (props) => {
 
                 let json_data = JSON.stringify({
                     "services": addServiceData.json_data.services,
-                    "products": [...products.filter(item => item.price !== '')],
+                    "products": [...products],
                     "travel_distance": travel_distance,
                     "new_services":addServiceData.json_data.new_services,
                     "new_products": [...newProd],

@@ -71,7 +71,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             <TextInputMask
                                 onChangeText={(formatted, extracted) => {
                                     if(extracted?.trim()==""){
-                                        props.setText("time_duration_h", "00", props.index, props.serviceItem)
+                                        props.setText("time_duration_h", "", props.index, props.serviceItem)
 
                                     }else{
                                         props.setText("time_duration_h", extracted, props.index, props.serviceItem)
@@ -85,7 +85,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 textAlign='right'
                                 editable={props.isSelected}
                                 style={styles.inputStyle}
-                                value={(props.serviceItem?.time_duration_h=="00"||props?.serviceItem?.time_duration_h=="0")?"":props?.serviceItem?.time_duration_h}
+                                value={props?.serviceItem?.time_duration_h}
                                 ref={hourRef}
                                 selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_h?.length??0,start:props.serviceItem?.time_duration_h?.length??0}}
                                 returnKeyType={'done'}
@@ -100,7 +100,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             <TextInputMask
                                 onChangeText={(formatted, extracted) => {
                                     if(extracted?.trim()==""){
-                                        props.setText("time_duration_m", "00", props.index, props.serviceItem)
+                                        props.setText("time_duration_m", "", props.index, props.serviceItem)
 
                                     }else{
                                         props.setText("time_duration_m", extracted, props.index, props.serviceItem)
@@ -114,7 +114,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 textAlign='right'
                                 editable={props.isSelected}
                                 style={styles.inputStyle}
-                                value={(props.serviceItem?.time_duration_m=="00"||props?.serviceItem?.time_duration_m=="0")?"":props?.serviceItem?.time_duration_m}
+                                value={props?.serviceItem?.time_duration_m}
                                 ref={minRef}
                                 selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_m?.length??0,start:props.serviceItem?.time_duration_m?.length??0}}
                                 returnKeyType={'done'}

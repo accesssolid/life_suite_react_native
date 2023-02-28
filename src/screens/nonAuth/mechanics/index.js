@@ -145,6 +145,10 @@ const Mechanics = (props) => {
     }, [providers, extraData])
 
     useEffect(() => {
+        console.log("Providers", JSON.stringify(providers))
+    }, [providers])
+
+    useEffect(() => {
         getProviders()
         getLocationPermission()
     }, [])
@@ -252,7 +256,7 @@ const Mechanics = (props) => {
 
     const locationMileDistanceUpdate = async () => {
         let d = { ...mile_distanceP }
-        console.log("Data",data)
+        console.log("Data", data)
         for (let provider of dupProviders) {
             let x = await getMilesBetweenCords({ latitude: provider?.address?.lat, longitude: provider?.address?.long }, { latitude: data.order_placed_lat, longitude: data.order_placed_long })
             d[`${provider.id}`] = x
@@ -262,7 +266,7 @@ const Mechanics = (props) => {
     }
 
     const getProviders = (rangeData = {}, showRangeResult = false, my_location = false) => {
-        // console.log("Data",rangeData)
+        // console.log("Data",data)
         // return
         setLoading(true)
         let headers = {
@@ -278,7 +282,7 @@ const Mechanics = (props) => {
         }
         getApi(config)
             .then((response) => {
-
+                console.log(response)
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -347,6 +351,7 @@ const Mechanics = (props) => {
         formdata.append("state", current_address.state)
         formdata.append("city", current_address.city)
         formdata.append("ordered_variant", JSON.stringify(ordered_variant))
+        // console.log("JSONDATA",JSON.stringify(jsonData))
         // setLoading(false)
         // return
         if (continuous_order) {
@@ -518,7 +523,17 @@ const Mechanics = (props) => {
 
     const [provider_prices, setProviderPrices] = React.useState([])
 
+    const getTimeInHours = (minute) => {
+        let d = parseInt(minute / 60)==0?"":parseInt(minute / 60)+" Hr"
+        if (minute % 60 !== 0) {
+            d += ` ${parseInt(minute % 60)} Mins`
+        }
+        if (Number(minute) == 0) {
+            return "0 Mins"
 
+        }
+        return `${d}`
+    }
     React.useEffect(() => {
         let p_p = []
         if (dupProviders.length > 0) {
@@ -657,17 +672,24 @@ const Mechanics = (props) => {
                                     let countryName = country && country.length > 0 ? country[country.length - 1] : ""
                                     let x = item.timeDuration / 60
                                     let time_format = ""
-                                    if (x > 1) {
-                                        time_format = parseInt(x) + " hr " + item.timeDuration % 60 + " min"
-                                    } else {
-                                        if(item.timeDuration==0){
-                                            time_format="To be determined"
-                                        }else{
-                                            time_format = item.timeDuration + " min"
+                                    let itemsLists = item.item_list
+                                    let totalTimeOfService = 0
+                                    let showTBD = true
+                                    for (let i of itemsLists) {
+                                        if (i?.time_duration == "" || i?.time_duration == null || i?.time_duration == undefined) {
+
+                                        } else {
+                                            totalTimeOfService =  Number(totalTimeOfService) + Number(i?.time_duration)
+                                            time_format = getTimeInHours(totalTimeOfService)
+                                            showTBD = false
                                         }
+                                    }
+                                    if (showTBD) {
+                                        time_format = "To be determined"
                                     }
                                     let totalServicePrice = item.item_list.filter(x => x.checked).map(x => Number(x.price)).reduce((a, b) => a + b, 0)
                                     let totalProductPrice = 0
+
                                     let showDistanceOrNot = false
                                     for (let z of item.item_list) {
                                         for (let p of z.products) {
@@ -684,21 +706,21 @@ const Mechanics = (props) => {
                                             }
                                         }
                                     }
-                                    let totalPrice = 0
-                                    totalPrice = Number(totalServicePrice) + Number(totalProductPrice)
-                                    let is_business_licensed=false
-                                    let is_certified=false
-                                    let is_insauranced=false
-                                    if(item?.questionnaire_data?.length>0){
-                                        is_business_licensed=item?.questionnaire_data[0]?.is_business_licensed=="1"
-                                        is_certified=item?.questionnaire_data[0]?.is_certified=="1"
-                                        is_insauranced=item?.questionnaire_data[0]?.is_insauranced=="1"
+                                    let totalPrice = 0.5
+                                    totalPrice += Number(totalServicePrice) + Number(totalProductPrice)
+                                    let is_business_licensed = false
+                                    let is_certified = false
+                                    let is_insauranced = false
+                                    if (item?.questionnaire_data?.length > 0) {
+                                        is_business_licensed = item?.questionnaire_data[0]?.is_business_licensed == "1"
+                                        is_certified = item?.questionnaire_data[0]?.is_certified == "1"
+                                        is_insauranced = item?.questionnaire_data[0]?.is_insauranced == "1"
                                     }
-
+                                    let checked_g = item.item_list.filter(i => i.checked).length > 0
                                     return <Card key={index} style={styles.alexiContainer}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Pressable onPress={() => {
-                                                props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService?.name, service_id: subService?.id ,list:true})
+                                                props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService?.name, service_id: subService?.id, list: true })
                                             }} style={{ flexDirection: 'row' }}>
                                                 <View style={{ height: 80, width: 80, borderRadius: 50, overflow: 'hidden', borderWidth: 0.5, borderColor: LS_COLORS.global.placeholder }}>
                                                     <Image
@@ -722,9 +744,9 @@ const Mechanics = (props) => {
                                                         <Image style={{ height: 18, width: 21 }} source={require('../../../assets/whiteHeart.png')} resizeMode="cover" />
                                                     }
                                                 </TouchableOpacity>
-                                                {totalPrice > 0 && <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                                                {checked_g && <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
                                                     <CheckBox
-                                                        checked={totalPrice > 0}
+                                                        checked={checked_g}
                                                         onPress={() => {
                                                             onGlobCheckBoxClicked(index)
                                                         }}
@@ -732,7 +754,7 @@ const Mechanics = (props) => {
                                                         checkedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/checked.png")} />}
                                                         uncheckedIcon={<Image style={{ height: 23, width: 23 }} source={require("../../../assets/unchecked.png")} />}
                                                     />
-                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15 }}>${totalPrice}</Text>
+                                                    <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, color: LS_COLORS.global.green, marginTop: 15 }}>${Number(totalPrice).toFixed(2)}</Text>
                                                 </View>}
                                             </View>
                                         </View>
@@ -741,16 +763,16 @@ const Mechanics = (props) => {
                                             :
                                             <Text maxFontSizeMultiplier={1.5} onPress={() => setOpen(!open)} style={{ fontSize: 14, marginLeft: 10, marginTop: 10, fontFamily: LS_FONTS.PoppinsRegular }}>{item.tagline}</Text>
                                         }
-                                        <View style={{  flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 10 }}>
-                                            {is_certified&&<View style={{ flexDirection: "row", alignItems: "center" ,marginVertical: 5,}}>
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 10 }}>
+                                            {is_certified && <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5, }}>
                                                 <Image source={require("../../../assets/profile/certify.png")} style={{ height: 15, width: 12 }} resizeMode="contain" />
                                                 <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black, marginLeft: 5 }}>Certified</Text>
                                             </View>}
-                                            {is_business_licensed&&<View style={{ flexDirection: "row", alignItems: "center",marginVertical: 5, }}>
+                                            {is_business_licensed && <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5, }}>
                                                 <Image source={require("../../../assets/profile/license.png")} style={{ height: 15, width: 15 }} resizeMode="contain" />
                                                 <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black, marginLeft: 5 }}>Licensed</Text>
                                             </View>}
-                                            {is_insauranced&&<View style={{ flexDirection: "row", alignItems: "center",marginVertical: 5, }}>
+                                            {is_insauranced && <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 5, }}>
                                                 <Image source={require("../../../assets/profile/insured.png")} style={{ height: 15, width: 15 }} resizeMode="contain" />
                                                 <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.black, marginLeft: 5 }}>Insured</Text>
                                             </View>}
@@ -773,14 +795,14 @@ const Mechanics = (props) => {
 
                                         <View style={{ marginLeft: 10 }}>
                                             {Boolean(ordered_variant?.variant_title) && <Text maxFontSizeMultiplier={1.5}
-                                                style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>{ordered_variant?.variant_title}</Text>: {ordered_variant?.variant}</Text>}
+                                                style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>{ordered_variant?.variant_title}:</Text> {String(ordered_variant?.variant).toUpperCase()}</Text>}
                                             <View style={{}}>
                                                 {ordered_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5}
-                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Make</Text>: {ordered_variant?.make}</Text>}
+                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Make:</Text> {ordered_variant?.make}</Text>}
                                                 {ordered_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5}
-                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Model</Text>: {ordered_variant?.model}</Text>}
+                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Model:</Text> {ordered_variant?.model}</Text>}
                                                 {ordered_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5}
-                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Year</Text>: {ordered_variant?.year}</Text>}
+                                                    style={[{ color: LS_COLORS.global.green, fontFamily: LS_FONTS.PoppinsRegular, }, { textAlign: "left", fontSize: 13, }]}><Text style={{ color: "black" }}>Year:</Text> {ordered_variant?.year}</Text>}
                                             </View>
                                         </View>
 
@@ -801,7 +823,7 @@ const Mechanics = (props) => {
                                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10, alignItems: "center" }}>
                                                         <Text maxFontSizeMultiplier={1.4} style={{ fontSize: 12, flex: 1, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, }}>{i.service_items_name + "(Service)"}</Text>
                                                         <View style={{ height: 25, flexDirection: "row", }}>
-                                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + i.price}</Text>
+                                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{i.price == "" ? "TBD" : "$" + Number(i.price).toFixed(2)}</Text>
                                                             <CheckBox
                                                                 checked={i.checked}
                                                                 onPress={() => {
@@ -842,7 +864,7 @@ const Mechanics = (props) => {
                                                                     </Text>
                                                                 </View>
                                                                 <View style={{ height: 20, flexDirection: "row" }}>
-                                                                    {isPriced && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{"$" + price}</Text>}
+                                                                    {isPriced && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium }}>{price == "" ? "TBD" : "$" + Number(price).toFixed(2)}</Text>}
                                                                     <CheckBox
                                                                         checked={itemData.checked}
                                                                         onPress={() => {
@@ -861,6 +883,10 @@ const Mechanics = (props) => {
                                         <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Estimated Time</Text>
                                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>{time_format}</Text>
+                                        </View>
+                                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>LyfeSuite Application Fee</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>$0.50</Text>
                                         </View>
                                     </Card>
                                 })

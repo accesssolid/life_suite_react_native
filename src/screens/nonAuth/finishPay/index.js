@@ -51,7 +51,7 @@ export default function FinishPay({ navigation, route }) {
             order_status: order_types.completed,
             rating_comment: reason,
             rating: rating,
-            tip: type == types[0] ? lodash.round(flat_amount,2) : lodash.round((Number(per_amount) * Number(totalPrice) / 100),2)
+            tip: type == types[0] ? lodash.round(flat_amount, 2) : lodash.round((Number(per_amount) * Number(totalPrice) / 100), 2)
         }
         console.log(datac)
         let config = {
@@ -132,12 +132,25 @@ export default function FinishPay({ navigation, route }) {
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{ width: "40%", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Tip Amount"} placeholderTextColor="black" style={{ height: 40, color: "black" }} textAlign="center" />
+                                    <TextInput value={flat_amount} onChangeText={t => {
+                                        const validated = String(t).match(/^(\d*\.{0,1}\d{0,2}$)/)
+                                        if(validated){
+                                            setFlatAmount(t)
+                                        }
+                                        
+                                    }} keyboardType={"numeric"} placeholder={"Tip Amount"} placeholderTextColor="black" style={{ height: 40, color: "black" }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
                             <><View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                <TextInput value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40, color: "black" }} textAlign="center" />
+                                <TextInput value={per_amount} onChangeText={t => {
+                                    const validated = String(t).match(/^(\d*\.{0,1}\d{0,2}$)/)
+                                    if(validated){
+                                        // if(Number(t)<100){
+                                            setPerAmount(t)
+                                        // }
+                                    }
+                                }} placeholder={"Enter Percentage"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40, color: "black" }} textAlign="center" />
                             </View>
                                 <View style={{ width: "40%", alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
                                     <Text style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40 }} >{(String(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2))) ?? "Calculated Amount"}</Text>

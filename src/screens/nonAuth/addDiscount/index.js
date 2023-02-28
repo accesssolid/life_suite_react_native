@@ -102,13 +102,22 @@ export default function AddDiscount({ navigation, route }) {
                         {type == types[0] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{ borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput maxFontSizeMultiplier={1.3} value={flat_amount} onChangeText={t => setFlatAmount(t)} keyboardType={"numeric"} placeholder={"Flat Amount ($)"} placeholderTextColor="black" style={{ height: 40,minWidth:100,color:"black"  }} textAlign="center" />
+                                    <TextInput maxFontSizeMultiplier={1.3} value={flat_amount} onChangeText={t => {
+                                        const validated = String(t).match(/^(\d*\.{0,1}\d{0,2}$)/)
+                                        if(validated){
+                                            setFlatAmount(t)
+                                        }}} keyboardType={"numeric"} placeholder={"Flat Amount ($)"} placeholderTextColor="black" style={{ height: 40,minWidth:100,color:"black"  }} textAlign="center" />
                                 </View>
                             </View>}
                         {type == types[1] &&
                             <View style={{ alignItems: "center", width: "100%" }}>
                                 <View style={{  alignSelf: "center", borderRadius: 6, height: 40, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
-                                    <TextInput maxFontSizeMultiplier={1.3} value={per_amount} onChangeText={t => setPerAmount(t)} placeholder={"Enter Percentage (%)"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40,minWidth:100,color:"black" }} textAlign="center" />
+                                    <TextInput maxFontSizeMultiplier={1.3} value={per_amount} onChangeText={t => {
+                                        const validated = String(t).match(/^(\d*\.{0,1}\d{0,2}$)/)
+                                        if(validated){
+                                            setPerAmount(t)
+                                        }
+                                    }} placeholder={"Enter Percentage (%)"} keyboardType={"numeric"} placeholderTextColor="black" style={{ height: 40,minWidth:100,color:"black" }} textAlign="center" />
                                 </View>
                                 <View style={{ alignSelf: "center", borderRadius: 6, height: 40, marginTop: 20, backgroundColor: LS_COLORS.global.lightGrey }}>
                                     <Text maxFontSizeMultiplier={1.3} style={{ height: 40, textAlign: "center", textAlignVertical: "center", lineHeight: 40,minWidth:100 }} >{Number(parseFloat(Number(per_amount) * totalPrice / 100).toFixed(2)) ?? "Calculated Amount"}</Text>

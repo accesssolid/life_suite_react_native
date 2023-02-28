@@ -93,7 +93,7 @@ const TimeFrame = props => {
                 let selectedServicesName = []
                 let otherOptions = []
                 let duration = 0
-
+                let showTBD=true
                 for (let i of p.item_list) {
                     let data = {
                         "item_id": i.service_item_id,
@@ -105,7 +105,12 @@ const TimeFrame = props => {
                     if (i.checked) {
                         selectedServices.push(i.service_item_id)
                         selectedServicesName.push(i.service_items_name)
-                        duration += Number(i.time_duration)
+                        if(i?.time_duration==""||i?.time_duration==null||i?.time_duration==undefined){
+
+                        }else{
+                            showTBD=false
+                            duration += Number(i.time_duration)
+                        }
                     }
                     for (let pr of i.products) {
                         if (pr.checked && !pr.type) {
@@ -131,7 +136,7 @@ const TimeFrame = props => {
                     z.push({
                         "provider_id": p.id,
                         "provider_name": p.first_name + " " + p.last_name, //need to removed when order hited
-                        "duration": duration, //need to removed when order hited
+                        "duration":showTBD?"": duration, //need to removed when order hited
                         "estimated_reached_time": "0",
                         "order_start_time": orderPreviousData?.order_start_time,
                         "order_end_time": orderPreviousData?.order_end_time,
@@ -152,7 +157,17 @@ const TimeFrame = props => {
             setJsonData(_.cloneDeep(z))
         }
     }, [data, mile_distanceP])
+    const getTimeInHours = (minute) => {
+        let d = parseInt(minute / 60)==0?"":parseInt(minute / 60)+" Hr"
+        if (minute % 60 !== 0) {
+            d += ` ${parseInt(minute % 60)} Mins`
+        }
+        if (Number(minute) == 0) {
+            return "0 Mins"
 
+        }
+        return `${d}`
+    }
     return (
         <Modal
             visible={props.visible}
@@ -174,14 +189,13 @@ const TimeFrame = props => {
 
                         {jsonData.length > 1 && <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Select time frame for each service provider</Text>}
                         {jsonData && jsonData.map((i, index) => {
-                            let x = i.duration / 60
                             let time_format = ""
-                            if (x > 1) {
-                                time_format = parseInt(x) + " hr " + i.duration % 60 + " mins"
-                            } else {
-                                time_format = i.duration + " mins"
+                            if(i.duration==""){
+                                time_format="TBD"
+                            }else{
+                                time_format=getTimeInHours(i.duration)
                             }
-                            let estimated_price = 0
+                            let estimated_price = 0.5
                             if (props.provider_prices) {
                                 let obj = props.provider_prices?.find(x => x.id == i.provider_id)
                                 // _price
@@ -190,9 +204,9 @@ const TimeFrame = props => {
                                 console.log(products)
                                 console.log(provider?.item_list)
                                 if (obj) {
-                                    estimated_price = obj?.price
+                                    estimated_price += obj?.price
                                     if (provider) {
-                                        estimated_price = 0
+                                        estimated_price = 0.5
                                         for (let item of provider?.item_list) {
                                             if (item.checked) {
                                                 estimated_price += Number(item.price)
@@ -224,7 +238,7 @@ const TimeFrame = props => {
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: "black" }}>({i.itemsName.join(", ")})</Text>
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Time: {time_format}</Text>
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Location: {location}</Text>
-                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${lodash.round(estimated_price, 2)}</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Estimated Cost: ${Number(estimated_price).toFixed(2)}</Text>
                                 {/* <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 11, color: LS_COLORS.global.green }}>Distance: {lodash.round(orderPreviousData?.mile_distance, 2)}</Text> */}
 
                                 <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 13, marginTop: "5%" }}>My available start time between:</Text>

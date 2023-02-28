@@ -31,6 +31,9 @@ export default function ProviderDetail(props) {
     const [modalVisible2, setModalVisible2] = React.useState(false)
 
     const [currentSelectedImage, setCurrentSelectedImage] = React.useState(0)
+    const [selectedImage, setSelectedImage] = React.useState("")
+    const [singleModal, setSingleModal] = React.useState(false)
+
     const [currentRating, setCurrentRating] = React.useState(0)
     const [sortBy, setSortBy] = React.useState(0)
     const [is_fav, setIsFav] = React.useState(false)
@@ -43,6 +46,7 @@ export default function ProviderDetail(props) {
         getProviderDetail()
         getRatings()
     }, [])
+
 
     useEffect(() => {
         let ratingsCopy = [...totalRatings]
@@ -300,11 +304,16 @@ export default function ProviderDetail(props) {
                     }
                 }}
             />
-            <Image
-                resizeMode='cover'
-                source={{ uri: BASE_URL + provider?.profile_image }}
-                style={{ width: 90, height: 90, borderWidth: 1, borderColor: LS_COLORS.global.green, zIndex: 1000, elevation: 10, top: -45, left: (width / 2) - 45, borderRadius: 45, backgroundColor: "gray" }}
-            />
+            <Pressable style={{top: -45,zIndex: 1000, elevation: 10,  left: (width / 2) - 45}} onPress={() => {
+                setSingleModal(true)
+                setSelectedImage(provider?.profile_image)
+            }}>
+                <Image
+                    resizeMode='cover'
+                    source={{ uri: BASE_URL + provider?.profile_image }}
+                    style={{ width: 90, height: 90, borderWidth: 1, borderColor: LS_COLORS.global.green,  borderRadius: 45, backgroundColor: "gray" }}
+                />
+            </Pressable>
             <TouchableOpacity onPress={() => { like(provider.id) }} style={{ height: 20, width: 25, marginTop: -40, justifyContent: "center", alignSelf: 'center' }}>
                 {is_fav
                     ?
@@ -314,7 +323,7 @@ export default function ProviderDetail(props) {
                 }
             </TouchableOpacity>
             <View style={{ marginTop: -0 }}>
-                <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: LS_COLORS.global.green }}>{provider?.first_name}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: LS_COLORS.global.green }}>{provider?.first_name}{(provider?.last_name&&(provider?.last_name!=""||provider!="null"))?(" "+provider?.last_name):""}</Text>
                 <View style={{ marginTop: 5, flexDirection: "row", justifyContent: "space-around", alignItems: "center", paddingHorizontal: 20 }}>
                     {questionaireData?.is_certified == 1 && <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <Image source={require("../../../assets/profile/certify.png")} style={{ height: 15, width: 12 }} resizeMode="contain" />
@@ -435,14 +444,12 @@ export default function ProviderDetail(props) {
                     </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                         <View style={{ width: 50 }}>
-
                         </View>
                         <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, textAlign: "center", fontSize: 16, marginTop: 5 }}>Customer Rating</Text>
                         <View style={{ width: 50 }}>
-
                         </View>
                     </View>
-                    <View style={{justifyContent:"center",flexDirection:"row",alignItems:"center"}}>
+                    <View style={{ justifyContent: "center", flexDirection: "row", alignItems: "center" }}>
                         <Rating
                             count={5}
                             startingValue={average_rating}
@@ -453,7 +460,7 @@ export default function ProviderDetail(props) {
                             imageSize={24}
                             readonly={true}
                         />
-                        <Text maxFontSizeMultiplier={1.3} style={{marginLeft:5,fontFamily:LS_FONTS.PoppinsRegular,fontSize:16,color:LS_COLORS.global.black}}>({average_rating})</Text>
+                        <Text maxFontSizeMultiplier={1.3} style={{ marginLeft: 5, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 16, color: LS_COLORS.global.black }}>({average_rating})</Text>
                     </View>
                     {(ratings.length == 0 || ratings.filter(rate => {
                         if (currentRating != 0) {
@@ -507,6 +514,7 @@ export default function ProviderDetail(props) {
                 <Text style={{ color: "white" }} maxFontSizeMultiplier={1.2} >T</Text>
             </Pressable>
             {loader && <Loader />}
+            <SingleModalPictureView visible={singleModal} setVisible={setSingleModal} image={selectedImage} />
             <ModalPictureView pictures={pictures} visible={modalVisible} setVisible={setModalVisible} currentImage={currentSelectedImage} />
             <ReportModal visible={modalVisible1} onPressSubmit={(d, t) => {
                 reportProvider(d, t)
@@ -522,6 +530,38 @@ const CustomInputViews = ({ title, text }) => {
             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, color: LS_COLORS.global.lightTextColor, marginHorizontal: 10, position: "absolute", top: -10, backgroundColor: "white" }}>{title}</Text>
             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, color: "black", fontFamily: LS_FONTS.PoppinsRegular }}>{text}</Text>
         </View>
+    )
+}
+
+
+
+const SingleModalPictureView = ({ visible, setVisible, image }) => {
+
+    return (
+        <Modal
+            visible={visible}
+            transparent={true}
+        >
+            <View style={{ flex: 1, backgroundColor: "#0006", justifyContent: "center", alignItems: "center" }}>
+                <View style={{ height: height * 0.9, width: width * 0.9, backgroundColor: "transparent", borderRadius: 20 }}>
+
+                    <Pressable onPress={() => {
+                        setVisible(false)
+                    }}>
+                        <Image
+                            // key={x.image}
+                            source={{ uri: BASE_URL + image }}
+                            style={{ height: height * 0.9, width: width * 0.9, borderRadius: 20, }}
+                            resizeMode="contain"
+                        />
+                    </Pressable>
+
+
+
+                </View>
+            </View>
+
+        </Modal>
     )
 }
 
@@ -564,8 +604,8 @@ const ModalPictureView = ({ pictures, visible, setVisible, currentImage }) => {
                                     <Image
                                         // key={x.image}
                                         source={{ uri: BASE_URL + item?.image }}
-                                        style={{ height: height * 0.9, width: width * 0.9, borderRadius: 20, backgroundColor: "gray" }}
-                                        resizeMode="cover"
+                                        style={{ height: height * 0.9, width: width * 0.9, borderRadius: 20, }}
+                                        resizeMode="contain"
                                     />
                                 </Pressable>
                             )

@@ -85,6 +85,8 @@ export default function OrderDetailUpdateCustomer(props) {
     const [textShowWithRed, settextShowWithRed] = React.useState("")
     const [rateVisible, setRateVisible] = React.useState(false)
     const [totalSettingData, settotalSettingData] = React.useState([])
+    const [tbdTime,setTbdTime]=React.useState(false)
+
     const [fromCoordinates, setFromCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
@@ -103,8 +105,6 @@ export default function OrderDetailUpdateCustomer(props) {
     const [order_variant, setOrderVariant] = React.useState({})
    
     React.useEffect(() => {
-        // props.navigation.navigate("OrderSuspend", { item: data })
-        console.log(data)
         if (data?.order_logs?.length > 0) {
             let logs = [...data?.order_logs]
             logs.reverse()
@@ -125,7 +125,6 @@ export default function OrderDetailUpdateCustomer(props) {
     const checkOrderVariant = () => {
         try {
             let variant = JSON.parse(data?.ordered_variant)
-            console.log("Variant", variant, data?.ordered_variant)
 
             setOrderVariant(variant)
         } catch (err) {
@@ -153,7 +152,6 @@ export default function OrderDetailUpdateCustomer(props) {
     }, [order_id, item])
 
     React.useEffect(() => {
-        console.log("Data", JSON.stringify(data))
         if (data?.id) {
             if (data.order_from_lat && data.order_from_long) {
                 setToCoordinates({
@@ -208,11 +206,10 @@ export default function OrderDetailUpdateCustomer(props) {
 
         getApi(config)
             .then((response) => {
-                console.log("Response", response)
                 if (response.status == true) {
+                    console.log("Response",response.data)
                     if (response.data) {
                         setData(response.data)
-                        console.log("Order Detail", JSON.stringify(response.data))
                         setVirtualData(response.data.virtual_order)
                     } else {
 
@@ -263,7 +260,6 @@ export default function OrderDetailUpdateCustomer(props) {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
                     getOrderDetail(itemData?.id)
@@ -298,7 +294,6 @@ export default function OrderDetailUpdateCustomer(props) {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
                     // props.navigation.pop()
@@ -326,6 +321,9 @@ export default function OrderDetailUpdateCustomer(props) {
             order_id: data.id,
             order_status: order_status,
             reason: reason
+        }
+        if(order_status==order_types.delay_request_reject){
+            datac.reason="Delay not Accepted"
         }
         // if(order_status==order_types.processing||order_status==order_types.completed){
         //     datac[`current_date`] = moment().format("YYYY-MM-DD HH:mm:[00]")
@@ -357,7 +355,6 @@ export default function OrderDetailUpdateCustomer(props) {
                     }
 
                 } else {
-                    console.log("Error", response)
                     showToast(response.message)
                 }
             }).catch(err => {
@@ -426,7 +423,6 @@ export default function OrderDetailUpdateCustomer(props) {
 
         getApi(config)
             .then((response) => {
-                console.log("Response", response)
                 if (response.status == true) {
                     showToast(response.message)
                 } else {
@@ -527,7 +523,6 @@ export default function OrderDetailUpdateCustomer(props) {
                 orderData: data
             })
         } else {
-            console.log(data?.providers_user_status)
             if (user?.user_status != 1) {
                 dispatch(updateBlockModal(true))
             } else if (data?.providers_user_status != 1) {
@@ -591,7 +586,6 @@ export default function OrderDetailUpdateCustomer(props) {
 
 
                 } else {
-                    console.log("Error", response)
                     showToast(response.message)
                 }
             }).catch(err => {
@@ -662,7 +656,6 @@ export default function OrderDetailUpdateCustomer(props) {
     const favs = useSelector(state => state.favorites)?.list
     
     useEffect(() => {
-        console.log("FAVS", favs)
         if(favs.map(x=>x.id)?.includes(data?.provider_id)){
             setIsFav(true)
         }
@@ -740,12 +733,12 @@ export default function OrderDetailUpdateCustomer(props) {
                             <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
                         {data?.order_status == 15 && <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
-                        <CardClientInfo order_variant={order_variant} orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
+                        <CardClientInfo tbdTime={tbdTime} setTbdTime={setTbdTime} order_variant={order_variant} orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
                             setRateType(t)
                             setRateVisible(true)
                         }} virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
-                        {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text style={{ color: "red" }}>Reason</Text>: {getReasonForCancellationText()}</Text>}
-                        {whoCancelled?.type != undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By</Text>: {whoCancelled?.type} ({whoCancelled?.name})</Text>}
+                        {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text style={{ color: "red" }}>Reason:</Text> {getReasonForCancellationText()}</Text>}
+                        {whoCancelled?.type != undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By:</Text> {whoCancelled?.type} ({whoCancelled?.name})</Text>}
 
                         <RenderAddressFromTO
                             service_is_at_address={data?.service_is_at_address}
@@ -866,14 +859,13 @@ export default function OrderDetailUpdateCustomer(props) {
             <BlockMessageModal visible={showMessage1} setVisble={setShowMessage1} text={`Provider is no longer providing this Service.`} />
             <BlockMessageModal visible={showMessage} setVisble={setShowMessage} text={`This service provider account is ${data?.providers_user_status == 2 ? "inactive" : "blocked"}. Please look for some another provider for getting service`} />
             {loading && <Loader />}
-
         </View>
     )
 }
 
 
 //items && virtual order items manage screens
-const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_data, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
+const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_data,tbdTime,setTbdTime, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
@@ -881,12 +873,11 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
     const [totalVirtualTime, setTotalVirtualTime] = React.useState(0)
     const [showVirtualData, setShowVirtualData] = React.useState(false)
     const navigation = useNavigation()
-    console.log(data)
     useEffect(() => {
         if (showVirtualData) {
-            if (totalTime && totalVirtualTime) {
+            if (totalTime>=0 && totalVirtualTime>=0) {
                 if (totalTime < totalVirtualTime) {
-                    settextShowWithRed(`Adding new service requires ${totalVirtualTime - totalTime} min extra`)
+                    settextShowWithRed(`Updating order requires ${getTimeInHours(totalVirtualTime - totalTime,false)} extra`)
                 } else if (totalTime > totalVirtualTime) {
                     // settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
                 } else if (totalTime === totalVirtualTime) {
@@ -918,7 +909,6 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
     }, [virtualOrdersItems])
 
     useEffect(() => {
-        console.log("items", JSON.stringify(items))
         if (items.length > 0) {
             let t = items.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
@@ -926,7 +916,24 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             setTotalWorkingMinutes(total)
         }
     }, [items])
-
+    useEffect(()=>{
+        let showTBD=true
+        for(let i of items){
+            if(i?.duration_time!=""){
+                showTBD=false
+            }
+        }
+        if(showVirtualData){
+            showTBD=true
+            for(let i of virtualOrdersItems){
+                if(i?.duration_time!=""){
+                    showTBD=false
+                }
+            }
+        }
+        console.log("ITEMS",virtualOrdersItems)
+        setTbdTime(showTBD)
+    },[items,virtualOrdersItems,showVirtualData])
     useEffect(() => {
         if (data) {
             if (data.order_placed_address) {
@@ -942,13 +949,14 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             }
 
             if (data.order_items) {
+                console.log(data.order_items)
                 setItems(data.order_items.filter(x => x.service_items_name))
             }
         }
     }, [data])
 
-    const getTimeInHours = (minute) => {
-        if((orderType=="Upcoming"&&data?.ordered_sub_services==12)||(orderType=="InProgress"&&data?.ordered_sub_services==12)){
+    const getTimeInHours = (minute,check=true) => {
+        if(check&&(orderType=="Upcoming"&&data?.ordered_sub_services==12)||(orderType=="InProgress"&&data?.ordered_sub_services==12)){
             return "---"
         }
         let d = parseInt(minute / 60) + " Hr"
@@ -956,7 +964,12 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             d += ` ${parseInt(minute % 60)} Mins`
         }
         if(Number(minute)==0){
-            return("--")
+            if(check){
+                return("--")
+            }else{
+                return "0 Mins"
+            }
+            
         }
         return `${d}`
     }
@@ -973,16 +986,16 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             }
             let return_value = Number(totalAmount1) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
-                return 0
+                return "0.00"
             } else {
-                return lodash.round(return_value,2)
+                return Number(return_value).toFixed(2)
             }
         } else {
             let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
-                return 0
+                return "0.00"
             } else {
-                return lodash.round(return_value,2)
+                return Number(return_value).toFixed(2)
             }
         }
     }
@@ -990,15 +1003,15 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
     const checkforDiscountToShow = (v_a, v_t, d_a, d_t, v_total, d_total) => {
         if (v_a && v_a !== "") {
             if (v_t == "flat") {
-                return `$${v_a}`
+                return `$${Number(v_a).toFixed(2)}`
             } else {
-                return `$${v_a * v_total / 100}`
+                return `$${Number(v_a * v_total / 100).toFixed(2)}`
             }
         } else if (d_a && d_a !== "") {
             if (d_t == "flat") {
-                return `$${d_a}`
+                return `$${Number(d_a).toFixed(2)}`
             } else {
-                return `$${d_a * d_total / 100}`
+                return `$${Number(d_a * d_total / 100).toFixed(2)}`
             }
         } else {
             return false
@@ -1015,7 +1028,7 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                 start: "Estimated Start Date/Time",
                 end: "Estimated End Date/Time",
                 start_date: moment(data?.order_start_new_time).format("MM/DD/YYYY hh:mm a"),
-                end_date: moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: tbdTime?"TBD":moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
             })
         }
         else if (orderType == "InProgress") {
@@ -1023,21 +1036,21 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                 start: "Start Date/Time",
                 end: "End Date/Time",
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-                end_date: "---"
+                end_date:tbdTime?"TBD": "---"
             })
         } else if (data?.order_status == order_types.suspend) {
             return ({
                 start: "Start Date/Time",
                 end: "End Date/Time",
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a"),
-                end_date: moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
+                end_date:tbdTime?"TBD": moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
             })
         }else if (orderType == "Upcoming"&&data?.ordered_sub_services==12) {
             return ({
                 start: "Start Date/Time",
                 end: "End Date/Time",
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-                end_date: "---"
+                end_date:tbdTime?"TBD": "---"
             })
         }
          else if (orderType == "Completed") {
@@ -1052,7 +1065,7 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             start: "Estimated Start Date/Time",
             end: "Estimated End Date/Time",
             start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-            end_date: moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+            end_date:orderType!="Requesting"&&tbdTime?"TBD":moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
         })
     }
 
@@ -1066,7 +1079,6 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
     }
     const [showDistance, setShowDistance] = React.useState(false)
     React.useEffect(() => {
-        console.log("Items", items.map(x => x.product))
         for (let i of items) {
             for (let p of i.product) {
                 if (p.item_products_is_per_mile == "1") {
@@ -1083,7 +1095,6 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
         <Card containerStyle={{ borderRadius: 10, overflow: "hidden" }}>
             <View style={{ flexDirection: "row" }}>
                 <Pressable onPress={() => {
-                    console.log(data)
                     navigation.navigate("ProviderDetail", { providerId: data.provider_id, service: data?.order_items && (data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name),service_id:data?.ordered_sub_services })
                 }} style={{ flex: 1, flexDirection: "row" }}>
                     <Avatar
@@ -1118,23 +1129,23 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                 </View>
             </View>
             {<View>
-                {Boolean(order_variant?.variant_title) && order_variant?.variant_title != "" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>{order_variant?.variant_title}</Text>: {order_variant?.variant}</Text>}
+                {Boolean(order_variant?.variant_title) && order_variant?.variant_title != "" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>{order_variant?.variant_title}:</Text> {String(order_variant?.variant).toUpperCase()}</Text>}
                 <View style={{}}>
-                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Make</Text>: {order_variant?.make}</Text>}
-                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Model</Text>: {order_variant?.model}</Text>}
-                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Year</Text>: {order_variant?.year}</Text>}
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Make:</Text> {order_variant?.make}</Text>}
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Model:</Text> {order_variant?.model}</Text>}
+                    {order_variant?.variant_title == "Vehicle Type" && <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { textAlign: "left", fontSize: 12, }]}><Text style={{ color: LS_COLORS.global.black }}>Year:</Text> {order_variant?.year}</Text>}
                 </View>
             </View>}
             {/* request data */}
             {showVirtualData && <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left", fontSize: 14, marginTop: 10 }]}>User Requested Order</Text>}
             {items?.map((i) => {
-                return (<OrderItemsDetail i={i} />)
+                return (<OrderItemsDetail i={i} orderType={orderType} />)
             })}
             {/* New Request products and Service */}
             {showVirtualData && virtualOrdersItems.length > 0 && <View style={{ marginVertical: 20 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.client_info_text, { textAlign: "left", fontSize: 14 }]}>Provider Updated Order</Text>
                 {virtualOrdersItems?.map((i) => {
-                    return (<OrderItemsDetail i={i} />)
+                    return (<OrderItemsDetail i={i}  orderType={orderType}  />)
                 })}
             </View>}
             {checkforDiscountToShow(virtual_data?.discount_amount, virtual_data?.discount_type, data?.discount_amount, data?.discount_type, virtual_data?.order_total_price, data?.order_total_price) && <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
@@ -1145,7 +1156,7 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                 <>
                     <View style={{ backgroundColor: "white", width: "100%", justifyContent: "space-between", flexDirection: "row", alignItems: "center", marginTop: 10 }}>
                         <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Tip</Text>
-                        <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ?? 0}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ?Number(data?.provider_rating_data?.tip).toFixed(2): "0.00"}</Text>
                     </View>
                 </>
             }
@@ -1154,16 +1165,20 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{data?.mile_distance ? lodash.round(data?.mile_distance, 2) : 0} miles</Text>
             </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>LyfeSuite Application Fee</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${data?.application_charges==""?0:data?.application_charges}</Text>
+            </View>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Amount</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { flex: 1, marginRight: 10 }]}>{getDateTimeShow().start}</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? moment(virtual_data?.order_start_time).format("hh:mm a") : getDateTimeShow().start_date}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ?  moment(virtual_data?.order_start_time).format("MM/DD/YYYY hh:mm a") : getDateTimeShow().start_date}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { flex: 1, marginRight: 10 }]}>{getDateTimeShow().end}</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? moment(virtual_data?.order_end_time).format("hh:mm a") : getDateTimeShow().end_date}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? (tbdTime?"TBD":moment(virtual_data?.order_end_time).format("MM/DD/YYYY hh:mm a")) : getDateTimeShow().end_date}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Time</Text>
@@ -1204,13 +1219,13 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
 }
 
 
-const OrderItemsDetail = ({ i }) => {
+const OrderItemsDetail = ({ i,orderType }) => {
     return (
         <>
             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} >{i.service_items_name + "  (Service Charge)"}</Text>
                 <View style={{ height: 20, flexDirection: "row" }}>
-                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (i.price==""?0:i?.price)}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(i.price == "" ? (orderType=="Completed"?("$0.00"):"TBD") : ("$" + Number(i?.price).toFixed(2)))}</Text>
                 </View>
             </View>
             {i.product.map((itemData, index) => {
@@ -1222,7 +1237,7 @@ const OrderItemsDetail = ({ i }) => {
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (itemData.price==""?0:itemData?.price)}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(itemData.price == "" ?(orderType=="Completed"?("$0.00"):"TBD")  : ("$" + Number(itemData?.price).toFixed(2)))}</Text>
                         </View>
                     </View>
                 )
@@ -1237,7 +1252,7 @@ const OrderItemsDetail = ({ i }) => {
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{"$" + (itemData.product_price==""?0:itemData?.product_price)}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(itemData.product_price == "" ?(orderType=="Completed"?("$0.00"):"TBD")  : ("$" + Number(itemData?.product_price).toFixed(2)))}</Text>
                         </View>
                     </View>
                 )

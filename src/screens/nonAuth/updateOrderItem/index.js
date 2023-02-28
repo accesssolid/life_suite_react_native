@@ -115,11 +115,11 @@ const OrderClientDetail = (props) => {
     const [updated, setUpdated] = useState(false)
 
     const checkforUpdate = () => {
-        let si = [...selectedItems].sort((a, b) => Number(a) - Number(b)).join("")
-        let si1 = [...selectedItems1].sort((a, b) => Number(a) - Number(b)).join("")
-        let pi = [...selectedProducts].sort((a, b) => Number(a) - Number(b)).join("")
-        let pi1 = [...selectedProducts1].sort((a, b) => Number(a) - Number(b)).join("")
-        if (pi == pi1 && si == si1 && otherProducts.length == 0) {
+        let si = selectedItems ? [...selectedItems].sort((a, b) => Number(a??0) - Number(b??0)).join("") : ""
+        let si1 = selectedItems1 ? [...selectedItems1].sort((a, b) => Number(a??0) - Number(b??0)).join("") : ""
+        let pi = selectedProducts ? [...selectedProducts].sort((a, b) => Number(a??0) - Number(b)).join("") : ""
+        let pi1 = selectedProducts1 ? [...selectedProducts1].sort((a, b) => Number(a??0) - Number(b??0)).join("") : ""
+        if (pi == pi1 && si == si1 && otherProducts?.length == 0) {
             return true
         }
         return false
@@ -157,7 +157,7 @@ const OrderClientDetail = (props) => {
                 {
                     item_name: x.name,
                     price: x.price,
-                    time_duration: Number(x?.time_duration_h != "" ? x?.time_duration_h : 0) * 60 + Number(x?.time_duration_m != "" ? x?.time_duration_m : 0),
+                    time_duration: (x?.time_duration_h?.trim()==""&&x?.time_duration_m?.trim()=="")?"":(Number(x?.time_duration_h != "" ? x?.time_duration_h : 0) * 60 + Number(x?.time_duration_m != "" ? x?.time_duration_m : 0)),
                     variant_data: x.variant_data,
                     products: otherProducts.filter(p => String(p.item_id).startsWith("new"))
                 }
@@ -180,12 +180,15 @@ const OrderClientDetail = (props) => {
                 }
                 return ({
                     "item_id": x,
-                    "time_duration": convertHHMMToMinutes(f?.time_duration_h, f?.time_duration_m),
+                    "time_duration":(String(f?.time_duration_h)?.trim()==""&&String(f?.time_duration_m)?.trim()=="")? "":convertHHMMToMinutes(f?.time_duration_h, f?.time_duration_m),
                     "price": f?.price
                 })
             }
             return null
         }).filter(x => x != null)
+        // console.log(itemsC)
+        // setLoading(false)
+        // return
         let config = {
             headers: headers,
             data: JSON.stringify({
@@ -199,7 +202,7 @@ const OrderClientDetail = (props) => {
                     requested_start_time: data.requested_start_time,
                     requested_end_time: checkTimeFrameIncrease(),
                     other_options: [],
-                    extra_products: otherProducts.filter(x => !String(x.item_id).startsWith("new")),
+                    extra_products: otherProducts.filter(x => !String(x.item_id).startsWith("new")).map(x => ({ ...x, price: (x?.price?.trim() == "" || x?.price?.trim() == "$") ? "" : x.price })),
                     new_services: newServices
                 }),
                 order_placed_address: data.order_placed_address,
@@ -217,7 +220,6 @@ const OrderClientDetail = (props) => {
 
         getApi(config)
             .then((response) => {
-
                 if (response.status == true) {
                     showToast(response.message)
                     props.navigation.pop()
@@ -265,7 +267,7 @@ const OrderClientDetail = (props) => {
             .then((response) => {
                 if (response.status == true) {
                     if (response.data) {
-                        console.log(JSON.stringify(response))
+                        console.log("Response",JSON.stringify(response))
                         setData(response.data)
                         if (response?.added_services_list[0]) {
                             let o_is = response.data.order_items
@@ -279,32 +281,44 @@ const OrderClientDetail = (props) => {
                                     if (omg) {
                                         d.time_duration = omg.duration_time
                                         d.price = omg.price
-                                        d.products = d?.products?.map(x => {
-                                            let p = _.cloneDeep(x)
-                                            let oproduct = omg?.products?.find(o => o.product_id == x.id)
-                                            if (oproduct) {
-                                                p.price = oproduct.price
-                                            }
-                                            if(x?.list_type=="orders"&&x?.request_status!="accept"){
-                                                return null
-                                            }
-                                            return p
-                                        })
-                                        d.products=d?.products?.filter(x=>x!=null)
                                     }
-                                    if (d?.list_type!="orders") {
+                                    d.products = d?.products?.map(x => {
+                                        let p = _.cloneDeep(x)
+                                        let oproduct = omg?.product?.find(o => o.product_id == x.id)
+                                        console.log("OMG",oproduct)
+
+                                        if (oproduct) {
+                                            p.price = oproduct.price
+                                        }
+                                        if (x?.list_type == "orders" && x?.request_status != "accept") {
+                                            return null
+                                        }
+                                        return p
+                                    })
+                                    d.products = d?.products?.filter(x => x != null)
+                                    // console.log(,d.products)
+                                    if (d?.list_type != "orders") {
                                         selected.push(d)
-                                    }else{
-                                        if(d?.request_status=="accept"){
+                                    } else {
+                                        if (d?.request_status == "accept") {
                                             selected.push(d)
                                         }
                                     }
                                 } else {
-                                    if (s?.list_type!="orders" ) {
-                                        unselected.push(s)
-                                    }else{
-                                        if(s?.request_status=="accept"){
-                                            selected.push(s)
+                                    let d = _.cloneDeep(s)
+                                    d.products = d?.products?.map(x => {
+                                        let p = _.cloneDeep(x)
+                                        if (x?.list_type == "orders" && x?.request_status != "accept") {
+                                            return null
+                                        }
+                                        return p
+                                    })
+                                    d.products = d?.products?.filter(x => x != null)
+                                    if (s?.list_type != "orders") {
+                                        unselected.push(d)
+                                    } else {
+                                        if (s?.request_status == "accept") {
+                                            selected.push(d)
                                         }
                                     }
                                 }
@@ -347,8 +361,8 @@ const OrderClientDetail = (props) => {
                 barStyle="light-content" />
             <HeaderView action={() => {
                 if (productShow) {
-                    if (otherProducts.filter(x => x.product_name.trim() == "" || x.product_price.trim() == "").length > 0) {
-                        showToast("Don't leave other product name and price empty!")
+                    if (otherProducts.filter(x => x.product_name.trim() == "").length > 0) {
+                        showToast("Don't leave other product name empty!")
                         return
                     }
                     setProductShow(false)
@@ -416,8 +430,8 @@ const OrderClientDetail = (props) => {
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={() => {
-                                if (otherProducts.filter(x => x.product_name.trim() == "" || x.product_price.trim() == "").length > 0) {
-                                    showToast("Don't leave other product name and price empty!")
+                                if (otherProducts.filter(x => x.product_name.trim() == "").length > 0) {
+                                    showToast("Don't leave other product name empty!")
                                     return
                                 }
                                 setUpdated(true)
@@ -572,9 +586,13 @@ const ItemView = ({
                         value={"$" + selectedData?.price}
                         onChangeText={t => {
                             let textD = t.replace(/\$/g, "")
-                            setSelectedData(state => {
-                                return ({ ...state, price: textD })
-                            })
+                            const validated = String(textD).match(/^(\d*\.{0,1}\d{0,2}$)/)
+                            if (validated) {
+                                setSelectedData(state => {
+                                    return ({ ...state, price: textD })
+                                })
+                            }
+
                         }}
                         placeholder="$"
                         maxFontSizeMultiplier={1.1}
@@ -622,11 +640,15 @@ const ItemView = ({
                                         placeholder="$000"
                                         onChangeText={(text) => {
                                             let d = text.replace(/\$/g, "")
-                                            setSelectedData(state => {
-                                                let products = _.cloneDeep(selectedData?.products)
-                                                products[index] = { ...product, price: d }
-                                                return { ...state, products }
-                                            })
+                                            const validated = String(d).match(/^(\d*\.{0,1}\d{0,2}$)/)
+                                            if (validated) {
+                                                setSelectedData(state => {
+                                                    let products = _.cloneDeep(selectedData?.products)
+                                                    products[index] = { ...product, price: d }
+                                                    return { ...state, products }
+                                                })
+                                            }
+
                                         }}
                                         keyboardType="numeric"
                                         value={"$" + product?.price}
@@ -719,11 +741,15 @@ const AddOtherProduct = ({ item, setOtherProducts, other, removeItemFromSelected
                     placeholder="$000"
                     onChangeText={(text) => {
                         let d = text.replace(/\$/g, "")
-                        setOtherProducts(state => {
-                            let data = _.cloneDeep(state)
-                            data[other.index].product_price = d
-                            return data
-                        })
+                        const validated = String(d).match(/^(\d*\.{0,1}\d{0,2}$)/)
+                        if (validated) {
+                            setOtherProducts(state => {
+                                let data = _.cloneDeep(state)
+                                data[other.index].product_price = d
+                                return data
+                            })
+                        }
+
                     }}
                     keyboardType="numeric"
                     value={"$" + other?.product_price}

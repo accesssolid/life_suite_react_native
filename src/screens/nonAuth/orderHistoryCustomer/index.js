@@ -29,6 +29,7 @@ const placeholder_image = require("../../../assets/user.png")
 // rejected
 import { Rating } from 'react-native-ratings';
 import CancelModal from '../../../components/cancelModal';
+import { useFocusEffect } from '@react-navigation/native';
 
 const order_types = [
     { id: 1, title: "Requested" },

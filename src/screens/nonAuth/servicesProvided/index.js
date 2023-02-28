@@ -24,6 +24,7 @@ import _ from 'lodash'
 import { updateSignupModal } from '../../../redux/features/signupModal';
 import { setVariantData } from '../../../redux/features/variantData';
 import { setCurrentLocationData } from '../../../redux/features/currentlocation';
+import moment from 'moment';
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -120,8 +121,9 @@ const ServicesProvided = (props) => {
                 console.log("Variant Data", response.data)
                 if (response.status == true) {
                     if (response.data?.length > 0) {
-                        setVehicleTypes(response.data)
-                        setVehicleType(response.data[0])
+                        let x=response.data
+                        setVehicleTypes( x)
+                        setVehicleType(x[0])
                     } else {
                         setVehicleTypes([])
                     }
@@ -591,11 +593,11 @@ const ServicesProvided = (props) => {
                         <DropDown
                             handleTextValue={true}
                             title={vehicleType?.service_variants_name}
-                            item={vehicle_types.map(x => x.name)}
-                            value={vehicleType.name}
+                            item={vehicle_types.map(x => String(x.name).toUpperCase())}
+                            value={String(vehicleType.name).toUpperCase()}
                             onChangeValue={(index, value) => onChangeVehicleType(vehicle_types[index])}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                            dropdownStyle={{ maxHeight: 300 }}
+                            dropdownStyle={{ height: vehicle_types?.length==0?10:(vehicle_types?.length>=4?160:vehicle_types?.length*40) }}
                         />
                         {subService.id == 14 && <View style={{ flexDirection: 'row', paddingHorizontal: "2.5%" }}>
                             <View style={{ flex: 1 }}>
@@ -609,7 +611,7 @@ const ServicesProvided = (props) => {
                                     }}
                                     value={makeList.find(x => x.id == selectedMake)?.title ?? "Make"}
                                     containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
-                                    dropdownStyle={{ maxHeight: 300 }}
+                                    dropdownStyle={{ maxHeight: makeList?.length>0?(makeList?.length*40<160?makeList?.length*40:160):40 }}
                                     textValueProps={{
                                         maxFontSizeMultiplier: 1.3
                                     }}
@@ -626,7 +628,7 @@ const ServicesProvided = (props) => {
                                         setSelectedModel(modelList[index].id)
                                     }}
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                    dropdownStyle={{ maxHeight: 300 }}
+                                    dropdownStyle={{ maxHeight: modelList?.length>0?(modelList?.length*40<160?modelList?.length*40:160):40 }}
                                     textValueProps={{
                                         maxFontSizeMultiplier: 1.3
                                     }}
@@ -642,8 +644,10 @@ const ServicesProvided = (props) => {
                                     onChangeValue={(index, value) => {
                                         setSelectedYear(yearList[index].id)
                                     }}
+                                                                        dropdownStyle={{ maxHeight: yearList?.length>0?(yearList?.length*40<160?yearList?.length*40:160):40 }}
+
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                    dropdownStyle={{ maxHeight: 300 }}
+                                  
                                     textValueProps={{
                                         maxFontSizeMultiplier: 1.3
                                     }}

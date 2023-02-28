@@ -491,7 +491,7 @@ const ChatScreen = (props) => {
                                                         color: '#63697B',
                                                         fontFamily: LS_FONTS.PoppinsRegular,
                                                     }}>
-                                                    {moment(itemData.item.time).format('hh:mm A')}
+                                                    {moment(itemData.item.time).format('MM/DD/YYYY hh:mm A')}
                                                 </Text>
                                                 <Image
                                                     source={{ uri: BASE_URL + itemData.item.sender.profile_url }}
@@ -568,7 +568,7 @@ const ChatScreen = (props) => {
                                                         color: '#63697B',
                                                         fontFamily: LS_FONTS.PoppinsRegular,
                                                     }}>
-                                                    {moment(itemData.item.time).format('hh:mm A')}
+                                                    {moment(itemData.item.time).format('MM/DD/YYYY hh:mm A')}
                                                 </Text>
                                             </View>
                                         </View>
@@ -626,7 +626,7 @@ const ChatScreen = (props) => {
                                                         color: '#63697B',
                                                         fontFamily: LS_FONTS.PoppinsRegular,
                                                     }}>
-                                                    {moment(itemData.item.time).format('hh:mm A')}
+                                                    {moment(itemData.item.time).format('MM/DD/YYYY hh:mm A')}
                                                 </Text>
                                             </View>
                                         </View>
@@ -683,7 +683,7 @@ const ChatScreen = (props) => {
                                                         color: '#63697B',
                                                         fontFamily: LS_FONTS.PoppinsRegular,
                                                     }}>
-                                                    {moment(itemData.item.time).format('hh:mm A')}
+                                                    {moment(itemData.item.time).format('MM/DD/YYYY hh:mm A')}
                                                 </Text>
                                             </View>
                                         </View>
@@ -733,7 +733,7 @@ const ChatScreen = (props) => {
                                                         color: '#63697B',
                                                         fontFamily: LS_FONTS.PoppinsRegular,
                                                     }}>
-                                                    {moment(itemData.item.time).format('hh:mm A')}
+                                                    {moment(itemData.item.time).format('MM/DD/YYYY hh:mm A')}
                                                 </Text>
                                             </View>
                                         </View>
@@ -781,7 +781,7 @@ const ChatScreen = (props) => {
                                                         color: '#63697B',
                                                         fontFamily: LS_FONTS.PoppinsRegular,
                                                     }}>
-                                                    {moment(itemData.item.time).format('hh:mm A')}
+                                                    {moment(itemData.item.time).format('MM/DD/YYYY hh:mm A')}
                                                 </Text>
                                             </View>
                                         </View>
