@@ -112,7 +112,15 @@ const ServicesProvided = (props) => {
                     setItemListMaster([...response.data])
                     console.log("checking", response.data)
                     if (response.variant_data) {
-                        setVariants(response.variant_data)
+                        setVariants(response.variant_data.sort((a,b)=>{
+                            if (a.name < b.name) {
+                                return -1;
+                              }
+                              if (a.name > b.name) {
+                                return 1;
+                              }
+                              return 0;
+                        }))
                         if(!selectedVariant){
                             setSelectedVariant(response.variant_data[0].id)
                         }
@@ -1123,7 +1131,7 @@ useEffect(()=>{
                     </View>
                 </ImageBackground>
             </View>
-            <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
                     <Text maxFontSizeMultiplier={1.5} style={styles.service}>SERVICES</Text>
                     {variants.length > 0 && <View style={{ height: 70 }}>

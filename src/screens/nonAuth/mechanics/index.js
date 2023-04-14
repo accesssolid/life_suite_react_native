@@ -376,7 +376,21 @@ const Mechanics = (props) => {
                     props.navigation.navigate("MainDrawer", { screen: "Orders" })
                 }
                 else {
-                    showToast(response.message)
+
+                    if (response?.data == "payment_failure_error") {
+                        Alert.alert("Order not placed", response.message, [
+                            {
+                                text: "Cancel"
+                            },
+                            {
+                                text: "Manage Cards",
+                                onPress: () => {
+                                    props.navigation.navigate("UserStack", { screen: "CardList" })
+                                }
+                            }])
+                    } else {
+                        showToast(response.message)
+                    }
                     if (response.warning_alert == 1) {
                         Alert.alert("Continue Order", "Are you sure you want to continue?", [
                             {
@@ -524,7 +538,7 @@ const Mechanics = (props) => {
     const [provider_prices, setProviderPrices] = React.useState([])
 
     const getTimeInHours = (minute) => {
-        let d = parseInt(minute / 60)==0?"":parseInt(minute / 60)+" Hr"
+        let d = parseInt(minute / 60) == 0 ? "" : parseInt(minute / 60) + " Hr"
         if (minute % 60 !== 0) {
             d += ` ${parseInt(minute % 60)} Mins`
         }
@@ -679,7 +693,7 @@ const Mechanics = (props) => {
                                         if (i?.time_duration == "" || i?.time_duration == null || i?.time_duration == undefined) {
 
                                         } else {
-                                            totalTimeOfService =  Number(totalTimeOfService) + Number(i?.time_duration)
+                                            totalTimeOfService = Number(totalTimeOfService) + Number(i?.time_duration)
                                             time_format = getTimeInHours(totalTimeOfService)
                                             showTBD = false
                                         }
@@ -706,7 +720,7 @@ const Mechanics = (props) => {
                                             }
                                         }
                                     }
-                                    let totalPrice = 0.5
+                                    let totalPrice = 3.5
                                     totalPrice += Number(totalServicePrice) + Number(totalProductPrice)
                                     let is_business_licensed = false
                                     let is_certified = false
@@ -886,7 +900,7 @@ const Mechanics = (props) => {
                                         </View>
                                         <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>LyfeSuite Application Fee</Text>
-                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>$0.50</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>$3.50</Text>
                                         </View>
                                     </Card>
                                 })

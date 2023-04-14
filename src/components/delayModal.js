@@ -75,7 +75,7 @@ const DelayModal = props => {
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={() => {
-                                if(Number(minute)>0){
+                                if(Number(minute)>0||Number(hour)>0){
                                     const totaldelay=Number(minute)+Number(hour)*60
                                     props.submit(totaldelay)
                                  }

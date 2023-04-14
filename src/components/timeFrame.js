@@ -195,7 +195,7 @@ const TimeFrame = props => {
                             }else{
                                 time_format=getTimeInHours(i.duration)
                             }
-                            let estimated_price = 0.5
+                            let estimated_price = 3.5
                             if (props.provider_prices) {
                                 let obj = props.provider_prices?.find(x => x.id == i.provider_id)
                                 // _price
@@ -206,7 +206,7 @@ const TimeFrame = props => {
                                 if (obj) {
                                     estimated_price += obj?.price
                                     if (provider) {
-                                        estimated_price = 0.5
+                                        estimated_price = 3.5
                                         for (let item of provider?.item_list) {
                                             if (item.checked) {
                                                 estimated_price += Number(item.price)
@@ -255,7 +255,7 @@ const TimeFrame = props => {
                                                     setSelectedIndex(index)
                                                     setDatePickerVisibility(!isDatePickerVisible)
                                                 }}>
-                                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{moment(i.order_start_time).format("hh : mm A")}</Text>
+                                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{moment(i.order_start_time).format("hh:mm A")}</Text>
                                                 <View style={{ height: 11, aspectRatio: 1 }}>
                                                     <Image source={require('../assets/time.png')} resizeMode="contain" style={{ height: '100%', width: '100%' }} />
                                                 </View>

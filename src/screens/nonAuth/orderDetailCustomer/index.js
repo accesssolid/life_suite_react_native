@@ -733,7 +733,7 @@ export default function OrderDetailUpdateCustomer(props) {
                             <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, textTransform: "none", flex: 1, textAlign: "right" }]}>Order Status: {notificationData?.title}</Text>
                         </View>
                         {data?.order_status == 15 && <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
-                        <CardClientInfo tbdTime={tbdTime} setTbdTime={setTbdTime} order_variant={order_variant} orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
+                        <CardClientInfo tbdTime={tbdTime} notificationData={notificationData} setTbdTime={setTbdTime} order_variant={order_variant} orderType={notificationData.title} noti_color={notificationData.color} handleClickOnEdit={(v, t) => {
                             setRateType(t)
                             setRateVisible(true)
                         }} virtual_data={virtualdata} settextShowWithRed={settextShowWithRed} data={data} setTotalWorkingMinutes={setTotalWorkingMinutes} />
@@ -865,7 +865,7 @@ export default function OrderDetailUpdateCustomer(props) {
 
 
 //items && virtual order items manage screens
-const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_data,tbdTime,setTbdTime, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
+const CardClientInfo = ({ data, order_variant, orderType,notificationData, noti_color, virtual_data,tbdTime,setTbdTime, setTotalWorkingMinutes, settextShowWithRed, handleClickOnEdit }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
@@ -1023,49 +1023,63 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
         let provider_end_date = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "") ? data?.provider_order_end_at : data?.order_end_time
         let showProviderStartTime = (Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "")
         let showProviderEndTime = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "")
+        
         if (data?.order_status == order_types.will_be_delayed) {
             return ({
                 start: "Estimated Start Date/Time",
                 end: "Estimated End Date/Time",
                 start_date: moment(data?.order_start_new_time).format("MM/DD/YYYY hh:mm a"),
-                end_date: tbdTime?"TBD":moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
+                end_date:tbdTime?"TBD": moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
             })
         }
-        else if (orderType == "InProgress") {
+        else if (notificationData.title == "InProgress") {
             return ({
                 start: "Start Date/Time",
-                end: "End Date/Time",
-                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-                end_date:tbdTime?"TBD": "---"
+                end: "Estimated End Date/Time",
+                start_date: moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a"),
+                end_date: tbdTime?"TBD":(showVirtualData?moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").add("minute",totalVirtualTime).format("MM/DD/YYYY hh:mm a"):moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").add("minute",totalTime).format("MM/DD/YYYY hh:mm a")),
             })
         } else if (data?.order_status == order_types.suspend) {
             return ({
                 start: "Start Date/Time",
                 end: "End Date/Time",
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a"),
-                end_date:tbdTime?"TBD": moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
+                end_date: moment(data?.updated_at).format("MM/DD/YYYY hh:mm a")
             })
-        }else if (orderType == "Upcoming"&&data?.ordered_sub_services==12) {
+        } else if (notificationData?.title == "Upcoming" && data?.ordered_sub_services == 12) {
             return ({
-                start: "Start Date/Time",
-                end: "End Date/Time",
-                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-                end_date:tbdTime?"TBD": "---"
+                start: "Estimated Start Date/Time",
+                end: "Estimated End Date/Time",
+                start_date:showProviderStartTime?moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: tbdTime?"TBD":"---"
             })
-        }
-         else if (orderType == "Completed") {
+        } else if (data?.order_status == order_types.update_acceptance) {
+            return ({
+                start: "Estimated Start Date/Time",
+                end: "Estimated End Date/Time",
+                start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date:tbdTime?"TBD": moment(virtual_data?.order_end_time).format("MM/DD/YYYY hh:mm a"),
+            })
+        } else if (notificationData.title == "Completed") {
             return ({
                 start: "Start Date/Time",
                 end: "End Date/Time",
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
                 end_date: showProviderEndTime ? moment(provider_end_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
             })
+        }else if (notificationData.title == "Requesting") {
+            return ({
+                start: "Requested Start Date/Time",
+                end: "Requested End Date/Time",
+                start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date:notificationData.title!="Requesting"&&tbdTime?"TBD": moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+            })
         }
         return ({
             start: "Estimated Start Date/Time",
             end: "Estimated End Date/Time",
             start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-            end_date:orderType!="Requesting"&&tbdTime?"TBD":moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+            end_date:notificationData.title!="Requesting"&&tbdTime?"TBD": moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
         })
     }
 
@@ -1166,7 +1180,7 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             </View>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>LyfeSuite Application Fee</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${data?.application_charges==""?0:data?.application_charges}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${data?.application_charges==""?"0.00":Number(data?.application_charges).toFixed(2)}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Amount</Text>
@@ -1174,11 +1188,11 @@ const CardClientInfo = ({ data, order_variant, orderType, noti_color, virtual_da
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { flex: 1, marginRight: 10 }]}>{getDateTimeShow().start}</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ?  moment(virtual_data?.order_start_time).format("MM/DD/YYYY hh:mm a") : getDateTimeShow().start_date}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{ getDateTimeShow().start_date}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { flex: 1, marginRight: 10 }]}>{getDateTimeShow().end}</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? (tbdTime?"TBD":moment(virtual_data?.order_end_time).format("MM/DD/YYYY hh:mm a")) : getDateTimeShow().end_date}</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{getDateTimeShow().end_date}</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Time</Text>

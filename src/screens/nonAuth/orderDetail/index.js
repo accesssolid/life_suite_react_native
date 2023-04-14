@@ -102,7 +102,7 @@ const OrderClientDetail = (props) => {
     const [delayModalOpen, setDelayModalOpen] = React.useState(false)
     const [ratingModal, setRatingModal] = React.useState(false)
     const [textShowWithRed, settextShowWithRed] = React.useState("")
-    const [tbdTime,setTbdTime]=React.useState(false)
+    const [tbdTime, setTbdTime] = React.useState(false)
     const [notificationData, setNotificationData] = React.useState({
         title: "",
         color: "white"
@@ -111,6 +111,11 @@ const OrderClientDetail = (props) => {
     const [booked, setBooked] = React.useState([])
     const [whoCancelled, setWhoCancelled] = React.useState({})
     const [order_variant, setOrderVariant] = React.useState({})
+    const [orderVT, setOrderVT] = useState({
+        showVirtualData: false,
+        totalVirtualTime: 0,
+        totalTime: 0,
+    })
     React.useEffect(() => {
         if (data?.order_logs?.length > 0) {
             let logs = [...data?.order_logs]
@@ -535,21 +540,21 @@ const OrderClientDetail = (props) => {
         let provider_end_date = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "") ? data?.provider_order_end_at : data?.order_end_time
         let showProviderStartTime = (Boolean(data?.provider_order_start_at) && data?.provider_order_start_at != "")
         let showProviderEndTime = (Boolean(data?.provider_order_end_at) && data?.provider_order_end_at != "")
-        
+
         if (data?.order_status == order_types.will_be_delayed) {
             return ({
                 start: "Estimated Start Date/Time",
                 end: "Estimated End Date/Time",
                 start_date: moment(data?.order_start_new_time).format("MM/DD/YYYY hh:mm a"),
-                end_date:tbdTime?"TBD": moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: tbdTime ? "TBD" : moment(data?.order_end_new_time).format("MM/DD/YYYY hh:mm a"),
             })
         }
         else if (notificationData.title == "InProgress") {
             return ({
                 start: "Start Date/Time",
-                end: "End Date/Time",
-                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-                end_date: tbdTime?"TBD":(data?.order_status == order_types.update_acceptance ? moment(virtualdata?.order_end_time).format("MM/DD/YYYY hh:mm a") : "---")
+                end: "Estimated End Date/Time",
+                start_date: moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a"),
+                end_date: tbdTime ? "TBD" : (orderVT.showVirtualData ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").add("minute", orderVT.totalVirtualTime).format("MM/DD/YYYY hh:mm a") : moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").add("minute", orderVT.totalTime).format("MM/DD/YYYY hh:mm a")),
             })
         } else if (data?.order_status == order_types.suspend) {
             return ({
@@ -562,15 +567,15 @@ const OrderClientDetail = (props) => {
             return ({
                 start: "Estimated Start Date/Time",
                 end: "Estimated End Date/Time",
-                start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-                end_date: tbdTime?"TBD":"---"
+                start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: tbdTime ? "TBD" : "---"
             })
         } else if (data?.order_status == order_types.update_acceptance) {
             return ({
                 start: "Estimated Start Date/Time",
                 end: "Estimated End Date/Time",
                 start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-                end_date:tbdTime?"TBD": moment(virtualdata?.order_end_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: tbdTime ? "TBD" : moment(virtualdata?.order_end_time).format("MM/DD/YYYY hh:mm a"),
             })
         } else if (notificationData.title == "Completed") {
             return ({
@@ -579,12 +584,19 @@ const OrderClientDetail = (props) => {
                 start_date: showProviderStartTime ? moment(provider_start_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
                 end_date: showProviderEndTime ? moment(provider_end_date, "YYYY-MM-DD HH:mm:[00]").format("MM/DD/YYYY hh:mm a") : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
             })
+        } else if (notificationData.title == "Requesting") {
+            return ({
+                start: "Requested Start Date/Time",
+                end: "Requested End Date/Time",
+                start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
+                end_date: notificationData.title != "Requesting" && tbdTime ? "TBD" : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+            })
         }
         return ({
             start: "Estimated Start Date/Time",
             end: "Estimated End Date/Time",
             start_date: moment(data?.order_start_time).format("MM/DD/YYYY hh:mm a"),
-            end_date:notificationData.title!="Requesting"&&tbdTime?"TBD": moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
+            end_date: notificationData.title != "Requesting" && tbdTime ? "TBD" : moment(data?.order_end_time).format("MM/DD/YYYY hh:mm a")
         })
     }
 
@@ -642,7 +654,7 @@ const OrderClientDetail = (props) => {
                         </View>
                         {data?.order_status == 15 && <Text maxFontSizeMultiplier={1.3} style={[styles.baseTextStyle, { fontSize: 12, marginHorizontal: 20, textTransform: "none", flex: 1, textAlign: "right" }]}>(Payment Pending)</Text>}
                         {/* {Boolean(order_variant?.variant)&& <Text style={{marginHorizontal: 20}}>{order_variant?.variant}</Text>} */}
-                        <CardClientInfo setTbdTime={setTbdTime} order_variant={order_variant} orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
+                        <CardClientInfo setOrderVT={setOrderVT} setTbdTime={setTbdTime} order_variant={order_variant} orderType={notificationData.title} noti_color={notificationData.color} settextShowWithRed={settextShowWithRed} data={data} virtual_data={virtualdata} setTotalWorkingMinutes={setTotalWorkingMinutes} />
                         {getReasonForCancellationText() && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Reason:</Text> {getReasonForCancellationText()}</Text>}
                         {whoCancelled?.type != undefined && <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular, marginTop: 10, marginHorizontal: 20 }]}><Text maxFontSizeMultiplier={1.5} style={{ color: "red" }}>Cancelled By:</Text> {whoCancelled?.type} ({whoCancelled?.name})</Text>}
                         <RenderAddressFromTO
@@ -789,7 +801,7 @@ const OrderClientDetail = (props) => {
 
 export default OrderClientDetail;
 
-const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_data, settextShowWithRed,setTbdTime, setTotalWorkingMinutes }) => {
+const CardClientInfo = ({ data, order_variant, noti_color, setOrderVT, orderType, virtual_data, settextShowWithRed, setTbdTime, setTotalWorkingMinutes }) => {
     const [country, setCountry] = useState("")
     const [items, setItems] = useState([])
     const [virtualOrdersItems, setVirtualOrdersItems] = React.useState([])
@@ -799,10 +811,10 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
 
     useEffect(() => {
         if (showVirtualData) {
-            if (totalTime>=0 && totalVirtualTime>=0) {
+            if (totalTime >= 0 && totalVirtualTime >= 0) {
                 if (totalTime < totalVirtualTime) {
                     // settextShowWithRed(`Adding new service requires ${getTimeInHours(totalVirtualTime - totalTime,false)} extra`)
-                    settextShowWithRed(`Updating order requires ${getTimeInHours(totalVirtualTime - totalTime,false)} extra`)
+                    settextShowWithRed(`Updating order requires ${getTimeInHours(totalVirtualTime - totalTime, false)} extra`)
                 } else if (totalTime > totalVirtualTime) {
                     // settextShowWithRed(`New updated order requires ${totalTime - totalVirtualTime} min less.`)
                 } else if (totalTime === totalVirtualTime) {
@@ -812,7 +824,11 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
         } else {
             settextShowWithRed(``)
         }
-
+        setOrderVT({
+            totalVirtualTime,
+            totalTime,
+            showVirtualData
+        })
     }, [totalVirtualTime, totalTime, showVirtualData])
 
     useEffect(() => {
@@ -839,28 +855,28 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
             let t = items.map(x => x.duration_time).filter(x => x)
             let total = t.reduce((a, b) => a + Number(b), 0)
             setTotalTime(total)
-          
+
             setTotalWorkingMinutes(total)
         }
-    }, [items,virtualOrdersItems,showVirtualData])
+    }, [items, virtualOrdersItems, showVirtualData])
 
-    useEffect(()=>{
-        let showTBD=true
-        for(let i of items){
-            if(i?.duration_time!=""){
-                showTBD=false
+    useEffect(() => {
+        let showTBD = true
+        for (let i of items) {
+            if (i?.duration_time != "") {
+                showTBD = false
             }
         }
-        if(showVirtualData){
-            showTBD=true
-            for(let i of virtualOrdersItems){
-                if(i?.duration_time!=""){
-                    showTBD=false
+        if (showVirtualData) {
+            showTBD = true
+            for (let i of virtualOrdersItems) {
+                if (i?.duration_time != "") {
+                    showTBD = false
                 }
             }
         }
         setTbdTime(showTBD)
-    },[items,virtualOrdersItems,showVirtualData])
+    }, [items, virtualOrdersItems, showVirtualData])
 
     useEffect(() => {
         if (data) {
@@ -882,8 +898,8 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
         }
     }, [data])
 
-    const getTimeInHours = (minute,check=true) => {
-        if (check&&(orderType == "Upcoming" && data?.ordered_sub_services == 12) || (orderType == "InProgress" && data?.ordered_sub_services == 12)) {
+    const getTimeInHours = (minute, check = true) => {
+        if (check && (orderType == "Upcoming" && data?.ordered_sub_services == 12) || (orderType == "InProgress" && data?.ordered_sub_services == 12)) {
             return "---"
         }
         let d = parseInt(minute / 60) + " Hr"
@@ -891,17 +907,17 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
             d += ` ${parseInt(minute % 60)} Mins`
         }
         if (Number(minute) == 0) {
-            if(check){
+            if (check) {
                 return ("--")
             }
             return "0 Mins"
-            
+
         }
         return `${d}`
     }
     const user = useSelector(state => state.authenticate.user)
 
-    const getTotalVirtualAmount = (dtype, amount, totalAmount) => {
+    const getTotalVirtualAmount = (dtype, amount, totalAmount,isServiceOnly) => {
         if (amount && amount !== "" && amount != 0) {
             let totalAmount1 = Number(totalAmount)
             if (dtype == "flat") {
@@ -911,16 +927,16 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
             }
             let return_value = Number(totalAmount1) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
-                return "0.00"
+                return isServiceOnly?"0.00":"3.50"
             } else {
-                return Number(return_value).toFixed(2)
+                return  isServiceOnly?Number(Number(return_value)-Number(3.50)).toFixed(2):Number(return_value).toFixed(2)
             }
         } else {
             let return_value = Number(totalAmount) + Number(data?.provider_rating_data?.tip ?? 0)
             if (Number.isNaN(return_value)) {
-                return "0.00"
+                return isServiceOnly?"0.00":"3.50"
             } else {
-                return Number(return_value).toFixed(2)
+                return isServiceOnly?Number(Number(return_value)-Number(3.50)).toFixed(2):Number(return_value).toFixed(2)
             }
         }
     }
@@ -1014,18 +1030,21 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
                 <>
                     <View style={{ backgroundColor: "white", width: "100%", justifyContent: "space-between", flexDirection: "row", alignItems: "center", marginTop: 10 }}>
                         <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Tip</Text>
-                        <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ?Number(data?.provider_rating_data?.tip).toFixed(2): "0.00"}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle]}>${data?.provider_rating_data?.tip ? Number(data?.provider_rating_data?.tip).toFixed(2) : "0.00"}</Text>
                     </View>
                 </>
             }
-             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontFamily: LS_FONTS.PoppinsBold }]}>{orderType != "Completed" && "Estimated "} Total Service Amount</Text>
+                <Text maxFontSizeMultiplier={1.5} style={[styles.greenTextStyle, { fontFamily: LS_FONTS.PoppinsBold }]}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price,true) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price,true)}</Text>
+            </View>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>Customer Application Fee</Text>
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>$0.50</Text>
+                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>$3.50</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <View >
-                <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Amount</Text>
-                {/* <Text maxFontSizeMultiplier={1.4} style={[styles.greenTextStyle,{fontSize:11}]}>(Include LyfeSuite Charges)</Text> */}
+                    <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Processed Amount</Text>
                 </View>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>${showVirtualData ? getTotalVirtualAmount(virtual_data?.discount_type, virtual_data?.discount_amount, virtual_data?.order_total_price) : getTotalVirtualAmount(data?.discount_type, data?.discount_amount, data?.order_total_price)}</Text>
             </View>
@@ -1033,19 +1052,18 @@ const CardClientInfo = ({ data, order_variant, noti_color, orderType, virtual_da
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{orderType != "Completed" && "Estimated "}Total Time</Text>
                 <Text maxFontSizeMultiplier={1.5} style={styles.greenTextStyle}>{showVirtualData ? getTimeInHours(totalVirtualTime) : getDifferenceTime()}</Text>
             </View>
-            
             <View style={{ position: "absolute", height: 1000, backgroundColor: noti_color, width: 4, left: -15, top: -20 }} />
         </Card>
     )
 }
 
-const OrderItemsDetail = ({ i ,orderType}) => {
+const OrderItemsDetail = ({ i, orderType }) => {
     return (
         <>
             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>
                 <Text maxFontSizeMultiplier={1.5} style={[styles.baseTextStyle, { fontFamily: LS_FONTS.PoppinsMedium, flex: 1 }]} >{i.service_items_name + "  (Service Charge)"}</Text>
                 <View style={{ height: 20, flexDirection: "row" }}>
-                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(i.price == "" ? (orderType=="Completed"?("$0.00"):"TBD") : ("$" + Number(i?.price).toFixed(2)))}</Text>
+                    <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(i.price == "" ? (orderType == "Completed" ? ("$0.00") : "TBD") : ("$" + Number(i?.price).toFixed(2)))}</Text>
                 </View>
             </View>
             {i.product.map((itemData, index) => {
@@ -1057,7 +1075,7 @@ const OrderItemsDetail = ({ i ,orderType}) => {
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(itemData.price == "" ?(orderType=="Completed"?("$0.00"):"TBD")  : ("$" + Number(itemData?.price).toFixed(2)))}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(itemData.price == "" ? (orderType == "Completed" ? ("$0.00") : "TBD") : ("$" + Number(itemData?.price).toFixed(2)))}</Text>
                         </View>
                     </View>
                 )
@@ -1072,7 +1090,7 @@ const OrderItemsDetail = ({ i ,orderType}) => {
                             </Text>
                         </View>
                         <View style={{ height: 20, flexDirection: "row" }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(itemData.product_price == "" ?(orderType=="Completed"?("$0.00"):"TBD")  : ("$" + Number(itemData?.product_price).toFixed(2)))}</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={styles.baseTextStyle}>{(itemData.product_price == "" ? (orderType == "Completed" ? ("$0.00") : "TBD") : ("$" + Number(itemData?.product_price).toFixed(2)))}</Text>
                         </View>
                     </View>
                 )

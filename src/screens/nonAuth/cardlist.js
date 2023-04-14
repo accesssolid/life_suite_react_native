@@ -193,7 +193,7 @@ export default function CardList({ navigation, route }) {
                                         name="delete"
                                         size={20}
                                         onPress={() => {
-                                            Alert.alert("Delete", "Do you really want to remove this card ?", [
+                                            Alert.alert("Delete", "Do you want to remove this card ?", [
                                                 {
                                                     text: "No"
                                                 },
@@ -214,7 +214,7 @@ export default function CardList({ navigation, route }) {
                                         checked={item.default_type}
                                         onPress={() => {
                                         
-                                            Alert.alert("Message", "Do you really want to make this card as primary card?", [
+                                            Alert.alert("Message", "Do you want to make this card as primary card?", [
                                                 {
                                                     text: "No"
                                                 },

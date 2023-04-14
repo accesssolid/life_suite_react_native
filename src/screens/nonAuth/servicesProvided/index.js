@@ -121,7 +121,15 @@ const ServicesProvided = (props) => {
                 console.log("Variant Data", response.data)
                 if (response.status == true) {
                     if (response.data?.length > 0) {
-                        let x=response.data
+                        let x=response.data.sort((a,b)=>{
+                            if (a.name < b.name) {
+                                return -1;
+                              }
+                              if (a.name > b.name) {
+                                return 1;
+                              }
+                              return 0;
+                        })
                         setVehicleTypes( x)
                         setVehicleType(x[0])
                     } else {

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Platform, StatusBar, Linking } from 'react-native'
+import { Platform, StatusBar, Linking, AppState } from 'react-native'
 
 /* Packages */
 import { Provider as StoreProvider } from 'react-redux';
@@ -63,6 +63,9 @@ const linking = {
 const App = () => {
   // function for getting noti token from #liahs
   const navigationRef=React.useRef(null)
+  const appState = React.useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = React.useState(appState.current);
+
   const getToken = async () => {
     try {
       let gg = await messaging().getToken()
@@ -73,7 +76,26 @@ const App = () => {
 
   }
 
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        console.log("App has come to the foreground!");
+        getData()
+      } else {
 
+      }
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+      console.log("AppState", appState.current);
+    });
+
+    return () => {
+      subscription?.remove();
+    };
+  }, []);
 
   const getData = async () => {
     try {

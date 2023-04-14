@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -239,8 +239,20 @@ const MechanicLocation = (props) => {
                     showToast(response.message)
                     props.navigation.navigate("MainDrawer", { screen: "HomeScreen" })
                 } else {
-                    console.log("Error", response)
-                    showToast(response.message)
+                    if (response?.data == "payment_failure_error") {
+                        Alert.alert("Order not placed", response.message, [
+                            {
+                                text: "Cancel"
+                            },
+                            {
+                                text: "Manage Cards",
+                                onPress: () => {
+                                    props.navigation.navigate("UserStack", { screen: "CardList" })
+                                }
+                            }])
+                    } else {
+                        showToast(response.message)
+                    }
                 }
             }).catch(err => {
 

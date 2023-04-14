@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -65,7 +65,20 @@ export default function FinishPay({ navigation, route }) {
                 if (response.status == true) {
                     navigation.pop()
                 } else {
-                    showToast(response.message)
+                    if (response?.data == "payment_failure_error") {
+                        Alert.alert("Payment failed", response.message, [
+                            {
+                                text: "Cancel"
+                            },
+                            {
+                                text: "Manage Cards",
+                                onPress: () => {
+                                    navigation.navigate("UserStack", { screen: "CardList" })
+                                }
+                            }])
+                    } else {
+                        showToast(response.message)
+                    }
                 }
             }).catch(err => {
 
