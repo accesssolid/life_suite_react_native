@@ -24,9 +24,9 @@ import { addUpdateQuestionaire } from '../../../redux/features/questionaire.mode
 
 const { width } = Dimensions.get("window")
 const upload_types = [
-    { id: 1, text: "Upload Certificate or Business Certificate", button_text: "Add Certificate" },
-    { id: 2, text: "Upload Driver or State License", button_text: "Add License" },
-    { id: 3, text: "Upload Certificate and License " }
+    { id: 1, text: "Upload General and/or Professional Liability Insurance", button_text: "Add Insurance" },
+    { id: 2, text: "Upload Driver License", button_text: "Add License" },
+    { id: 3, text: "Upload General and/or Professional Liability Insurance and License " }
 ]
 
 
@@ -508,10 +508,10 @@ const AddLicense = (props) => {
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <Container>
                     <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                        <Text maxFontSizeMultiplier={1.5} style={styles.service}>{upload_type.text}</Text>
+                        <Text maxFontSizeMultiplier={1.5} style={[styles.service,{textAlign:"center"}]}>{upload_type.text}</Text>
                         {showSelector && <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green, marginHorizontal: 20, marginBottom: 10 }}>
                             <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
-                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
+                                <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Insurance</Text>
                             </TouchableOpacity>
                             <View style={{ width: 1, backgroundColor: LS_COLORS.global.green }} />
                             <TouchableOpacity onPress={() => setSelected(1)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 1 ? LS_COLORS.global.green : "white" }}>

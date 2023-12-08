@@ -1086,8 +1086,8 @@ const SignUpScreen = (props) => {
                                 />
                             </View>
                             {role !== 1 && <CustomTextInput
-                                placeholder="Driver Licence # State ID"
-                                title="Driver Licence # State ID"
+                                placeholder="Driver License #"
+                                title="Driver License #"
                                 value={provider_data.license}
                                 onChangeText={(text) => {
                                     setProviderData({ ...provider_data, license: text })

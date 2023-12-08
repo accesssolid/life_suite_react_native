@@ -1421,7 +1421,7 @@ const Profile = (props) => {
 
 
                                 {user.user_role == role.provider && <CustomInput
-                                    text="Driver License #State ID "
+                                    text="Driver License #"
                                     value={userData?.license ? (userData.license == "null" ? "" : userData.license) : ""}
                                     onChangeText={(text) => {
                                         setUserData({ ...userData, license: text })
@@ -1647,7 +1647,7 @@ const Profile = (props) => {
                                             }}>
 
                                                 <Image source={require("../../../assets/signup/add_field1.png")} style={{ height: 30, width: 30 }} resizeMode="contain" />
-                                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, color: LS_COLORS.global.black, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 10 }}>Add New Certificate</Text>
+                                                <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 14, color: LS_COLORS.global.black, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 10 }}>Add New Insurance</Text>
                                             </Pressable>}
                                         </View>
                                     </View>

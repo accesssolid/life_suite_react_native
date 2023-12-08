@@ -232,7 +232,7 @@ const BothTab = ({ data, renderItem, pickImage }) => {
         <View style={{ flex: 1 }}>
             <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green }}>
                 <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
-                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
+                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Insurance</Text>
                 </TouchableOpacity>
                 <View style={{ width: 1, backgroundColor: LS_COLORS.global.green }} />
                 <TouchableOpacity onPress={() => setSelected(1)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 1 ? LS_COLORS.global.green : "white" }}>

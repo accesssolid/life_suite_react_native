@@ -304,7 +304,7 @@ export default function ProviderDetail(props) {
                     }
                 }}
             />
-            <Pressable style={{top: -45,zIndex: 1000, elevation: 10,  left: (width / 2) - 45}} onPress={() => {
+            <Pressable style={{top: -45,zIndex: 1000, elevation: 10,width:90, left: (width / 2) - 45}} onPress={() => {
                 setSingleModal(true)
                 setSelectedImage(provider?.profile_image)
             }}>

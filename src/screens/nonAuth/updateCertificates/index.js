@@ -23,9 +23,9 @@ import ImagePicker from 'react-native-image-crop-picker';
 
 
 const upload_types = [
-    { id: 1, text: "Upload Certificate or Business Certificate", button_text: "Add Certificate" },
-    { id: 2, text: "Upload Driver or State License", button_text: "Add License" },
-    { id: 3, text: "Upload Certificate and License " }
+    { id: 1, text: "Upload General and/or Professional Liability Insurance", button_text: "Add Insurance" },
+    { id: 2, text: "Upload Driver License", button_text: "Add License" },
+    { id: 3, text: "Upload General and/or Professional Liability Insurance and License " }
 ]
 
 
@@ -209,7 +209,7 @@ export default function UpdateCertificates({ navigation, route }) {
             />
             <FontAwesome
                 onPress={() => {
-                    Alert.alert("Delete", "Do you want to remove this certificate? ", [
+                    Alert.alert("Delete", "Do you want to remove this insurance? ", [
                         { text: "no" },
                         { text: "yes", onPress: () => deleteCertificate(item.id) }])
                 }}
@@ -237,7 +237,7 @@ export default function UpdateCertificates({ navigation, route }) {
 
             />
             <Container style={styles.container}>
-                <Text style={styles.service}>{current_upload_type.text}</Text>
+            {current_upload_type.id != upload_types[2].id &&<Text style={styles.service}>{current_upload_type.text}</Text>}
                 {current_upload_type.id !== upload_types[2].id && <><FlatList
                     data={cerrtificates}
                     keyExtractor={(item, index) => item.id + "" + index}
@@ -276,9 +276,10 @@ const BothTab = ({ data, renderItem, pickImage }) => {
 
     return (
         <View style={{ flex: 1 }}>
+            <Text style={styles.service}>{selected==0?"Upload General and/or Professional Liability Insurance":"Upload Driver License"}</Text>
             <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green }}>
                 <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
-                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Certificate</Text>
+                    <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, color: selected == 0 ? "white" : "black" }}>Upload Insurance</Text>
                 </TouchableOpacity>
                 <View style={{ width: 1, backgroundColor: LS_COLORS.global.green }} />
                 <TouchableOpacity onPress={() => setSelected(1)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 1 ? LS_COLORS.global.green : "white" }}>
@@ -300,7 +301,7 @@ const BothTab = ({ data, renderItem, pickImage }) => {
                 if (pickImage) {
                     pickImage(selected)
                 }
-            }} title={selected == 0 ? "Add Certificate" : "Add License"} />
+            }} title={selected == 0 ? "Add Insurance" : "Add License"} />
         </View>
     )
 }
@@ -335,6 +336,7 @@ const styles = StyleSheet.create({
         color: "black",
         alignSelf: 'center',
         paddingVertical: '3%',
-        marginTop: '10%'
+        marginTop: '10%',
+        textAlign:"center"
     }
 })

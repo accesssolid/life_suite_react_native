@@ -18,7 +18,7 @@
 		35603CB02152450190F99950 /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C0412A8716946649C628EC9 /* Poppins-Thin.ttf */; };
 		3590F7721FBC4DCCB8B3381E /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 89C7DB46D88341E0B9DA2EB7 /* Poppins-ExtraBold.ttf */; };
 		45C38C0665614A6EBBAF8D96 /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 57C73C89CAB54965A326D70E /* Poppins-MediumItalic.ttf */; };
-		5206CBB226E9FA2000A8BD1E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5206CBB126E9FA2000A8BD1E /* GoogleService-Info.plist */; };
+		526E58F72AA9AC35002B659E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 526E58F62AA9AC35002B659E /* GoogleService-Info.plist */; };
 		52BBE1B178C9447481E00A1C /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 721B886FFDA446268B57EEC7 /* Poppins-Italic.ttf */; };
 		584396209D4E439D9D264610 /* Poppins-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1570F3700F6B4DDDBA483C4B /* Poppins-BlackItalic.ttf */; };
 		70495610FC9F4C18A3EA1037 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FB42B67699642C1BEFA0501 /* Poppins-ExtraLight.ttf */; };
@@ -75,7 +75,7 @@
 		4D19739529D047A1A49AC34D /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		4D39E1A43AA44538965B793C /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/native-base/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		506AE38DBB3D40EDA468A2BF /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
-		5206CBB126E9FA2000A8BD1E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		526E58F62AA9AC35002B659E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		52C84EAA26F32FDD00FB3327 /* LifeSuite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = LifeSuite.entitlements; path = LifeSuite/LifeSuite.entitlements; sourceTree = "<group>"; };
 		54EDEAB41CC8405DBA5B6F90 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		57C73C89CAB54965A326D70E /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-MediumItalic.ttf"; path = "../assets/Fonts/Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
@@ -206,7 +206,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				5206CBB126E9FA2000A8BD1E /* GoogleService-Info.plist */,
+				526E58F62AA9AC35002B659E /* GoogleService-Info.plist */,
 				AB0ECFAF26B5534500061D80 /* File.swift */,
 				13B07FAE1A68108700A75B9A /* LifeSuite */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -403,7 +403,7 @@
 				1F96560F3EEB429A942D1834 /* Poppins-SemiBoldItalic.ttf in Resources */,
 				35603CB02152450190F99950 /* Poppins-Thin.ttf in Resources */,
 				791484B87DD4419FA0543BDA /* Poppins-ThinItalic.ttf in Resources */,
-				5206CBB226E9FA2000A8BD1E /* GoogleService-Info.plist in Resources */,
+				526E58F72AA9AC35002B659E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -631,7 +631,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = RSWZ8MVF9V;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AF3CJ2X9N4;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = LifeSuite/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -644,10 +644,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.LifeSuite;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lyfesuite;
 				PRODUCT_NAME = LifeSuite;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = LifeSuiteDev;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = DEV;
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeSuite-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -668,7 +668,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = RSWZ8MVF9V;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AF3CJ2X9N4;
 				INFOPLIST_FILE = LifeSuite/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -681,10 +681,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.LifeSuite;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lyfesuite;
 				PRODUCT_NAME = LifeSuite;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = LifeSuiteDev;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = DEV;
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeSuite-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

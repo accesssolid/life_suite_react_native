@@ -776,7 +776,7 @@ const CustomDrawerContent = (props) => {
                         color: LS_COLORS.global.darkBlack,
                     }}
                     maxFontSizeMultiplier={1.7}
-                >Update Certificate/License
+                >Update Insurance/License
                 </Text>}
                 icon={({ focused, color }) => <Image resizeMode="cover" source={require('../assets/certs.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
