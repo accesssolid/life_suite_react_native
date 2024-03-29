@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, ScrollView } from 'react-native'
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
 import LS_FONTS from '../../../constants/fonts';
@@ -82,8 +82,8 @@ export default function AddDiscount({ navigation, route }) {
             //     navigation.navigate("MainDrawer")
             // }}
             />
-            <Container>
-                <Content>
+            <View>
+                <ScrollView>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, alignItems: "center", paddingHorizontal: 20 }}>
                         <Text maxFontSizeMultiplier={1.3}  style={styles.textStyle}>DISCOUNT</Text>
                         <View style={{ flex: 1, alignItems: "flex-end", justifyContent: "center", }}>
@@ -125,7 +125,7 @@ export default function AddDiscount({ navigation, route }) {
                             </View>
                         }
                     </View>
-                </Content>
+                </ScrollView>
                 <TouchableOpacity
                     style={[styles.save, { marginVertical: 10, borderRadius: 25 }]}
                     activeOpacity={0.7}
@@ -142,7 +142,7 @@ export default function AddDiscount({ navigation, route }) {
                     <Text maxFontSizeMultiplier={1.3} style={styles.saveText}>Confirm</Text>
                 </TouchableOpacity>
                 {loader && <Loader />}
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

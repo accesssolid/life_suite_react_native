@@ -15,7 +15,7 @@ const Cards = props => {
             activeOpacity={0.7}
             onPress={props.action}
             style={{ ...styles.mainView, ...props.customContainerStyle }}>
-            <View style={{ flex: 1, borderTopLeftRadius: 10, borderTopEndRadius: 10, overflow: 'hidden' }}>
+            <View style={{ flex: 1, borderTopLeftRadius: 10, borderTopEndRadius: 10, overflow: 'hidden' , }}>
                 <Image
                     resizeMode="cover"
                     style={styles.room}

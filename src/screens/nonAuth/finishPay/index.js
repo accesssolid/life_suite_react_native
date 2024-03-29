@@ -15,6 +15,7 @@ import { Rating, AirbnbRating } from 'react-native-ratings';
 import Loader from '../../../components/loader';
 import { order_types } from '../../../constants/globals';
 import lodash from 'lodash'
+import { ScrollView } from 'react-native';
 
 const types = ["Flat Amount", "Percentage"]
 export default function FinishPay({ navigation, route }) {
@@ -102,8 +103,8 @@ export default function FinishPay({ navigation, route }) {
             //     navigation.navigate("HomeScreen")
             // }}
             />
-            <Container>
-                <Content>
+            <View>
+                <ScrollView>
                     <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20 }}>
                         <Text style={[styles.textStyle, { fontSize: 14 }]}>Rate this Job</Text>
                         {/* <Rating
@@ -174,7 +175,7 @@ export default function FinishPay({ navigation, route }) {
                     <View style={{ width: "90%", alignSelf: "center", marginTop: 20, borderRadius: 6, height: 200, marginBottom: 0, backgroundColor: LS_COLORS.global.lightGrey }}>
                         <TextInput value={reason} multiline={true} onChangeText={t => setReason(t)} textAlignVertical="top" placeholder={"Your Comments"} placeholderTextColor="gray" style={{ height: 200, padding: 10, color: "black" }} />
                     </View>
-                </Content>
+                </ScrollView>
                 <TouchableOpacity
                     style={[styles.save, { marginVertical: 10, borderRadius: 25 }]}
                     activeOpacity={0.7}
@@ -183,7 +184,7 @@ export default function FinishPay({ navigation, route }) {
                     }}>
                     <Text style={styles.saveText}>Confirm</Text>
                 </TouchableOpacity>
-            </Container>
+            </View>
             {loading && <Loader />}
         </SafeAreaView>
     )

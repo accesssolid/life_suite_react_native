@@ -185,7 +185,7 @@ const OrderHistory = (props) => {
                 containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 {/* <Content
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}> */}
@@ -278,7 +278,7 @@ const OrderHistory = (props) => {
                 {/* <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
                     <View style={{ height: 30 }}></View> */}
                 {/* </Content> */}
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

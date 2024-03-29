@@ -118,7 +118,6 @@ export default function UpdateCertificates({ navigation, route }) {
                 type: 'post'
             }
             let response = await getApi(config)
-            console.log("response", response)
             if (response.status) {
                 showToast(response.message)
                 getCertificateList()
@@ -236,7 +235,7 @@ export default function UpdateCertificates({ navigation, route }) {
                 containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
             {current_upload_type.id != upload_types[2].id &&<Text style={styles.service}>{current_upload_type.text}</Text>}
                 {current_upload_type.id !== upload_types[2].id && <><FlatList
                     data={cerrtificates}
@@ -255,7 +254,7 @@ export default function UpdateCertificates({ navigation, route }) {
                 </>
                 }
                 {current_upload_type.id == upload_types[2].id && <BothTab data={cerrtificates} renderItem={renderItem} pickImage={pickImage} />}
-            </Container>
+            </View>
 
             {loader && <Loader />}
         </SafeAreaView>

@@ -64,8 +64,8 @@ const UpdateOrder = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    <Container style={{ marginTop: "5%" }}>
-                        <Content showsVerticalScrollIndicator={false} bounces={false} >
+                    <View style={{ marginTop: "5%" }}>
+                        <ScrollView showsVerticalScrollIndicator={false} bounces={false} >
                             <Text style={{ alignSelf: 'center', color: 'black', fontSize: 16, fontFamily: LS_FONTS.PoppinsBold }}>ORDER UPDATE</Text>
                             <Card style={{ width: '90%', alignSelf: "center",  backgroundColor: "white", marginTop: "5%" }}></Card>
                             {/* {providers.length > 0 ?
@@ -175,8 +175,8 @@ const UpdateOrder = (props) => {
                                 </TouchableOpacity>
                             </View>
                             <View style={{ height: 30 }}></View>
-                        </Content>
-                    </Container>
+                        </ScrollView>
+                    </View>
                 </View>
                 {loading && <Loader />}
             </SafeAreaView>

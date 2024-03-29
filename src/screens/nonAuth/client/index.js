@@ -57,10 +57,21 @@ const Client = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    <Container style={{ marginTop: 26 }}>
-                        <Content>
+                    <View style={{ marginTop: 26 }}>
+                        <ScrollView>
                             <Text style={{ alignSelf: 'center', fontSize: 16, fontFamily: LS_FONTS.PoppinsBold }}>CLIENT</Text>
-                            <Card style={styles.alexiContainer}>
+                            <View style={[styles.alexiContainer,{
+                               shadowColor: "#000",
+                               shadowOffset: {
+                                   width: 0,
+                                   height: 2,
+                               },
+                               shadowOpacity: 0.23,
+                               shadowRadius: 2.62,
+                               
+                               elevation: 4,
+                                
+                            }]}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <View>
                                         <Image
@@ -97,7 +108,7 @@ const Client = (props) => {
                                     <Text style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>Time</Text>
                                     <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.global.green }}>2.5 hrs</Text>
                                 </View>
-                            </Card>
+                            </View>
                             <Image
                                 style={{ height: 140, alignSelf: 'center', width: "90%", marginTop: 10 }}
                                 source={require("../../../assets/map.png")}
@@ -173,8 +184,8 @@ const Client = (props) => {
                                 </TouchableOpacity>
                             </View>
                             <View style={{ height: 30 }}></View>
-                        </Content>
-                    </Container>
+                        </ScrollView>
+                    </View>
                 </View>
             </SafeAreaView>
         </>

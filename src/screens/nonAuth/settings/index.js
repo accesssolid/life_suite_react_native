@@ -1,9 +1,11 @@
 
-import { Container, Content, Icon, Switch } from 'native-base';
+import { Container, Content, Icon, } from 'native-base';
+
 import React, { useEffect, useRef, useState } from 'react';
 import {
     Alert,
     BackHandler,
+    ScrollView,
     StatusBar,
     Text,
     View,
@@ -15,6 +17,7 @@ import Header from '../../../components/header';
 import CustomButton from '../../../components/customButton';
 import { getJsonData, storeJsonData } from '../../../asyncStorage/async'
 import LS_COLORS from '../../../constants/colors';
+import { Switch } from 'react-native';
 
 const Settings = (props) => {
     const [passcodeVerification, setPassCodeVerification] = useState(false)
@@ -147,9 +150,9 @@ const Settings = (props) => {
                     containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
                 />
-                <Container>
-                    <Content bounces={false} scrollEnabled={true} >
-                        <View style={{ flex: 1 }}>
+                <View style={{backgroundColor:LS_COLORS.global.white ,flex:1}}>
+                    <ScrollView  bounces={false} scrollEnabled={true} >
+                        <View style={{ flex: 1 ,}}>
                             <View style={{ width: '90%', alignSelf: 'center', flex: 1 }}>
                                 <View style={{ flexDirection: 'row', width: '100%', marginVertical: 10 }}>
                                     <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -180,8 +183,8 @@ const Settings = (props) => {
                                 />}
                             </View>
                         </View>
-                    </Content>
-                </Container>
+                    </ScrollView>
+                </View>
             </SafeAreaView>
         </>
     );

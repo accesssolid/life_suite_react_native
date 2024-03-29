@@ -14,6 +14,7 @@ import { CheckBox } from 'react-native-elements';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Entypo from 'react-native-vector-icons/Entypo'
+// @"AIzaSyB5d--ow70_ZQqfsDdp2XSGX6AFg2tjhfU"
 /* Components */
 import Header from '../../../components/header';
 import CustomInput from "../../../components/textInput"
@@ -27,7 +28,7 @@ import Loader from '../../../components/loader';
 import SearchableDropDown from '../../../components/searchableDropDown';
 import { Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import DeviceInfo, { getUniqueId, getManufacturer } from 'react-native-device-info';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -202,6 +203,17 @@ const Profile = (props) => {
     const [isVerfiedPhone, setIsVerifiedPhone] = useState(true)
     const [otpModal, setOTPModal] = useState(false)
     // 
+    const [devicdId, setDevicdId] = useState('')
+
+    useEffect(() => {
+        getDeviceID()
+    }, [])
+
+    const getDeviceID = async() =>{
+        let device_id=await DeviceInfo.getUniqueId()
+        setDevicdId(device_id)
+    }
+
     const [experience, setExperince] = React.useState("")
     const [gender,setGender]=React.useState("Male")
     React.useEffect(() => {
@@ -221,13 +233,14 @@ const Profile = (props) => {
         }
     }, [user])
 
-    function logout() {
+    async function logout() {
         setLoader(true)
+        let device_id=await DeviceInfo.getUniqueId()
         let headers = {
             "Authorization": `Bearer ${access_token}`
         }
         var formdata = new FormData();
-        formdata.append("device_id", getUniqueId());
+        formdata.append("device_id", device_id);
 
         let config = {
             headers: headers,
@@ -237,6 +250,7 @@ const Profile = (props) => {
         }
         getApi(config)
             .then((response) => {
+                console.log(response,"response===>");
                 if (response.status == true) {
                     storeItem('user', null)
                     storeItem('passcode', null)
@@ -261,7 +275,7 @@ const Profile = (props) => {
     }, [user])
 
     useEffect(() => {
-        console.log("USERDATA", userData)
+
         if (userData.profile_image) {
             setProfilePic({ uri: BASE_URL + userData.profile_image })
         }
@@ -503,7 +517,7 @@ const Profile = (props) => {
                         }).then(image => {
                             updateProfilePic(image)
                         }).catch(err => {
-                            console.warn("Image picker error : ", err)
+                           
                         })
                     }
                 },
@@ -690,7 +704,7 @@ const Profile = (props) => {
                 type: 'post'
             }
             let response = await getApi(config)
-            console.log(response)
+      
             if (response.status) {
                 if (response.data) {
                     props.navigation.navigate("UserStack", { screen: "CustomWebView", params: { uri: response.data.url, change: true, connect_account_id: response.connect_account_id } })
@@ -765,7 +779,7 @@ const Profile = (props) => {
             endPoint: user.user_role == role.customer ? '/api/customer_detail_update' : '/api/provider_detail_update',
             type: 'post'
         }
-        console.log(formdata)
+    
 
         try {
             getApi(config)
@@ -785,7 +799,7 @@ const Profile = (props) => {
 
                 })
         } catch (error) {
-            console.error("error ==>> ", error)
+        
         }
     }
 
@@ -968,7 +982,7 @@ const Profile = (props) => {
     }
 
     React.useEffect(() => {
-        console.log(homeAddressData)
+   
     }, [homeAddressData, workAddressData])
 
     function formatPhoneNumber(value) {
@@ -1032,7 +1046,7 @@ const Profile = (props) => {
                             }
 
                         }).catch(err => {
-                            console.log("Image picker error : ", err)
+                      
                         })
                     }
                 },
@@ -1119,7 +1133,7 @@ const Profile = (props) => {
             <View style={{ flex: 1, backgroundColor: "white" }}>
                 <Header
                     imageUrl={require("../../../assets/back.png")}
-                    action={() => props.navigation.goBack()}
+                    action={() => props.navigation.navigate('HomeScreen')}
                     imageUrl1={require("../../../assets/home.png")}
                     action1={() => props.navigation.navigate("HomeScreen")}
                     imageStyle={{ tintColor: "black" }}
@@ -1186,7 +1200,9 @@ const Profile = (props) => {
                                     // returnKeyType="next"
                                     // onSubmitEditing={() => { lnameRef.current._root.focus() }}
                                     required={true}
+                                   
                                 />
+                       
 
                                 <CustomInput
                                     text="Last Name"
@@ -1284,7 +1300,7 @@ const Profile = (props) => {
                                     title="Date of Birth *"
                                     value={userData?.dob}
                                     onChangeText={(formatted, extracted) => {
-                                        console.log(formatted)
+                                       
                                         setUserData({ ...userData, dob: formatted })
                                     }}
                                     containerStyle={{
@@ -1463,7 +1479,7 @@ const Profile = (props) => {
                                         placeholder={`${user.user_role == role.customer ? 'Home' : 'Permanent'} address${user.user_role == role.customer ? '' : "*"}`}
                                         fetchDetails={true}
                                         onPress={(data, details) => {
-                                            console.log(JSON.stringify(details))
+                                          
                                             const zip_code = details?.address_components.find((addressComponent) =>
                                                 addressComponent.types.includes('postal_code'),
                                             )?.short_name;
@@ -1493,13 +1509,13 @@ const Profile = (props) => {
                                             onSubmitEditing: () => workAddressRef.current.focus(),
                                             placeholderTextColor: LS_COLORS.global.placeholder,
                                             selection: Platform.OS == "android" ? selection : null,
-                                            onChangeText: (t) => {
-                                                setHomeAddressData({
-                                                    ...homeAddressData,
-                                                    address_line_1: t,
-                                                })
-                                                setSelection({ start: t?.length })
-                                            },
+                                            // onChangeText: (t) => {
+                                            //     setHomeAddressData({
+                                            //         ...homeAddressData,
+                                            //         address_line_1: t,
+                                            //     })
+                                            //     setSelection({ start: t?.length })
+                                            // },
                                             maxFontSizeMultiplier: 1.5,
                                             onBlur: () => { setSelection({ start: 0 }) },
                                             onFocus: () => { setSelection({ start: homeAddressData?.address_line_1?.length }) }
@@ -1602,13 +1618,13 @@ const Profile = (props) => {
                                             editable: !isSameAddress,
                                             placeholderTextColor: LS_COLORS.global.placeholder,
                                             selection: Platform.OS == "android" ? selection1 : null,
-                                            onChangeText: (t) => {
-                                                setWorkAddressData({
-                                                    ...workAddressData,
-                                                    address_line_1: t,
-                                                })
-                                                setSelection1({ start: t?.length })
-                                            },
+                                            // onChangeText: (t) => {
+                                            //     setWorkAddressData({
+                                            //         ...workAddressData,
+                                            //         address_line_1: t,
+                                            //     })
+                                            //     setSelection1({ start: t?.length })
+                                            // },
                                             maxFontSizeMultiplier: 1.5,
                                             onBlur: () => { setSelection1({ start: 0 }) },
                                             onFocus: () => { setSelection1({ start: workAddressData?.address_line_1?.length }) }

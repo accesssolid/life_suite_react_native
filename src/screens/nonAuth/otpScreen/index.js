@@ -14,6 +14,8 @@ import { getApi } from '../../../api/api';
 import { TouchableOpacity } from 'react-native';
 import LS_COLORS from '../../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import MaterialIcons from "react-native-vector-icons/MaterialIcons"
+import { ScrollView } from 'react-native';
 
 const OtpScreen = props => {
   const [code, setCode] = useState('')
@@ -108,9 +110,9 @@ const OtpScreen = props => {
     <SafeAreaView style={globalStyles.safeAreaView}>
       <StatusBar backgroundColor={Colors.global.green} barStyle="light-content" />
 
-      <Container>
-        <Content>         
-        <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
+      <View>
+        <ScrollView>         
+        <MaterialIcons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
  
           <View style={styles.screen}>
             <Text maxFontSizeMultiplier={1.7} style={{ marginTop: "20%", ...styles.forgot }}>Verification</Text>
@@ -141,9 +143,9 @@ const OtpScreen = props => {
               />
             </View>
           </View>
-        </Content>
+        </ScrollView>
         {loader == true && <Loader />}
-      </Container>
+      </View>
     </SafeAreaView>
   );
 };

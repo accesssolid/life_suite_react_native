@@ -285,7 +285,7 @@ const OrderHistory1 = (props) => {
                 title="MY ORDER"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    props.navigation.goBack()
+                    props.navigation.navigate('HomeScreen')
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
@@ -294,7 +294,7 @@ const OrderHistory1 = (props) => {
                 containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 <CustomTextInput
                     placeholder="Search"
                     value={searchData.text}
@@ -393,7 +393,7 @@ const OrderHistory1 = (props) => {
                 {/* <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 20 }}></View>
                     <View style={{ height: 30 }}></View> */}
                 {loader && <Loader />}
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

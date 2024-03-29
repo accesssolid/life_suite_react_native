@@ -78,10 +78,7 @@ const ServicesProvided = (props) => {
     }, [selectedVariant, itemListMaster])
 
     useEffect(() => {
-        console.log(selectedItems, "Selected Items")
-        console.log(servicesData, "Services Data")
-        console.log(productsData, "Products")
-        console.log(newProductsData, "New Products Data")
+       
     }, [selectedItems, servicesData, productsData, newProductsData])
 
     const getServiceItems = () => {
@@ -106,11 +103,9 @@ const ServicesProvided = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
                     setLoading(false)
                     setItemListMaster([...response.data])
-                    console.log("checking", response.data)
                     if (response.variant_data) {
                         setVariants(response.variant_data.sort((a,b)=>{
                             if (a.name < b.name) {
@@ -362,20 +357,7 @@ useEffect(()=>{
                 }
             }
         }))
-        console.log("JSON DATA", JSON.stringify({
-            data: {
-                ...addServiceData,
-                user_id: user.id,
-                service_id: subService.id,
-                json_data: {
-                    ...addServiceData.json_data,
-                    products: [...productsData].filter(x => x.name != "").map(x=>({...x,price:x?.price=="$"?"":x?.price})).filter(x=>selectedProducts?.map(x=>x.id)?.includes(x.id)),
-                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "").map(x=>({...x,price:x?.price=="$"?"":x?.price})),
-                    services: [...services],
-                    new_services: [...new_services]
-                }
-            }
-        }))
+    
         verifyNewProducts(services, new_services)
     }
 
@@ -687,7 +669,6 @@ useEffect(()=>{
         } else {
             servicesData?.forEach((itemm, index) => {
                 if (selectedItems?.includes(itemm?.item_id)) {
-                    console.log("itemm =>> ", itemm)
                     if (itemm?.price.trim() !== ""
                         // && itemm.time_duration_h.trim() !== "" 
                         && itemm?.time_duration_m.trim() !== "") {
@@ -752,7 +733,6 @@ useEffect(()=>{
     const filterVariants = () => {
         let data = itemListMaster.filter(item => item.variant_data == selectedVariant)
         let data1 = newServicesMaster.filter(item => item.variant_data == selectedVariant)
-        console.log("Data", JSON.stringify(data))
         setNewServices([...data1])
         setItemList([...data])
     }
@@ -831,9 +811,7 @@ useEffect(()=>{
                 type: "post",
                 endPoint: "/api/deleteNotGlobalProduct"
             }
-            console.log(id)
             let res = await getApi(config)
-            console.log(res)
             if (res.status) {
                 showToast(res.message)
                 let newArr = []
@@ -865,7 +843,6 @@ useEffect(()=>{
                     newData.push({ ...item, products: products.filter(x => x.id != id) })
                 })
 
-                console.log(newArr)
                 setProductsData([...newArr].filter(x => x.id !== id))
                 setItemListMaster(newData)
             } else {
@@ -1057,7 +1034,6 @@ useEffect(()=>{
 
                 }
             })
-            console.log(selectedProducts)
             let json_data = {
                 products: [...productsData].filter(x => x.name != "").map(x => ({ item_product_id: x.id, price:x.price=="$"?"":x.price })).filter(x=>selectedProducts?.map(x=>x.id).includes(x.item_product_id)),
                 new_products: [...newProductsData].filter(x => !String(x?.item_id).startsWith("new")).filter(x => x.name != "").map(x=>({...x,price:x.price=="$"?"":x.price})),
@@ -1132,7 +1108,7 @@ useEffect(()=>{
                 </ImageBackground>
             </View>
              <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
-                <Container>
+                <View style={{backgroundColor:"white" ,flex:1}}>
                     <Text maxFontSizeMultiplier={1.5} style={styles.service}>SERVICES</Text>
                     {variants.length > 0 && <View style={{ height: 70 }}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 10, marginHorizontal: 15, height: 70 }}>
@@ -1163,7 +1139,7 @@ useEffect(()=>{
                         </ScrollView>
                     </View>}
                     {activeItem !== null && <View style={{ flexDirection: 'row', width: '98%', alignSelf: "center", marginBottom: '2%' }}>
-                        <View style={{ flex: 1 }} />
+                        <View style={{ flex: 1 ,}} />
                         <View style={{ flexDirection: "row", justifyContent: 'flex-end' }}>
                             <View style={{ alignItems: 'center', marginRight: 15 }}>
                                 <Text maxFontSizeMultiplier={1.2} style={{ ...styles.priceTime, }}>Estimated Time</Text>
@@ -1173,7 +1149,7 @@ useEffect(()=>{
                             </View>
                         </View>
                     </View>}
-                    <Content showsVerticalScrollIndicator={false}>
+                    <ScrollView showsVerticalScrollIndicator={false}>
                         {activeItem !== null && <ServiceItem
                             ref={itemRef}
                             item={activeItem}
@@ -1261,7 +1237,7 @@ useEffect(()=>{
                                 {/* <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 14,  alignSelf: "center" }}>Add Service +</Text> */}
                             </>
                         }
-                    </Content>
+                    </ScrollView>
                     <View style={{ paddingBottom: '2.5%' }}>
                         {activeItem == null
                             ?
@@ -1273,7 +1249,7 @@ useEffect(()=>{
                             <CustomButton maxFont={1.2} title={"Save"} action={() => saveRequest()} />
                         }
                     </View>
-                </Container>
+                </View>
                 {loading && <Loader />}
                 <CheckServiceNameModal addNewService={addNewService} visible={openModal} setVisible={setOpenModal} />
             </SafeAreaView >

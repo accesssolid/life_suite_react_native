@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, SafeAreaView, Text } from 'react-native'
+import { View, StyleSheet, Image, TouchableOpacity, SafeAreaView, Text,ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 /* Components */
 import Header from '../../../components/header';
-import { Container, Content, Card } from 'native-base';
+import { Container, Content, Card,  } from 'native-base';
 import SureModal from '../../../components/sureModal';
 const DeclineConfirmation = (props) => {
     const dispatch = useDispatch()
@@ -23,10 +23,9 @@ const DeclineConfirmation = (props) => {
                     setOpen(!open);
                 }}
                 visible={open}
-                action1={() => props.navigation.navigate("OrderHistory")}
-                action1={() => {
-                    setOpen(!open);
-                }}
+                action1={() => {props.navigation.navigate("OrderHistory") ,setOpen(!open)}}
+               
+            
             />
             <Header
                 title="DECLINE CONFIRMATION"
@@ -41,15 +40,25 @@ const DeclineConfirmation = (props) => {
                 containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
             />
-            <Container style={styles.container}>
-                <Content>
+            <View style={styles.container}>
+                <ScrollView>
                     <View style={styles.imageView}>
                         <Image
                             style={styles.image}
                             source={require("../../../assets/man.png")}
                         />
                     </View>
-                    <Card style={styles.desp}>
+                    <View style={[styles.desp,{
+                        shadowColor: "#000",
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.23,
+                        shadowRadius: 2.62,
+                        
+                        elevation: 4,
+                    }]}>
                         <View style={styles.textView}>
                             <Text style={styles.mainText}>SP1</Text>
                             <Text style={styles.subText}>Task 1</Text>
@@ -74,7 +83,7 @@ const DeclineConfirmation = (props) => {
                             <Text style={styles.subText}>Rating</Text>
                             <Text style={styles.subText}>*****</Text>
                         </View>
-                    </Card>
+                    </View>
                     <View style={styles.remainingView}>
                         <Text style={styles.remaining}>You have 3 remaining</Text>
                         <Text style={styles.remaining}>Cancel/Decline orders</Text>
@@ -99,8 +108,8 @@ const DeclineConfirmation = (props) => {
                             <Text style={styles.saveText}>Yes,Decline</Text>
                         </TouchableOpacity>
                     </View>
-                </Content>
-            </Container>
+                </ScrollView>
+            </View>
         </SafeAreaView>
     )
 }

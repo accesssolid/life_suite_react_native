@@ -27,7 +27,6 @@ const Header = (props) => {
             <Pressable style={styles.rightView}
                 onPress={()=>{
                     if(props.action1){
-                        console.log(props.action1)
                         props.action1()
                     }else{
                       

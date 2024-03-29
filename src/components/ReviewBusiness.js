@@ -87,7 +87,6 @@ const ReviewBusiness = ({ onPressNext, pressHandler }) => {
                 type: 'post'
             }
             let response = await getApi(config)
-            console.log(response)
             if (response.status) {
                 if (response.data) {
                     if (response.data[0]) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid } from 'react-native'
+import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -7,7 +7,7 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Circle, Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 
@@ -94,7 +94,7 @@ const SelectLocation = (props) => {
             }
 
         } catch (err) {
-            console.error("Error",err)
+            console.error("Error", err)
         } finally {
             setLoading(false)
 
@@ -114,11 +114,11 @@ const SelectLocation = (props) => {
 
     return (
         <>
-            <StatusBar 
-           // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-            barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="stretch"
@@ -136,7 +136,7 @@ const SelectLocation = (props) => {
                                     action1={() => {
                                         props.navigation.navigate("HomeScreen")
                                     }}
-                                    // containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                                // containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
                                 />
                             </View>
@@ -148,25 +148,30 @@ const SelectLocation = (props) => {
                 </ImageBackground>
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
-                <Container>
-                    <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+                <View style={{ flex: 1, backgroundColor: "white" }}>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                         <View style={styles.mapContainer}>
                             <MapView
                                 style={styles.map}
                                 region={{
                                     ...coordinates,
                                 }}>
-                                {travelDistance !== '' && <MapView.Circle
-                                    key={(coordinates.latitude + coordinates.longitude).toString()}
-                                    center={coordinates}
-                                    radius={Number(travelDistance * 1.60934) * 1000}
-                                    strokeWidth={1}
-                                    strokeColor={'red'}
-                                    fillColor={'rgba(230,238,255,0.1)'}
-                                />}
-                                <Marker
-                                    coordinate={{ ...coordinates }}
-                                />
+
+                                {travelDistance !== '' &&
+                                    <React.Fragment>
+                                        <Circle
+                                            key={(coordinates.latitude + coordinates.longitude).toString()}
+                                            center={coordinates}
+                                            radius={Number(travelDistance * 1.60934) * 1000}
+                                            strokeWidth={1}
+                                            strokeColor={'red'}
+                                            fillColor={'rgba(230,238,255,0.1)'}
+                                        />
+                                        <Marker
+                                            coordinate={{ ...coordinates }}
+                                        />
+                                    </React.Fragment>
+                                }
                             </MapView>
                         </View>
                         <View style={{ flex: 1, padding: 20 }}>
@@ -185,12 +190,12 @@ const SelectLocation = (props) => {
                                 }}
                                 activeOpacity={0.7}
                                 onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: coordinates })}>
-                                <Text maxFontSizeMultiplier={1.5}  numberOfLines={1} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, }}>{address}</Text>
+                                <Text maxFontSizeMultiplier={1.5} numberOfLines={1} style={{ fontSize: 14, fontFamily: LS_FONTS.PoppinsRegular, }}>{address}</Text>
                                 <View style={{ aspectRatio: 1, position: 'absolute', right: '5%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                                     <Image source={require('../../../assets/location.png')} resizeMode="contain" style={{ height: '70%', width: '100%', backgroundColor: LS_COLORS.global.lightGrey }} />
                                 </View>
                             </TouchableOpacity>
-                            <Text maxFontSizeMultiplier={1.5}  style={{ fontFamily: LS_FONTS.PoppinsMedium }}>Travel Distance to provide service(Miles)</Text>
+                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium }}>Travel Distance to provide service(Miles)</Text>
                             <CustomTextInput
                                 placeholder="Travel Distance"
                                 value={travelDistance}
@@ -207,8 +212,8 @@ const SelectLocation = (props) => {
                                 action={() => next()}
                             />
                         </View>
-                    </Content>
-                </Container>
+                    </ScrollView>
+                </View>
                 {loading && <Loader />}
             </SafeAreaView >
         </>

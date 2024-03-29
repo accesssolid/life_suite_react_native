@@ -138,7 +138,7 @@ const Notification = (props) => {
                     seenNotification(item)
                 }}
             >
-                <Card
+                <View
                     style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
@@ -151,7 +151,7 @@ const Notification = (props) => {
                         overflow: "hidden",
                         minHeight: 62
                     }}
-                    activeOpacity={0.7}
+              
                 >
                     <View style={{ flexDirection: 'row' }}>
                         <View style={{ width: '7%', borderRadius: 10, justifyContent: "center", alignItems: "center", right: 10, backgroundColor: backgroundColor }}></View>
@@ -163,7 +163,7 @@ const Notification = (props) => {
                             {/* <Text maxFontSizeMultiplier={1.5} style={{ color: "grey", fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12 }}>{orderType}</Text> */}
                         </View>
                     </View>
-                </Card>
+                </View>
             </Pressable>
         )
     }
@@ -180,7 +180,7 @@ const Notification = (props) => {
                     title="Notification"
                     imageUrl={require("../../../assets/back.png")}
                     action={() => {
-                        props.navigation.goBack()
+                        props.navigation.navigate('HomeScreen')
                     }}
                     containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 

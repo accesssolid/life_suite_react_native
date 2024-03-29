@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -65,8 +65,8 @@ const InProgress = (props) => {
                 containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
             />
-            <Container style={styles.container}>
-                <Content
+            <View style={styles.container}>
+                <ScrollView
                     style={{ paddingTop: 15 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}>
@@ -142,9 +142,9 @@ const InProgress = (props) => {
                         <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, color: LS_COLORS.global.darkBlack, }}>Actual Start Time:</Text>
                         <Text style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 12, color: LS_COLORS.global.darkBlack, }}>10:10 am</Text>
                     </View>
-                </Content>
+                </ScrollView>
                 <CustomButton action={() => props.navigation.navigate('SuspendInProgress')} title="Suspend" customStyles={{ width: '50%', height: 40, marginTop: 10 }} />
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

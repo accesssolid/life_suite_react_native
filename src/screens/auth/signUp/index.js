@@ -9,7 +9,7 @@ import { globalStyles } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import { getUniqueId } from 'react-native-device-info';
+import DeviceInfo, { getUniqueId } from 'react-native-device-info';
 import { CheckBox } from 'react-native-elements';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
@@ -33,9 +33,12 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ModalOTP from '../../../components/ModalOTP';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import MaterialIcons from "react-native-vector-icons/MaterialIcons"
+
 import messaging from '@react-native-firebase/messaging';
 import { changeSwitched } from '../../../redux/features/switchTo';
 import { CommonActions } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
 
 const getMessage = (name) => {
     switch (name) {
@@ -90,7 +93,7 @@ const getNotificationType = (type) => {
             return "Email"
         case 4:
             return "Text"
-            
+
     }
 }
 const getNotiPref = (text) => {
@@ -108,7 +111,7 @@ const getNotiPref = (text) => {
             return 4
     }
 }
-const m_filed_text = ["Agree to terms and conditions.", "Agree to privacy policy", "Agree to CDC guidelines."]
+const m_filed_text = ["Agree to terms and conditions.", "Agree to privacy policy", "Agree to CDC guidelines.",]
 const SignUpScreen = (props) => {
     const dispatch = useDispatch()
     const fnameRef = useRef(null)
@@ -124,6 +127,7 @@ const SignUpScreen = (props) => {
     const tagRef = useRef(null)
     const businessRef = useRef(null)
     const licenseRef = useRef(null)
+    const [isselected, setisselected] = useState(false)
 
     const workAddressLine1Ref = useRef(null)
     const workAddressLine2Ref = useRef(null)
@@ -146,7 +150,7 @@ const SignUpScreen = (props) => {
     const homeAddressRef = useRef(null)
     const workAddressRef = useRef(null)
     const [notificationType, setNotificationType] = useState(getNotificationType(1))
-    const [gender,setGender]=useState("Male")
+    const [gender, setGender] = useState("Male")
     /* State Drop Down */
     const [dropStateValue, setDropStateValue] = useState("State")
     const [dropStateData, setDropStateData] = useState([])
@@ -173,6 +177,18 @@ const SignUpScreen = (props) => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
     const [initialDate, setInitialDate] = useState(new Date())
     const [fcmToken, setFcmToken] = useState("")
+    const [devicdId, setDevicdId] = useState('')
+
+    useEffect(() => {
+        getDeviceID()
+        GetToken()
+    }, [])
+
+    const getDeviceID = async () => {
+        let device_id = await DeviceInfo.getUniqueId()
+        setDevicdId(device_id)
+    }
+
 
     useEffect(() => {
         setLoader(false)
@@ -311,7 +327,7 @@ const SignUpScreen = (props) => {
         password: '',
         password_confirmation: '',
         address: [],
-        device_id: getUniqueId(),
+        device_id: devicdId,
         fcm_token: '#fcm!234',
         is_accept_privatepolicy: 0,
         is_accept_cdd: 0,
@@ -494,7 +510,7 @@ const SignUpScreen = (props) => {
             dob: moment(signUpData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"),
             notification_prefrence: getNotiPref(notificationType),
             timezone: getTimeZone(),
-            gender:String(gender).toLowerCase()
+            gender: String(gender).toLowerCase()
 
         }
         console.log(user_data)
@@ -582,7 +598,7 @@ const SignUpScreen = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             console.log(image);
                             setProfilePic(image)
@@ -597,7 +613,7 @@ const SignUpScreen = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             console.log(image);
                             setProfilePic(image)
@@ -627,7 +643,7 @@ const SignUpScreen = (props) => {
                             width: 400,
                             height: 400,
                             cropping: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             console.log(image);
                             setPictures([...pictures, image])
@@ -640,7 +656,7 @@ const SignUpScreen = (props) => {
                     text: "Gallery", onPress: () => {
                         ImagePicker.openPicker({
                             multiple: true,
-                            forceJpg:true
+                            forceJpg: true
                         }).then(image => {
                             if (Array.isArray(image)) {
                                 let p = [...pictures, ...image]
@@ -848,8 +864,10 @@ const SignUpScreen = (props) => {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.container}>
                 <ScrollView style={{ flex: 1, width: '100%' }} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
-                    <Ionicons onPress={() => props.navigation.goBack()} name='arrow-back' size={24} style={{ padding: 20 }} />
-
+                    <MaterialIcons onPress={() => props.navigation.goBack()} name='arrow-back' size={24} style={{ padding: 20 }} />
+                   {/* <Pressable onPress={() => props.navigation.goBack()} style={{padding:20}}>
+                   <FastImage resizeMode={'contain'} style={{ height: 20, width: 20 }} source={require('../../../assets/back.png')} />
+                   </Pressable> */}
                     <View style={{ flex: 1, width: '100%' }}>
                         <View style={styles.textContainer}>
                             <Text maxFontSizeMultiplier={1.7} style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
@@ -925,14 +943,14 @@ const SignUpScreen = (props) => {
 
                                 }}
                             />
-                             <View style={{}}>
+                            <View style={{}}>
                                 <DropDown
                                     title="Gender"
-                                    item={["Male","Female","Non-Binary "]}
+                                    item={["Male", "Female", "Non-Binary "]}
                                     value={gender}
                                     onChangeValue={(index, value) => { setGender(value) }}
                                     handleTextValue={true}
-                                    dropdownStyle={{height:120}}
+                                    dropdownStyle={{ height: 120 }}
                                 />
                             </View>
                             {role !== 1 && <CustomTextInput
@@ -1079,7 +1097,7 @@ const SignUpScreen = (props) => {
                             <View style={{}}>
                                 <DropDown
                                     title="Notification type"
-                                    item={[ "All", "Push Notification","Email","Text"]}
+                                    item={["All", "Push Notification", "Email", "Text"]}
                                     value={notificationType}
                                     onChangeValue={(index, value) => { setNotificationType(value) }}
                                     handleTextValue={true}
@@ -1479,6 +1497,31 @@ const SignUpScreen = (props) => {
                             })} style={{ fontSize: 12, flex: 1, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>{m_filed_text[2]}</Text>
                         </View>}
 
+
+
+
+
+
+
+                        <View style={{
+                            flexDirection: "row",
+                            marginLeft: 30,
+                            alignItems: "center",
+
+                        }}>
+                            <Pressable
+                                onPress={() => setisselected(!isselected)} >
+
+                                {isselected ? <FastImage style={{ height: 20, width: 20 }} source={require("../../../assets/checked.png")}
+                                /> :
+                                    <FastImage style={{ height: 20, width: 20 }} resizeMode="contain" source={require("../../../assets/unchecked.png")} />}
+                            </Pressable>
+
+                            <View style={{ marginLeft: 5 }}>
+                                <Text maxFontSizeMultiplier={1.7} style={{ fontSize: 12, flex: 1, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.lightTextColor, textDecorationLine: "underline" }}>I Agree to receive transactional messages {'\n'} from LyfeSuite</Text>
+                            </View>
+
+                        </View>
                         <View style={[styles.buttonContainer, { marginTop: 20 }]}>
                             <CustomButton
                                 title="Sign Up"

@@ -25,8 +25,6 @@ import { role } from './src/constants/globals';
 import { getApi } from './src/api/api';
 import { changeSwitched } from './src/redux/features/switchTo';
 
-
-
 PushNotification.configure({
   onNotification: function (notification) {
     console.log("NOTIFICATION:", notification);
@@ -119,7 +117,6 @@ const App = () => {
         type: 'post'
       }
       const response = await getApi(config)
-      console.log("Response", response)
       if (response.status == true) {
         store.dispatch(loginReducer(response.data))
       }
@@ -134,7 +131,6 @@ const App = () => {
     // PushNotification.setApplicationIconBadgeNumber(10)
     getToken()
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log(remoteMessage)
       try {
         console.log(typeof remoteMessage?.data?.is_blocked)
         if (remoteMessage?.data?.is_blocked == "true") {
@@ -193,7 +189,7 @@ const App = () => {
   }, []);
 
   return (
-    <Root>
+    // <Root>
       <StoreProvider store={store}>
         <StatusBar backgroundColor={LS_COLORS.global.green} barStyle="light-content" />
         <SafeAreaProvider>
@@ -204,7 +200,7 @@ const App = () => {
           </NavigationContainer>
         </SafeAreaProvider>
       </StoreProvider>
-    </Root>
+    // </Root>
   );
 };
 

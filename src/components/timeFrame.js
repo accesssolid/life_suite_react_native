@@ -93,7 +93,7 @@ const TimeFrame = props => {
                 let selectedServicesName = []
                 let otherOptions = []
                 let duration = 0
-                let showTBD=true
+                let showTBD = true
                 for (let i of p.item_list) {
                     let data = {
                         "item_id": i.service_item_id,
@@ -105,10 +105,10 @@ const TimeFrame = props => {
                     if (i.checked) {
                         selectedServices.push(i.service_item_id)
                         selectedServicesName.push(i.service_items_name)
-                        if(i?.time_duration==""||i?.time_duration==null||i?.time_duration==undefined){
+                        if (i?.time_duration == "" || i?.time_duration == null || i?.time_duration == undefined) {
 
-                        }else{
-                            showTBD=false
+                        } else {
+                            showTBD = false
                             duration += Number(i.time_duration)
                         }
                     }
@@ -136,7 +136,7 @@ const TimeFrame = props => {
                     z.push({
                         "provider_id": p.id,
                         "provider_name": p.first_name + " " + p.last_name, //need to removed when order hited
-                        "duration":showTBD?"": duration, //need to removed when order hited
+                        "duration": showTBD ? "" : duration, //need to removed when order hited
                         "estimated_reached_time": "0",
                         "order_start_time": orderPreviousData?.order_start_time,
                         "order_end_time": orderPreviousData?.order_end_time,
@@ -158,7 +158,7 @@ const TimeFrame = props => {
         }
     }, [data, mile_distanceP])
     const getTimeInHours = (minute) => {
-        let d = parseInt(minute / 60)==0?"":parseInt(minute / 60)+" Hr"
+        let d = parseInt(minute / 60) == 0 ? "" : parseInt(minute / 60) + " Hr"
         if (minute % 60 !== 0) {
             d += ` ${parseInt(minute % 60)} Mins`
         }
@@ -176,11 +176,20 @@ const TimeFrame = props => {
             {...props}
         >
             <Pressable onPress={props.pressHandler} style={styles.modalScreen}>
-                <Card style={{
+                <View style={{
                     backgroundColor: 'white',
                     width: "95%",
                     borderRadius: 10,
                     padding: 10,
+                    shadowColor: "#000",
+                    shadowOffset: {
+                        width: 0,
+                        height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+
+                    elevation: 3,
                 }}>
                     <Pressable>
                         {/* <Text  maxFontSizeMultiplier={1.5} style={{ textAlign: "center", color: LS_COLORS.global.green, fontSize: 16, fontFamily: LS_FONTS.PoppinsSemiBold, marginTop: 10 }}>Select Time Frame</Text> */}
@@ -190,10 +199,10 @@ const TimeFrame = props => {
                         {jsonData.length > 1 && <Text maxFontSizeMultiplier={1.5} style={{ textAlign: "center", fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Select time frame for each service provider</Text>}
                         {jsonData && jsonData.map((i, index) => {
                             let time_format = ""
-                            if(i.duration==""){
-                                time_format="TBD"
-                            }else{
-                                time_format=getTimeInHours(i.duration)
+                            if (i.duration == "") {
+                                time_format = "TBD"
+                            } else {
+                                time_format = getTimeInHours(i.duration)
                             }
                             let estimated_price = 3.5
                             if (props.provider_prices) {
@@ -313,7 +322,7 @@ const TimeFrame = props => {
                             </TouchableOpacity>
                         </View>
                     </Pressable>
-                </Card>
+                </View>
                 <DateTimePickerModal
                     date={selectedDate}
                     isVisible={isDatePickerVisible}
@@ -353,11 +362,20 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
         >
             <Pressable onPress={() => setVisible(false)} style={{ flex: 1 }}>
                 <KeyboardAvoidingView behavior={Platform.OS == "android" ? "none" : "padding"} style={styles.modalScreen}>
-                    <Card style={{
+                    <View style={{
                         backgroundColor: 'white',
                         width: "95%",
                         borderRadius: 10,
                         padding: 10,
+                        shadowColor: "#000",
+shadowOffset: {
+	width: 0,
+	height: 1,
+},
+shadowOpacity: 0.22,
+shadowRadius: 2.22,
+
+elevation: 3,
                         // maxHeight:"80%"
                     }}>
                         <Pressable>
@@ -510,7 +528,7 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                             </ScrollView>
 
                         </Pressable>
-                    </Card>
+                    </View>
 
                 </KeyboardAvoidingView>
             </Pressable>

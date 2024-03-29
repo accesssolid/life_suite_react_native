@@ -150,7 +150,7 @@ export default function OrderSuspend(props) {
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {
-                                        props.navigation.goBack()
+                                        props.navigation.navigate("HomeScreen")
                                     }}
                                     title={data?.order_items && data?.order_items[0]?.services_name}
                                     titleStyle={{ color: "white" }}

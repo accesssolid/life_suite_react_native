@@ -66,7 +66,6 @@ const ServicesProvided = (props) => {
             "model": modelList.find(x => x.id == selectedModel)?.title ?? "",
             "year": yearList.find(x => x.id == selectedYear)?.title ?? ""
         }
-        console.log(data)
         dispatch(setVariantData(data))
     }, [selectedMake, selectedModel, selectedYear, vehicleType])
 
@@ -677,8 +676,8 @@ const ServicesProvided = (props) => {
                         //     </View>)
                     }
                     <Text maxFontSizeMultiplier={1.4} style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
-                    <Container>
-                        <Content>
+                    <View>
+                        <ScrollView>
                             {
                                 activeItem !== null
                                     ?
@@ -720,8 +719,8 @@ const ServicesProvided = (props) => {
                                             {!loading && <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
                                         </View>
                             }
-                        </Content>
-                    </Container>
+                        </ScrollView>
+                    </View>
                     {/* <KeyboardAvoidingView behavior={Platform.OS=="ios"?"padding":undefined}  /> */}
                     <TouchableOpacity
                         style={styles.save}

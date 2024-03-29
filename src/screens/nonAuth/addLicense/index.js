@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -506,8 +506,8 @@ const AddLicense = (props) => {
                 </ImageBackground>
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
-                <Container>
-                    <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+                <View style={{backgroundColor:"white",flex:1}}>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                         <Text maxFontSizeMultiplier={1.5} style={[styles.service,{textAlign:"center"}]}>{upload_type.text}</Text>
                         {showSelector && <View style={{ flexDirection: "row", borderWidth: 1, borderColor: LS_COLORS.global.green, marginHorizontal: 20, marginBottom: 10 }}>
                             <TouchableOpacity onPress={() => setSelected(0)} style={{ padding: 10, flex: 1, alignItems: "center", backgroundColor: selected == 0 ? LS_COLORS.global.green : "white" }}>
@@ -561,7 +561,7 @@ const AddLicense = (props) => {
                                 action={() => pickImage()}
                             />
                         </View>
-                    </Content>
+                    </ScrollView>
                     <View style={{ paddingBottom: '2.5%', }}>
                         {isAddServiceMode ? <CustomButton
                             title={"NEXT"}
@@ -576,7 +576,7 @@ const AddLicense = (props) => {
                             </View>
                         }
                     </View>
-                </Container>
+                </View>
                 {loading && <Loader />}
             </SafeAreaView >
         </>

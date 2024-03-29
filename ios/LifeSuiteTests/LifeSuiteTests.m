@@ -13,7 +13,7 @@
 
 @implementation LifeSuiteTests
 
-- (BOOL)findSubviewInView:(UIView *)view matching:(BOOL(^)(UIView *view))test
+- (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {
   if (test(view)) {
     return YES;
@@ -34,11 +34,12 @@
 
   __block NSString *redboxError = nil;
 #ifdef DEBUG
-  RCTSetLogFunction(^(RCTLogLevel level, RCTLogSource source, NSString *fileName, NSNumber *lineNumber, NSString *message) {
-    if (level >= RCTLogLevelError) {
-      redboxError = message;
-    }
-  });
+  RCTSetLogFunction(
+      ^(RCTLogLevel level, RCTLogSource source, NSString *fileName, NSNumber *lineNumber, NSString *message) {
+        if (level >= RCTLogLevelError) {
+          redboxError = message;
+        }
+      });
 #endif
 
   while ([date timeIntervalSinceNow] > 0 && !foundElement && !redboxError) {
@@ -47,9 +48,10 @@
 
     foundElement = [self findSubviewInView:vc.view matching:^BOOL(UIView *view) {
       if ([view.accessibilityLabel isEqualToString:TEXT_TO_LOOK_FOR]) {
-        return YES;
-      }
-      return NO;
+                                            return YES;
+                                    }
+                                    return NO;
+
     }];
   }
 

@@ -193,7 +193,7 @@ const MechanicLocation = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-
+                console.log("resultsMechanicLocationScreen========>",results);
                 setFromAddress(results[0].address)
                 setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
                 dispatch(setCurrentLocationData({ latitude: results[0].location.latitude, longitude: results[0].location.longitude }))

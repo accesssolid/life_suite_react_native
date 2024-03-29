@@ -17,7 +17,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Container } from 'native-base'
 import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
-import { ScrollView } from 'react-native-gesture-handler';
 import { showToast } from '../../../components/validators';
 
 const MapScreen = (props) => {
@@ -103,6 +102,7 @@ const MapScreen = (props) => {
         setLoading(true)
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
+                console.log("resultsMapScreen========>",results);
                 setAddress(results[0].address)
                 placesRef.current.setAddressText(results[0].address)
                 if (results[0].location.latitude) {
@@ -163,7 +163,7 @@ const MapScreen = (props) => {
                 barStyle="light-content"
             />
             <SafeAreaView style={styles.safeArea}>
-                <Container>
+                <View style={{flex:1,backgroundColor:"white"}}>
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => props.navigation.goBack()}
@@ -347,7 +347,7 @@ const MapScreen = (props) => {
                             />
                         </View>
                     </View>
-                </Container>
+                </View>
                 {loading && <Loader />}
             </SafeAreaView >
         </>

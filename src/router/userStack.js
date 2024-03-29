@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 /* Packages */
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 /* Screens */
 import HomeScreen from '../screens/nonAuth/homeScreen';
@@ -36,11 +36,11 @@ import OrderSuspend from '../screens/nonAuth/orderSuspend'
 import FinishPay from '../screens/nonAuth/finishPay';
 import ProviderDetail from '../screens/nonAuth/providerDetail';
 import AddCard1 from '../screens/nonAuth/addCard1';
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 const UserStack = () => {
     return (
-        <Stack.Navigator headerMode={'none'}>
+        <Stack.Navigator screenOptions={{headerShown:false}} headerMode={'none'}>
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="SubServices" component={SubServices} />
             <Stack.Screen name="Profile" component={Profile} />

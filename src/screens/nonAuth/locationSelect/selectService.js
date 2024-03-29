@@ -37,7 +37,7 @@ export default function SelectService({ navigation, route }) {
                 containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 <FlatList
                     data={[...myJobs]}
                     style={{ marginTop: 20 }}
@@ -58,7 +58,7 @@ export default function SelectService({ navigation, route }) {
                     }}
                     keyExtractor={(item, index) => index}
                 />
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

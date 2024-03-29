@@ -6,6 +6,7 @@ import {
     View,
     TextInput,
     BackHandler,
+    ScrollView,
 } from 'react-native';
 import { Icon, Container, Content } from 'native-base'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -51,8 +52,8 @@ const SetPassCode = (props) => {
 
                     title="Set Passcode"
                 />
-                <Container>
-                    <Content keyboardShouldPersistTaps={'never'} keyboardDismissMode={false}>
+                <View style={{backgroundColor:LS_COLORS.global.white ,flex:1}}>
+                    <ScrollView keyboardShouldPersistTaps={'never'} keyboardDismissMode={false}>
 
                         <View style={{ flex: 1, alignItems: 'center', }}>
                             <Text style={{ width: '80%', alignSelf: 'center', marginVertical: 5 }}>New Passcode</Text>
@@ -74,8 +75,8 @@ const SetPassCode = (props) => {
                             <View style={{ height: 30 }} />
                             <CustomButton action={() => confirmPassCode()} title={'Set Passcode'} />
                         </View>
-                    </Content>
-                </Container>
+                    </ScrollView>
+                </View>
             </SafeAreaView>
         </>
     );

@@ -21,9 +21,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
     const priceNewRef = useRef(null)
 
     // from #liahs data check for the service item
-    useEffect(() => {
-        console.log(props.serviceItem?.time_duration_m)
-    }, [props.serviceItem])
+
 
     useEffect(() => {
         setInitialServiceData()

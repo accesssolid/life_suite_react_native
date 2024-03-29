@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 /* Packages */
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 /* Components */
 import Loader from '../components/loader';
@@ -22,7 +22,7 @@ import ChatMembers from '../screens/nonAuth/chatMembers';
 import OrderHistoryCustomer from '../screens/nonAuth/orderHistoryCustomer'
 import OrderHistoryProvider from '../screens/nonAuth/orderHistoryProvider'
 import Settings from '../screens/nonAuth/settings';
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 const Router = () => {
   const loading = useSelector(state => state.authenticate.loading)
@@ -31,7 +31,7 @@ const Router = () => {
   return (
     <>
 
-      <Stack.Navigator headerMode={'none'}>
+      <Stack.Navigator screenOptions={{headerShown:false}} headerMode={'none'}>
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="WelcomeScreen" component={Welcomescreen} />
         <Stack.Screen name="AuthStack" component={AuthStack} />

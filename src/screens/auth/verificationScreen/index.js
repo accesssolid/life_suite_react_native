@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, StatusBar } from 'react-native';
+import { View, StyleSheet, Image, Text, SafeAreaView, StatusBar ,ScrollView} from 'react-native';
 import Colors from '../../../constants/colors';
 import CustomButton from "../../../components/customButton"
 import CustomTextInput from "../../../components/customTextInput"
-import { Container, Content } from 'native-base';
+// import { Container, Content, ScrollView } from 'native-base';
 import Fonts from '../../../constants/fonts';
 import { globalStyles } from '../../../utils';
 import Loader from '../../../components/loader';
@@ -11,7 +11,7 @@ import { showToast } from '../../../utils';
 import { getApi } from '../../../api/api';
 import { useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons'
-
+import MaterialIcons from "react-native-vector-icons/MaterialIcons"
 const VerificationCode = props => {
   const [email, setEmail] = useState('')
   const [loader, setLoader] = useState("")
@@ -69,9 +69,9 @@ const VerificationCode = props => {
         backgroundColor={Colors.global.green}
         barStyle="light-content" />
         
-      <Container>
-        <Content>
-        <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
+      <View>
+        <ScrollView>
+        <MaterialIcons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
 
           <View style={styles.screen}>
             <Text maxFontSizeMultiplier={1.7} style={{ marginTop: "20%", ...styles.forgot }}>Forgot</Text>
@@ -99,9 +99,9 @@ const VerificationCode = props => {
               />
             </View>
           </View>
-        </Content>
+        </ScrollView>
         {loader == true && <Loader />}
-      </Container>
+      </View>
     </SafeAreaView>
   );
 };

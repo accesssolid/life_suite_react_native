@@ -39,10 +39,46 @@
               "client_type": 3
             },
             {
-              "client_id": "143754571862-ebc5aom20noh1qdnrld87scblu09u8pd.apps.googleusercontent.com",
+              "client_id": "143754571862-ah59s87lmkim52818u5580vkeq8239lp.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.LifeSuite"
+                "bundle_id": "com.lyfesuite"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143754571862:android:180d9d7546aebbd3760bf7",
+        "android_client_info": {
+          "package_name": "com.lyfesuite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143754571862-nadjs9odve6p8agprpj62shcgih4ff83.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe4FAT5KGMGh4Ozt57Kb_mhtt5UbulXu4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143754571862-nadjs9odve6p8agprpj62shcgih4ff83.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "143754571862-ah59s87lmkim52818u5580vkeq8239lp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lyfesuite"
               }
             }
           ]

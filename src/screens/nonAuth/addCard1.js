@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet, ScrollView } from 'react-native'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Header from '../../components/header'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -222,8 +222,8 @@ export default function AddCard1({ navigation, route }) {
                     // imageUrl1={require("../../assets/home.png")}
                     // action1={() => props.navigation.navigate("HomeScreen")}
                     title={'Add Debit/Credit card'} />
-                <Container>
-                    <Content>
+                <View>
+                    <ScrollView>
                         <View style={{
                             alignItems: "center",
                             shadowColor: "#000",
@@ -432,8 +432,8 @@ export default function AddCard1({ navigation, route }) {
                                 }}
                             /> */}
                         </View>
-                    </Content>
-                </Container>
+                    </ScrollView>
+                </View>
                 <TouchableOpacity
                     style={styles.save}
                     activeOpacity={0.7}

@@ -65,7 +65,7 @@ export default function FAQ({ navigation, route }) {
             <SafeAreaView style={{ flex: 1, backgroundColor: LS_COLORS.global.cyan }}>
                 <View style={{ flex: 1, backgroundColor: "white" }}>
                     <Header imageUrl={require("../../assets/back.png")}
-                        action={() => navigation.goBack()}
+                        action={() => navigation.navigate('HomeScreen')}
                         // imageUrl1={require("../../assets/home.png")}
                         // action1={() => props.navigation.navigate("HomeScreen")}
                         title={'FAQ'}

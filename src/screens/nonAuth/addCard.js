@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Alert, FlatList, Pressable, ImageBackground, StyleSheet,ScrollView } from 'react-native'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Header from '../../components/header'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux'
 import Loader from '../../components/loader'
 import LS_COLORS from '../../constants/colors'
 import LS_FONTS from '../../constants/fonts'
-import { Container, Content } from 'native-base'
+// import { Container, Content, ScrollView } from 'native-base'
 import { showToast } from '../../components/validators';
 import creditCardType from 'credit-card-type';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -257,8 +257,8 @@ export default function CardList({ navigation, route }) {
                     // action1={() => props.navigation.navigate("HomeScreen")}
                     title={type == "edit" ? "Edit Card" : 'Add Card'} />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
-                    <Container style={{ backgroundColor: "white" }}>
-                        <Content style={{ backgroundColor: "white" }}>
+                    <View style={{ backgroundColor: "white" }}>
+                        <ScrollView style={{ backgroundColor: "white" }}>
                             <View style={{ alignItems: "center" }}>
                                 <View style={{ position: "relative" }}>
                                     <CardView
@@ -461,8 +461,8 @@ export default function CardList({ navigation, route }) {
                                 }}
                             /> */}
                             </View>
-                        </Content>
-                    </Container>
+                        </ScrollView>
+                    </View>
                     <TouchableOpacity
                         style={styles.save}
                         activeOpacity={0.7}

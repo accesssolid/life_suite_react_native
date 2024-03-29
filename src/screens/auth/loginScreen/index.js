@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, Modal } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, TouchableOpacity, Modal, ScrollView } from 'react-native'
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -8,7 +9,7 @@ import { globalStyles } from '../../../utils';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import DeviceInfo, { getUniqueId, getManufacturer } from 'react-native-device-info';
 
 /* Components */
 import CustomTextInput from '../../../components/customTextInput';
@@ -23,6 +24,7 @@ import messaging from '@react-native-firebase/messaging';
 
 /* Icons */
 import Entypo from 'react-native-vector-icons/Entypo'
+import MaterialIcons from "react-native-vector-icons/MaterialIcons"
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import * as RNLocalize from "react-native-localize";
@@ -43,13 +45,20 @@ const LoginScreen = (props) => {
     const [modalVisible, setModalVisible] = React.useState(false)
     const [message, setMessage] = React.useState("")
     const [user, setUser] = React.useState({})
+    const [devicdId, setDevicdId] = useState('')
     const switchRole = () => {
         dispatch(setUserRole({ data: role == 1 ? 2 : 1 }))
     }
 
     useEffect(() => {
+        getDeviceID()
         GetToken()
     }, [])
+
+    const getDeviceID = async () => {
+        let device_id = await DeviceInfo.getUniqueId()
+        setDevicdId(device_id)
+    }
 
     const GetToken = async () => {
         const authorizationStatus = await messaging().requestPermission();
@@ -76,7 +85,7 @@ const LoginScreen = (props) => {
             "email": email.toLowerCase(),
             "password": password,
             "fcm_token": fcmToken,
-            device_id: getUniqueId(),
+            device_id: devicdId,
             login_type: "biometric",
             timezone: RNLocalize.getTimeZone()
         }
@@ -89,7 +98,6 @@ const LoginScreen = (props) => {
 
         getApi(config)
             .then(async (response) => {
-                console.log(response)
                 if (response.status == true) {
                     setLoader(false)
                     showToast(response.message, 'success')
@@ -124,7 +132,7 @@ const LoginScreen = (props) => {
             })
             .catch(err => {
                 console.error(err)
-            }).finally(()=>{
+            }).finally(() => {
                 setLoader(false)
             })
     }
@@ -230,10 +238,19 @@ const LoginScreen = (props) => {
 
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <Root>
-                <Container style={styles.container}>
-                    <Ionicons onPress={() => props.navigation.goBack()} name='arrow-back' size={24} style={{ padding: 20 }} />
-                    <Content showsVerticalScrollIndicator={false}>
+
+            <View style={styles.container}>
+                <MaterialIcons name='arrow-back' onPress={() => props.navigation.goBack()}  size={24} style={{ padding: 20 }} />
+                <KeyboardAwareScrollView
+                    bounces={false}
+                    // keyboardShouldPersistTaps="always"
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                >
+
+
+                    <ScrollView showsVerticalScrollIndicator={false}>
                         <View style={styles.textContainer}>
                             <Text maxFontSizeMultiplier={1.7} style={styles.loginText}>{role == 1 ? "Customer" : "Service Provider"}</Text>
                             <Text maxFontSizeMultiplier={1.7} style={{ ...styles.loginText, fontSize: 24 }}>Login</Text>
@@ -290,9 +307,10 @@ const LoginScreen = (props) => {
                             }}> Sign Up</Text></Text>
                         </View>
                         {loader == true && <Loader />}
-                    </Content>
-                </Container>
-            </Root>
+                    </ScrollView>
+                </KeyboardAwareScrollView>
+            </View>
+
             <BlockMessageModal text={message} user={user} visible={modalVisible} setVisble={setModalVisible} />
         </SafeAreaView>
     )
@@ -300,8 +318,8 @@ const LoginScreen = (props) => {
 
 export default LoginScreen;
 
-const BlockMessageModal = ({ text, visible, setVisble ,user}) => {
-    const navigation=useNavigation()
+const BlockMessageModal = ({ text, visible, setVisble, user }) => {
+    const navigation = useNavigation()
     return (
         <Modal
             onBackButtonPress={() => {
@@ -325,7 +343,7 @@ const BlockMessageModal = ({ text, visible, setVisble ,user}) => {
                     <Image source={require('../../../assets/splash/logo.png')} resizeMode="contain" style={{ height: 100, width: 200, alignSelf: "center" }} />
                     <Text maxFontSizeMultiplier={1.4} style={{ color: "black", fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16, textAlign: "center" }}>{text}</Text>
 
-                    <View style={{ flexDirection: "row" ,justifyContent:"center"}}>
+                    <View style={{ flexDirection: "row", justifyContent: "center" }}>
                         {/* <TouchableOpacity onPress={() => {
                             if (setVisble) {
                                 setVisble(false)
@@ -334,8 +352,8 @@ const BlockMessageModal = ({ text, visible, setVisble ,user}) => {
                             <Text maxFontSizeMultiplier={1.4} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white", textAlign: "center" }}>Cancel</Text>
                         </TouchableOpacity> */}
                         <TouchableOpacity onPress={() => {
-                           navigation.navigate("ContactUs",{user})
-                           setVisble(false)
+                            navigation.navigate("ContactUs", { user })
+                            setVisble(false)
                         }} style={{ backgroundColor: LS_COLORS.global.green, padding: 10, width: "40%", alignSelf: "center", borderRadius: 5, margin: 10 }} >
                             <Text maxFontSizeMultiplier={1.4} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "white", textAlign: "center" }}>Contact Us</Text>
                         </TouchableOpacity>

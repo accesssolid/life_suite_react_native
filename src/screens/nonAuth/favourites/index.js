@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, FlatList, Dimensions, Pressable } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, FlatList, Dimensions, Pressable, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -155,16 +155,16 @@ const Favourites = (props) => {
 
     const onItemPress = (item) => {
         dispatch(setAddServiceMode({ data: true }))
-        if(user?.user_role==role.customer){
-            navigation.navigate("HomeScreen",{screen:"ServicesProvided",params:{ subService: item, items: [] }})
-        }else{
-            navigation.navigate("ServicesProvided",{ subService: item, items: [] })
+        if (user?.user_role == role.customer) {
+            navigation.navigate("HomeScreen", { screen: "ServicesProvided", params: { subService: item, items: [] } })
+        } else {
+            navigation.navigate("ServicesProvided", { subService: item, items: [] })
         }
     }
 
     const goBack = () => {
         dispatch(setAddServiceMode({ data: false }))
-        navigation.navigate("HomeScreen",{screen:"HomeScreen"})
+        navigation.navigate("HomeScreen", { screen: "HomeScreen" })
 
     }
 
@@ -176,12 +176,12 @@ const Favourites = (props) => {
                 action={() => goBack()}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
-                    navigation.navigate("HomeScreen",{screen:"HomeScreen"})
+                    navigation.navigate("HomeScreen", { screen: "HomeScreen" })
                 }}
-                containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
+                containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 {user.user_role == 2 &&
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', marginVertical: 30 }}>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => setActivetab(0)} style={{
@@ -237,46 +237,59 @@ const Favourites = (props) => {
                         }}
                     />
                     :
-                    <Content showsVerticalScrollIndicator={false} >
+                    <ScrollView showsVerticalScrollIndicator={false} >
                         {provider.map((item, index) => {
                             return (
-                                <Pressable key={index+""+item?.id} onPress={()=>{
+                                <Pressable key={index + "" + item?.id} onPress={() => {
                                     // navigation.navigate("UserStack",{screen:"ProviderDetail",params:{providerId:item.id}})
                                     navigation.navigate("OrderHistoryCustomer", { user1: item.id })
 
                                 }}>
-                                <Card  style={{ flexDirection: 'row', marginBottom: 20, alignItems: 'center', height: 70, paddingHorizontal: 10, borderRadius: 12 }}>
-                                    <Pressable onPress={()=>{
-                                        navigation.navigate("UserStack",{screen:"ProviderDetail",params:{providerId:item.id}})
-                                    }} style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
-                                        <Image source={item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
-                                    </Pressable>
-                                    <Pressable 
-                                    onPress={()=>{
-                                        navigation.navigate("UserStack",{screen:"ProviderDetail",params:{providerId:item.id}})
+                                    <View style={{
+                                        flexDirection: 'row',
 
-                                    }}
-                                    style={{  paddingLeft: 10, justifyContent: 'center' }}>
-                                        <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
-                                        <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>{item.last_name}</Text>
-                                    </Pressable>
-                                    <View style={{flex:1}} />
-                                    <View>
-                                        {/* <Text maxFontSizeMultiplier={1.5}>Price: $25/hr</Text> */}
-                                        <Text maxFontSizeMultiplier={1.5}>Rating: {lodash.round(item.rating,2)}</Text>
+                                        shadowColor: "#000",
+                                        shadowOffset: {
+                                            width: 0,
+                                            height: 2,
+                                        },
+                                        shadowOpacity: 0.23,
+                                        shadowRadius: 2.62,
+
+                                        elevation: 4,
+                                        marginBottom: 20, alignItems: 'center', height: 70, paddingHorizontal: 10, borderRadius: 12
+                                    }}>
+                                        <Pressable onPress={() => {
+                                            navigation.navigate("UserStack", { screen: "ProviderDetail", params: { providerId: item.id } })
+                                        }} style={{ height: 40, aspectRatio: 1, borderRadius: 20, overflow: 'hidden' }}>
+                                            <Image source={item.profile_image !== null ? { uri: BASE_URL + item.profile_image } : require('../../../assets/user.png')} style={{ height: '100%', width: '100%' }} resizeMode="contain" />
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={() => {
+                                                navigation.navigate("UserStack", { screen: "ProviderDetail", params: { providerId: item.id } })
+
+                                            }}
+                                            style={{ paddingLeft: 10, justifyContent: 'center' }}>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, color: LS_COLORS.global.darkBlack }}>{item.first_name}</Text>
+                                            <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsRegular, fontSize: 12, color: LS_COLORS.global.darkBlack }}>{item.last_name}</Text>
+                                        </Pressable>
+                                        <View style={{ flex: 1 }} />
+                                        <View>
+                                            {/* <Text maxFontSizeMultiplier={1.5}>Price: $25/hr</Text> */}
+                                            <Text maxFontSizeMultiplier={1.5}>Rating: {lodash.round(item.rating, 2)}</Text>
+                                        </View>
+                                        <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: 50, justifyContent: 'center', alignItems: "center", marginLeft: 10 }}>
+                                            <Image source={require('../../../assets/heartGreen.png')} style={{ height: 25, width: 25 }} resizeMode="contain" />
+                                        </TouchableOpacity>
                                     </View>
-                                    <TouchableOpacity onPress={() => { providerLike(item.id) }} activeOpacity={0.7} style={{ height: 50, justifyContent: 'center', alignItems: "center", marginLeft: 10 }}>
-                                        <Image source={require('../../../assets/heartGreen.png')} style={{ height: 25, width: 25 }} resizeMode="contain" />
-                                    </TouchableOpacity>
-                                </Card>
                                 </Pressable>
                             )
                         })}
-                    </Content>
+                    </ScrollView>
 
                 }
                 <View style={{ height: 30 }}></View>
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

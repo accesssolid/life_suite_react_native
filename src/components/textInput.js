@@ -1,6 +1,6 @@
 import { Input, Item, Icon } from 'native-base';
 import React, { useState, useEffect } from 'react';
-import { View, Image, Text, TouchableOpacity } from 'react-native'
+import { View, Image, Text, TouchableOpacity, TextInput } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -27,19 +27,22 @@ function CustomInput({
     customContainerStyles,
     customInputStyles,
     bottomText,
-    blurOnSubmit,icon,
+    blurOnSubmit, icon,
     TextInputProps
 }) {
     return (
-        <Item
-            regular
+        <View
+
             style={{
                 marginTop: text && text.trim() !== '' ? 35 : 0,
                 borderRadius: 7,
-                borderColor: LS_COLORS.global.textInutBorderColor,
+                borderWidth:1.2,
+                borderColor: "#E5E5E5",
                 paddingLeft: 16,
+                backgroundColor: "white",
+            
                 width: width,
-                maxWidth: '90%',
+                width: '90%',
                 alignSelf: 'center',
                 ...customContainerStyles
             }}>
@@ -48,7 +51,7 @@ function CustomInput({
                     {text}{required == true && '*'}
                 </Text>
             </View>
-            <Input
+            <TextInput
                 ref={inpuRef}
                 keyboardType={keyboardType}
                 secureTextEntry={secureTextEntry}
@@ -59,6 +62,7 @@ function CustomInput({
                 style={{
                     color: LS_COLORS.global.black,
                     height: 60,
+                    marginLeft:15,
                     fontFamily: LS_FONTS.PoppinsMedium,
                     fontSize: 16,
                     ...customInputStyles
@@ -83,9 +87,9 @@ function CustomInput({
                     source={imageUrl}
                 />
             </TouchableOpacity>
-            {bottomText && <Text maxFontSizeMultiplier={1.5} style={{ paddingRight:10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.black, fontSize:12 }}>{bottomText}</Text>}
+            {bottomText && <Text maxFontSizeMultiplier={1.5} style={{ paddingRight: 10, fontFamily: LS_FONTS.PoppinsRegular, color: LS_COLORS.black, fontSize: 12 }}>{bottomText}</Text>}
             {icon}
-        </Item>
+        </View>
     );
 }
 

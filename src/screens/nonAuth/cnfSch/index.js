@@ -57,10 +57,20 @@ const CnfSch = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    <Container style={{ marginTop: 26 }}>
-                        <Content>
+                    <View style={{ marginTop: 26 }}>
+                        <ScrollView>
                             <Text style={{ alignSelf: 'center', fontSize: 16, fontFamily: LS_FONTS.PoppinsBold }}>Confirmed & Scheduled</Text>
-                            <Card style={styles.alexiContainer}>
+                            <Card style={[styles.alexiContainer,{
+                                shadowColor: "#000",
+                                shadowOffset: {
+                                    width: 0,
+                                    height: 2,
+                                },
+                                shadowOpacity: 0.23,
+                                shadowRadius: 2.62,
+                                
+                                elevation: 4,
+                            }]}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <View>
                                         <Image
@@ -99,7 +109,17 @@ const CnfSch = (props) => {
                                     <Text style={{ fontSize: 12, marginRight: 10, fontFamily: LS_FONTS.PoppinsMedium }}>$50</Text>
                                 </View>
                             </Card>
-                            <Card style={styles.alexiContainer}>
+                            <Card style={[styles.alexiContainer,{
+                                shadowColor: "#000",
+                                shadowOffset: {
+                                    width: 0,
+                                    height: 2,
+                                },
+                                shadowOpacity: 0.23,
+                                shadowRadius: 2.62,
+                                
+                                elevation: 4,
+                            }]}>
                                 <Image
                                     style={{ height: 26, width: 26, resizeMode: 'contain', alignSelf: 'flex-end' }}
                                     source={require("../../../assets/cross.png")}
@@ -137,8 +157,8 @@ const CnfSch = (props) => {
                             </Card>
 
                             <View style={{ height: 30 }}></View>
-                        </Content>
-                    </Container>
+                        </ScrollView>
+                    </View>
                 </View>
             </SafeAreaView>
         </>

@@ -13,7 +13,8 @@ import {
     BackHandler,
     Dimensions,
     TouchableOpacity,
-    ImageBackground
+    ImageBackground,
+    ScrollView
 } from 'react-native';
 import { Icon, Container, Content } from 'native-base'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -64,8 +65,8 @@ const ConfirmSetPassCode = (props) => {
                     containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
                 />
-                <Container>
-                    <Content keyboardShouldPersistTaps={'never'} keyboardDismissMode={false}>
+                <View style={{backgroundColor:LS_COLORS.global.white ,flex:1}}>
+                    <ScrollView keyboardShouldPersistTaps={'never'} keyboardDismissMode={false}>
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <Text style={{ width: '80%', alignSelf: 'center', marginVertical: 5 }}>Confirm Passcode</Text>
                             <View style={{ backgroundColor: "#F6F6F6", width: "80%", height: 50 }}>
@@ -86,8 +87,8 @@ const ConfirmSetPassCode = (props) => {
                             </View>
                             <CustomButton action={() => confirmPassCode()} title={'Confirm'} />
                         </View>
-                    </Content>
-                </Container>
+                    </ScrollView>
+                </View>
             </SafeAreaView>
         </>
     );

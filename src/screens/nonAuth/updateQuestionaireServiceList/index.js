@@ -41,7 +41,7 @@ export default function UpdateQuestionaireService({ navigation, route }) {
                 title="Services"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    navigation.goBack()
+                    navigation.navigate('HomeScreen')
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
@@ -50,7 +50,7 @@ export default function UpdateQuestionaireService({ navigation, route }) {
                 containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 <FlatList
                     data={[...filteredJobs]}
                     style={{ marginTop: 20 }}
@@ -75,7 +75,7 @@ export default function UpdateQuestionaireService({ navigation, route }) {
                     }}
                     keyExtractor={(item, index) => index}
                 />
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

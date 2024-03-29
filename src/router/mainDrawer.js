@@ -6,11 +6,12 @@ import { createDrawerNavigator, DrawerItemList, DrawerContentScrollView, DrawerI
 /* Screens */
 import LS_FONTS from '../constants/fonts';
 import LS_COLORS from '../constants/colors';
-import { View } from 'native-base';
+// import { View } from 'native-base';
+
 import UserStack from './userStack';
 import { useSelector } from 'react-redux';
 import ProviderStack from './providerStack';
-import { Dimensions, Image, Platform, Text, TouchableOpacity } from 'react-native';
+import { Dimensions, Image, Platform, Text, TouchableOpacity,View } from 'react-native';
 import Profile from '../screens/nonAuth/profile';
 import OrderHistory from '../screens/nonAuth/orderHistory';
 import Favourites from '../screens/nonAuth/favourites';
@@ -153,7 +154,6 @@ const MainDrawer = (props) => {
                 type: 'post'
             }
             getApi(config).then(response => {
-                console.log(response)
                 if (response.status == true) {
                     if (response.data) {
                         if (response.data.email && response.data.details_submitted) {
@@ -195,7 +195,6 @@ const MainDrawer = (props) => {
                 type: 'post'
             }
             getApi(config).then(response => {
-                console.log(response)
                 if (response.status == true) {
                     if (response.data) {
                         props.navigation.navigate("UserStack", { screen: "CustomWebView", params: { uri: response.data.url } })
@@ -281,7 +280,8 @@ const MainDrawer = (props) => {
                 }}
                 initialRouteName="HomeScreen"
                 screenOptions={{
-                    unmountOnBlur: true
+                    unmountOnBlur: true,
+                    headerShown:false
                 }}
                 drawerContentOptions={{
                     labelStyle: {

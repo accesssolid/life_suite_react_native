@@ -72,13 +72,13 @@ const AboutUs = (props) => {
                     props.navigation.navigate("HomeScreen")
                 }}
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 <AboutUsModal
                 isVisible={softwareVisible}
                 setVisible={setSoftwareVisible}
                 />
                 <View style={{ height: 30 }}></View>
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

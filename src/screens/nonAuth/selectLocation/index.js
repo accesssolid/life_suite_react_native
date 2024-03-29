@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid } from 'react-native'
+import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -7,7 +7,7 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker,Circle } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 
@@ -33,7 +33,7 @@ const SelectLocation = (props) => {
     const addServiceData = useSelector(state => state.services.addServiceData)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [address, setAddress] = useState('')
-    const [travelDistance, setTravelDistance] = useState('')
+    const [travelDistance2, setTravelDistance2] = useState('')
 
     const [coordinates, setCoordinates] = useState({
         latitude: 37.78825,
@@ -48,7 +48,7 @@ const SelectLocation = (props) => {
             latitudeDelta: 0.25,
             longitudeDelta: 0.012134,
         })
-    }, [travelDistance])
+    }, [travelDistance2])
 
     useEffect(() => {
         getLocationPermission()
@@ -62,7 +62,9 @@ const SelectLocation = (props) => {
         }
         setAddress(subService.travel_data?.address_text)
         setCoordinates({ ...coordinates, ...coords })
-        setTravelDistance(String(subService.travel_data?.travel_distance))
+        let dist = subService?.travel_data?.travel_distance ?? ""
+        console.log(typeof (dist), ">>?>")
+        setTravelDistance2(dist)
     }
 
     const getLocationPermission = async () => {
@@ -130,7 +132,7 @@ const SelectLocation = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-                console.log("getCurrentPlace =>>", results);
+                console.log("resultsSelectLocationScreen========>",results);
                 setAddress(results[0].address)
                 setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
             })
@@ -140,19 +142,19 @@ const SelectLocation = (props) => {
     const setPreviousAddress = () => {
         if (!isAddServiceMode && subService.travel_data.address_text) {
             setAddress(subService.travel_data.address_text)
-            setTravelDistance(subService.travel_data.travel_distance)
+            setTravelDistance2((subService?.travel_data?.travel_distance ?? "") + '')
             setCoordinates({ ...coordinates, latitude: Number(subService.travel_data.lat), longitude: Number(subService.travel_data.long) })
         }
     }
 
     const next = () => {
         let travel_distance = {
-            "travel_distance": travelDistance,
+            "travel_distance": travelDistance2,
             "address_text": address,
             "lat": coordinates.latitude,
             "long": coordinates.longitude
         }
-        if (travelDistance.trim() == "") {
+        if (travelDistance2.trim() == "") {
             showToast("Please enter travel distance")
         } else if (address.trim() == "") {
             showToast("Please enter or select address")
@@ -183,7 +185,7 @@ const SelectLocation = (props) => {
                     "services": addServiceData.json_data.services,
                     "products": [...products],
                     "travel_distance": travel_distance,
-                    "new_services":addServiceData.json_data.new_services,
+                    "new_services": addServiceData.json_data.new_services,
                     "new_products": [...newProd],
                     "time_frame": []
                 })
@@ -238,7 +240,7 @@ const SelectLocation = (props) => {
         })
     }
 
-    const saveData=async()=>{
+    const saveData = async () => {
         try {
             setLoading(true)
             let headers = {
@@ -247,19 +249,19 @@ const SelectLocation = (props) => {
 
             const formdata = new FormData()
             formdata.append("service_id", subService.id)
-            let json_data={
-                products: addServiceData?.json_data?.products?.map(x=>({item_product_id:x.id,price:x.price})),
-                new_products:addServiceData?.json_data?.new_products,
-                services:addServiceData?.json_data?.services,
-                new_services:addServiceData?.json_data?.new_services,
-                travel_distance:{
-                    travel_distance:travelDistance,
-                    address_text:address,
-                    lat:coordinates.latitude,
-                    long:coordinates.longitude
+            let json_data = {
+                products: addServiceData?.json_data?.products?.map(x => ({ item_product_id: x.id, price: x.price })),
+                new_products: addServiceData?.json_data?.new_products,
+                services: addServiceData?.json_data?.services,
+                new_services: addServiceData?.json_data?.new_services,
+                travel_distance: {
+                    travel_distance: travelDistance2,
+                    address_text: address,
+                    lat: coordinates.latitude,
+                    long: coordinates.longitude
                 }
             }
-            formdata.append("json_data",JSON.stringify(json_data))
+            formdata.append("json_data", JSON.stringify(json_data))
             addServiceData.images.forEach((item, index) => {
                 if (item.name != "") {
                     let PATH_TO_THE_FILE = Platform.OS == "ios" ? item.uri.replace('file:///', '') : item.uri
@@ -298,17 +300,17 @@ const SelectLocation = (props) => {
             if (response.status) {
                 showToast(response.message)
                 dispatch(getMyJobsThunk(user.id, access_token))
-                setTimeout(()=>{
+                setTimeout(() => {
                     props.navigation.navigate("HomeScreen")
                     dispatch(addUpdateQuestionaire())
                     setLoading(false)
-                },1500)
+                }, 1500)
             } else {
                 showToast(response.message, 'danger')
             }
 
         } catch (err) {
-            console.error("Error",err)
+            console.error("Error", err)
         } finally {
             setLoading(false)
 
@@ -317,11 +319,11 @@ const SelectLocation = (props) => {
 
     return (
         <>
-            <StatusBar 
-           // translucent 
-            // backgroundColor={"transparent"} 
-            backgroundColor={LS_COLORS.global.green}
-              barStyle="light-content" />
+            <StatusBar
+                // translucent 
+                // backgroundColor={"transparent"} 
+                backgroundColor={LS_COLORS.global.green}
+                barStyle="light-content" />
             <View style={{ width: '100%', height: '30%' }}>
                 <ImageBackground
                     resizeMode="stretch"
@@ -349,26 +351,33 @@ const SelectLocation = (props) => {
                 </ImageBackground>
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
-                <Container>
-                    <Content contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+                <View style={{backgroundColor:"white",flex:1}}>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                         <View style={styles.mapContainer}>
                             <MapView
                                 style={styles.map}
-                                region={{
+                                initialRegion={{
                                     ...coordinates,
+                                    latitudeDelta: 0.0922, // You can adjust these values as per your requirement
+                                    longitudeDelta: 0.0421, // You can adjust these values as per your requirement
                                 }}>
-                                {travelDistance !== '' && <MapView.Circle
-                                    key={(coordinates.latitude + coordinates.longitude).toString()}
-                                    center={coordinates}
-                                    radius={Number(travelDistance * 1.60934) * 1000}
-                                    strokeWidth={1}
-                                    strokeColor={'red'}
-                                    fillColor={'rgba(230,238,255,0.1)'}
-                                />}
-                                <Marker
-                                    coordinate={{ ...coordinates }}
-                                />
+                                {(travelDistance2 ?? "") != '' && (
+                                    <React.Fragment>
+                                        <Circle
+                                            key={(coordinates.latitude + coordinates.longitude).toString()}
+                                            center={coordinates}
+                                            radius={Number(travelDistance2 ?? 0) * 1000} // Removed the conversion factor
+                                            strokeWidth={1}
+                                            strokeColor={'red'}
+                                            fillColor={'rgba(230,238,255,0.1)'}
+                                        />
+                                        <Marker
+                                            coordinate={{ ...coordinates }}
+                                        />
+                                    </React.Fragment>
+                                )}
                             </MapView>
+
                         </View>
                         <View style={{ flex: 1, padding: 20 }}>
                             <TouchableOpacity
@@ -394,9 +403,9 @@ const SelectLocation = (props) => {
                             <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium }}>Travel Distance to provide service(Miles)</Text>
                             <CustomTextInput
                                 placeholder="Travel Distance"
-                                value={travelDistance}
+                                value={travelDistance2}
                                 keyboardType="numeric"
-                                onChangeText={setTravelDistance}
+                                onChangeText={setTravelDistance2}
                                 customContainerStyle={{ marginHorizontal: '0%' }}
                                 customInputStyle={{ paddingHorizontal: '7%' }}
                             />
@@ -415,8 +424,8 @@ const SelectLocation = (props) => {
                                 </View>
                             }
                         </View>
-                    </Content>
-                </Container>
+                    </ScrollView>
+                </View>
                 {loading && <Loader />}
             </SafeAreaView >
         </>

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, StatusBar } from 'react-native';
+import { View, StyleSheet, Image, Text, SafeAreaView, StatusBar,ScrollView } from 'react-native';
 import Colors from '../../../constants/colors';
 import CustomButton from "../../../components/customButton"
 import CustomTextInput from "../../../components/customTextInput"
-import { Container, Content } from 'native-base';
+// import { Container, Content, ScrollView } from 'native-base';
 import Fonts from '../../../constants/fonts';
 import { globalStyles } from '../../../utils';
 import Loader from '../../../components/loader';
@@ -12,7 +12,7 @@ import { getApi } from '../../../api/api';
 import { useSelector } from 'react-redux';
 import Entypo from 'react-native-vector-icons/Entypo'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-
+import MaterialIcons from "react-native-vector-icons/MaterialIcons"
 const ResetPassword = (props) => {
     const { email, otp } = props.route.params
     const passRef = useRef(null)
@@ -75,9 +75,9 @@ const ResetPassword = (props) => {
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
             <StatusBar backgroundColor={Colors.global.green} barStyle="light-content" />
-            <Container>
-                <Content>
-                <Ionicons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
+            <View>
+                <ScrollView>
+                <MaterialIcons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
                     <View style={styles.screen}>
                         <Text maxFontSizeMultiplier={1.7} style={{ marginTop: "20%", ...styles.forgot }}>Reset</Text>
                         <Text maxFontSizeMultiplier={1.7} style={styles.forgot}>Password</Text>
@@ -118,9 +118,9 @@ const ResetPassword = (props) => {
                             />
                         </View>
                     </View>
-                </Content>
+                </ScrollView>
                 {loader == true && <Loader />}
-            </Container>
+            </View>
         </SafeAreaView>
     );
 };

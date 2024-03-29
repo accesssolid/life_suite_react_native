@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 /* Packages */
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 /* Screens */
 import HomeScreen from '../screens/nonAuth/homeScreen';
@@ -31,11 +31,11 @@ import LocationServiceSelect from '../screens/nonAuth/locationSelect/selectServi
 import LocationUpdate from '../screens/nonAuth/locationSelect/location'
 import ScheduleTime from '../screens/nonAuth/schedule_time';
 import AddTimeFrameForService from '../screens/nonAuth/schedule_time/AddTimeForService';
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 const ProviderStack = () => {
     return (
-        <Stack.Navigator headerMode={'none'}>
+        <Stack.Navigator screenOptions={{headerShown:false}} headerMode={'none'}>
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="CnfSch" component={CnfSch} />
             <Stack.Screen name="DeclineConfirmation" component={DeclineConfirmation} />

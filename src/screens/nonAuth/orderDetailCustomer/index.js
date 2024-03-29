@@ -535,8 +535,9 @@ export default function OrderDetailUpdateCustomer(props) {
 
     }
     const getCurrentPlace = () => {
-        RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
+        RNGooglePlaces?.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
+                console.log("resultsOrderDetailsCustomerScreen========>",results);
                 setFromAddress(results[0].address)
                 setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
 

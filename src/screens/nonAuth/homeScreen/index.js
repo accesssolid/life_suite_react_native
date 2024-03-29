@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Image, Text, SafeAreaView, ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable, RefreshControl } from 'react-native'
 import messaging from '@react-native-firebase/messaging';
-import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import DeviceInfo, { getUniqueId, getManufacturer } from 'react-native-device-info';
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -116,6 +116,17 @@ const HomeScreen = (props) => {
     const [allowJobAdd, setAllowedJobAdd] = React.useState(false)
     const [refreshload, setRefreshLoad] = React.useState(false)
 
+    const [devicdId, setDevicdId] = useState('')
+
+  useEffect(() => {
+    getDeviceID()
+        GetToken()
+    }, [])
+
+    const getDeviceID = async() =>{
+        let device_id=await DeviceInfo.getUniqueId()
+        setDevicdId(device_id)
+    }
     const getConnectAccountDetail = async () => {
         try {
             let headers = {
@@ -193,7 +204,7 @@ const HomeScreen = (props) => {
         }
 
         let data = new FormData()
-        data.append("device_id", getUniqueId())
+        data.append("device_id", devicdId)
         data.append("fcm_token", token)
 
         let config = {
@@ -459,8 +470,10 @@ const HomeScreen = (props) => {
     }
 
     const getCurrentPlace = () => {
+ 
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
+               console.log("resultsHomeScreen========>",results);
                 let locationData = {
                     lat: results[0].location.latitude,
                     long: results[0].location.longitude,
@@ -525,7 +538,7 @@ const HomeScreen = (props) => {
     const [selectedItem, setSelectedItem] = useState(null)
     return (
         <SafeAreaView style={globalStyles.safeAreaView}>
-            <View style={styles.container}>
+            <View style={[styles.container]}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <TouchableOpacity
                         activeOpacity={0.7}
@@ -571,7 +584,7 @@ const HomeScreen = (props) => {
                     ?
                     isAddJobActive
                         ?
-                        <View style={{ flex: 1, paddingTop: '5%' }}>
+                        <View style={{ flex: 1, paddingTop: '5%' , }}>
                             <FlatList
                                 refreshControl={<RefreshControl
                                     refreshing={refreshload}

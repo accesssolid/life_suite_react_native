@@ -39,7 +39,7 @@ const ServiceItemUser = (props) => {
     }, [otherText, haveOwnText, isNeedRecommendationSelected, isOtherSelected, isHaveOwnSelected])
 
     React.useEffect(()=>{
-        console.log(props.item)
+       
         if(props.item&&props.extraData){
             let data=props.extraData.find(x=>x.parent_id==props.item.id)
             if(data){

@@ -30,7 +30,7 @@ export default function UpdateCertificateService({ navigation, route }) {
                 title="Services"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    navigation.goBack()
+                    navigation.navigate('HomeScreen')
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
@@ -39,7 +39,7 @@ export default function UpdateCertificateService({ navigation, route }) {
                 containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 <FlatList
                     data={[...myJobs]}
                     style={{ marginTop: 20 }}
@@ -63,7 +63,7 @@ export default function UpdateCertificateService({ navigation, route }) {
                     }}
                     keyExtractor={(item, index) => index}
                 />
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

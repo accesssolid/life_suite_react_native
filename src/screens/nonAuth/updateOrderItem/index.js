@@ -267,7 +267,6 @@ const OrderClientDetail = (props) => {
             .then((response) => {
                 if (response.status == true) {
                     if (response.data) {
-                        console.log("Response",JSON.stringify(response))
                         setData(response.data)
                         if (response?.added_services_list[0]) {
                             let o_is = response.data.order_items

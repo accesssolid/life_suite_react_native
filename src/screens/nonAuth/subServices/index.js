@@ -123,9 +123,7 @@ const SubServices = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response)
                 if (response.status == true) {
-                    console.log(response)
                     showToast(response.message)
                     getSubServices()
                 }

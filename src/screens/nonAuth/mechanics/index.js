@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, Alert, Pressable } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, Alert, Pressable, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -210,6 +210,7 @@ const Mechanics = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['location', 'address'])
             .then((results) => {
+                console.log("resultsmechanicsScreen========>",results);
                 if (results.length > 0) {
                     let res = results[0].address?.split(",")
                     if (res.length == 3) {
@@ -615,7 +616,7 @@ const Mechanics = (props) => {
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {
-                                        props.navigation.goBack()
+                                        props.navigation.navigate("HomeScreen")
                                     }}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
@@ -632,8 +633,8 @@ const Mechanics = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
                 <View style={styles.container}>
-                    <Container style={{ marginTop: 26 }}>
-                        <Content showsVerticalScrollIndicator={false} bounces={false} >
+                    <View style={{ marginTop: 26 }}>
+                        <ScrollView showsVerticalScrollIndicator={false} bounces={false} >
                             <View style={{ height: 40, width: '90%', alignSelf: "center", justifyContent: 'space-between', flexDirection: 'row' }}>
                                 <TouchableOpacity onPress={() => { setFilterModal(true) }} style={{ justifyContent: "center", alignItems: "center", marginRight: 5 }}>
                                     <Image style={{ height: 30, width: 30, alignSelf: "center" }} source={require("../../../assets/filter.png")} />
@@ -731,7 +732,15 @@ const Mechanics = (props) => {
                                         is_insauranced = item?.questionnaire_data[0]?.is_insauranced == "1"
                                     }
                                     let checked_g = item.item_list.filter(i => i.checked).length > 0
-                                    return <Card key={index} style={styles.alexiContainer}>
+                                    return <View key={index} style={[styles.alexiContainer,{shadowColor: "#000",
+                                    shadowOffset: {
+                                        width: 0,
+                                        height: 2,
+                                    },
+                                    shadowOpacity: 0.23,
+                                    shadowRadius: 2.62,
+                                    
+                                    elevation: 4,}]}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Pressable onPress={() => {
                                                 props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService?.name, service_id: subService?.id, list: true })
@@ -902,14 +911,14 @@ const Mechanics = (props) => {
                                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginLeft: 10, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>LyfeSuite Application Fee</Text>
                                             <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, marginRight: 15, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>$3.50</Text>
                                         </View>
-                                    </Card>
+                                    </View>
                                 })
                                 :
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                                     {!loading && <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginTop: 10 }}>No Providers Found</Text>}
                                 </View>
                             }
-                        </Content>
+                        </ScrollView>
                         <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
@@ -941,7 +950,7 @@ const Mechanics = (props) => {
                             <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Request</Text>
                         </TouchableOpacity>
                         <View style={{ height: 10 }}></View>
-                    </Container>
+                    </View>
                 </View>
                 {loading && <Loader />}
             </SafeAreaView>

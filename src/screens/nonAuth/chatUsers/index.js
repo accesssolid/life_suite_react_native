@@ -146,7 +146,7 @@ const ChatUsers = (props) => {
                     title="Chat"
                     imageUrl={require("../../../assets/back.png")}
                     action={() => {
-                        props.navigation.goBack()
+                        props.navigation.navigate('HomeScreen')
                     }}
                     containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
 

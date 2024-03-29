@@ -87,7 +87,6 @@ export default function UpdateCertificates({ navigation, route }) {
                 type: 'post'
             }
             let response = await getApi(config)
-            console.log(response)
             if (response.status) {
                 if (response.data) {
                     if (response.data[0]) {
@@ -121,7 +120,6 @@ export default function UpdateCertificates({ navigation, route }) {
                 type: 'post'
             }
             let response = await getApi(config)
-            console.log(response)
             if (response.status) {
                 showToast(response.message)
                 navigation.goBack()
@@ -195,7 +193,7 @@ export default function UpdateCertificates({ navigation, route }) {
                 containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 <Text maxFontSizeMultiplier={1.3} style={styles.service}>Update Business Questionaire</Text>
                 <FlatList
                     data={questions}
@@ -209,7 +207,7 @@ export default function UpdateCertificates({ navigation, route }) {
                     }}
                 />
 
-            </Container>
+            </View>
 
             {loader && <Loader />}
         </SafeAreaView>

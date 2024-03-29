@@ -169,7 +169,7 @@ const OrderHistory = (props) => {
                 title="MY ORDER"
                 imageUrl={require("../../../assets/back.png")}
                 action={() => {
-                    props.navigation.goBack()
+                    props.navigation.navigate('HomeScreen')
                 }}
                 imageUrl1={require("../../../assets/home.png")}
                 action1={() => {
@@ -178,7 +178,7 @@ const OrderHistory = (props) => {
                 containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
 
             />
-            <Container style={styles.container}>
+            <View style={styles.container}>
                 {/* <Content
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}> */}
@@ -272,7 +272,7 @@ const OrderHistory = (props) => {
                         </TouchableOpacity>)
                     }}
                 />
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }

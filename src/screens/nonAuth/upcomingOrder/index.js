@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -64,8 +64,8 @@ const UpcomingOrder = (props) => {
                 }}
                 containerStyle={{backgroundColor:LS_COLORS.global.cyan}}
             />
-            <Container style={styles.container}>
-                <Content
+            <View style={styles.container}>
+                <ScrollView
                     style={{ paddingTop: 15 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}>
@@ -137,9 +137,9 @@ const UpcomingOrder = (props) => {
                         <Text style={{ backgroundColor: LS_COLORS.global.white, zIndex: 5, paddingHorizontal: 15, fontFamily: LS_FONTS.PoppinsMedium, fontSize: 14, }}>Upcoming Job</Text>
                         <View style={{ position: 'absolute', borderTopWidth: 2, borderTopColor: LS_COLORS.global.textCyan, width: '85%', }} />
                     </View>                
-                </Content>
+                </ScrollView>
                 <CustomButton action={() => props.navigation.navigate('CancelConfirmation')} title="Cancel" customStyles={{ width: '50%', height: 40, marginTop: 10 }} />
-            </Container>
+            </View>
         </SafeAreaView>
     )
 }
