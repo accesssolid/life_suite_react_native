@@ -470,10 +470,11 @@ const HomeScreen = (props) => {
     }
 
     const getCurrentPlace = () => {
- 
-        RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
+        console.log("results===>",results);
+        setTimeout(() => {
+            RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-               console.log("resultsHomeScreen========>",results);
+               
                 let locationData = {
                     lat: results[0].location.latitude,
                     long: results[0].location.longitude,
@@ -484,6 +485,8 @@ const HomeScreen = (props) => {
             .catch((error) => console.log("results error => ", error.message))
             .finally(() => {
             })
+        }, 0);
+     
     }
 
     const updateLocation = (data) => {

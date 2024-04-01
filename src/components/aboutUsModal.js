@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, Platform } from 'react-native'
 import Modal from 'react-native-modal';
-import { getInfoDescription } from '../utils';
 import LS_COLORS from "../constants/colors";
 import LS_FONTS from "../constants/fonts";
 import { useDispatch, useSelector } from 'react-redux';
 import { getApi } from '../api/api';
-import { setAddServiceData } from '../redux/features/services';
-import { ScrollView } from 'react-native-gesture-handler';
 import {WebView} from "react-native-webview"
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 

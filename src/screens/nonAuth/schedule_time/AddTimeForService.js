@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, Alert } from 'react-native'
+import { View, StyleSheet, Image, Text, TouchableOpacity, Alert,ScrollView } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -7,11 +7,9 @@ import LS_FONTS from '../../../constants/fonts';
 import { globalStyles } from '../../../utils';
 
 /* Packages */
-import CalendarPicker from 'react-native-calendar-picker';
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
 
 
-import TextInputMask from 'react-native-text-input-mask';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -24,9 +22,7 @@ import { getApi } from '../../../api/api';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
 import { setAddServiceMode, clearCleanData } from '../../../redux/features/services';
-import { ScrollView } from 'react-native-gesture-handler';
-import { CheckBox, Toast } from 'native-base'
-import { indexOf } from 'lodash';
+
 const Moment = require("moment")
 const MomentRange = require("moment-range")
 const moment = MomentRange.extendMoment(Moment)

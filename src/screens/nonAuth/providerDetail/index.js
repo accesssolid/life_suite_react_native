@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, Dimensions, ScrollView, Image, Modal, Pressable, Linking, TouchableOpacity, TextInput, Keyboard } from 'react-native'
+import { View, Text, Dimensions, ScrollView, Image, Modal, Pressable, Linking, TouchableOpacity, TextInput, Keyboard ,FlatList} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../../components/header';
 import LS_COLORS from '../../../constants/colors';
@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BASE_URL, getApi } from '../../../api/api';
 import Loader from '../../../components/loader';
 import moment from 'moment';
-import { FlatList } from 'react-native-gesture-handler';
+
 import DropDown from '../../../components/dropDown';
 import { setFavList } from '../../../redux/features/favorites';
 import CustomButton from '../../../components/customButton';

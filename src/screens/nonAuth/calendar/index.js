@@ -22,6 +22,7 @@ import CustomButton from "../../../components/customButton"
 const Calendar = (props) => {
     const { setDate, service } = props.route.params
     const [date, setDatee] = useState(moment(new Date().getTime()).format("DD MMM YYYY"))
+    console.log(date,"date======>");
 
     const onDateChange = (date) => {
         var a = moment(date).format("DD MMM YYYY")

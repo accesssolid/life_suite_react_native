@@ -341,7 +341,7 @@ export default function OrderDetailUpdateCustomer(props) {
                     if (cancelSearchModal) {
                         setCancelSearcHModal(false)
                         props.navigation.navigate("MechanicLocation", {
-                            servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
+                            serviceData: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
                             subService: {
                                 name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
                                 image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
@@ -493,7 +493,7 @@ export default function OrderDetailUpdateCustomer(props) {
         if (user?.user_status == 1) {
             dispatch(setVariantData(order_variant))
             props.navigation.navigate("MechanicLocation", {
-                servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
+                serviceData: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
                 subService: {
                     name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
                     image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
@@ -512,7 +512,7 @@ export default function OrderDetailUpdateCustomer(props) {
         if (user?.user_status == 1 && data?.providers_user_status == 1 && data?.provider_provide_service > 0) {
             dispatch(setVariantData(order_variant))
             props.navigation.navigate("MechanicLocation", {
-                servicedata: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
+                serviceData: data?.order_items?.map(x => ({ item_id: x.item_id, products: x.product.map(y => y.product_id) })),
                 subService: {
                     name: data?.order_items[0]?.services_name ?? data?.order_items[0]?.parent_services_name,
                     image: data?.order_items[0]?.services_image ?? data?.order_items[0]?.parent_services_image,
@@ -535,14 +535,17 @@ export default function OrderDetailUpdateCustomer(props) {
 
     }
     const getCurrentPlace = () => {
-        RNGooglePlaces?.getCurrentPlace(['placeID', 'location', 'name', 'address'])
+        setTimeout(() => {
+            RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-                console.log("resultsOrderDetailsCustomerScreen========>",results);
+                console.log(results,'res')
                 setFromAddress(results[0].address)
                 setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
 
             })
             .catch((error) => console.log(error.message));
+        }, 0);
+     
     }
 
     const getCurrentLocation = (hasLocationPermission) => {

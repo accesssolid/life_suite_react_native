@@ -102,7 +102,6 @@ const MapScreen = (props) => {
         setLoading(true)
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-                console.log("resultsMapScreen========>",results);
                 setAddress(results[0].address)
                 placesRef.current.setAddressText(results[0].address)
                 if (results[0].location.latitude) {

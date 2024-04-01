@@ -132,7 +132,7 @@ const SelectLocation = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-                console.log("resultsSelectLocationScreen========>",results);
+                console.log("getCurrentPlace =>>", results);
                 setAddress(results[0].address)
                 setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
             })

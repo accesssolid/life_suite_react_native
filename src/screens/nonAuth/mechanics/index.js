@@ -210,7 +210,6 @@ const Mechanics = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['location', 'address'])
             .then((results) => {
-                console.log("resultsmechanicsScreen========>",results);
                 if (results.length > 0) {
                     let res = results[0].address?.split(",")
                     if (res.length == 3) {

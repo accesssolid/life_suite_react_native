@@ -7,7 +7,7 @@ import LS_FONTS from "../../../constants/fonts";
 import { useDispatch, useSelector } from 'react-redux';
 import { getApi } from '../../../api/api';
 import { setAddServiceData } from '../../../redux/features/services';
-import { ScrollView } from 'react-native-gesture-handler';
+
 import { WebView} from "react-native-webview"
 import Header from '../../../components/header';
 import { SafeAreaView } from 'react-native-safe-area-context';

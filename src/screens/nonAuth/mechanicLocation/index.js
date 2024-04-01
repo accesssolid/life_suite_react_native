@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert ,TextInput} from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -17,7 +17,7 @@ import { BASE_URL, getApi } from '../../../api/api';
 import Header from '../../../components/header';
 import DropDown from '../../../components/dropDown';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
-import { TextInput } from 'react-native-gesture-handler';
+
 import { Dimensions } from 'react-native';
 import { showToast } from '../../../components/validators';
 import { PermissionsAndroid } from 'react-native';
@@ -31,7 +31,19 @@ import { setCurrentLocationData } from '../../../redux/features/currentlocation'
 // #liahs_before_providers
 
 const MechanicLocation = (props) => {
-    const { servicedata, subService, extraData, orderData, reorder } = props.route.params
+    const { serviceData, subService, extraData, orderData, reorder } = props.route.params
+    console.log("====asdfdff>",serviceData);
+    const [servicedata, setServicedata] = useState([])
+    const [sub_Service, setsub_Service] = useState({})
+    useEffect(() => {
+        console.log('abhi-=-',serviceData);
+     if (serviceData !=undefined && serviceData?.length>0) {
+        console.log("aaaaaaaaaa=>",serviceData);
+        setServicedata(serviceData)
+     }
+    }, [serviceData,subService])
+    
+    console.log(servicedata,"subService====>");
     const user = useSelector(state => state.authenticate.user)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
@@ -47,7 +59,7 @@ const MechanicLocation = (props) => {
 
     const [isLoadCurrentLocation, setIsLoadCurrentLocation] = React.useState(false)
     React.useEffect(() => {
-        console.log("Params", props.route.params)
+        // console.log("Params", props.route.params)
     }, [props.route.params])
     const currentLocation=useSelector(state=>state.currentLocation)?.current
     // const [currentLocation, setCurrentLocation] = React.useState({
@@ -193,7 +205,7 @@ const MechanicLocation = (props) => {
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-                console.log("resultsMechanicLocationScreen========>",results);
+
                 setFromAddress(results[0].address)
                 setFromCoordinates({ ...fromCoordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
                 dispatch(setCurrentLocationData({ latitude: results[0].location.latitude, longitude: results[0].location.longitude }))
@@ -309,14 +321,14 @@ const MechanicLocation = (props) => {
             return
         }
         let arr = []
-        servicedata.forEach(element => {
+        servicedata?.forEach(element => {
             arr.push(element.item_id)
         });
         let data = {
             "user_id": user.id,
             "json_data": JSON.stringify({
                 "items": arr,
-                "products": servicedata[0].products
+                "products": servicedata[0]?.products
             }),
             "order_placed_address": toAddress,
             "order_placed_lat": toCoordinates.latitude,
@@ -328,7 +340,7 @@ const MechanicLocation = (props) => {
             "order_from_address": fromAddress,
             "mile_distance": total_distance
         }
-        if (subService.location_type == 2 && data.order_from_address.trim() == "") {
+        if (subService?.location_type == 2 && data?.order_from_address.trim() == "") {
             showToast("Please add from address")
         } else if (data.order_placed_address.trim() == "") {
             showToast("Please add to address")
@@ -448,8 +460,8 @@ const MechanicLocation = (props) => {
                         <Text style={{ fontSize: 16, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.green }}>Other Location</Text>
                     </View> */}
                     <View style={{ marginTop: 20 }}>
-                        {subService.location_type == 2 && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>}
-                        {subService.location_type == 2 && <TouchableOpacity
+                        {subService?.location_type == 2 && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24 }}>From</Text>}
+                        {subService?.location_type == 2 && <TouchableOpacity
                             onPress={() => {
                                 props.navigation.navigate('MapScreen', { onConfirm: onLocation.bind(this), coords: fromCoordinates })
                             }}
@@ -467,8 +479,8 @@ const MechanicLocation = (props) => {
                                 />
                             </TouchableOpacity>
                         </TouchableOpacity>}
-                        {(subService.location_type == 1 || subService.location_type == 2) && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>}
-                        {(subService.location_type == 1 || subService.location_type == 2) && <TouchableOpacity
+                        {(subService?.location_type == 1 || subService?.location_type == 2) && <Text maxFontSizeMultiplier={1.5} style={{ fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, marginLeft: 24, marginTop: 20 }}>To</Text>}
+                        {(subService?.location_type == 1 || subService?.location_type == 2) && <TouchableOpacity
                             onPress={() => props.navigation.navigate('MapScreen', { onConfirm: onLocation1.bind(this), coords: toCoordinates })}
                             style={styles.fromContainer}>
                             <Text maxFontSizeMultiplier={1.5} style={{ flex: 1, }} numberOfLines={1}>{toAddress == "" ? "Select Address" : toAddress}</Text>
@@ -616,7 +628,8 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
-        marginTop: 10
+        marginTop: 10,
+        marginBottom:5
     },
     saveText: {
         textAlign: "center",

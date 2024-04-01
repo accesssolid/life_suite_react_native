@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useImperativeHandle, useReducer } from 'react';
-import { View, StyleSheet, Text, Platform, Image, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { View, StyleSheet, Text, Platform, Image, TouchableOpacity, KeyboardAvoidingView ,TextInput} from 'react-native';
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -10,7 +10,7 @@ import { CheckBox } from 'react-native-elements';
 import TextInputMask from 'react-native-text-input-mask';
 
 /* Components */;
-import { TextInput } from 'react-native-gesture-handler';
+
 import _ from 'lodash';
 
 const ServiceItem = React.forwardRef((props, ref) => {

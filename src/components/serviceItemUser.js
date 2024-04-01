@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView ,TextInput} from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../constants/colors';
@@ -11,7 +11,7 @@ import { CheckBox } from 'react-native-elements'
 import TextInputMask from 'react-native-text-input-mask';
 
 /* Components */;
-import { TextInput } from 'react-native-gesture-handler';
+
 import { setAddServiceData } from '../redux/features/services';
 import _, { forEach } from 'lodash'
 

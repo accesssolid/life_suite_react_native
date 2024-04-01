@@ -24,7 +24,7 @@ import { getApi, BASE_URL } from '../../../api/api';
 import { showToast } from '../../../components/validators';
 import { setMyJobs } from '../../../redux/features/provider';
 import { setAddServiceMode, clearCleanData } from '../../../redux/features/services';
-import {  } from 'react-native-gesture-handler';
+
 import Cards from '../../../components/cards';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { set } from 'lodash';
