@@ -137,7 +137,7 @@ const OrderHistory1 = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
+                // console.log(response)
                 if (response.status == true) {
                     if (response.data?.data) {
                         if (page == 1) {
@@ -193,7 +193,7 @@ const OrderHistory1 = (props) => {
         console.log(config)
         getApi(config)
             .then((response) => {
-                console.log(response)
+                // console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
                     getOrders(1, 1)
@@ -228,7 +228,7 @@ const OrderHistory1 = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
+                // console.log(response)
                 if (response.status == true) {
                     showToast(response.message)
                     getOrders(1, 1)

@@ -324,7 +324,7 @@ const HomeScreen = (props) => {
             }
             getApi(config)
                 .then((response) => {
-                    console.log("Response===>>>", response)
+                    // console.log("Response===>>>", response)
                     if (response.status == true) {
 
                     }

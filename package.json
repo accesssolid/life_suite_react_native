@@ -51,6 +51,7 @@
     "react-native-file-viewer": "^2.1.5",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-gesture-handler": "^2.15.0",
+    "react-native-get-location": "^4.0.1",
     "react-native-google-places": "^3.1.2",
     "react-native-google-places-autocomplete": "^2.5.6",
     "react-native-image-crop-picker": "^0.40.3",

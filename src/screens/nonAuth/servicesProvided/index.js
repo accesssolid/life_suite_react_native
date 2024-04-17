@@ -421,8 +421,8 @@ const ServicesProvided = (props) => {
             }
         });
 
-        console.log(subService)
-        props.navigation.navigate("MechanicLocation", { servicedata: servicedata, subService: subService, extraData: extraData })
+        // console.log(subService)
+        props.navigation.navigate("MechanicLocation", { serviceData: servicedata, subService: subService, extraData: extraData })
     }
 
     const onPressItem = (item) => {
@@ -676,8 +676,8 @@ const ServicesProvided = (props) => {
                         //     </View>)
                     }
                     <Text maxFontSizeMultiplier={1.4} style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
-                    <View>
-                        <ScrollView>
+                    <View style={{flex:1}}>
+                        <ScrollView   showsVerticalScrollIndicator={false} >
                             {
                                 activeItem !== null
                                     ?

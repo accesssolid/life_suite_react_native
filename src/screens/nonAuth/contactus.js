@@ -22,7 +22,7 @@ export default function ContactUs({ navigation, route }) {
     const emailRef = useRef(null)
     const messageRef = useRef(null)
     const scrollRef = React.useRef(null)
-    console.log("user",user)
+    // console.log("user",user)
     React.useEffect(()=>{
         if(user){
             if(userType!="guest"){

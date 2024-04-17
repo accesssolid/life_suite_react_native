@@ -75,7 +75,7 @@ const OrderHistory = (props) => {
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)
     const [data, setData] = useState([])
-    console.log(data)
+    // console.log(data)
     const [searchData, setSearchData] = useState({
         text: "",
         data: []
@@ -136,7 +136,7 @@ const OrderHistory = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response)
+                // console.log(response)
                 if (response.status == true) {
                     if (response.data?.data) {
                         if (page == 1) {

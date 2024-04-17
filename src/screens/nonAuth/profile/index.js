@@ -250,7 +250,7 @@ const Profile = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response,"response===>");
+              
                 if (response.status == true) {
                     storeItem('user', null)
                     storeItem('passcode', null)

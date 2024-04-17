@@ -130,7 +130,7 @@ const OrderHistory = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    console.log(response.data)
+                    // console.log(response.data)
                     if (response.data?.data) {
                         if (page == 1) {
                             setData(response.data.data)

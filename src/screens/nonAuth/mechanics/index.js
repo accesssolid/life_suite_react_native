@@ -61,13 +61,15 @@ const Mechanics = (props) => {
     useFocusEffect(useCallback(() => {
         getFavProvider()
     }, []))
-
+    useEffect(()=>{
+        console.log(subService,"======---")
+    },[subService])
     React.useEffect(() => {
         let z = []
         for (let i of providers) {
             let changedItems = _.cloneDeep(i.item_list).map(x => {
                 let service_id = x.service_item_id
-                let other_options = extraData.find(e => e.parent_id == service_id)
+                let other_options = extraData?.find(e => e.parent_id == service_id)
                 let other = null
                 let have_own = null
                 let need_recommendation = null
@@ -234,6 +236,7 @@ const Mechanics = (props) => {
         try {
             let response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyA8vPYceBJX2Mt43IKubB1Gpa2EcZ6Mg_g`)
             let res = await response.json()
+            console.log(res,"=============")
             if (res?.rows[0]) {
                 let element = res.rows[0].elements[0]
                 if (element?.distance?.value) {
@@ -261,7 +264,7 @@ const Mechanics = (props) => {
             let x = await getMilesBetweenCords({ latitude: provider?.address?.lat, longitude: provider?.address?.long }, { latitude: data.order_placed_lat, longitude: data.order_placed_long })
             d[`${provider.id}`] = x
         }
-        console.log(d)
+
         setMileDistanceP(d)
     }
 
@@ -282,7 +285,7 @@ const Mechanics = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
+               
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -839,7 +842,7 @@ const Mechanics = (props) => {
                                                 time_format = i.time_duration + " min"
                                             }
                                             let service_id = i.service_item_id
-                                            let extra = extraData.find(x => x.parent_id == service_id)
+                                            let extra = extraData?.find(x => x.parent_id == service_id)
                                             return (
                                                 <>
                                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10, alignItems: "center" }}>
@@ -990,7 +993,7 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
-        marginTop: 20
+        marginTop: Platform.OS =='ios'?4:10
     },
     saveText: {
         textAlign: "center",

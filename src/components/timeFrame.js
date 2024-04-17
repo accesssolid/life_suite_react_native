@@ -35,7 +35,7 @@ const TimeFrame = props => {
     const [mile_distanceP, setMileDistanceP] = React.useState({})
     // const 
     const handleConfirm = (date) => {
-        console.log(date, selectedIndex, type)
+        // console.log(date, selectedIndex, type)
         if (typeof selectedIndex == "number") {
             let d = _.cloneDeep(jsonData)
             const start_time = moment(props.starting_time, "YYYY-MM-DD HH:mm:[00]")
@@ -66,7 +66,7 @@ const TimeFrame = props => {
                 }
             }
             setDatePickerVisibility(false)
-            console.log(d)
+            // console.log(d)
             setJsonData(d)
         }
         setDatePickerVisibility(false)
@@ -210,8 +210,8 @@ const TimeFrame = props => {
                                 // _price
                                 let products = i.products
                                 let provider = data?.find(x => x?.id == i.provider_id)
-                                console.log(products)
-                                console.log(provider?.item_list)
+                                // console.log(products)
+                                // console.log(provider?.item_list)
                                 if (obj) {
                                     estimated_price += obj?.price
                                     if (provider) {
@@ -368,14 +368,14 @@ export const FilterModal = ({ visible, setVisible, getFilteredData }) => {
                         borderRadius: 10,
                         padding: 10,
                         shadowColor: "#000",
-shadowOffset: {
-	width: 0,
-	height: 1,
-},
-shadowOpacity: 0.22,
-shadowRadius: 2.22,
+                        shadowOffset: {
+                            width: 0,
+                            height: 1,
+                        },
+                        shadowOpacity: 0.22,
+                        shadowRadius: 2.22,
 
-elevation: 3,
+                        elevation: 3,
                         // maxHeight:"80%"
                     }}>
                         <Pressable>

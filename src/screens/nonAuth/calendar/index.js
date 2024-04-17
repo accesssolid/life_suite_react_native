@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, ScrollView, SafeAreaView, StatusBar, TouchableOpacity, Platform } from 'react-native'
+import { View, StyleSheet, Image, Text, ScrollView, SafeAreaView, StatusBar, TouchableOpacity, Platform, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -20,22 +20,25 @@ import CustomInput from "../../../components/textInput"
 import CustomButton from "../../../components/customButton"
 
 const Calendar = (props) => {
-    const { setDate, service } = props.route.params
+    const { setDate, service, subService: subService, } = props.route.params
     const [date, setDatee] = useState(moment(new Date().getTime()).format("DD MMM YYYY"))
-    console.log(date,"date======>");
+
 
     const onDateChange = (date) => {
         var a = moment(date).format("DD MMM YYYY")
+    
         setDatee(a)
         setDate(a)
     }
 
     const confirm = () => {
-        var a = moment(date).format("YYYY-MM-DD")
-        setDatee(a)
+        // Alert.alert(JSON.stringify(date))
+        var a = moment(date,"DD MMM YYYY").format("YYYY-MM-DD")
+        // console.log(a,"confirm")
+        // setDatee(a)
         setDate(a)
         // props.navigation.goBack()
-        props.navigation.navigate("MechanicLocation", { data: date })
+        props.navigation.navigate("MechanicLocation", { data: date,subService })
     }
 
     return (

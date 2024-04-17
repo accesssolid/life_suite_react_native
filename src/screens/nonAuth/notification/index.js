@@ -56,7 +56,7 @@ const Notification = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
     const notificationsg = useSelector(state => state.notification)?.data
-    console.log("Notifications", JSON.stringify(notifications))
+    // console.log("Notifications", JSON.stringify(notifications))
     const [showUnread, setShowUnread] = useState(false)
     const [notifications, setNotifications] = useState([])
 

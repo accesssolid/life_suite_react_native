@@ -111,7 +111,7 @@ export default function ProviderDetail(props) {
                 type: 'post'
             }
             let res = await getApi(config)
-            console.log("Res", res)
+            // console.log("Res", res)
             if (res.status) {
                 setProvider(res.data)
                 if (res?.data?.service_questionnaire) {

@@ -11,7 +11,7 @@ import LS_COLORS from '../constants/colors';
 import UserStack from './userStack';
 import { useSelector } from 'react-redux';
 import ProviderStack from './providerStack';
-import { Dimensions, Image, Platform, Text, TouchableOpacity,View } from 'react-native';
+import { Dimensions, Image, Platform, Text, TouchableOpacity, View } from 'react-native';
 import Profile from '../screens/nonAuth/profile';
 import OrderHistory from '../screens/nonAuth/orderHistory';
 import Favourites from '../screens/nonAuth/favourites';
@@ -42,7 +42,7 @@ import { loadNotificaitonsThunk } from '../redux/features/notification'
 import { showToast, storeItem } from '../components/validators';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import firestore from '@react-native-firebase/firestore';
-import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import DeviceInfo, { getUniqueId, getManufacturer } from 'react-native-device-info';
 import { logoutAll } from '../redux/features/loginReducer';
 import PushNotification from 'react-native-push-notification';
 import ShortcutBadge from 'react-native-app-badge';
@@ -281,7 +281,7 @@ const MainDrawer = (props) => {
                 initialRouteName="HomeScreen"
                 screenOptions={{
                     unmountOnBlur: true,
-                    headerShown:false
+                    headerShown: false
                 }}
                 drawerContentOptions={{
                     labelStyle: {
@@ -442,7 +442,7 @@ const MainDrawer = (props) => {
                         drawerLabel: ({ focused, color }) => <Text style={{ height: 0 }}></Text>,
                     }}
                 />
-                 <Drawer.Screen
+                <Drawer.Screen
                     name="UpdateQuestionaireStack"
                     component={UpdateQuestionaireStack}
                     options={{
@@ -471,11 +471,11 @@ const MainDrawer = (props) => {
                 isVisible={softwareVisible1}
                 setVisible={setSoftwareVisible1}
             />
-             <AboutUsModal
+            <AboutUsModal
                 isVisible={softwareVisible1}
                 setVisible={setSoftwareVisible1}
             />
-             <CDCModal
+            <CDCModal
                 isVisible={cdcVisible}
                 setVisible={setCDCVisible}
             />
@@ -500,16 +500,19 @@ const CustomDrawerContent = (props) => {
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const [loader, setLoader] = React.useState(false)
-    function logout() {
+
+
+    async function logout() {
         props.navigation.closeDrawer()
         // props.navigation.pop()
         // return
         setLoader(true)
+        let device_id = await DeviceInfo?.getUniqueId()
         let headers = {
             "Authorization": `Bearer ${access_token}`
         }
         var formdata = new FormData();
-        formdata.append("device_id", getUniqueId());
+        formdata.append("device_id", device_id);
 
         let config = {
             headers: headers,

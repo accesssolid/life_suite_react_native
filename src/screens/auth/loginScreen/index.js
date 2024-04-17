@@ -57,6 +57,7 @@ const LoginScreen = (props) => {
 
     const getDeviceID = async () => {
         let device_id = await DeviceInfo.getUniqueId()
+        console.log(device_id,"device_id===>");
         setDevicdId(device_id)
     }
 
@@ -64,7 +65,7 @@ const LoginScreen = (props) => {
         const authorizationStatus = await messaging().requestPermission();
         if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
             const token = await messaging().getToken()
-            console.log('TOKEN==>>>>', token)
+            // console.log('TOKEN==>>>>', token)
             setFcmToken(token)
         }
     }
@@ -84,11 +85,12 @@ const LoginScreen = (props) => {
         let user_data = {
             "email": email.toLowerCase(),
             "password": password,
-            "fcm_token": fcmToken,
+            "fcm_token": fcmToken?fcmToken:"*",
             device_id: devicdId,
             login_type: "biometric",
             timezone: RNLocalize.getTimeZone()
         }
+        console.log(user_data,"user_data");
         let config = {
             headers: headers,
             data: JSON.stringify(user_data),
@@ -98,6 +100,7 @@ const LoginScreen = (props) => {
 
         getApi(config)
             .then(async (response) => {
+                console.log("response",response);
                 if (response.status == true) {
                     setLoader(false)
                     showToast(response.message, 'success')

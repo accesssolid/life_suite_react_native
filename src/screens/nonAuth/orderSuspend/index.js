@@ -54,7 +54,7 @@ export default function OrderSuspend(props) {
 
         getApi(config)
             .then((response) => {
-                console.log("Response", response)
+                // console.log("Response", response)
                 if (response.status == true) {
                     if (response.data) {
                         setData(response.data)

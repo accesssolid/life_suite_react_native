@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, Text } from 'react-native'
+import { View, StyleSheet, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, Text, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -12,23 +12,25 @@ import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { SafeAreaView } from 'react-native-safe-area-context';
+// import GetLocation from 'react-native-get-location'
 
 /* Components */;
 import { Container } from 'native-base'
 import CustomButton from '../../../components/customButton';
 import Loader from '../../../components/loader';
 import { showToast } from '../../../components/validators';
+import queryString from 'query-string'; 
 
 const MapScreen = (props) => {
     const dispatch = useDispatch()
     const mapRef = useRef(null)
-    const queryString = require('query-string');
     const { onConfirm, coords } = props.route.params
     const placesRef = useRef();
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)
     const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
     const [address, setAddress] = useState('')
+    // console.log('address====>',address);
     const [focused, setFocused] = useState(false)
     // #liahs for permanent button clicked checked
     const [isPermanentClicked, setIsPermanetClicked] = React.useState(false)
@@ -43,6 +45,7 @@ const MapScreen = (props) => {
     useEffect(() => {
         if (coords?.latitude ==  37.78825&&coords?.longitude==-122.4324) {
             getLocationPermission()
+            
         } else {
             setCoordinates(coords)
             mapRef.current.animateToRegion({
@@ -50,6 +53,10 @@ const MapScreen = (props) => {
             })
         }
     }, [])
+    // useEffect(() => {
+    //     getCurrentPlace()
+    // }, [])
+    
 
     const getLocationPermission = async () => {
         let hasLocationPermission = false
@@ -98,22 +105,80 @@ const MapScreen = (props) => {
         }
     }
 
-    const getCurrentPlace = () => {
-        setLoading(true)
-        RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
-            .then((results) => {
-                setAddress(results[0].address)
-                placesRef.current.setAddressText(results[0].address)
-                if (results[0].location.latitude) {
-                    setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
-                    mapRef.current.animateToRegion({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
-                }
-            })
-            .catch((error) => console.log("results error => ", error.message))
-            .finally(() => {
-                setLoading(false)
-            })
-    }
+    // const getCurrentPlace = () => {
+    //     setLoading(true)
+    //     RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
+    //         .then((results) => {
+    //             console.log("results ======>",results);
+    //             setAddress(results[0]?.address)
+    //             placesRef?.current?.setAddressText(results[0]?.address)
+    //             if (results[0]?.location.latitude) {
+    //                 setCoordinates({ ...coordinates, latitude: results[0]?.location.latitude, longitude: results[0]?.location.longitude })
+    //                 mapRef.current.animateToRegion({ ...coordinates, latitude: results[0]?.location.latitude, longitude: results[0]?.location.longitude })
+    //             }
+    //         })
+    //         .catch((error) => console.log("results error=> ", error.message))
+    //         .finally(() => {
+    //             setLoading(false)
+    //         })
+    // }
+
+
+    const getCurrentPlace = (retryCount = 3) => {
+        setLoading(true);
+    
+        const fetchPlace = (attemptNumber) => {
+            RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
+                .then((results) => {
+                    console.log("results ======>", results);
+                    setAddress(results[0]?.address);
+                    placesRef?.current?.setAddressText(results[0]?.address);
+                    if (results[0]?.location.latitude) {
+                        setCoordinates({ ...coordinates, latitude: results[0]?.location.latitude, longitude: results[0]?.location.longitude });
+                        mapRef.current.animateToRegion({ ...coordinates, latitude: results[0]?.location.latitude, longitude: results[0]?.location.longitude });
+                    }
+                })
+                .catch((error) => {
+                    console.log("results error=> ", error.message);
+                    if (attemptNumber < retryCount) {
+                        console.log(`Retrying (${attemptNumber + 1}/${retryCount})...`);
+                        fetchPlace(attemptNumber + 1); // Retry fetching the current place
+                    } else {
+                        console.log('Exceeded maximum retry attempts. Giving up.');
+                    }
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        };
+    
+        fetchPlace(1); // Start with the first attempt
+    };
+    
+
+
+    // function getCurrentPlace() {
+    //     try {
+    //       GetLocation.getCurrentPosition({
+    //         enableHighAccuracy: false,
+    //         timeout: 15000,
+    //       })
+    //         .then((location) => {
+    //             console.log(location,"location===>");
+    //         //   setlat(location.latitude);
+    //         //   setlong(location.longitude);
+    //         //   dispatch(setlatitude(location.latitude));
+    //         //   dispatch(setlongitude(location.longitude));
+    //         //   getPlaceFromLatLng(location.latitude, location.longitude);
+    //         })
+    //         .catch((error) => {
+    //           console.log("error", error);
+    //           const { code, message } = error;
+    //         });
+    //     } catch (error) {
+    //       console.log("error", error);
+    //     }
+    //   }
 
     const reverseGeocode = (lat, lng) => {
         // #liahs for name of adderess won't change if the permananet address is clicked
@@ -136,8 +201,8 @@ const MapScreen = (props) => {
                     if (json.status !== 'OK') {
                         throw new Error(`Geocode error: ${json.status}`);
                     }
-                    setAddress(json.results[0].formatted_address)
-                    placesRef.current.setAddressText(json.results[0].formatted_address)
+                    setAddress(json.results[0]?.formatted_address)
+                    placesRef.current.setAddressText(json.results[0]?.formatted_address)
                 }).catch(err => {
                     console.log("reverseGeocode err => ", err)
                     showToast("Error fetching location details, please try again")
@@ -207,6 +272,9 @@ const MapScreen = (props) => {
                             maxFontSizeMultiplier: 1.4,
                             blurOnSubmit: true,
                             onSubmitEditing: () => setFocused(false),
+                            value:address,
+                  
+                            onChangeText: (t) =>setAddress(t)
                         }}
                         query={{
                             key: 'AIzaSyCqBdweD7WqRWXNUUC0sYMWnXG1jfnPCRk',
@@ -217,7 +285,7 @@ const MapScreen = (props) => {
                     <View style={styles.mapContainer}>
                         <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: focused ? '15%' : '10%', alignItems: 'center', paddingHorizontal: '10%', zIndex: 1 }}>
                             {user?.address[0]?.address_line_1 !== '' && <CustomButton
-                                title={user.user_role == 2 ? "Home" : "Permanent"}
+                                title={user.user_role == 2 ? "Home" : "Permannt"}
                                 customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
                                 customStyles={{
                                     width: '100%',
@@ -300,6 +368,7 @@ const MapScreen = (props) => {
                             }}
                             onRegionChangeComplete={(reg) => {
                                 setCoordinates({ ...reg })
+                                // Alert.alert('hi')
                                 reverseGeocode(reg.latitude, reg.longitude)
                             }}
                             style={styles.map}
@@ -342,7 +411,9 @@ const MapScreen = (props) => {
                             <CustomButton
                                 title={"Submit"}
                                 customStyles={{ width: '50%', borderRadius: 6 }}
-                                action={() => { onConfirm(address, coordinates), props.navigation.goBack() }}
+                                action={() => { 
+                                    onConfirm(address, coordinates), 
+                                    props.navigation.goBack() }}
                             />
                         </View>
                     </View>

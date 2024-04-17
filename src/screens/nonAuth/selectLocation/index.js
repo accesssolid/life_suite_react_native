@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, ScrollView } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Text, SafeAreaView, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, PermissionsAndroid, ScrollView, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -7,7 +7,7 @@ import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
 import { useDispatch, useSelector } from 'react-redux';
-import MapView, { Marker,Circle } from 'react-native-maps';
+import MapView, { Marker, Circle } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 
@@ -29,19 +29,20 @@ const SelectLocation = (props) => {
     const { subService } = props.route.params
     const user = useSelector(state => state.authenticate.user)
     const [loading, setLoading] = useState(false)
-    const isAddServiceMode = useSelector(state => state.services.isAddServiceMode)
+    const isAddServiceMode = useSelector(state => state?.services?.isAddServiceMode)
+    console.log("sdsfhfdhjfadf====>", isAddServiceMode);
     const addServiceData = useSelector(state => state.services.addServiceData)
     const access_token = useSelector(state => state.authenticate.access_token)
     const [address, setAddress] = useState('')
     const [travelDistance2, setTravelDistance2] = useState('')
-
+    const ref = useRef(null)
     const [coordinates, setCoordinates] = useState({
         latitude: 37.78825,
         longitude: -122.4324,
         latitudeDelta: 0.25,
         longitudeDelta: 0.012134,
     })
-
+console.log('coordinate-=-',coordinates);
     useEffect(() => {
         setCoordinates({
             ...coordinates,
@@ -52,6 +53,7 @@ const SelectLocation = (props) => {
 
     useEffect(() => {
         getLocationPermission()
+      
     }, [])
 
 
@@ -63,7 +65,7 @@ const SelectLocation = (props) => {
         setAddress(subService.travel_data?.address_text)
         setCoordinates({ ...coordinates, ...coords })
         let dist = subService?.travel_data?.travel_distance ?? ""
-        console.log(typeof (dist), ">>?>")
+        console.log(typeof(dist), ">>?>")
         setTravelDistance2(dist)
     }
 
@@ -107,8 +109,12 @@ const SelectLocation = (props) => {
     }
 
     const getCurrentLocation = (hasLocationPermission) => {
-        if (isAddServiceMode) {
+        console.log("hasLocationPermission", hasLocationPermission);
+        console.log("isAddServiceMode", isAddServiceMode);
+        // if (isAddServiceMode) {
+
             if (hasLocationPermission) {
+
                 Geolocation.getCurrentPosition(
                     (position) => {
                         console.log("position =>>", position);
@@ -117,26 +123,28 @@ const SelectLocation = (props) => {
                     (error) => {
                         console.log("getCurrentPosition error =>>", error.code, error.message);
                     },
-                    { /* enableHighAccuracy: true, */ timeout: 15000, /* maximumAge: 10000 */ }
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
                 );
+
             } else {
                 showToast("Location permission not granted")
             }
-        } else {
-            setInitialData()
-            setPreviousAddress()
-        }
+        // }
+        //  else {
+        //     setInitialData()
+        //     setPreviousAddress()
+        // }
     }
 
 
     const getCurrentPlace = () => {
         RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
             .then((results) => {
-                console.log("getCurrentPlace =>>", results);
+                console.log("getCurrentPlace =>>", results[0].location);
                 setAddress(results[0].address)
                 setCoordinates({ ...coordinates, latitude: results[0].location.latitude, longitude: results[0].location.longitude })
             })
-            .catch((error) => console.log(error.message));
+            .catch((error) => console.log("aaaaaa==>", error.message));
     }
 
     const setPreviousAddress = () => {
@@ -144,6 +152,7 @@ const SelectLocation = (props) => {
             setAddress(subService.travel_data.address_text)
             setTravelDistance2((subService?.travel_data?.travel_distance ?? "") + '')
             setCoordinates({ ...coordinates, latitude: Number(subService.travel_data.lat), longitude: Number(subService.travel_data.long) })
+       
         }
     }
 
@@ -238,8 +247,18 @@ const SelectLocation = (props) => {
             latitudeDelta: 0.25,
             longitudeDelta: 0.012134,
         })
+        zoomToCoordinates({ ...coords })
     }
-
+    function zoomToCoordinates(coords) {
+        if (ref?.current) {
+            ref?.current.animateToRegion(
+                {
+                    ...coords
+                },
+                1000 // Optional duration (milliseconds) for the animation
+            );
+        }
+    }
     const saveData = async () => {
         try {
             setLoading(true)
@@ -351,22 +370,24 @@ const SelectLocation = (props) => {
                 </ImageBackground>
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
-                <View style={{backgroundColor:"white",flex:1}}>
+                <View style={{ backgroundColor: "white", flex: 1 }}>
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                         <View style={styles.mapContainer}>
                             <MapView
+                                ref={ref}
                                 style={styles.map}
+                                region={coordinates}
                                 initialRegion={{
                                     ...coordinates,
-                                    latitudeDelta: 0.0922, // You can adjust these values as per your requirement
-                                    longitudeDelta: 0.0421, // You can adjust these values as per your requirement
+                                    latitudeDelta: 0.015,
+                                    longitudeDelta: 0.0121,
                                 }}>
                                 {(travelDistance2 ?? "") != '' && (
                                     <React.Fragment>
                                         <Circle
                                             key={(coordinates.latitude + coordinates.longitude).toString()}
                                             center={coordinates}
-                                            radius={Number(travelDistance2 ?? 0) * 1000} // Removed the conversion factor
+                                            radius={(Number(travelDistance2 ?? 0)??0) * 1000} // Removed the conversion factor
                                             strokeWidth={1}
                                             strokeColor={'red'}
                                             fillColor={'rgba(230,238,255,0.1)'}
@@ -376,6 +397,12 @@ const SelectLocation = (props) => {
                                         />
                                     </React.Fragment>
                                 )}
+                                  {/* <Marker
+                                coordinate={{
+                                    latitude: coordinates?.latitude ?? 0,
+                                    longitude: coordinates?.longitude ?? 0,
+                                }}
+                            /> */}
                             </MapView>
 
                         </View>

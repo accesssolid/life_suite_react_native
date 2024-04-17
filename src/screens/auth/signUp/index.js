@@ -552,7 +552,7 @@ const SignUpScreen = (props) => {
         getApi(config)
             .then(async (response) => {
                 if (response.status == true) {
-                    console.log(response.data)
+                    // console.log(response.data)
                     showToast('User Registered Successfully', 'success')
                     setLoader(false)
                     await storeItem('user', response.data)

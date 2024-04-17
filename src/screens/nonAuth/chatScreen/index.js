@@ -37,7 +37,7 @@ const ChatScreen = (props) => {
     const data = props.route.params.item
     const user = useSelector(state => state.authenticate?.user)
     const access_token = useSelector(state => state.authenticate?.access_token)
-    console.log("User", user)
+    // console.log("User", user)
     const [messages, setMessages] = useState("");
     const flatlistRef = useRef();
     const [visible, setVisible] = useState(false)

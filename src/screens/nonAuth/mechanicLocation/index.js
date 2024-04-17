@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert ,TextInput} from 'react-native'
+import { View, StyleSheet, Text, ImageBackground, StatusBar, Platform, Image, TouchableOpacity, ScrollView, Alert, TextInput } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -31,19 +31,26 @@ import { setCurrentLocationData } from '../../../redux/features/currentlocation'
 // #liahs_before_providers
 
 const MechanicLocation = (props) => {
-    const { serviceData, subService, extraData, orderData, reorder } = props.route.params
-    console.log("====asdfdff>",serviceData);
+    const { serviceData, subService, extraData, orderData, reorder,data } = props.route.params
+
+console.log(subService,"jhdfhdff===>");
     const [servicedata, setServicedata] = useState([])
-    const [sub_Service, setsub_Service] = useState({})
+    // const [subService, setsub_Service] = useState({})
+    const [date_data, setDate_data] = useState('')
     useEffect(() => {
-        console.log('abhi-=-',serviceData);
-     if (serviceData !=undefined && serviceData?.length>0) {
-        console.log("aaaaaaaaaa=>",serviceData);
-        setServicedata(serviceData)
-     }
-    }, [serviceData,subService])
-    
-    console.log(servicedata,"subService====>");
+        console.log('abhi-=-', data);
+        if (serviceData != undefined && serviceData?.length > 0) {
+            // console.log("aaaaaaaaaa=>", serviceData);
+            setServicedata(serviceData)
+        }
+        // if (subService?.hasOwnProperty("image")) {
+        //     setsub_Service(subService)
+        // }
+        // if (data !=undefined ) {
+        //     setDate_data(data)  
+        // }
+    }, [serviceData])
+
     const user = useSelector(state => state.authenticate.user)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isDatePickerVisible1, setDatePickerVisibility1] = useState(false);
@@ -51,19 +58,21 @@ const MechanicLocation = (props) => {
     const [endTime, setEndTime] = useState(moment())
     const [fromAddress, setFromAddress] = useState("")
     const [toAddress, setToAddress] = useState("")
-    const [date, setDate] = useState("")
+    const [date, setDatee] = useState("")
     const [open, setOpen] = useState(false)
-    const dispatch=useDispatch()
+    const dispatch = useDispatch()
     const [loading, setLoading] = React.useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
-
+    const setDate=(date)=>{
+        setDatee(date)
+    }
     const [isLoadCurrentLocation, setIsLoadCurrentLocation] = React.useState(false)
     React.useEffect(() => {
         // console.log("Params", props.route.params)
     }, [props.route.params])
-    const currentLocation=useSelector(state=>state.currentLocation)?.current
+    const currentLocation = useSelector(state => state.currentLocation)?.current
     // const [currentLocation, setCurrentLocation] = React.useState({
-        
+
     // })
 
     const [fromCoordinates, setFromCoordinates] = useState({
@@ -80,6 +89,7 @@ const MechanicLocation = (props) => {
         latitude: 37.78825,
         longitude: -122.4324,
     })
+
 
     // useEffect(() => {
     //     setActiveCoordinates(fromCoordinates)
@@ -190,6 +200,7 @@ const MechanicLocation = (props) => {
         if (hasLocationPermission) {
             Geolocation.getCurrentPosition(
                 (position) => {
+                    console.log(position,"position")
                     getCurrentPlace()
                 },
                 (error) => {
@@ -299,6 +310,7 @@ const MechanicLocation = (props) => {
 
     const submit = () => {
         if (reorder) {
+           
             if (date.trim() == "") {
                 setTimeout(() => {
                     showToast("Please select date")
@@ -340,6 +352,8 @@ const MechanicLocation = (props) => {
             "order_from_address": fromAddress,
             "mile_distance": total_distance
         }
+        console.log(data)
+        // return
         if (subService?.location_type == 2 && data?.order_from_address.trim() == "") {
             showToast("Please add from address")
         } else if (data.order_placed_address.trim() == "") {
@@ -358,6 +372,8 @@ const MechanicLocation = (props) => {
                 showToast("Start Time must be grater than End Time. ")
             }, 200)
         } else {
+           
+            
             props.navigation.navigate("Mechanics", { data: data, subService: subService, extraData })
         }
     }
@@ -398,6 +414,7 @@ const MechanicLocation = (props) => {
     };
 
     const onLocation = (location, coords) => {
+     
         setFromAddress(location)
         setFromCoordinates({
             ...coords,
@@ -415,16 +432,16 @@ const MechanicLocation = (props) => {
         })
     }
 
-    useEffect(()=>{
-        if(date!=""){
-            if(startTime){
+    useEffect(() => {
+        if (date != "") {
+            if (startTime) {
                 if (moment().toDate() > moment(moment(date).format("MM-DD-YYYY") + " " + moment(startTime).format("HH:mm"), "MM-DD-YYYY HH:mm").toDate()) {
                     setStartTime(moment())
                     setEndTime(moment())
                 }
             }
-        }    
-    },[date])
+        }
+    }, [date])
 
     const renderView = () => {
         return (
@@ -443,16 +460,16 @@ const MechanicLocation = (props) => {
                         <MapView
                             style={styles.map}
                             region={{
-                                latitude:activeCoordinates?.latitude??0,
-                                longitude:activeCoordinates?.longitude??0,
+                                latitude: activeCoordinates?.latitude ?? 0,
+                                longitude: activeCoordinates?.longitude ?? 0,
                                 latitudeDelta: 0.015,
                                 longitudeDelta: 0.0121,
                             }}>
                             <Marker
                                 coordinate={{
-                                    latitude:activeCoordinates?.latitude??0,
-                                longitude:activeCoordinates?.longitude??0,
-                                 }}
+                                    latitude: activeCoordinates?.latitude ?? 0,
+                                    longitude: activeCoordinates?.longitude ?? 0,
+                                }}
                             />
                         </MapView>
                     </View>
@@ -507,7 +524,7 @@ const MechanicLocation = (props) => {
                             />
                             <TouchableOpacity
                                 onPress={() => {
-                                    props.navigation.navigate("Calendar", { setDate: setDate.bind(this), service: subService?.name })
+                                    props.navigation.navigate("Calendar", { setDate: setDate, service: subService?.name, subService: subService, })
                                 }}
                                 style={{ alignSelf: "center", height: '100%', aspectRatio: 1, justifyContent: 'center' }}
                                 activeOpacity={0.7}
@@ -583,7 +600,7 @@ const MechanicLocation = (props) => {
                                     }}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
-                                        props.navigation.navigate("MainDrawer", { screen: "HomeScreen" ,params:{screen:"HomeScreen"}})
+                                        props.navigation.navigate("MainDrawer", { screen: "HomeScreen", params: { screen: "HomeScreen" } })
                                     }}
                                 />
                             </View>
@@ -629,7 +646,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         alignSelf: 'center',
         marginTop: 10,
-        marginBottom:5
+        marginBottom: 5
     },
     saveText: {
         textAlign: "center",

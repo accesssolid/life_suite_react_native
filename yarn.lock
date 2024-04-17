@@ -7262,6 +7262,11 @@ react-native-gesture-handler@^2.15.0, "react-native-gesture-handler@>= 1.0.0":
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
+react-native-get-location@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/react-native-get-location/-/react-native-get-location-4.0.1.tgz"
+  integrity sha512-blDWHI7f+gfzXbrrlFNRjpVMuuMTng3hsKR0Yi3iPNIM5LRs0EJDYvvdQaauFk7mJPryOxRE3+A5XAr+3kkpFg==
+
 react-native-google-places-autocomplete@^2.5.6:
   version "2.5.6"
   resolved "https://registry.npmjs.org/react-native-google-places-autocomplete/-/react-native-google-places-autocomplete-2.5.6.tgz"
@@ -7465,7 +7470,7 @@ react-native-webview@^13.8.1:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@>= 0.30.0", "react-native@>= 0.59", "react-native@>= 0.60.0", "react-native@>= 0.62", "react-native@>= 0.64.3", react-native@>=0.33, react-native@>=0.35, react-native@>=0.40.0, react-native@>=0.42.0, react-native@>=0.47, react-native@>=0.48.4, react-native@>=0.50.0, react-native@>=0.57, react-native@>=0.57.0, react-native@>=0.58.4, react-native@>=0.60.0, react-native@>=0.65.0, react-native@>=0.69, react-native@>=0.69.0, react-native@>=0.70.0, react-native@>=0.71.0, react-native@0.73.4:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@>= 0.30.0", "react-native@>= 0.59", "react-native@>= 0.60.0", "react-native@>= 0.62", "react-native@>= 0.64.3", react-native@>=0.33, react-native@>=0.35, react-native@>=0.40.0, react-native@>=0.42.0, react-native@>=0.47, react-native@>=0.48.4, react-native@>=0.50.0, react-native@>=0.57, react-native@>=0.57.0, react-native@>=0.58.4, react-native@>=0.60, react-native@>=0.60.0, react-native@>=0.65.0, react-native@>=0.69, react-native@>=0.69.0, react-native@>=0.70.0, react-native@>=0.71.0, react-native@0.73.4:
   version "0.73.4"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.73.4.tgz"
   integrity sha512-VtS+Yr6OOTIuJGDECIYWzNU8QpJjASQYvMtfa/Hvm/2/h5GdB6W9H9TOmh13x07Lj4AOhNMx3XSsz6TdrO4jIg==

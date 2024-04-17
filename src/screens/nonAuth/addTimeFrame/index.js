@@ -240,7 +240,7 @@ const AddTimeFrame = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log("response", response)
+                console.log("response==>", response)
                 if (response.status == true) {
                     setLoading(false)
                     let styles = [];

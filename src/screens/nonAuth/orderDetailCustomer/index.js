@@ -207,7 +207,7 @@ export default function OrderDetailUpdateCustomer(props) {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
-                    console.log("Response",response.data)
+                    // console.log("Response",response.data)
                     if (response.data) {
                         setData(response.data)
                         setVirtualData(response.data.virtual_order)
@@ -552,6 +552,7 @@ export default function OrderDetailUpdateCustomer(props) {
         if (hasLocationPermission) {
             Geolocation.getCurrentPosition(
                 (position) => {
+                    // console.log("position =>>", position);
                     getCurrentPlace()
                 },
                 (error) => {
@@ -935,7 +936,7 @@ const CardClientInfo = ({ data, order_variant, orderType,notificationData, noti_
                 }
             }
         }
-        console.log("ITEMS",virtualOrdersItems)
+        // console.log("ITEMS",virtualOrdersItems)
         setTbdTime(showTBD)
     },[items,virtualOrdersItems,showVirtualData])
     useEffect(() => {

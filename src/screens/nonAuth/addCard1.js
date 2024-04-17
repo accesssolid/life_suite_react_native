@@ -159,7 +159,7 @@ export default function AddCard1({ navigation, route }) {
 
         getApi(config)
             .then((response) => {
-                console.log("Card Save", response)
+                // console.log("Card Save", response)
                 if (response.status == true) {
                     showToast("Successfully, card added.")
                     navigation.goBack()

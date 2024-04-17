@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, Alert } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, Alert,ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
@@ -15,7 +15,7 @@ import { Rating, AirbnbRating } from 'react-native-ratings';
 import Loader from '../../../components/loader';
 import { order_types } from '../../../constants/globals';
 import lodash from 'lodash'
-import { ScrollView } from 'react-native';
+
 
 const types = ["Flat Amount", "Percentage"]
 export default function FinishPay({ navigation, route }) {
@@ -103,7 +103,7 @@ export default function FinishPay({ navigation, route }) {
             //     navigation.navigate("HomeScreen")
             // }}
             />
-            <View>
+            <View style={{backgroundColor:LS_COLORS.global.white ,flex:1}}>
                 <ScrollView>
                     <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20 }}>
                         <Text style={[styles.textStyle, { fontSize: 14 }]}>Rate this Job</Text>
