@@ -56,7 +56,8 @@ export default function ContactUs({ navigation, route }) {
             .then((response) => {
                 if (response.status == true) {
                     showToast("Form submitted successfully")
-                    navigation.goBack()
+                    navigation.navigate("Profile")
+
                 }
                 else {
                     showToast(response?.message)

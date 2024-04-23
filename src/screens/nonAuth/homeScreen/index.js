@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable, RefreshControl } from 'react-native'
+import { View, StyleSheet, Image, Text, SafeAreaView, ScrollView, TouchableOpacity, FlatList, BackHandler, Platform, PermissionsAndroid, Pressable, RefreshControl, Alert } from 'react-native'
 import messaging from '@react-native-firebase/messaging';
 import DeviceInfo, { getUniqueId, getManufacturer } from 'react-native-device-info';
 
@@ -587,7 +587,7 @@ const HomeScreen = (props) => {
                     ?
                     isAddJobActive
                         ?
-                        <View style={{ flex: 1, paddingTop: '5%' , }}>
+                        <View style={{ flex: 1, paddingTop: '5%'  }}>
                             <FlatList
                                 refreshControl={<RefreshControl
                                     refreshing={refreshload}
@@ -735,6 +735,7 @@ const HomeScreen = (props) => {
                                                     ?
                                                     props.navigation.navigate("ServicesProvided", { subService: item, items: [...item.itemsData] })
                                                     :
+
                                                     props.navigation.navigate("SubServices", { service: item })
                                             }
 

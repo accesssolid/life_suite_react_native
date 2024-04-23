@@ -1,6 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: 'com.google.gms.google-services' // apply after this line
-// apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: "com.facebook.react"
 apply plugin: "kotlin-android"
 
@@ -167,7 +167,6 @@ dependencies {
  
    implementation 'com.google.android.gms:play-services-location:20.0.0'
 
-  
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'

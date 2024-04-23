@@ -19,11 +19,11 @@ export default function ModalOTP({ visible, setVisible, setIsVerifiedPhone, phon
         setCode("")
         // }
 
-        if (visible) {
-            setTimeout(() => {
-                otpRef?.current.focusField(0)
-            }, 500);
-        }
+        // if (visible) {
+        //     setTimeout(() => {
+        //         otpRef?.current.focusField(0)
+        //     }, 500);
+        // }
     }, [visible])
     const VerifyPhoneNumber = async () => {
         try {

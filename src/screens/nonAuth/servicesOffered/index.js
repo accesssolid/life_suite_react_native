@@ -1299,10 +1299,12 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: LS_COLORS.global.cyan,
+        
     },
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
+        
     },
     image: {
         resizeMode: 'contain',
