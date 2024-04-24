@@ -56,6 +56,7 @@ const ServicesProvided = (props) => {
     const [selectedModel, setSelectedModel] = React.useState("")
     const [selectedYear, setSelectedYear] = React.useState("")
     const [vehicle_types, setVehicleTypes] = React.useState([])
+    console.log(vehicle_types,"vehicle_types===>>>>");
 
     React.useEffect(() => {
         let data = {
@@ -587,9 +588,7 @@ const ServicesProvided = (props) => {
                                     props.navigation.navigate("HomeScreen")
                                 }}
                             />
-                            {/* <View style={{ justifyContent: 'center', alignItems: "center", height: "33%" }}>
-                                <Text style={{ fontSize: 29, fontFamily: LS_FONTS.PoppinsMedium, color: LS_COLORS.global.white }}>{subService?.name}</Text>
-                            </View> */}
+                           
                         </SafeAreaView>
                     </View>
                 </ImageBackground>
@@ -602,6 +601,7 @@ const ServicesProvided = (props) => {
                             title={vehicleType?.service_variants_name}
                             item={vehicle_types.map(x => String(x.name).toUpperCase())}
                             value={String(vehicleType.name).toUpperCase()}
+                           
                             onChangeValue={(index, value) => onChangeVehicleType(vehicle_types[index])}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                             dropdownStyle={{ height: vehicle_types?.length==0?10:(vehicle_types?.length>=4?160:vehicle_types?.length*40) }}
@@ -634,6 +634,7 @@ const ServicesProvided = (props) => {
                                     onChangeValue={(index, value) => {
                                         setSelectedModel(modelList[index].id)
                                     }}
+                                    
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
                                     dropdownStyle={{ maxHeight: modelList?.length>0?(modelList?.length*40<160?modelList?.length*40:160):40 }}
                                     textValueProps={{
@@ -701,14 +702,16 @@ const ServicesProvided = (props) => {
                                             {itemList && itemList.length > 0
                                                 ?
                                                 itemList.map((item, index) => {
-                                                    return (<ServiceItemUser
+                                                    return (
+                                                    <ServiceItemUser
                                                         key={index}
                                                         item={item}
                                                         index={index}
                                                         onCheckPress={() => onPressItem(item, index)}
                                                         isSelected={selectedItems.includes(item.id)}
                                                         setExtraData={setExtraData}
-                                                    />)
+                                                    />
+                                                )
                                                 })
                                                 :
                                                 null}
@@ -754,6 +757,7 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: LS_COLORS.global.cyan,
+        
     },
     container: {
         flex: 1,

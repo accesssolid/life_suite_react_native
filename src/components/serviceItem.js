@@ -80,13 +80,14 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 color="black"
                                 placeholder="HH"
                                 keyboardType="numeric"
-                                textAlign='right'
+                                textAlign='left'
                                 editable={props.isSelected}
                                 style={styles.inputStyle}
                                 value={props?.serviceItem?.time_duration_h}
                                 ref={hourRef}
-                                selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_h?.length??0,start:props.serviceItem?.time_duration_h?.length??0}}
+                                //  selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_h?.length??0,start:props.serviceItem?.time_duration_h?.length??0}}
                                 returnKeyType={'done'}
+                                // selection={null} 
                                 placeholderTextColor={LS_COLORS.global.placeholder}
                                 maxFontSizeMultiplier={1.2}
                             />
@@ -109,15 +110,16 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 color="black"
                                 placeholder="MM"
                                 keyboardType="numeric"
-                                textAlign='right'
+                                textAlign='left'
                                 editable={props.isSelected}
                                 style={styles.inputStyle}
                                 value={props?.serviceItem?.time_duration_m}
                                 ref={minRef}
-                                selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_m?.length??0,start:props.serviceItem?.time_duration_m?.length??0}}
+                                // selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_m?.length??0,start:props.serviceItem?.time_duration_m?.length??0}}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
                                 maxFontSizeMultiplier={1.2}
+                                rightToLeft={false}
                             />
                         </View>
                     </View>
@@ -128,13 +130,14 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 style={[styles.inputStyle,{minWidth:40}]}
                                 color="black"
                                 placeholder="$000"
-                                textAlign="right"
+                                textAlign="left"
                                 editable={props.isSelected}
                                 onChangeText={(text) => props.setText("price", text, props.index, props.serviceItem)}
+
                                 keyboardType="numeric"
                                 value={props.serviceItem?.price}
                                 ref={priceRef}
-                                selection={{end:props.serviceItem?.price?.length??0,start:props.serviceItem?.price?.length??0}}
+                                // selection={{end:props.serviceItem?.price?.length??0,start:props.serviceItem?.price?.length??0}}
                                 numberOfLines={1}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
@@ -160,12 +163,12 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             style={styles.inputStyle}
                             color="black"
                             placeholder="$00"
-                            textAlign='right'
+                            textAlign='left'
                             editable={props.selectedProducts.includes(item.id)}
                             onChangeText={(text) => props.setProductText(item, text)}
                             keyboardType="numeric"
                             value={item.price}
-                            selection={{end:item.price?.length??0,start:item.price?.length??0}}
+                            // selection={{end:item.price?.length??0,start:item.price?.length??0}}
                             returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
                             placeholderTextColor={LS_COLORS.global.placeholder}
                             maxFontSizeMultiplier={1.2}

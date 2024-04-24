@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Dimensions, SafeAreaView, FlatList, Text } from 'react-native'
+import { View, StyleSheet, Image, Dimensions, SafeAreaView, FlatList, Text, Alert } from 'react-native'
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';

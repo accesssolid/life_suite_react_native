@@ -46,6 +46,11 @@ const ServicesProvided = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const [activeIndex, setActiveIndex] = useState(null)
     const [activeItem, setActiveItem] = useState(null)
+    console.log(servicesData,"servicesData====>>");
+    console.log(variants,"variants====>>");
+    console.log(activeItem,"activeItem====>>");
+    console.log(selectedVariant,"selectedVariant====>>");
+
     const [newServices, setNewServices] = useState([])
     const [newServicesMaster, setNewServicesMaster] = useState([])
     const [openModal, setOpenModal] = useState(false)
@@ -373,6 +378,8 @@ useEffect(()=>{
     }
 
     const setText = (key, text, indexx, incomingItem) => {
+
+        console.log(key,text,indexx,incomingItem,"pppppp");
         if (variants.length > 0) {
             let temp = [...servicesData.filter(item => item.variant_data == selectedVariant)]
             let otherItems = [...servicesData.filter(item => item.variant_data !== selectedVariant)]
@@ -392,6 +399,7 @@ useEffect(()=>{
                     }
                 }
             })
+            console.log("yesss");
             setServicesData([...temp, ...otherItems])
 
         } else {
@@ -416,6 +424,7 @@ useEffect(()=>{
                     temp[index] = item
                 }
             });
+            console.log("noooo");
 
             setServicesData([...temp])
         }
@@ -488,7 +497,8 @@ useEffect(()=>{
             } else {
                 setIsOtherSelected(false)
             }
-        } else {
+        }
+         else {
             if (getSelectedProducts().length > 0 || getSelectedNewProducts().length > 0) {
                 Alert.alert(
                     "Lifesuite",
@@ -668,7 +678,9 @@ useEffect(()=>{
 
         } else {
             servicesData?.forEach((itemm, index) => {
-                if (selectedItems?.includes(itemm?.item_id)) {
+                console.log(itemm,'itemmmm')
+                console.log(selectedItems,'selecteddddddd')
+                if (selectedItems?.includes(itemm?.id??itemm?.item_id)) {
                     if (itemm?.price.trim() !== ""
                         // && itemm.time_duration_h.trim() !== "" 
                         && itemm?.time_duration_m.trim() !== "") {
@@ -1159,7 +1171,7 @@ useEffect(()=>{
                             setText={setText}
                             setProductText={setProductText}
                             setNewProductText={setNewProductText}
-                            serviceItem={variants.length > 0 ? servicesData.find(item => item?.variant_data == selectedVariant && item?.item_id == activeItem?.id) : servicesData.find(item => item?.item_id == activeItem?.id)}
+                            serviceItem={variants.length > 0 ? servicesData.find(item => item?.variant_data == selectedVariant && item?.item_id == activeItem?.id) : servicesData.find(item => item?.id ??item?.item_id == activeItem?.id)}
                             subService={subService}
                             showInputs
                             products={productsData?.filter(item => item?.item_id == activeItem?.id)}
