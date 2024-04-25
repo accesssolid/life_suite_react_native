@@ -750,7 +750,7 @@ const CustomDrawerContent = (props) => {
                 </Text>}
                 icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/contactUs.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
-                    navigation.navigate("Contact Us")
+                    navigation.navigate("Contact Us",{from:"Drawer"})
                 }}
             />
             <DrawerItem

@@ -8,14 +8,29 @@ export const storeStringData = async (key, value) => {
     }
 }
 
+// export const storeJsonData = async (key, value) => {
+//     console.log(key,value,"kkkkk==>>");
+//     try {
+//         const jsonValue = JSON.stringify(value)
+//         await AsyncStorage.setItem(key, jsonValue)
+//         console.log(jsonValue,"jsonValue");
+//     } catch (e) {
+//         // saving error
+//     }
+// }
+
 export const storeJsonData = async (key, value) => {
+    console.log(key, value, "kkkkk==>>");
     try {
-        const jsonValue = JSON.stringify(value)
-        await AsyncStorage.setItem(key, jsonValue)
-    } catch (e) {
-        // saving error
+        const jsonValue = JSON.stringify(value);
+        await AsyncStorage.setItem(key, jsonValue);
+        console.log(jsonValue, "jsonValue");
+        return true; // Return true upon successful storage
+    } catch (error) {
+        console.error("Error storing data:", error);
+        return false; // Return false if storing data fails
     }
-}
+};
 
 
 export const getStringData = async (key) => {
@@ -30,6 +45,7 @@ export const getStringData = async (key) => {
 }
 
 export const getJsonData = async (key) => {
+    console.log(key,"key");
     try {
         const jsonValue = await AsyncStorage.getItem(key)
         return jsonValue != null ? JSON.parse(jsonValue) : null;

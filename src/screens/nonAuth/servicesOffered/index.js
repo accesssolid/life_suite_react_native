@@ -1293,8 +1293,13 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService }) => {
                     <CustomButton
                         title="Submit"
                         action={() => {
-                            addNewService(service_name)
+                            if (service_name=='') {
+                                showToast("Please enter service name")
+                            } else {
+                                addNewService(service_name)
                             setVisible(false)
+                            }
+                            
                         }}
                         customStyles={{ width: "35%", borderRadius: 5, marginTop: 20 }}
                         customTextStyles={{ fontSize: 12 }}

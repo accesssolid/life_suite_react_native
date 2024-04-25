@@ -32,11 +32,13 @@ import { updateSignupModal } from '../../../redux/features/signupModal';
 import { updateBlockModal } from '../../../redux/features/blockModel';
 import ReviewBusiness from '../../../components/ReviewBusiness';
 import { setQOpen, setQService, setQuestionTypes } from '../../../redux/features/questionaire.model';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 const HomeScreen = (props) => {
     const dispatch = useDispatch()
     const navigation = useNavigation();
     const user = useSelector(state => state.authenticate.user)
+
     const userType = useSelector(state => state.authenticate.type)
 
     const services = useSelector(state => state.authenticate.services)
@@ -98,6 +100,7 @@ const HomeScreen = (props) => {
     }, [switched, userType])
 
     useEffect(() => {
+        console.log("yesss");
         if (userType != "guest") {
             getServices(true)
             if (user.user_role == 3) {
@@ -110,6 +113,7 @@ const HomeScreen = (props) => {
                 getConnectAccountDetail()
             }, 300);
         } else {
+            console.log("nooooo");
             getGuestServices(true)
         }
     }, [])
@@ -186,11 +190,16 @@ const HomeScreen = (props) => {
     useFocusEffect(
         useCallback(() => {
             if (userType != "guest") {
+
                 if (props.route?.params) {
+                console.log("guestnotttttt");
+
                     if (props.route?.params.addJobClear) {
                         setIsAddJobActive(false)
                     }
                 }
+                console.log("guestnottttttppppp");
+
                 getServices(false)
             }
 
@@ -249,7 +258,7 @@ const HomeScreen = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
+                console.log(response,"res1==>>>>")
                 if (response.status == true) {
                     dispatch(setServices({ data: [...response.data] }))
                     setItems([...response.data])
@@ -285,7 +294,7 @@ const HomeScreen = (props) => {
         }
         getApi(config)
             .then((response) => {
-                console.log(response)
+                console.log(response,"res===>>>>")
                 if (response.status == true) {
                     dispatch(setServices({ data: [...response.data] }))
                     setItems([...response.data])
@@ -326,7 +335,8 @@ const HomeScreen = (props) => {
                 .then((response) => {
                     // console.log("Response===>>>", response)
                     if (response.status == true) {
-
+                        // getGuestServices(),
+                        // getServices()
                     }
                     else {
                         showToast(response.message, 'danger')
@@ -704,8 +714,10 @@ const HomeScreen = (props) => {
                         }} />}
                         scrollEnabled={scrollEnabled}
                         showsVerticalScrollIndicator={false}>
-                        <View style={{ flex: 1, paddingTop: '5%' }}>
+                        <View style={{ flex: 1, paddingTop: '5%',}}>
                             <SortableGrid
+                            // itemWidth={widthPercentageToDP(40)}
+                            // itemHeight={100}
                                 blockTransitionDuration={400}
                                 activeBlockCenteringDuration={500}
                                 itemsPerRow={2}
@@ -717,16 +729,17 @@ const HomeScreen = (props) => {
                                         arr.push(items[itemData.key].id)
                                         setOrder(arr)
                                     })
-                                    console.log("arr", arr)
+                                    console.log("arr==>>>", arr)
                                     getList(arr)
                                     console.log("Drag was released, the blocks are in the following order: ", arr)
                                 }}
                                 onDragStart={() => {
                                     setScrollEnabled(false)
                                 }}>
-                                {items.map((item, index) =>
+                                {items.map((item, index) =>(
+                                console.log(index),
                                     <View key={index}
-                                        style={{ alignItems: 'center', justifyContent: 'center' }}
+                                        style={{ alignItems: 'center', justifyContent: 'center'}}
                                         onTap={() => {
                                             if (user?.user_status == 3) {
                                                 dispatch(updateBlockModal(true))
@@ -747,6 +760,7 @@ const HomeScreen = (props) => {
                                             imageUrl={{ uri: BASE_URL + item.image }}
                                         />
                                     </View>
+                                )
                                 )}
                             </SortableGrid>
                         </View>

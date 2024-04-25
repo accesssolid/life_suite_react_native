@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 1.0,
         borderRadius: 10,
         backgroundColor: LS_COLORS.global.white,
+
     },
     text: {
         textAlign: 'center',

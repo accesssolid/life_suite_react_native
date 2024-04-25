@@ -1,0 +1,21 @@
+diff --git a/node_modules/react-native-sortable-grid-with-fixed/index.js b/node_modules/react-native-sortable-grid-with-fixed/index.js
+index e2602d9..f1c9aa7 100644
+--- a/node_modules/react-native-sortable-grid-with-fixed/index.js
++++ b/node_modules/react-native-sortable-grid-with-fixed/index.js
+@@ -54,6 +54,7 @@ class SortableGrid extends Component {
+           this.items.map((item, key) => (
+             <Block
+               key={key}
++             
+               style={this._getBlockStyle(key)}
+               onLayout={this.saveBlockPositions(key)}
+               panHandlers={this._panResponder.panHandlers}
+@@ -628,7 +629,7 @@ class SortableGrid extends Component {
+ 
+   _getBlockStyle = key => [
+     {
+-      width: this.state.blockWidth,
++      width: this.state.blockWidth-1,
+       height: this.state.blockHeight,
+       justifyContent: "center"
+     },

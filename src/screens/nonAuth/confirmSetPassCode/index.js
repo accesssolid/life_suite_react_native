@@ -26,6 +26,7 @@ import LS_COLORS from '../../../constants/colors';
 
 const ConfirmSetPassCode = (props) => {
     const [Passcode, setPasscode] = useState('')
+    console.log(Passcode,"Passcode===>>>");
 
     useFocusEffect(
         React.useCallback(() => {
@@ -43,9 +44,11 @@ const ConfirmSetPassCode = (props) => {
     );
 
     const confirmPassCode = async () => {
+
         if (props.route.params.pass == Passcode) {
             let x = await storeJsonData("passcode", Passcode)
             let y = await storeJsonData("passcodeVerification", true)
+            console.log(x,y,'jjjjjj');
             props.navigation.navigate('Settings')
         }
         else {

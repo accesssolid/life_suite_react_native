@@ -42,7 +42,7 @@ const Settings = (props) => {
             setPassCodeVerification(v)
             let pass = await getJsonData("passcode")
             let passVerification = await getJsonData("passcodeVerification")
-            console.log(pass,v,passVerification)
+            console.log(pass,v,passVerification,"iiiii")
             if (v) {
                 if (pass && !passVerification) {
                     let x = await storeJsonData("passcodeVerification", true)
