@@ -204,11 +204,13 @@ const AddTimeFrame = (props) => {
             .then((response) => {
                 console.log(response,"response====>>>>>");
                 if (response.status == true) {
-                console.log(response,"response====>>>>><<<<");
+               
 
                     setLoading(false)
                     // showToast(response.message, 'success')
-                    showToast(response.message, 'success')
+                     showToast(response.message, 'success')
+                 
+
 
                     data = []
                     getMyJobs(true)
@@ -216,7 +218,8 @@ const AddTimeFrame = (props) => {
                 }
                 else {
                     setLoading(false)
-                    showToast(response.message, 'danger')
+                     showToast(response.message, 'danger')
+                  
                 }
             })
             .catch(err => {

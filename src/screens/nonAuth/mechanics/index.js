@@ -374,6 +374,7 @@ const Mechanics = (props) => {
 
         getApi(config)
             .then((response) => {
+                console.log(response,"response===>>><<<<:::::");
                 if (response.status == true) {
                     setLoading(false)
                     props.navigation.navigate("MainDrawer", { screen: "Orders" })
@@ -943,6 +944,7 @@ const Mechanics = (props) => {
                                 //    console.log(z)
                                 // if (_.isEqual(requiredSevices.sort((a, b) => a - b), z.sort((a, b) => a - b))) {
                                 if (z.length > 0) {
+
                                     setOpen2(!open2)
                                 } else {
                                     showToast("Please select atleast on service from service provider list.")

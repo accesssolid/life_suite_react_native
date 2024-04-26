@@ -6,7 +6,7 @@ import LS_COLORS from '../../constants/colors';
 
 /* Packages */
 import {useDispatch, useSelector} from 'react-redux';
-import ReactNativeBiometrics from 'react-native-biometrics';
+import ReactNativeBiometrics, {BiometryTypes} from 'react-native-biometrics';
 
 /* Methods */
 import {retrieveItem, showToast} from '../../components/validators';
@@ -105,103 +105,103 @@ const Splash = props => {
     console.log(bioVerification, 'bioVerification===>>>>');
 
     if (pass) {
-        console.log('yess1');
+      const rnBiometrics = new ReactNativeBiometrics();
 
-    //   const {biometryType} = await ReactNativeBiometrics.isSensorAvailable();
-      const {biometryType} = new ReactNativeBiometrics({ allowDeviceCredentials: true })
+      rnBiometrics.isSensorAvailable().then(async resultObject => {
+        console.log(resultObject, 'resultObject==>>>');
+        const {available, biometryType} = resultObject;
 
+        if (Platform.OS === 'ios') {
+          console.log('yess111==>>>>');
 
-      
-      
-    //   console.log(biometryType,"biometryType==>>>");
-      console.log(Platform.OS,"Platform.OS");
-      if (Platform.OS === 'ios') {
-        console.log('yess111==>>>>');
-
-
-        if (bioVerification) {
-          if (biometryType === ReactNativeBiometrics.TouchID) {
-            ReactNativeBiometrics.simplePrompt({
-              promptMessage: 'Confirm fingerprint',
-            })
-              .then(resultObject => {
-                const {success} = resultObject;
-                if (success) {
-                  checkAuth();
-                } else {
+          if (bioVerification) {
+            if (biometryType === BiometryTypes.TouchID) {
+              rnBiometrics.simplePrompt({
+                promptMessage: 'Confirm fingerprint',
+              })
+                .then(resultObject => {
+                  const {success} = resultObject;
+                  if (success) {
+                    checkAuth();
+                  } else {
+                    setTimeout(() => {
+                      props.navigation.navigate('Passcode');
+                    }, 1000);
+                  }
+                })
+                .catch(() => {
                   setTimeout(() => {
                     props.navigation.navigate('Passcode');
                   }, 1000);
-                }
+                });
+            } else if (biometryType === BiometryTypes.FaceID) {
+              rnBiometrics.simplePrompt({
+                promptMessage: 'Confirm face',
               })
-              .catch(() => {
-                setTimeout(() => {
-                  props.navigation.navigate('Passcode');
-                }, 1000);
-              });
-          } else if (biometryType === ReactNativeBiometrics.FaceID) {
-            ReactNativeBiometrics.simplePrompt({promptMessage: 'Confirm face'})
-              .then(resultObject => {
-                const {success} = resultObject;
-                if (success) {
-                  checkAuth();
-                } else {
+                .then(resultObject => {
+                  const {success} = resultObject;
+                  if (success) {
+                    checkAuth();
+                  } else {
+                    setTimeout(() => {
+                      props.navigation.navigate('Passcode');
+                    }, 1000);
+                  }
+                })
+                .catch(() => {
                   setTimeout(() => {
                     props.navigation.navigate('Passcode');
                   }, 1000);
-                }
-              })
-              .catch(() => {
-                setTimeout(() => {
-                  props.navigation.navigate('Passcode');
-                }, 1000);
-              });
+                });
+            } else {
+              setTimeout(() => {
+                props.navigation.navigate('Passcode');
+              }, 1000);
+            }
           } else {
             setTimeout(() => {
               props.navigation.navigate('Passcode');
             }, 1000);
           }
         } else {
-          setTimeout(() => {
-            props.navigation.navigate('Passcode');
-          }, 1000);
-        }
-      } else {
-        console.log('yess==>>>>');
+          console.log('yess==>>>>');
 
-        if (bioVerification) {
-          if (biometryType === ReactNativeBiometrics.Biometrics) {
-            ReactNativeBiometrics.simplePrompt({
-              promptMessage: 'Confirm fingerprint',
-            })
-              .then(resultObject => {
-                const {success} = resultObject;
-                if (success) {
-                  checkAuth();
-                } else {
+          if (bioVerification) {
+          console.log(bioVerification,"bioVerification==>>>:::");
+
+            if (biometryType === BiometryTypes.Biometrics) {
+              console.log("(((((");
+              rnBiometrics.simplePrompt({
+                promptMessage: 'Confirm fingerprint',
+              })
+                .then(resultObject => {
+                  const {success} = resultObject;
+                  if (success) {
+                    checkAuth();
+                  } else {
+                    setTimeout(() => {
+                      props.navigation.navigate('Passcode');
+                    }, 1000);
+                  }
+                })
+                .catch(() => {
                   setTimeout(() => {
                     props.navigation.navigate('Passcode');
                   }, 1000);
-                }
-              })
-              .catch(() => {
-                setTimeout(() => {
-                  props.navigation.navigate('Passcode');
-                }, 1000);
-              });
+                });
+            } else {
+              setTimeout(() => {
+                props.navigation.navigate('Passcode');
+              }, 1000);
+            }
           } else {
             setTimeout(() => {
               props.navigation.navigate('Passcode');
             }, 1000);
           }
-        } else {
-          setTimeout(() => {
-            props.navigation.navigate('Passcode');
-          }, 1000);
         }
-      }
+      });
     } else {
-
       setTimeout(async () => {
         checkAuth();
       }, 1000);

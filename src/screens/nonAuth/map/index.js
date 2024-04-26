@@ -285,7 +285,7 @@ const MapScreen = (props) => {
                     <View style={styles.mapContainer}>
                         <View style={{ position: 'absolute', width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-around', top: focused ? '15%' : '10%', alignItems: 'center', paddingHorizontal: '10%', zIndex: 1 }}>
                             {user?.address[0]?.address_line_1 !== '' && <CustomButton
-                                title={user.user_role == 2 ? "Home" : "permanent"}
+                                title={user.user_role == 2 ? "Home" : "Permanent"}
                                 customTextStyles={{ fontSize: 14, color: LS_COLORS.global.white }}
                                 customStyles={{
                                     width: '100%',
