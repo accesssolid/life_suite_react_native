@@ -41,10 +41,18 @@ const DropDown1 = (props) => {
                 </View>
                 }
                 <ModalDropdown
+                
                     ref={props.dropRef}
                     defaultValue={props.value}
                     isFullWidth={true}
                     options={props.item}
+                    renderSeparator={()=>{
+                        return(
+                            <View style={{borderBottomWidth: 0.8 ,
+                                borderColor:"gray"}}>
+                                </View>
+                        )
+                    }}
                     textStyle={{
                         fontSize: props.handleTextValue ? 0 : 14,
                         height: 50,
@@ -60,7 +68,7 @@ const DropDown1 = (props) => {
                         fontSize: 12,
                         color: LS_COLORS.global.black
                     }}
-                    dropdownStyle={[{ borderWidth: 1 }, props.dropdownStyle]}
+                    dropdownStyle={[{ borderWidth: 1,marginTop:5 }, props.dropdownStyle,]}
                     onSelect={props.onChangeValue}
                     showsVerticalScrollIndicator={true}
                     disabled={props.disabled}
@@ -70,9 +78,9 @@ const DropDown1 = (props) => {
                             width: "100%",
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            height: 40,
+                            height:40,
                             paddingHorizontal: '2%',
-                            backgroundColor: LS_COLORS.global.white
+                            backgroundColor: LS_COLORS.global.white,
                         }}>
                             <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
                             {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}
@@ -109,6 +117,13 @@ export const DropDown = (props) => {
                     defaultValue={props.value}
                     isFullWidth={true}
                     options={props.item}
+                    renderSeparator={()=>{
+                        return(
+                            <View style={{borderBottomWidth: 0.8 ,
+                                borderColor:"gray"}}>
+                                </View>
+                        )
+                    }}
                     textStyle={{
                         fontSize: props.handleTextValue ? 0 : 14,
                         minHeight: 50,
@@ -137,7 +152,7 @@ export const DropDown = (props) => {
                             alignItems: 'center',
                             height: 40,
                             paddingHorizontal: '2%',
-                            backgroundColor: LS_COLORS.global.white
+                            backgroundColor: LS_COLORS.global.white,
                         }}>
                             <Text maxFontSizeMultiplier={1.7} style={{ fontFamily: LS_FONTS.RalewayRegular, fontSize: 12, textAlign: "left" }}>{item}</Text>
                             {props.value == item && <AntDesign name="check" color={LS_COLORS.global.green} size={18} />}

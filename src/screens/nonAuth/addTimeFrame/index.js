@@ -143,7 +143,7 @@ const AddTimeFrame = (props) => {
     }
     const [pressed, setPressed] = React.useState(false)
     const save = () => {
-        setPressed(true)
+        // setPressed(true)
         setLoading(true)
         let headers = {
             Accept: "application/json",
@@ -192,6 +192,8 @@ const AddTimeFrame = (props) => {
         // setLoading(false)
         // return
 
+
+
         let config = {
             headers: headers,
             data: formdata,
@@ -200,16 +202,24 @@ const AddTimeFrame = (props) => {
         }
         getApi(config)
             .then((response) => {
+                console.log(response,"response====>>>>>");
                 if (response.status == true) {
+               
+
                     setLoading(false)
-                    showToast(response.message, 'success')
+                    // showToast(response.message, 'success')
+                     showToast(response.message, 'success')
+                 
+
+
                     data = []
                     getMyJobs(true)
                     dispatch(addUpdateQuestionaire())
                 }
                 else {
                     setLoading(false)
-                    showToast(response.message, 'danger')
+                     showToast(response.message, 'danger')
+                  
                 }
             })
             .catch(err => {

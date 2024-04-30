@@ -140,7 +140,7 @@ const ChatScreen = (props) => {
             // If user canceled the document selection
             alert(
                 DocumentPicker.isCancel(error)
-                    ? "Canceled"
+                    ? "Cancelled"
                     : "Unknown Error: " + JSON.stringify(error)
             );
         }

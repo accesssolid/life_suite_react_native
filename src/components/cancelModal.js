@@ -53,7 +53,7 @@ const CancelModal = props => {
                     }}>
                         <TextInput
                             multiline={true}
-                            style={{ padding: 10, height: 100, color: "black", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlignVertical: 'top' }}
+                            style={{ padding: 10, height: 100, color: "black", fontSize: 12, fontFamily: LS_FONTS.PoppinsRegular, textAlignVertical: 'top',borderWidth:0.6,borderColor:"black",borderRadius:10 }}
                             placeholder="Write your reason for cancel here..."
                             value={props.value}
                             onChangeText={props.onChangeText}

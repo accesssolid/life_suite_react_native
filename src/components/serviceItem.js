@@ -66,7 +66,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                     <View style={{ alignItems: "center", marginRight: 10 }}>
                         <Text maxFontSizeMultiplier={1.2} style={{ textAlign: "center", marginBottom: 5, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Hour</Text>
                         <View style={{ ...styles.fromContainer }}>
-                            <TextInputMask
+                            {/* <TextInputMask
                                 onChangeText={(formatted, extracted) => {
                                     if(extracted?.trim()==""){
                                         props.setText("time_duration_h", "", props.index, props.serviceItem)
@@ -80,12 +80,57 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 color="black"
                                 placeholder="HH"
                                 keyboardType="numeric"
-                                textAlign='right'
+                                textAlign='left'
                                 editable={props.isSelected}
                                 style={styles.inputStyle}
                                 value={props?.serviceItem?.time_duration_h}
                                 ref={hourRef}
-                                selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_h?.length??0,start:props.serviceItem?.time_duration_h?.length??0}}
+                                //  selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_h?.length??0,start:props.serviceItem?.time_duration_h?.length??0}}
+                                returnKeyType={'done'}
+                                // selection={null} 
+                                placeholderTextColor={LS_COLORS.global.placeholder}
+                                maxFontSizeMultiplier={1.2}
+                            /> */}
+                            {/* <TextInput
+                                onChangeText={(formatted, extracted) => {
+                                    console.log();
+                                    if(extracted?.trim()==""){
+                                        props.setText("time_duration_h", "", props.index, props.serviceItem)
+
+                                    }else{
+                                        props.setText("time_duration_h", extracted, props.index, props.serviceItem)
+
+                                    }
+                                }}
+                                // mask={"[00]"}
+                                color="black"
+                                placeholder="HH"
+                                keyboardType="numeric"
+                                textAlign='left'
+                                editable={props.isSelected}
+                                style={styles.inputStyle}
+                                value={props?.serviceItem?.time_duration_h}
+                                ref={hourRef}
+                                //  selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_h?.length??0,start:props.serviceItem?.time_duration_h?.length??0}}
+                                returnKeyType={'done'}
+                                // selection={null} 
+                                placeholderTextColor={LS_COLORS.global.placeholder}
+                                maxFontSizeMultiplier={1.2}
+                            /> */}
+                            <TextInput
+                                style={{minWidth:25,alignItems:'center',justifyContent:'center'}}
+                                color="black"
+                                placeholder="HH"
+                                textAlign='left'
+                                editable={props.isSelected}
+                                maxLength={2}
+                                // onChangeText={(text) => props.setText("time_duration_h", "", props.index, props.serviceItem)}
+                                onChangeText={(text) => props.setText("time_duration_h", text, props.index, props.serviceItem)}
+                                keyboardType="numeric"
+                                value={props?.serviceItem?.time_duration_h}
+                                ref={hourRef}
+                                // selection={{end:props.serviceItem?.price?.length??0,start:props.serviceItem?.price?.length??0}}
+                                numberOfLines={1}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
                                 maxFontSizeMultiplier={1.2}
@@ -95,7 +140,7 @@ const ServiceItem = React.forwardRef((props, ref) => {
                     <View style={{ alignItems: "center", marginRight: 10 }}>
                         <Text maxFontSizeMultiplier={1.2} numberOfLines={1.} style={{ textAlign: "center", marginBottom: 5, fontSize: 11, fontFamily: LS_FONTS.PoppinsRegular }}>Minutes</Text>
                         <View style={{ ...styles.fromContainer }}>
-                            <TextInputMask
+                            {/* <TextInputMask
                                 onChangeText={(formatted, extracted) => {
                                     if(extracted?.trim()==""){
                                         props.setText("time_duration_m", "", props.index, props.serviceItem)
@@ -109,12 +154,31 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 color="black"
                                 placeholder="MM"
                                 keyboardType="numeric"
-                                textAlign='right'
+                                textAlign='left'
                                 editable={props.isSelected}
                                 style={styles.inputStyle}
                                 value={props?.serviceItem?.time_duration_m}
                                 ref={minRef}
-                                selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_m?.length??0,start:props.serviceItem?.time_duration_m?.length??0}}
+                                // selection={Platform.OS=="android"?undefined:{end:props.serviceItem?.time_duration_m?.length??0,start:props.serviceItem?.time_duration_m?.length??0}}
+                                returnKeyType={'done'}
+                                placeholderTextColor={LS_COLORS.global.placeholder}
+                                maxFontSizeMultiplier={1.2}
+                                rightToLeft={false}
+                            /> */}
+                            <TextInput
+                                style={{minWidth:25,alignItems:'center',justifyContent:'center'}}
+                                color="black"
+                                placeholder="MM"
+                                textAlign='left'
+                                editable={props.isSelected}
+                                maxLength={2}
+                                // onChangeText={(text) => props.setText("time_duration_h", "", props.index, props.serviceItem)}
+                                onChangeText={(text) => props.setText("time_duration_m", text, props.index, props.serviceItem)}
+                                keyboardType="numeric"
+                                value={props?.serviceItem?.time_duration_m}
+                                ref={hourRef}
+                                // selection={{end:props.serviceItem?.price?.length??0,start:props.serviceItem?.price?.length??0}}
+                                numberOfLines={1}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
                                 maxFontSizeMultiplier={1.2}
@@ -128,13 +192,14 @@ const ServiceItem = React.forwardRef((props, ref) => {
                                 style={[styles.inputStyle,{minWidth:40}]}
                                 color="black"
                                 placeholder="$000"
-                                textAlign="right"
+                                textAlign="left"
                                 editable={props.isSelected}
                                 onChangeText={(text) => props.setText("price", text, props.index, props.serviceItem)}
+
                                 keyboardType="numeric"
                                 value={props.serviceItem?.price}
                                 ref={priceRef}
-                                selection={{end:props.serviceItem?.price?.length??0,start:props.serviceItem?.price?.length??0}}
+                                // selection={{end:props.serviceItem?.price?.length??0,start:props.serviceItem?.price?.length??0}}
                                 numberOfLines={1}
                                 returnKeyType={'done'}
                                 placeholderTextColor={LS_COLORS.global.placeholder}
@@ -160,12 +225,12 @@ const ServiceItem = React.forwardRef((props, ref) => {
                             style={styles.inputStyle}
                             color="black"
                             placeholder="$00"
-                            textAlign='right'
+                            textAlign='left'
                             editable={props.selectedProducts.includes(item.id)}
                             onChangeText={(text) => props.setProductText(item, text)}
                             keyboardType="numeric"
                             value={item.price}
-                            selection={{end:item.price?.length??0,start:item.price?.length??0}}
+                            // selection={{end:item.price?.length??0,start:item.price?.length??0}}
                             returnKeyType={Platform.OS == "ios" ? 'done' : "next"}
                             placeholderTextColor={LS_COLORS.global.placeholder}
                             maxFontSizeMultiplier={1.2}

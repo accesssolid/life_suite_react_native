@@ -11,6 +11,8 @@ import { showToast } from '../../components/validators';
 
 export default function ContactUs({ navigation, route }) {
     const [loader, setLoader] = useState(false)
+    const from=route?.params
+    console.log(from,"from===>>>>");
     const access_token = useSelector(state => state.authenticate.access_token)
     const user = useSelector(state => state.authenticate.user)
     const userType = useSelector(state => state.authenticate.type)
@@ -59,7 +61,10 @@ export default function ContactUs({ navigation, route }) {
             .then((response) => {
                 if (response.status == true) {
                     showToast("Form submitted successfully")
-                    navigation.goBack()
+                    
+                    setTimeout(() => {
+                        navigation.navigate("HomeScreen")
+                    }, 200);
                 }
                 else {
                     showToast(response?.message)
@@ -82,9 +87,9 @@ export default function ContactUs({ navigation, route }) {
                 <Header
                     containerStyle={{ backgroundColor: LS_COLORS.global.cyan }}
                     imageUrl={require("../../assets/back.png")}
-                    action={() => navigation.goBack()}
+                    action={() =>{navigation?.navigate("HomeScreen")}}
                     // imageUrl1={require("../../assets/home.png")}
-                    // action1={() => props.navigation.navigate("HomeScreen")}
+                    action1={() => props.navigation.navigate("HomeScreen")}
                     title={'contact us'} />
                 <View style={{ flex: 1, backgroundColor: "white" }}>
                     <KeyboardAvoidingView behavior={Platform.OS == "ios" ? "padding" : "none"} style={{ backgroundColor: "white", flex: 1 }}>
