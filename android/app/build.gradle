@@ -117,6 +117,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         versionCode 4
         versionName "1"
+        targetSdk 34
 
     }
   

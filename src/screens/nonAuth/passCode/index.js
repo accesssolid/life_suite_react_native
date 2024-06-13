@@ -10,8 +10,9 @@ import {
     BackHandler,
     ImageBackground,
     Dimensions,
+    ScrollView
 } from 'react-native';
-import { Container, Content } from 'native-base'
+import { Container, Content,  } from 'native-base'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getJsonData, storeJsonData } from '../../../asyncStorage/async'
 import { retrieveItem, showToast } from '../../../components/validators';
@@ -127,8 +128,9 @@ const Passcode = (props) => {
         <>
             <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
                 <View style={{ flex: 1, alignItems: 'center' }}>
-                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                        <View style={{ width: Dimensions.get('screen').width, height: 100, marginBottom: 10 }}>
+               
+                    <ScrollView style={{ flex: 1,  }}>
+                        <View style={{ width: Dimensions.get('screen').width, height: 100, marginBottom: 10 ,marginTop:"35%"}}>
                             <Image
                                 source={require('../../../assets/splash/logo.png')}
                                 style={{ height: '100%', width: '100%' }}
@@ -153,7 +155,7 @@ const Passcode = (props) => {
                         </View>
                         <View style={{ height: 30 }} />
                         <CustomButton action={() => confirmPassCode()} title={'CONFIRM'} customStyles={{ width: '60%' }} />
-                    </View>
+                    </ScrollView>
                 </View>
                 {loading && <Loader />}
             </SafeAreaView>

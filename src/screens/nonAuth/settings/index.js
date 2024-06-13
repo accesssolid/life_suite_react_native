@@ -21,13 +21,14 @@ import {Switch} from 'react-native';
 const Settings = props => {
   const [passcodeVerification, setPassCodeVerification] = useState(false);
   const [biometricVerification, setBiometricVerification] = useState(false);
-  console.log(biometricVerification, 'biometricVerification===>>>>>');
+
 
   const getPasscode = async () => {
     let pass = await getJsonData('passcode');
     let passVerification = await getJsonData('passcodeVerification');
     let fingerVerification = await getJsonData('fingerPrintVerification');
     if (pass && passVerification) {
+
       setPassCodeVerification(true);
     }
     if (pass && passVerification && fingerVerification) {
@@ -38,13 +39,15 @@ const Settings = props => {
   };
 
   const setPassCode = async v => {
+
     try {
-      setPassCodeVerification(v);
+
       let pass = await getJsonData('passcode');
       let passVerification = await getJsonData('passcodeVerification');
       console.log(pass, v, passVerification, 'iiiii');
       if (v) {
         if (pass && !passVerification) {
+     
           let x = await storeJsonData('passcodeVerification', true);
           setPassCodeVerification(true);
         }
@@ -116,13 +119,20 @@ const Settings = props => {
       let fingerVerification = await getJsonData('fingerPrintVerification');
       console.log(fingerVerification, 'fingerVerification==>>');
       if (v) {
+  
         console.log(fingerVerification, biometryType,"=====<><><");
 
         if (!fingerVerification  && biometryType !== undefined) {
           let x = await storeJsonData('fingerPrintVerification', true);
 
-          setBiometricVerification(true);
+          if (passVerification) {
+            setBiometricVerification(true);
+          } else {
+            Alert.alert('Turn on passcode authentication');
+          }
         } else {
+    
+
           if (biometryType === BiometryTypes.TouchID) {
             console.log('touchid');
             if (passVerification) {

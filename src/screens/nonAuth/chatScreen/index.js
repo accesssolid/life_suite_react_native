@@ -693,7 +693,7 @@ const ChatScreen = (props) => {
                             }
 
                             else {
-                                if (user.id === itemData.item.sender.id) {
+                                if (user.id === itemData?.item?.sender?.id) {
                                     return (
                                         <View>
                                             <View style={{ marginTop: '3%', flexDirection: "row", alignSelf: 'flex-end', marginRight: '5%', borderRadius: 20, overflow: 'hidden' }}>
