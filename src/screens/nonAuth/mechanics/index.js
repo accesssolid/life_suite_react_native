@@ -578,7 +578,7 @@ const Mechanics = (props) => {
                 // backgroundColor={"transparent"} 
                 backgroundColor={LS_COLORS.global.green}
                 barStyle="light-content" />
-            <View style={{ width: '100%', height: '30%' }}>
+            <View style={{ width: '100%', height: '30%',backgroundColor:"red" }}>
                 <SureModal1
                     title="No provider available on selected date or time.Kindly change the time or select different date"
                     pressHandler={() => {
@@ -634,7 +634,7 @@ const Mechanics = (props) => {
                     </View>
                 </ImageBackground>
             </View>
-            <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+            <SafeAreaView style={styles.safeArea} edges={[""]}>
                 <View style={styles.container}>
                     <View style={{ marginTop: 26 }}>
                         <ScrollView showsVerticalScrollIndicator={false} bounces={false} >
@@ -921,8 +921,7 @@ const Mechanics = (props) => {
                                     {!loading && <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginTop: 10 }}>No Providers Found</Text>}
                                 </View>
                             }
-                        </ScrollView>
-                        <TouchableOpacity
+                              <TouchableOpacity
                             style={styles.save}
                             activeOpacity={0.7}
                             onPress={() => {
@@ -954,6 +953,8 @@ const Mechanics = (props) => {
                             <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Request</Text>
                         </TouchableOpacity>
                         <View style={{ height: 10 }}></View>
+                        </ScrollView>
+                      
                     </View>
                 </View>
                 {loading && <Loader />}
@@ -981,6 +982,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
+   
     },
     image: {
         resizeMode: 'contain',
