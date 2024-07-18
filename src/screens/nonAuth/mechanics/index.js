@@ -28,10 +28,13 @@ import RNGooglePlaces from 'react-native-google-places';
 import { useFocusEffect } from '@react-navigation/native';
 import lodash from 'lodash'
 import { setFavList } from '../../../redux/features/favorites';
+import { heightPercentageToDP } from 'react-native-responsive-screen';
 // #liahs_provider_list
 
 const Mechanics = (props) => {
-    const { data, subService, extraData } = props.route.params
+    const { data, subService  } = props.route.params
+    const extraData = useSelector(state => state?.total?.otherservice)
+
     const [loading, setLoading] = useState(false)
     const [providers, setProviders] = useState([])
     const access_token = useSelector(state => state.authenticate.access_token)
@@ -61,19 +64,21 @@ const Mechanics = (props) => {
     useFocusEffect(useCallback(() => {
         getFavProvider()
     }, []))
-    useEffect(()=>{
-        console.log(subService,"======---")
-    },[subService])
+    useEffect(() => {
+     
+    }, [subService])
     React.useEffect(() => {
         let z = []
         for (let i of providers) {
             let changedItems = _.cloneDeep(i.item_list).map(x => {
                 let service_id = x.service_item_id
+                console.log("service_id",service_id);
                 let other_options = extraData?.find(e => e.parent_id == service_id)
                 let other = null
                 let have_own = null
                 let need_recommendation = null
                 if (other_options) {
+                    console.log(other_options,"otheroption");
                     if (other_options.other?.trim() != "") {
                         other = {
                             created_at: "2021-10-11T07:46:35.000000Z",
@@ -236,7 +241,7 @@ const Mechanics = (props) => {
         try {
             let response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${toCoordinates.latitude}%2C${toCoordinates.longitude}&origins=${fromCoordinates.latitude}%2C${fromCoordinates.longitude}&key=AIzaSyA8vPYceBJX2Mt43IKubB1Gpa2EcZ6Mg_g`)
             let res = await response.json()
-            console.log(res,"=============")
+   
             if (res?.rows[0]) {
                 let element = res.rows[0].elements[0]
                 if (element?.distance?.value) {
@@ -285,7 +290,7 @@ const Mechanics = (props) => {
         }
         getApi(config)
             .then((response) => {
-               
+
                 if (response.status == true) {
                     let proData = Object.keys(response.data).map((item, index) => {
                         return response.data[item]
@@ -374,7 +379,7 @@ const Mechanics = (props) => {
 
         getApi(config)
             .then((response) => {
-                console.log(response,"response===>>><<<<:::::");
+                // console.log(response, "response===>>><<<<:::::");
                 if (response.status == true) {
                     setLoading(false)
                     props.navigation.navigate("MainDrawer", { screen: "Orders" })
@@ -578,7 +583,7 @@ const Mechanics = (props) => {
                 // backgroundColor={"transparent"} 
                 backgroundColor={LS_COLORS.global.green}
                 barStyle="light-content" />
-            <View style={{ width: '100%', height: '30%',backgroundColor:"red" }}>
+            <View style={{ width: '100%', height: '30%', backgroundColor: "red" }}>
                 <SureModal1
                     title="No provider available on selected date or time.Kindly change the time or select different date"
                     pressHandler={() => {
@@ -634,55 +639,56 @@ const Mechanics = (props) => {
                     </View>
                 </ImageBackground>
             </View>
-            <SafeAreaView style={styles.safeArea} edges={[""]}>
+            <SafeAreaView style={styles.safeArea} edges={["bottom"]} >
                 <View style={styles.container}>
                     <View style={{ marginTop: 26 }}>
-                        <ScrollView showsVerticalScrollIndicator={false} bounces={false} >
-                            <View style={{ height: 40, width: '90%', alignSelf: "center", justifyContent: 'space-between', flexDirection: 'row' }}>
-                                <TouchableOpacity onPress={() => { setFilterModal(true) }} style={{ justifyContent: "center", alignItems: "center", marginRight: 5 }}>
-                                    <Image style={{ height: 30, width: 30, alignSelf: "center" }} source={require("../../../assets/filter.png")} />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => {
-                                    setPrice(!price)
-                                    let data = _.cloneDeep(dupProviders)
-                                    if (price) {
-                                        data.sort((a, b) => a.totalPrice - b.totalPrice)
-                                    }
-                                    else {
-                                        data.sort((a, b) => b.totalPrice - a.totalPrice)
-                                    }
-                                    setDupProviders(data)
-                                }} style={styles.upper} >
-                                    <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Price</Text>
-                                    <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => {
-                                    setTime(!time)
-                                    let data = _.cloneDeep(dupProviders)
-                                    if (time) {
-                                        data.sort((a, b) => a.timeDuration - b.timeDuration)
-                                    } else {
-                                        data.sort((a, b) => b.timeDuration - a.timeDuration)
-                                    }
-                                    setDupProviders(data)
-                                }} style={[styles.upper, { marginHorizontal: 5 }]} >
-                                    <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Time</Text>
-                                    <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => {
-                                    setRating(!rating)
-                                    let data = _.cloneDeep(dupProviders)
-                                    if (rating) {
-                                        data.sort((a, b) => a.rating - b.rating)
-                                    } else {
-                                        data.sort((a, b) => b.rating - a.rating)
-                                    }
-                                    setDupProviders(data)
-                                }} style={styles.upper} >
-                                    <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Rating</Text>
-                                    <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
-                                </TouchableOpacity>
-                            </View>
+                        <View style={{ height: 40, width: '90%', alignSelf: "center", justifyContent: 'space-between', flexDirection: 'row' }}>
+                            <TouchableOpacity onPress={() => { setFilterModal(true) }} style={{ justifyContent: "center", alignItems: "center", marginRight: 5 }}>
+                                <Image style={{ height: 30, width: 30, alignSelf: "center" }} source={require("../../../assets/filter.png")} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                setPrice(!price)
+                                let data = _.cloneDeep(dupProviders)
+                                if (price) {
+                                    data.sort((a, b) => a.totalPrice - b.totalPrice)
+                                }
+                                else {
+                                    data.sort((a, b) => b.totalPrice - a.totalPrice)
+                                }
+                                setDupProviders(data)
+                            }} style={styles.upper} >
+                                <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Price</Text>
+                                <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                setTime(!time)
+                                let data = _.cloneDeep(dupProviders)
+                                if (time) {
+                                    data.sort((a, b) => a.timeDuration - b.timeDuration)
+                                } else {
+                                    data.sort((a, b) => b.timeDuration - a.timeDuration)
+                                }
+                                setDupProviders(data)
+                            }} style={[styles.upper, { marginHorizontal: 5 }]} >
+                                <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Time</Text>
+                                <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => {
+                                setRating(!rating)
+                                let data = _.cloneDeep(dupProviders)
+                                if (rating) {
+                                    data.sort((a, b) => a.rating - b.rating)
+                                } else {
+                                    data.sort((a, b) => b.rating - a.rating)
+                                }
+                                setDupProviders(data)
+                            }} style={styles.upper} >
+                                <Text maxFontSizeMultiplier={1.5} style={styles.upperText}>Rating</Text>
+                                <Image style={{ height: 10, width: 10 }} source={require("../../../assets/sort.png")} />
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView contentContainerStyle={{ paddingBottom: heightPercentageToDP(14) }} showsVerticalScrollIndicator={false} bounces={false} >
+
                             {/* providers changed to dupProviders */}
                             {dupProviders.length > 0 ?
                                 dupProviders.map((item, index) => {
@@ -735,15 +741,17 @@ const Mechanics = (props) => {
                                         is_insauranced = item?.questionnaire_data[0]?.is_insauranced == "1"
                                     }
                                     let checked_g = item.item_list.filter(i => i.checked).length > 0
-                                    return <View key={index} style={[styles.alexiContainer,{shadowColor: "#000",
-                                    shadowOffset: {
-                                        width: 0,
-                                        height: 2,
-                                    },
-                                    shadowOpacity: 0.23,
-                                    shadowRadius: 2.62,
-                                    
-                                    elevation: 4,}]}>
+                                    return <View key={index} style={[styles.alexiContainer, {
+                                        shadowColor: "#000",
+                                        shadowOffset: {
+                                            width: 0,
+                                            height: 2,
+                                        },
+                                        shadowOpacity: 0.23,
+                                        shadowRadius: 2.62,
+
+                                        elevation: 4,
+                                    }]}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Pressable onPress={() => {
                                                 props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService?.name, service_id: subService?.id, list: true })
@@ -835,6 +843,7 @@ const Mechanics = (props) => {
                                         {/* <Text  maxFontSizeMultiplier={1.5} style={{ marginHorizontal: 10, fontSize: 13, fontFamily: LS_FONTS.PoppinsRegular }}>Distance : {data.mile_distance?.toFixed(2)} miles</Text> */}
                                         <View style={{ height: 1, width: '95%', alignSelf: 'center', borderWidth: 0.7, borderColor: "#00000029", marginTop: 10 }}></View>
                                         {item.item_list.map((i, iIndex) => {
+                                            console.log(i,"=====>");
                                             let x = i.time_duration / 60
                                             let time_format = ""
                                             if (x > 1) {
@@ -860,7 +869,8 @@ const Mechanics = (props) => {
                                                             />
                                                         </View>
                                                     </View>
-                                                    {i.products.map((itemData, prIndex) => {
+                                                    {i?.products.map((itemData, prIndex) => {
+                                                        console.log(itemData,"=======aa");
                                                         let productTitle = "(Product)"
                                                         let price = itemData?.price
                                                         if (itemData.item_products_is_per_mile == "1") {
@@ -921,41 +931,73 @@ const Mechanics = (props) => {
                                     {!loading && <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginTop: 10 }}>No Providers Found</Text>}
                                 </View>
                             }
-                              <TouchableOpacity
-                            style={styles.save}
-                            activeOpacity={0.7}
-                            onPress={() => {
-                                // props.navigation.navigate("MainDrawer",{screen:"Orders"})
-                                if (cards.length == 0) {
-                                    showToast("Please add payment method before requesting any service")
-                                    props.navigation.navigate("AddCard", { type: "add" })
-                                    return
-                                }
-                                let requiredSevices = JSON.parse(data.json_data)?.items
-                                let z = []
-                                for (let p of dupProviders) {
-                                    for (let item of p.item_list) {
-                                        if (item.checked) {
-                                            z.push(item.service_item_id)
+
+                            {/* <TouchableOpacity
+                                style={styles.save}
+                                activeOpacity={0.7}
+                                onPress={() => {
+                                    // props.navigation.navigate("MainDrawer",{screen:"Orders"})
+                                    if (cards.length == 0) {
+                                        showToast("Please add payment method before requesting any service")
+                                        props.navigation.navigate("AddCard", { type: "add" })
+                                        return
+                                    }
+                                    let requiredSevices = JSON.parse(data.json_data)?.items
+                                    let z = []
+                                    for (let p of dupProviders) {
+                                        for (let item of p.item_list) {
+                                            if (item.checked) {
+                                                z.push(item.service_item_id)
+                                            }
                                         }
                                     }
-                                }
-                                //    console.log(z)
-                                // if (_.isEqual(requiredSevices.sort((a, b) => a - b), z.sort((a, b) => a - b))) {
-                                if (z.length > 0) {
+                                    //    console.log(z)
+                                    // if (_.isEqual(requiredSevices.sort((a, b) => a - b), z.sort((a, b) => a - b))) {
+                                    if (z.length > 0) {
 
-                                    setOpen2(!open2)
-                                } else {
-                                    showToast("Please select atleast on service from service provider list.")
-                                    // showToast("Please select service provider for all the service listed.")
-                                }
-                            }}>
-                            <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Request</Text>
-                        </TouchableOpacity>
-                        <View style={{ height: 10 }}></View>
+                                        setOpen2(!open2)
+                                    } else {
+                                        showToast("Please select atleast on service from service provider list.")
+                                        // showToast("Please select service provider for all the service listed.")
+                                    }
+                                }}>
+                                <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Request</Text>
+                            </TouchableOpacity> */}
                         </ScrollView>
-                      
+
+                        <Pressable
+                                style={[styles.save]}
+                                // activeOpacity={0.7}
+                                onPress={() => {
+                                    // props.navigation.navigate("MainDrawer",{screen:"Orders"})
+                                    if (cards.length == 0) {
+                                        showToast("Please add payment method before requesting any service")
+                                        props.navigation.navigate("AddCard", { type: "add" })
+                                        return
+                                    }
+                                    let requiredSevices = JSON.parse(data.json_data)?.items
+                                    let z = []
+                                    for (let p of dupProviders) {
+                                        for (let item of p.item_list) {
+                                            if (item.checked) {
+                                                z.push(item.service_item_id)
+                                            }
+                                        }
+                                    }
+                                    //    console.log(z)
+                                    // if (_.isEqual(requiredSevices.sort((a, b) => a - b), z.sort((a, b) => a - b))) {
+                                    if (z.length > 0) {
+
+                                        setOpen2(!open2)
+                                    } else {
+                                        showToast("Please select atleast on service from service provider list.")
+                                        // showToast("Please select service provider for all the service listed.")
+                                    }
+                                }}>
+                                <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Request</Text>
+                            </Pressable>
                     </View>
+
                 </View>
                 {loading && <Loader />}
             </SafeAreaView>
@@ -982,7 +1024,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
-   
+
     },
     image: {
         resizeMode: 'contain',
@@ -997,7 +1039,10 @@ const styles = StyleSheet.create({
         backgroundColor: LS_COLORS.global.green,
         borderRadius: 6,
         alignSelf: 'center',
-        marginTop: Platform.OS =='ios'?4:10
+        marginTop: Platform.OS == 'ios' ? 4 : 10,
+        position:'absolute',
+        bottom:40,
+        marginBottom:5
     },
     saveText: {
         textAlign: "center",

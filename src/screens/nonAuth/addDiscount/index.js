@@ -51,7 +51,9 @@ export default function AddDiscount({ navigation, route }) {
                 endPoint: '/api/addDiscountOrder',
                 type: 'post'
             }
+            console.log(JSON.stringify(config),"=========>");
             const response = await getApi(config)
+            
             if (response.status) {
                 showToast("Discount added successfully")
                navigation.navigate("ProviderStack", { screen: "OrderDetail", params: { item:{id:order_id} } })
@@ -82,8 +84,8 @@ export default function AddDiscount({ navigation, route }) {
             //     navigation.navigate("MainDrawer")
             // }}
             />
-            <View>
-                <ScrollView>
+            <View style={styles.container}>
+                <ScrollView showsVerticalScrollIndicator={false}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, alignItems: "center", paddingHorizontal: 20 }}>
                         <Text maxFontSizeMultiplier={1.3}  style={styles.textStyle}>DISCOUNT</Text>
                         <View style={{ flex: 1, alignItems: "flex-end", justifyContent: "center", }}>
@@ -153,6 +155,10 @@ const styles = StyleSheet.create({
         fontFamily: LS_FONTS.PoppinsMedium,
         alignSelf: 'center',
         textAlign: "center"
+    },
+    container: {
+        flex: 1,
+        backgroundColor: LS_COLORS.global.white,
     },
     save: {
         justifyContent: "center",

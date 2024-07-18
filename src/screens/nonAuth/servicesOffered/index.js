@@ -25,6 +25,7 @@ const { width } = Dimensions.get("window")
 import CustomInput from '../../../components/textInput'
 import messagging from '@react-native-firebase/messaging'
 import { addUpdateQuestionaire } from '../../../redux/features/questionaire.model';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -36,6 +37,7 @@ const ServicesProvided = (props) => {
     const [loading, setLoading] = useState(false)
     const [selectedItems, setSelectedItems] = useState([])
     const [servicesData, setServicesData] = useState([])
+    console.log('service data-=-', JSON.stringify(servicesData));
     const [productsData, setProductsData] = useState([])
     const [newProductsData, setNewProductsData] = useState([])
     const [selectedProducts, setSelectedProducts] = useState([])
@@ -46,10 +48,10 @@ const ServicesProvided = (props) => {
     const access_token = useSelector(state => state.authenticate.access_token)
     const [activeIndex, setActiveIndex] = useState(null)
     const [activeItem, setActiveItem] = useState(null)
-    console.log(servicesData,"servicesData====>>");
-    console.log(variants,"variants====>>");
-    console.log(activeItem,"activeItem====>>");
-    console.log(selectedVariant,"selectedVariant====>>");
+    // console.log(servicesData, "servicesData====>>");
+    // console.log(variants, "variants====>>");
+    // console.log(activeItem, "activeItem====>>");
+    // console.log(selectedVariant, "selectedVariant====>>");
 
     const [newServices, setNewServices] = useState([])
     const [newServicesMaster, setNewServicesMaster] = useState([])
@@ -83,7 +85,7 @@ const ServicesProvided = (props) => {
     }, [selectedVariant, itemListMaster])
 
     useEffect(() => {
-       
+
     }, [selectedItems, servicesData, productsData, newProductsData])
 
     const getServiceItems = () => {
@@ -105,23 +107,24 @@ const ServicesProvided = (props) => {
             endPoint: '/api/providerSubServicesItemList',
             type: 'post'
         }
-
+        console.log(JSON.stringify(config), "config==>");
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
                     setLoading(false)
                     setItemListMaster([...response.data])
+                    // console.log(JSON.stringify(response.data), "aaaaaaaa========>");
                     if (response.variant_data) {
-                        setVariants(response.variant_data.sort((a,b)=>{
+                        setVariants(response.variant_data.sort((a, b) => {
                             if (a.name < b.name) {
                                 return -1;
-                              }
-                              if (a.name > b.name) {
+                            }
+                            if (a.name > b.name) {
                                 return 1;
-                              }
-                              return 0;
+                            }
+                            return 0;
                         }))
-                        if(!selectedVariant){
+                        if (!selectedVariant) {
                             setSelectedVariant(response.variant_data[0].id)
                         }
                     }
@@ -145,7 +148,7 @@ const ServicesProvided = (props) => {
     }
 
     React.useEffect(() => {
-        console.log("Services data", JSON.stringify(servicesData))
+        // console.log("Services data", JSON.stringify(servicesData))
     }, [servicesData])
 
     const setInitialServiceData = () => {
@@ -177,6 +180,7 @@ const ServicesProvided = (props) => {
                 }
                 return x
             })
+          
             setServicesData(d)
         }
 
@@ -187,11 +191,11 @@ const ServicesProvided = (props) => {
             itemListMaster.concat(newServicesMaster).forEach((item, index) => {
                 subService?.items?.forEach((ele, ind) => {
                     if (item.id == ele.id && item.variant_data == ele.variant_data) {
-                        let hours =ele.time_duration==""?"": toHoursAndMinutes(ele.time_duration, 'hours')
-                        let minutes =ele.time_duration==""?"": toHoursAndMinutes(ele.time_duration, 'minutes')
+                        let hours = ele.time_duration == "" ? "" : toHoursAndMinutes(ele.time_duration, 'hours')
+                        let minutes = ele.time_duration == "" ? "" : toHoursAndMinutes(ele.time_duration, 'minutes')
                         arr.push({
                             "item_id": item.id,
-                            "price": ele.price==""?"":("$" + ele.price),
+                            "price": ele.price == "" ? "" : ("$" + ele.price),
                             "time_duration_h": String(hours),
                             "time_duration_m": String(minutes),
                             "variant_data": item.variant_data
@@ -216,11 +220,11 @@ const ServicesProvided = (props) => {
             itemListMaster.concat(newServicesMaster).forEach((item, index) => {
                 subService?.items?.forEach((ele, ind) => {
                     if (item.id == ele.id) {
-                        let hours = ele.time_duration==""?"":toHoursAndMinutes(ele.time_duration, 'hours')
-                        let minutes =ele.time_duration==""?"": toHoursAndMinutes(ele.time_duration, 'minutes')
+                        let hours = ele.time_duration == "" ? "" : toHoursAndMinutes(ele.time_duration, 'hours')
+                        let minutes = ele.time_duration == "" ? "" : toHoursAndMinutes(ele.time_duration, 'minutes')
                         arr.push({
                             "item_id": item.id,
-                            "price": ele.price==""?"":("$" + ele.price),
+                            "price": ele.price == "" ? "" : ("$" + ele.price),
                             "time_duration_h": String(hours),
                             "time_duration_m": String(minutes),
                         })
@@ -240,7 +244,7 @@ const ServicesProvided = (props) => {
             })
         }
         // #liahs get previous added service data and union based on item_id
-        console.log(servicesData1, "DDDDDDDDDDD")
+   
         let d = arr.map(x => {
             let data = servicesData1.find(y => y.item_id == x.item_id)
             if (data) {
@@ -248,7 +252,7 @@ const ServicesProvided = (props) => {
             }
             return x
         })
-        console.log(d, "D")
+        // console.log(d, "D")
         setServicesData(d)
         //    selected Save Data from Liahs
         const setData = new Set([...selected, ...selectedItems])
@@ -259,9 +263,9 @@ const ServicesProvided = (props) => {
 
     }
 
-useEffect(()=>{
-    console.log("ITemListMast",itemListMaster)
-},[itemListMaster])
+    useEffect(() => {
+        // console.log("ITemListMast", itemListMaster)
+    }, [itemListMaster])
 
     const setInitialProductsData = () => {
         if (!selectedProducts.length > 0 && !selectedNewProducts.length > 0) {
@@ -273,7 +277,7 @@ useEffect(()=>{
                     newArr.push({
                         "id": element.id,
                         "name": element.name,
-                        "price": !isAddServiceMode ? (getPrice(element.item_id, element.id)=="$"?"":getPrice(element.item_id, element.id) ): "",
+                        "price": !isAddServiceMode ? (getPrice(element.item_id, element.id) == "$" ? "" : getPrice(element.item_id, element.id)) : "",
                         "item_id": element.item_id,
                         list_type: element?.list_type
                     })
@@ -281,7 +285,7 @@ useEffect(()=>{
                         selected.push({
                             "id": element.id,
                             "name": element.name,
-                            "price": !isAddServiceMode ? (getPrice(element.item_id, element.id)=="$"?"":getPrice(element.item_id, element.id) ): "",
+                            "price": !isAddServiceMode ? (getPrice(element.item_id, element.id) == "$" ? "" : getPrice(element.item_id, element.id)) : "",
                             "item_id": element.item_id,
                             list_type: element?.list_type
                         })
@@ -331,15 +335,15 @@ useEffect(()=>{
             if (selectedItems.includes(itemm.item_id)) {
                 var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
                 var fieldArray = hoursDotMinutes.split(":");
-                var minutes =(itemm.time_duration_m==""&&itemm.time_duration_h=="")?"": Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
+                var minutes = (itemm.time_duration_m == "" && itemm.time_duration_h == "") ? "" : Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
                 let obj = {
                     "item_id": itemm.item_id,
-                    "price":(itemm.price?.trim()==""||itemm.price=="$")?"": Number(itemm.price.replace('$', '')),
+                    "price": (itemm.price?.trim() == "" || itemm.price == "$") ? "" : Number(itemm.price.replace('$', '')),
                     "time_duration": minutes
                 }
                 if (String(itemm.item_id).startsWith("new")) {
                     let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
-                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).filter(x => x.name != "").map(x=>({...x,price:x?.price=="$"?"":x?.price}))
+                    let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).filter(x => x.name != "").map(x => ({ ...x, price: x?.price == "$" ? "" : x?.price }))
                     new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                 } else {
                     services.push(obj)
@@ -355,14 +359,14 @@ useEffect(()=>{
                 service_id: subService.id,
                 json_data: {
                     ...addServiceData.json_data,
-                    products: [...productsData].filter(x => x.name != "").map(x=>({...x,price:x?.price=="$"?"":x?.price})).filter(x=>selectedProducts?.map(x=>x.id)?.includes(x.id)),
-                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "")?.map(x=>({...x,price:x?.price=="$"?"":x?.price})),
+                    products: [...productsData].filter(x => x.name != "").map(x => ({ ...x, price: x?.price == "$" ? "" : x?.price })).filter(x => selectedProducts?.map(x => x.id)?.includes(x.id)),
+                    new_products: [...newProductsData].filter(x => !String(x.item_id).startsWith("new")).filter(x => x.name != "")?.map(x => ({ ...x, price: x?.price == "$" ? "" : x?.price })),
                     services: [...services],
                     new_services: [...new_services]
                 }
             }
         }))
-    
+
         verifyNewProducts(services, new_services)
     }
 
@@ -379,7 +383,7 @@ useEffect(()=>{
 
     const setText = (key, text, indexx, incomingItem) => {
 
-        console.log(key,text,indexx,incomingItem,"pppppp");
+        console.log(key, text, indexx, incomingItem, "pppppp");
         if (variants.length > 0) {
             let temp = [...servicesData.filter(item => item.variant_data == selectedVariant)]
             let otherItems = [...servicesData.filter(item => item.variant_data !== selectedVariant)]
@@ -498,7 +502,7 @@ useEffect(()=>{
                 setIsOtherSelected(false)
             }
         }
-         else {
+        else {
             if (getSelectedProducts().length > 0 || getSelectedNewProducts().length > 0) {
                 Alert.alert(
                     "Lifesuite",
@@ -644,7 +648,7 @@ useEffect(()=>{
     const saveRequest = () => {
         let hasSubProducts = false
         const selectedItemsss = itemListMaster?.filter(item => selectedItems?.includes(item.id))
-        let isLessThan=false
+        let isLessThan = false
         selectedItemsss.forEach(element => {
             if (element?.products?.length > 0 && String(element?.is_product_mandatory) == "1") {
                 hasSubProducts = true
@@ -656,7 +660,7 @@ useEffect(()=>{
         }
 
         let isValidData = false
-        let validhrmm=true
+        let validhrmm = true
         if (variants.length > 0) {
             servicesData?.filter(item => item?.variant_data == selectedVariant).forEach((itemm, index) => {
                 if (selectedItems?.includes(itemm?.item_id)) {
@@ -667,20 +671,20 @@ useEffect(()=>{
                     } else {
                         isValidData = true
                     }
-                    if((itemm?.time_duration_m?.trim()=="00"||itemm?.time_duration_m?.trim()=="")&&(itemm?.time_duration_h?.trim()=="00"||itemm?.time_duration_h?.trim()=="")){
+                    if ((itemm?.time_duration_m?.trim() == "00" || itemm?.time_duration_m?.trim() == "") && (itemm?.time_duration_h?.trim() == "00" || itemm?.time_duration_h?.trim() == "")) {
                         validhrmm = false
                     }
-                    if(Number(String(itemm?.price)?.match(/[\d.]+/,""))<0.5){
-                        isLessThan=true
+                    if (Number(String(itemm?.price)?.match(/[\d.]+/, "")) < 0.5) {
+                        isLessThan = true
                     }
                 }
             })
 
         } else {
             servicesData?.forEach((itemm, index) => {
-                console.log(itemm,'itemmmm')
-                console.log(selectedItems,'selecteddddddd')
-                if (selectedItems?.includes(itemm?.id??itemm?.item_id)) {
+                console.log(itemm, 'itemmmm')
+                console.log(selectedItems, 'selecteddddddd')
+                if (selectedItems?.includes(itemm?.id ?? itemm?.item_id)) {
                     if (itemm?.price.trim() !== ""
                         // && itemm.time_duration_h.trim() !== "" 
                         && itemm?.time_duration_m.trim() !== "") {
@@ -688,11 +692,11 @@ useEffect(()=>{
                     } else {
                         isValidData = true
                     }
-                    if((itemm?.time_duration_m?.trim()=="00"||itemm?.time_duration_m?.trim()=="")&&(itemm?.time_duration_h?.trim()=="00"||itemm?.time_duration_h?.trim()=="")){
+                    if ((itemm?.time_duration_m?.trim() == "00" || itemm?.time_duration_m?.trim() == "") && (itemm?.time_duration_h?.trim() == "00" || itemm?.time_duration_h?.trim() == "")) {
                         validhrmm = false
                     }
-                    if(Number(String(itemm?.price).match(/[\d.]+/,""))<0.5){
-                        isLessThan=true
+                    if (Number(String(itemm?.price).match(/[\d.]+/, "")) < 0.5) {
+                        isLessThan = true
                     }
                 }
             })
@@ -702,7 +706,7 @@ useEffect(()=>{
                 return ({
                     ...item,
                     time_duration_h: "",
-                    
+
                 })
             }
             return item
@@ -712,19 +716,19 @@ useEffect(()=>{
             if (element?.price?.trim() == "") {
                 // isValidData = false
             }
-            if(Number(String(element?.price).match(/[\d.]+/,""))<0.5){
-                isLessThan=true
+            if (Number(String(element?.price).match(/[\d.]+/, "")) < 0.5) {
+                isLessThan = true
             }
         });
 
         let selectedNew = getSelectedNewProducts()
-       
+
         newProductsData?.filter(item => selectedNew?.includes(item?.id))?.forEach(element => {
             if (element?.price?.trim() == "" || element?.name?.trim() == "") {
                 // isValidData = false
             }
-            if(Number(String(element?.price)?.match(/[\d.]+/,""))<0.5){
-                isLessThan=true
+            if (Number(String(element?.price)?.match(/[\d.]+/, "")) < 0.5) {
+                isLessThan = true
             }
         });
 
@@ -829,18 +833,18 @@ useEffect(()=>{
                 let newArr = []
                 let newData = []
                 itemListMaster.map((item, index) => {
-                    
+
                     let products = item.products.map(element => {
-                        let prods=productsData.find(x=>x.id==element.id)
+                        let prods = productsData.find(x => x.id == element.id)
                         if (element.item_id == item.id) {
                             newArr.push({
                                 "id": element.id,
                                 "name": element.name,
-                                "price":prods?prods?.price:(element.price ?? ""),
+                                "price": prods ? prods?.price : (element.price ?? ""),
                                 "item_id": element.item_id,
                                 list_type: element?.list_type ?? "private"
                             })
-                        } else  {
+                        } else {
                             newArr.push({
                                 "id": element.id,
                                 "name": element.name,
@@ -985,7 +989,7 @@ useEffect(()=>{
         setNewProductsData([...temp])
     }
 
-    
+
     const addNewProduct = () => {
         let arr = [...newProductsData]
         arr.push({
@@ -1027,17 +1031,17 @@ useEffect(()=>{
                 if (selectedItems.includes(itemm.item_id)) {
                     var hoursDotMinutes = `${itemm.time_duration_h}:${itemm.time_duration_m}`;
                     var fieldArray = hoursDotMinutes.split(":");
-                    var minutes =(itemm.time_duration_m==""&&itemm.time_duration_h=="")?"":Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
+                    var minutes = (itemm.time_duration_m == "" && itemm.time_duration_h == "") ? "" : Number(itemm.time_duration_m) + 60 * Number(itemm.time_duration_h);
                     let obj = {
                         "item_id": itemm.item_id,
-                        "price":(itemm.price?.trim()==""||itemm.price=="$")?"": Number(itemm.price.replace('$', '')),
+                        "price": (itemm.price?.trim() == "" || itemm.price == "$") ? "" : Number(itemm.price.replace('$', '')),
                         "time_duration": minutes
                     }
                     if (String(itemm.item_id).startsWith("new")) {
                         let newServiceItem = newServicesMaster.find(x => x.id == itemm.item_id)
                         let productsofItems = newProductsData.filter(x => x.item_id == itemm.item_id).map(x => ({
                             name: x.name,
-                            price:x.price=="$"?"":x.price
+                            price: x.price == "$" ? "" : x.price
                         })).filter(x => x.name != "")
                         new_services.push({ ...obj, item_name: newServiceItem.name, variant_data: newServiceItem.variant_data, products: productsofItems })
                     } else {
@@ -1047,8 +1051,8 @@ useEffect(()=>{
                 }
             })
             let json_data = {
-                products: [...productsData].filter(x => x.name != "").map(x => ({ item_product_id: x.id, price:x.price=="$"?"":x.price })).filter(x=>selectedProducts?.map(x=>x.id).includes(x.item_product_id)),
-                new_products: [...newProductsData].filter(x => !String(x?.item_id).startsWith("new")).filter(x => x.name != "").map(x=>({...x,price:x.price=="$"?"":x.price})),
+                products: [...productsData].filter(x => x.name != "").map(x => ({ item_product_id: x.id, price: x.price == "$" ? "" : x.price })).filter(x => selectedProducts?.map(x => x.id).includes(x.item_product_id)),
+                new_products: [...newProductsData].filter(x => !String(x?.item_id).startsWith("new")).filter(x => x.name != "").map(x => ({ ...x, price: x.price == "$" ? "" : x.price })),
                 services: [...services],
                 new_services: [...new_services]
             }
@@ -1070,12 +1074,12 @@ useEffect(()=>{
             if (res.status) {
                 dispatch(getMyJobsThunk(user.id, access_token))
                 showToast(res.message)
-                setTimeout(()=>{
+                setTimeout(() => {
                     props.navigation.navigate("HomeScreen")
                     dispatch(addUpdateQuestionaire())
                     setLoading(false)
-                },1500)
-               
+                }, 1500)
+
             } else {
                 showToast(res.message)
                 setLoading(false)
@@ -1084,7 +1088,7 @@ useEffect(()=>{
             console.error(err)
             setLoading(false)
         } finally {
-           
+
         }
     }
 
@@ -1119,151 +1123,161 @@ useEffect(()=>{
                     </View>
                 </ImageBackground>
             </View>
-             <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
-                <View style={{backgroundColor:"white" ,flex:1}}>
-                    <Text maxFontSizeMultiplier={1.5} style={styles.service}>SERVICES</Text>
-                    {variants.length > 0 && <View style={{ height: 70 }}>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 10, marginHorizontal: 15, height: 70 }}>
-                            {variants.map((item, index) => {
-                                return (
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => toggleVariant(item)} key={index}
-                                        style={{
-                                            backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
-                                            marginHorizontal: 10,
-                                            paddingHorizontal: 15,
-                                            paddingVertical: 5,
-                                            borderRadius: 100,
-                                            height: 40,
-                                            borderWidth: selectedVariant == item.id ? 1 : 1,
-                                            borderColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.green
-                                        }}>
-                                        <Text style={{
-                                            fontFamily: LS_FONTS.PoppinsMedium,
-                                            fontSize: 14,
-                                            textTransform: 'uppercase',
-                                            color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
-                                        }} maxFontSizeMultiplier={1.5} >
-                                            {item.name}
-                                        </Text>
-                                    </TouchableOpacity>
-                                )
-                            })}
-                        </ScrollView>
-                    </View>}
-                    {activeItem !== null && <View style={{ flexDirection: 'row', width: '98%', alignSelf: "center", marginBottom: '2%' }}>
-                        <View style={{ flex: 1 ,}} />
-                        <View style={{ flexDirection: "row", justifyContent: 'flex-end' }}>
-                            <View style={{ alignItems: 'center', marginRight: 15 }}>
-                                <Text maxFontSizeMultiplier={1.2} style={{ ...styles.priceTime, }}>Estimated Time</Text>
-                            </View>
-                            <View style={{ alignItems: "center", marginRight: 10 }}>
-                                <Text maxFontSizeMultiplier={1.2} style={styles.priceTime}>Price</Text>
-                            </View>
-                        </View>
-                    </View>}
-                    <ScrollView showsVerticalScrollIndicator={false}>
-                        {activeItem !== null && <ServiceItem
-                            ref={itemRef}
-                            item={activeItem}
-                            index={activeIndex}
-                            onCheckPress={() => onPressItem(activeIndex, activeItem)}
-                            isSelected={selectedItems.includes(activeItem.id)}
-                            setText={setText}
-                            setProductText={setProductText}
-                            setNewProductText={setNewProductText}
-                            serviceItem={variants.length > 0 ? servicesData.find(item => item?.variant_data == selectedVariant && item?.item_id == activeItem?.id) : servicesData.find(item => item?.id ??item?.item_id == activeItem?.id)}
-                            subService={subService}
-                            showInputs
-                            products={productsData?.filter(item => item?.item_id == activeItem?.id)}
-                            newProducts={newProductsData?.filter(item => item?.item_id == activeItem?.id)}
-                            selectedProducts={getSelectedProducts()}
-                            selectedNewProducts={getSelectedNewProducts()}
-                            onPressProduct={(item) => onPressProduct(item)}
-                            onPressNewProduct={(item) => onPressNewProduct(item)}
-                            onSelectOther={onSelectOther}
-                            isOtherSelected={isOtherSelected}
-                            removeNewproduct={removeNewproduct}
-                            addNewProduct={addNewProduct}
-                            removeNonGlobalItem={removeNonGlobalItem}
-                        />}
-                        {activeItem == null && itemList && itemList.length > 0 &&
-                            <>
-                                {itemList.map(((item, index) => {
+            <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+                <KeyboardAwareScrollView
+                    bounces={false}
+                    // keyboardShouldPersistTaps="always"
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View style={{ backgroundColor: "white", flex: 1 }}>
+                        <Text maxFontSizeMultiplier={1.5} style={styles.service}>SERVICES</Text>
+
+
+                        {variants.length > 0 && <View style={{ height: 70 }}>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 10, marginHorizontal: 15, height: 70 }}>
+                                {variants.map((item, index) => {
                                     return (
-                                        <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
-                                            <View style={{ width: width * 0.70 }}>
-                                                <ServiceItem
-                                                    key={index}
-                                                    item={item}
-                                                    index={index}
-                                                    onCheckPress={() => {
-                                                        onPressItem(index, item)
-                                                    }}
-                                                    isSelected={selectedItems.includes(item.id)}
-                                                />
-                                            </View>
-                                            {item.list_type == "private" && <Text
-                                                maxFontSizeMultiplier={1.2}
-                                                style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }}
-                                                onPress={() => {
-                                                    removeServiceData(item.id)
-                                                }}>Remove</Text>}
-                                        </View>)
-                                }))}
-                                {newServices.map((item, index) => {
-                                    return (
-                                        <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
-                                            <View style={{ width: width * 0.70 }}>
-                                                <ServiceItem
-                                                    key={index}
-                                                    item={item}
-                                                    index={index}
-                                                    onCheckPress={() => {
-                                                        onPressItem(index, item)
-                                                    }}
-                                                    isSelected={selectedItems.includes(item.id)}
-                                                />
-                                            </View>
-                                            <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
-                                                removeNewService(item)
-                                            }}>Remove</Text>
-                                        </View>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => toggleVariant(item)} key={index}
+                                            style={{
+                                                backgroundColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.white,
+                                                marginHorizontal: 10,
+                                                paddingHorizontal: 15,
+                                                paddingVertical: 5,
+                                                borderRadius: 100,
+                                                height: 40,
+                                                borderWidth: selectedVariant == item.id ? 1 : 1,
+                                                borderColor: selectedVariant == item.id ? LS_COLORS.global.green : LS_COLORS.global.green
+                                            }}>
+                                            <Text style={{
+                                                fontFamily: LS_FONTS.PoppinsMedium,
+                                                fontSize: 14,
+                                                textTransform: 'uppercase',
+                                                color: selectedVariant == item.id ? LS_COLORS.global.white : LS_COLORS.global.black,
+                                            }} maxFontSizeMultiplier={1.5} >
+                                                {item.name}
+                                            </Text>
+                                        </TouchableOpacity>
                                     )
                                 })}
-                                <CustomButton title="Add Service"
-                                    action={() => {
-                                        setOpenModal(true)
-                                    }}
-                                    maxFont={1.2}
-                                    customStyles={{
-                                        height: 40,
-                                        width: "35%",
-                                        borderRadius: 5,
-                                        marginBottom: 15
-                                    }}
-                                    customTextStyles={{
-                                        fontSize: 13,
-                                        fontFamily: LS_FONTS.PoppinsRegular
-                                    }}
-                                />
-                                {/* <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 14,  alignSelf: "center" }}>Add Service +</Text> */}
-                            </>
-                        }
-                    </ScrollView>
-                    <View style={{ paddingBottom: '2.5%' }}>
-                        {activeItem == null
-                            ?
-                            selectedItems.length > 0 && (isAddServiceMode ? <CustomButton title={"Next"} action={() => next()} /> : <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                                <CustomButton maxFont={1.2} title={"Save"} action={() => { saveData() }} customStyles={{ width: width * 0.45 }} />
-                                <CustomButton maxFont={1.2} title={"Next"} action={() => next()} customStyles={{ width: width * 0.45 }} />
-                            </View>)
-                            :
-                            <CustomButton maxFont={1.2} title={"Save"} action={() => saveRequest()} />
-                        }
+                            </ScrollView>
+                        </View>}
+                        {activeItem !== null && <View style={{ flexDirection: 'row', width: '98%', alignSelf: "center", marginBottom: '2%' }}>
+                            <View style={{ flex: 1, }} />
+                            <View style={{ flexDirection: "row", justifyContent: 'flex-end' }}>
+                                <View style={{ alignItems: 'center', marginRight: 15 }}>
+                                    <Text maxFontSizeMultiplier={1.2} style={{ ...styles.priceTime, }}>Estimated Time</Text>
+                                </View>
+                                <View style={{ alignItems: "center", marginRight: 10 }}>
+                                    <Text maxFontSizeMultiplier={1.2} style={styles.priceTime}>Price</Text>
+                                </View>
+                            </View>
+                        </View>}
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            {activeItem !== null && <ServiceItem
+                                ref={itemRef}
+                                item={activeItem}
+                                index={activeIndex}
+                                onCheckPress={() => onPressItem(activeIndex, activeItem)}
+                                isSelected={selectedItems.includes(activeItem.id)}
+                                setText={setText}
+                                setProductText={setProductText}
+                                setNewProductText={setNewProductText}
+                                serviceItem={variants.length > 0 ? servicesData.find(item => item?.variant_data == selectedVariant && item?.item_id == activeItem?.id) : servicesData.find(item => item?.id ?? item?.item_id == activeItem?.id)}
+                                subService={subService}
+                                showInputs
+                                products={productsData?.filter(item => item?.item_id == activeItem?.id)}
+                                newProducts={newProductsData?.filter(item => item?.item_id == activeItem?.id)}
+                                selectedProducts={getSelectedProducts()}
+                                selectedNewProducts={getSelectedNewProducts()}
+                                onPressProduct={(item) => onPressProduct(item)}
+                                onPressNewProduct={(item) => onPressNewProduct(item)}
+                                onSelectOther={onSelectOther}
+                                isOtherSelected={isOtherSelected}
+                                removeNewproduct={removeNewproduct}
+                                addNewProduct={addNewProduct}
+                                removeNonGlobalItem={removeNonGlobalItem}
+                            />}
+                            {activeItem == null && itemList && itemList.length > 0 &&
+                                <>
+                                    {itemList.map(((item, index) => {
+                                        return (
+                                            <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
+                                                <View style={{ width: width * 0.70 }}>
+                                                    <ServiceItem
+                                                        key={index}
+                                                        item={item}
+                                                        index={index}
+                                                        onCheckPress={() => {
+                                                            onPressItem(index, item)
+                                                        }}
+                                                        isSelected={selectedItems.includes(item.id)}
+                                                    />
+                                                </View>
+                                                {item.list_type == "private" && <Text
+                                                    maxFontSizeMultiplier={1.2}
+                                                    style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }}
+                                                    onPress={() => {
+                                                        removeServiceData(item.id)
+                                                    }}>Remove</Text>}
+                                            </View>)
+                                    }))}
+                                    {newServices.map((item, index) => {
+                                        return (
+                                            <View style={{ flexDirection: "row", width: width * 0.75, marginLeft: 5, alignItems: "center" }}>
+                                                <View style={{ width: width * 0.70 }}>
+                                                    <ServiceItem
+                                                        key={index}
+                                                        item={item}
+                                                        index={index}
+                                                        onCheckPress={() => {
+                                                            onPressItem(index, item)
+                                                        }}
+                                                        isSelected={selectedItems.includes(item.id)}
+                                                    />
+                                                </View>
+                                                <Text maxFontSizeMultiplier={1.2} style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "red", fontSize: 12, paddingHorizontal: 10, borderRadius: 5, borderWidth: 1, borderColor: "red", paddingVertical: 5 }} onPress={() => {
+                                                    removeNewService(item)
+                                                }}>Remove</Text>
+                                            </View>
+                                        )
+                                    })}
+                                    <CustomButton title="Add Service"
+                                        action={() => {
+                                            setOpenModal(true)
+                                        }}
+                                        maxFont={1.2}
+                                        customStyles={{
+                                            height: 40,
+                                            width: "35%",
+                                            borderRadius: 5,
+                                            marginBottom: 15
+                                        }}
+                                        customTextStyles={{
+                                            fontSize: 13,
+                                            fontFamily: LS_FONTS.PoppinsRegular
+                                        }}
+                                    />
+                                    {/* <Text style={{ fontFamily: LS_FONTS.PoppinsRegular, color: "black", fontSize: 14,  alignSelf: "center" }}>Add Service +</Text> */}
+                                </>
+                            }
+                        </ScrollView>
+                        <View style={{ paddingBottom: '2.5%' }}>
+                            {activeItem == null
+                                ?
+                                selectedItems.length > 0 && (isAddServiceMode ? <CustomButton title={"Next"} action={() => next()} /> : <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                                    <CustomButton maxFont={1.2} title={"Save"} action={() => { saveData() }} customStyles={{ width: width * 0.45 }} />
+                                    <CustomButton maxFont={1.2} title={"Next"} action={() => next()} customStyles={{ width: width * 0.45 }} />
+                                </View>)
+                                :
+                                <CustomButton maxFont={1.2} title={"Save"} action={() => saveRequest()} />
+                            }
+                        </View>
                     </View>
-                </View>
-                {loading && <Loader />}
-                <CheckServiceNameModal addNewService={addNewService} visible={openModal} setVisible={setOpenModal} />
+                    {loading && <Loader />}
+                    <CheckServiceNameModal addNewService={addNewService} visible={openModal} setVisible={setOpenModal} />
+                </KeyboardAwareScrollView>
             </SafeAreaView >
         </>
     )
@@ -1293,13 +1307,13 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService }) => {
                     <CustomButton
                         title="Submit"
                         action={() => {
-                            if (service_name=='') {
+                            if (service_name == '') {
                                 showToast("Please enter service name")
                             } else {
                                 addNewService(service_name)
-                            setVisible(false)
+                                setVisible(false)
                             }
-                            
+
                         }}
                         customStyles={{ width: "35%", borderRadius: 5, marginTop: 20 }}
                         customTextStyles={{ fontSize: 12 }}
@@ -1316,12 +1330,12 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: LS_COLORS.global.cyan,
-        
+
     },
     container: {
         flex: 1,
         backgroundColor: LS_COLORS.global.white,
-        
+
     },
     image: {
         resizeMode: 'contain',

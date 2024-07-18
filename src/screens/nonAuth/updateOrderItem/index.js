@@ -62,7 +62,7 @@ const OrderClientDetail = (props) => {
     const [newTimeNeeded, setTimeNeeded] = React.useState("")
 
     useEffect(() => {
-        console.log(items)
+   
     }, [items])
 
     React.useEffect(() => {
@@ -140,6 +140,7 @@ const OrderClientDetail = (props) => {
     }
 
     const submitOrderUpdateDetail = () => {
+        console.log("calling");
 
         if (checkforUpdate() && !updated) {
             return
@@ -220,6 +221,7 @@ const OrderClientDetail = (props) => {
 
         getApi(config)
             .then((response) => {
+            
                 if (response.status == true) {
                     showToast(response.message)
                     props.navigation.pop()
@@ -284,7 +286,7 @@ const OrderClientDetail = (props) => {
                                     d.products = d?.products?.map(x => {
                                         let p = _.cloneDeep(x)
                                         let oproduct = omg?.product?.find(o => o.product_id == x.id)
-                                        console.log("OMG",oproduct)
+                                  
 
                                         if (oproduct) {
                                             p.price = oproduct.price
@@ -450,7 +452,7 @@ const OrderClientDetail = (props) => {
                 </View>
             </SafeAreaView >
             {loading && <Loader />}
-            <CheckServiceNameModal setLoading={setLoading} items={items} addNewService={addNewService} visible={openModal} setVisible={setOpenModal} />
+            <CheckServiceNameModal setLoading={setLoading} items={items} addNewService={addNewService} visible={openModal} setVisible={setOpenModal} order_id={order_id} />
 
         </View>
     )
@@ -582,7 +584,7 @@ const ItemView = ({
                             style={[styles.itemTextStyle, { minWidth: 37, maxWidth: 40, height: 40, marginLeft: 5, marginRight: 10, paddingVertical: 4, color: LS_COLORS.global.black, backgroundColor: LS_COLORS.global.lightGrey }]} />
                     </View>
                     <TextInput
-                        value={"$" + selectedData?.price}
+                        value={selectedData?.price?.length>0?( "$" + selectedData?.price):selectedData?.price}
                         onChangeText={t => {
                             let textD = t.replace(/\$/g, "")
                             const validated = String(textD).match(/^(\d*\.{0,1}\d{0,2}$)/)
@@ -834,7 +836,7 @@ const HeaderView = ({ subService, navigation, data, action }) => {
 
 
 
-const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setLoading }) => {
+const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setLoading ,order_id}) => {
     const [service_name, setServiceName] = React.useState("")
     const access_token = useSelector(state => state.authenticate.access_token)
     const [service_id, setServiceID] = React.useState(null)
@@ -853,6 +855,12 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setL
     }, [visible])
 
     const checkName = async () => {
+let temp = items?.filter(i=>i.name?.trim()?.toLowerCase() ==service_name?.trim()?.toLowerCase())
+        if(temp?.length>0){
+            showToast("Service name already added.")
+            return
+        }
+        
         try {
             setLoading(true)
             let headers = {
@@ -861,13 +869,16 @@ const CheckServiceNameModal = ({ visible, setVisible, addNewService, items, setL
             let body = new FormData()
             body.append("service_id", service_id)
             body.append("name", service_name)
+            body.append("order_id",order_id)
             let config = {
                 headers: headers,
                 data: body,
                 endPoint: '/api/addProviderItemExist',
                 type: 'post'
             }
+            // console.log(JSON.stringify(config),"config===>");
             let res = await getApi(config)
+            // console.log("res==>",JSON.stringify(res));
             if (res.status) {
                 setVisible(false)
                 addNewService(

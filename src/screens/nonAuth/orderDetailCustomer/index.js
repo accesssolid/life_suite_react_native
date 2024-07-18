@@ -1239,6 +1239,7 @@ const CardClientInfo = ({ data, order_variant, orderType,notificationData, noti_
 
 
 const OrderItemsDetail = ({ i,orderType }) => {
+    console.log(i,"==========iiiiiii");
     return (
         <>
             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginTop: 10 }}>

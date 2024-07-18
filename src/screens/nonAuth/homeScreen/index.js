@@ -64,7 +64,7 @@ const HomeScreen = props => {
   const userType = useSelector(state => state.authenticate.type);
 
   const services = useSelector(state => state.authenticate.services);
-  console.log(services, 'services===>>>');
+
   const myJobs = useSelector(state => state.provider.myJobs);
   const access_token = useSelector(state => state.authenticate.access_token);
   const switched = useSelector(state => state.switchTo)?.switched;
@@ -73,7 +73,7 @@ const HomeScreen = props => {
   const [dataRefresh, setDataRefresh] = useState(false);
 
   const [items, setItems] = useState([]);
-  console.log(items, 'items===><><');
+
   const [order, setOrder] = useState([]);
   const [scrollEnabled, setScrollEnabled] = React.useState(true);
   const showDot = useSelector(state => state.dot)?.showDot;
@@ -291,7 +291,7 @@ const HomeScreen = props => {
   };
 
   const getServices = (load = true) => {
-    console.log('------------------------------');
+
     if (load) {
       setLoading(true);
     }
@@ -312,7 +312,7 @@ const HomeScreen = props => {
     };
     getApi(config)
       .then(response => {
-        console.log(response?.data, 'res===>>>>:::');
+   
         if (response.status == true) {
           dispatch(setServices({data: [...response.data]}));
           setItems([...response.data]);
@@ -392,9 +392,10 @@ const HomeScreen = props => {
       endPoint: '/api/providerAddedServicesList',
       type: 'post',
     };
+    console.log(config,"------->");
     getApi(config)
       .then(response => {
-        console.log('/api/providerAddedServicesList', response);
+        console.log('/api/providerAddedServicesList', JSON.stringify(response));
         if (response.status == true) {
           dispatch(setMyJobs({data: [...response.data]}));
           setLoading(false);
@@ -740,6 +741,7 @@ const HomeScreen = props => {
             </View>
           ) : myJobs.length > 0 ? (
             <FlatList
+            showsVerticalScrollIndicator={false}
               data={[...myJobs]}
               numColumns={2}
               refreshControl={
@@ -833,7 +835,7 @@ const HomeScreen = props => {
                       arr.push(items[itemData.key].id);
                       setOrder(arr);
                     });
-                    console.log('arr==>>>', arr);
+          
                     getList(arr);
                     console.log(
                       'Drag was released, the blocks are in the following order: ',
@@ -845,7 +847,7 @@ const HomeScreen = props => {
                   }}>
                   {items?.map(
                     (item, index) => (
-                      console.log(item?.id, index, '__)_)_)_)'),
+                   
                       (
                         <View
                           key={index}

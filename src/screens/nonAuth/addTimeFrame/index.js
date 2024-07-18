@@ -144,6 +144,29 @@ const AddTimeFrame = (props) => {
     const [pressed, setPressed] = React.useState(false)
     
     const save = () => {
+        const invalidTimeFrames = customDatesStyles.filter(item => {
+            return item.from_time.trim() === '' || item.to_time.trim() === '';
+        });
+    
+        if (invalidTimeFrames.length > 0) {
+            setLoading(false);
+            invalidTimeFrames.forEach(item => {
+                if (item.from_time.trim() === '') {
+                    showToast("Please fill in 'From Time", 'danger');
+                    return
+                }
+                if (item.to_time.trim() === '') {
+                    showToast("Please fill in 'To Time'", 'danger');
+                    return
+                }
+            });
+            return;
+        }
+        // let temp = items?.filter(i=>i.name?.trim()?.toLowerCase() ==service_name?.trim()?.toLowerCase())
+        // if(temp?.length>0){
+        //     showToast("Service name already added.")
+        //     return
+        // }
         // setPressed(true)
         setLoading(true)
         let headers = {

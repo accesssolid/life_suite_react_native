@@ -12,6 +12,7 @@ import { getApi } from '../../../api/api';
 import { useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import MaterialIcons from "react-native-vector-icons/MaterialIcons"
+import LS_COLORS from '../../../constants/colors';
 const VerificationCode = props => {
   const [email, setEmail] = useState('')
   const [loader, setLoader] = useState("")
@@ -69,8 +70,8 @@ const VerificationCode = props => {
         backgroundColor={Colors.global.green}
         barStyle="light-content" />
         
-      <View>
-        <ScrollView>
+      <View style={styles.container}>
+        <ScrollView showsVerticalScrollIndicator={false} bounces={false} >
         <MaterialIcons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
 
           <View style={styles.screen}>
@@ -111,6 +112,10 @@ const styles = StyleSheet.create({
     flex: 1,
     // backgroundColor: Colors.white,
   },
+  container: {
+    flex: 1,
+    backgroundColor: LS_COLORS.global.white,
+},
   design: {
     height: 220,
     width: 300,

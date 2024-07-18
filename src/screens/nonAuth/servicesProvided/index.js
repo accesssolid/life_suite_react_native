@@ -25,6 +25,8 @@ import { updateSignupModal } from '../../../redux/features/signupModal';
 import { setVariantData } from '../../../redux/features/variantData';
 import { setCurrentLocationData } from '../../../redux/features/currentlocation';
 import moment from 'moment';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { SetOtherservice } from '../../../redux/features/total';
 const ServicesProvided = (props) => {
     const dispatch = useDispatch()
     const { subService } = props.route.params
@@ -56,7 +58,6 @@ const ServicesProvided = (props) => {
     const [selectedModel, setSelectedModel] = React.useState("")
     const [selectedYear, setSelectedYear] = React.useState("")
     const [vehicle_types, setVehicleTypes] = React.useState([])
-    console.log(vehicle_types,"vehicle_types===>>>>");
 
     React.useEffect(() => {
         let data = {
@@ -121,16 +122,16 @@ const ServicesProvided = (props) => {
                 console.log("Variant Data", response.data)
                 if (response.status == true) {
                     if (response.data?.length > 0) {
-                        let x=response.data.sort((a,b)=>{
+                        let x = response.data.sort((a, b) => {
                             if (a.name < b.name) {
                                 return -1;
-                              }
-                              if (a.name > b.name) {
+                            }
+                            if (a.name > b.name) {
                                 return 1;
-                              }
-                              return 0;
+                            }
+                            return 0;
                         })
-                        setVehicleTypes( x)
+                        setVehicleTypes(x)
                         setVehicleType(x[0])
                     } else {
                         setVehicleTypes([])
@@ -427,6 +428,7 @@ const ServicesProvided = (props) => {
     }
 
     const onPressItem = (item) => {
+        console.log(item,"item===>");
         if (!selectedItems.includes(item.id)) {
             setCheckedData(item)
         }
@@ -460,7 +462,7 @@ const ServicesProvided = (props) => {
 
     const saveRequest = () => {
         console.log(activeItem)
-        console.log(extraData)
+
 
         let isSelected = false
 
@@ -490,7 +492,7 @@ const ServicesProvided = (props) => {
     }
 
     const setExtraData = (data, item) => {
-
+   
         let obj = {
             parent_id: item.id,
         }
@@ -522,6 +524,7 @@ const ServicesProvided = (props) => {
             //     }
             // });
         }
+        dispatch(SetOtherservice(temp))
         setExtraDataa([...temp])
     }
 
@@ -588,7 +591,7 @@ const ServicesProvided = (props) => {
                                     props.navigation.navigate("HomeScreen")
                                 }}
                             />
-                           
+
                         </SafeAreaView>
                     </View>
                 </ImageBackground>
@@ -601,10 +604,10 @@ const ServicesProvided = (props) => {
                             title={vehicleType?.service_variants_name}
                             item={vehicle_types.map(x => String(x.name).toUpperCase())}
                             value={String(vehicleType.name).toUpperCase()}
-                           
+
                             onChangeValue={(index, value) => onChangeVehicleType(vehicle_types[index])}
                             containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                            dropdownStyle={{ height: vehicle_types?.length==0?10:(vehicle_types?.length>=4?160:vehicle_types?.length*40) }}
+                            dropdownStyle={{ height: vehicle_types?.length == 0 ? 10 : (vehicle_types?.length >= 4 ? 160 : vehicle_types?.length * 40) }}
                         />
                         {subService.id == 14 && <View style={{ flexDirection: 'row', paddingHorizontal: "2.5%" }}>
                             <View style={{ flex: 1 }}>
@@ -618,7 +621,7 @@ const ServicesProvided = (props) => {
                                     }}
                                     value={makeList.find(x => x.id == selectedMake)?.title ?? "Make"}
                                     containerStyle={{ width: '90%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey, flexDirection: 'column' }}
-                                    dropdownStyle={{ maxHeight: makeList?.length>0?(makeList?.length*40<160?makeList?.length*40:160):40 }}
+                                    dropdownStyle={{ maxHeight: makeList?.length > 0 ? (makeList?.length * 40 < 160 ? makeList?.length * 40 : 160) : 40 }}
                                     textValueProps={{
                                         maxFontSizeMultiplier: 1.3
                                     }}
@@ -634,9 +637,9 @@ const ServicesProvided = (props) => {
                                     onChangeValue={(index, value) => {
                                         setSelectedModel(modelList[index].id)
                                     }}
-                                    
+
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                    dropdownStyle={{ maxHeight: modelList?.length>0?(modelList?.length*40<160?modelList?.length*40:160):40 }}
+                                    dropdownStyle={{ maxHeight: modelList?.length > 0 ? (modelList?.length * 40 < 160 ? modelList?.length * 40 : 160) : 40 }}
                                     textValueProps={{
                                         maxFontSizeMultiplier: 1.3
                                     }}
@@ -652,10 +655,10 @@ const ServicesProvided = (props) => {
                                     onChangeValue={(index, value) => {
                                         setSelectedYear(yearList[index].id)
                                     }}
-                                                                        dropdownStyle={{ maxHeight: yearList?.length>0?(yearList?.length*40<160?yearList?.length*40:160):40 }}
+                                    dropdownStyle={{ maxHeight: yearList?.length > 0 ? (yearList?.length * 40 < 160 ? yearList?.length * 40 : 160) : 40 }}
 
                                     containerStyle={{ width: '80%', alignSelf: 'center', borderRadius: 5, backgroundColor: LS_COLORS.global.white, marginBottom: 15, borderWidth: 1, borderColor: LS_COLORS.global.grey }}
-                                  
+
                                     textValueProps={{
                                         maxFontSizeMultiplier: 1.3
                                     }}
@@ -677,52 +680,60 @@ const ServicesProvided = (props) => {
                         //     </View>)
                     }
                     <Text maxFontSizeMultiplier={1.4} style={{ paddingLeft: '5%', fontFamily: LS_FONTS.PoppinsMedium, fontSize: 16, marginBottom: 10 }}>Select Services and Products</Text>
-                    <View style={{flex:1}}>
-                        <ScrollView   showsVerticalScrollIndicator={false} >
-                            {
-                                activeItem !== null
-                                    ?
-                                    <>
-                                        <ServiceItemUser
-                                            item={activeItem}
-                                            onCheckPress={() => onPressItem(activeItem)}
-                                            isSelected={selectedItems.includes(activeItem.id)}
-                                            selectedProducts={selectedProducts}
-                                            onSelectProduct={(product) => setCheckedDataProducts(product)}
-                                            activeMode
-                                            extraData={extraData}
-                                            setExtraData={setExtraData}
-                                        />
-                                    </>
-                                    :
-                                    itemListMaster.length > 0
+                    <View style={{ flex: 1 }}>
+                        <KeyboardAwareScrollView
+                            bounces={false}
+                            // keyboardShouldPersistTaps="always"
+                            contentContainerStyle={{ flexGrow: 1 }}
+                            showsHorizontalScrollIndicator={false}
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <ScrollView showsVerticalScrollIndicator={false} >
+                                {
+                                    activeItem !== null
                                         ?
                                         <>
-                                            {/* <Content removeClippedSubviews={true} style={{ flex: 1 }}> */}
-                                            {itemList && itemList.length > 0
-                                                ?
-                                                itemList.map((item, index) => {
-                                                    return (
-                                                    <ServiceItemUser
-                                                        key={index}
-                                                        item={item}
-                                                        index={index}
-                                                        onCheckPress={() => onPressItem(item, index)}
-                                                        isSelected={selectedItems.includes(item.id)}
-                                                        setExtraData={setExtraData}
-                                                    />
-                                                )
-                                                })
-                                                :
-                                                null}
-                                            {/* </Content> */}
+                                            <ServiceItemUser
+                                                item={activeItem}
+                                                onCheckPress={() => onPressItem(activeItem)}
+                                                isSelected={selectedItems.includes(activeItem.id)}
+                                                selectedProducts={selectedProducts}
+                                                onSelectProduct={(product) => setCheckedDataProducts(product)}
+                                                activeMode
+                                                extraData={extraData}
+                                                setExtraData={setExtraData}
+                                            />
                                         </>
                                         :
-                                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                            {!loading && <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
-                                        </View>
-                            }
-                        </ScrollView>
+                                        itemListMaster.length > 0
+                                            ?
+                                            <>
+                                                {/* <Content removeClippedSubviews={true} style={{ flex: 1 }}> */}
+                                                {itemList && itemList.length > 0
+                                                    ?
+                                                    itemList.map((item, index) => {
+                                                        return (
+                                                            <ServiceItemUser
+                                                                key={index}
+                                                                item={item}
+                                                                index={index}
+                                                                onCheckPress={() => onPressItem(item, index)}
+                                                                isSelected={selectedItems.includes(item.id)}
+                                                                setExtraData={setExtraData}
+                                                            />
+                                                        )
+                                                    })
+                                                    :
+                                                    null}
+                                                {/* </Content> */}
+                                            </>
+                                            :
+                                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                                {!loading && <Text maxFontSizeMultiplier={1.5} style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>No Services Available</Text>}
+                                            </View>
+                                }
+                            </ScrollView>
+                        </KeyboardAwareScrollView>
                     </View>
                     {/* <KeyboardAvoidingView behavior={Platform.OS=="ios"?"padding":undefined}  /> */}
                     <TouchableOpacity
@@ -757,7 +768,7 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: LS_COLORS.global.cyan,
-        
+
     },
     container: {
         flex: 1,

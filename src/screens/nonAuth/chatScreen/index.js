@@ -97,6 +97,7 @@ const ChatScreen = (props) => {
     }
 
     const pickImage = () => {
+  
         ImagePicker.openPicker({
             width: 300,
             height: 300,
@@ -257,7 +258,7 @@ const ChatScreen = (props) => {
                             pickImage()
 
                         }} style={{ flexDirection: 'row', paddingHorizontal: 20, alignItems: "center" }} >
-                            <Image source={require('../../../assets/cameraChat.png')} style={{ height: 25, width: 25, resizeMode: 'contain', tintColor: LS_COLORS.global.green, alignItems: 'center', }} />
+                            <Image source={require('../../../assets/gallery.png')} style={{ height: 25, width: 25, resizeMode: 'contain', tintColor: LS_COLORS.global.green, alignItems: 'center', }} />
                             <Text maxFontSizeMultiplier={1.5} style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Gallery</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -266,7 +267,7 @@ const ChatScreen = (props) => {
 
                             }}
                             style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }} >
-                            <Image source={require('../../../assets/gallery.png')} style={{ height: 25, width: 25, resizeMode: 'contain', tintColor: LS_COLORS.global.green, alignItems: 'center', }} />
+                            <Image source={require('../../../assets/cameraChat.png')} style={{ height: 25, width: 25, resizeMode: 'contain', tintColor: LS_COLORS.global.green, alignItems: 'center', }} />
                             <Text maxFontSizeMultiplier={1.5} style={{ alignItems: 'center', marginHorizontal: 10, fontFamily: LS_FONTS.PoppinsRegular, fontSize: 15 }} >Camera</Text>
                         </TouchableOpacity>
                         <TouchableOpacity

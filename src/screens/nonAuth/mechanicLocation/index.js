@@ -31,14 +31,13 @@ import { setCurrentLocationData } from '../../../redux/features/currentlocation'
 // #liahs_before_providers
 
 const MechanicLocation = (props) => {
-    const { serviceData, subService, extraData, orderData, reorder,data } = props.route.params
+    const { serviceData, subService, extraData, orderData, reorder, data } = props.route.params
 
-console.log(subService,"jhdfhdff===>");
+   
     const [servicedata, setServicedata] = useState([])
     // const [subService, setsub_Service] = useState({})
     const [date_data, setDate_data] = useState('')
     useEffect(() => {
-        console.log('abhi-=-', data);
         if (serviceData != undefined && serviceData?.length > 0) {
             // console.log("aaaaaaaaaa=>", serviceData);
             setServicedata(serviceData)
@@ -63,14 +62,17 @@ console.log(subService,"jhdfhdff===>");
     const dispatch = useDispatch()
     const [loading, setLoading] = React.useState(false)
     const access_token = useSelector(state => state.authenticate.access_token)
-    const setDate=(date)=>{
+   
+   
+    const setDate = (date) => {
         setDatee(date)
     }
     const [isLoadCurrentLocation, setIsLoadCurrentLocation] = React.useState(false)
     React.useEffect(() => {
         // console.log("Params", props.route.params)
     }, [props.route.params])
-    const currentLocation = useSelector(state => state.currentLocation)?.current
+    const currentLocation = useSelector(state => state?.currentlocation?.current)
+    console.log(currentLocation,"currentLocation");
     // const [currentLocation, setCurrentLocation] = React.useState({
 
     // })
@@ -200,7 +202,7 @@ console.log(subService,"jhdfhdff===>");
         if (hasLocationPermission) {
             Geolocation.getCurrentPosition(
                 (position) => {
-                    console.log(position,"position")
+                    console.log(position, "position")
                     getCurrentPlace()
                 },
                 (error) => {
@@ -286,18 +288,22 @@ console.log(subService,"jhdfhdff===>");
     }
 
     const getDistanceApi = (to, from) => {
+        setLoading(true)
         fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${to.latitude}%2C${to.longitude}&origins=${from.latitude}%2C${from.longitude}&key=AIzaSyA8vPYceBJX2Mt43IKubB1Gpa2EcZ6Mg_g`).then(res => {
             return res.json()
         }).then(res => {
+          
             if (res?.rows[0]) {
                 let element = res.rows[0].elements[0]
                 // alert(element?.distance?.value)
                 if (element?.distance?.value >= 0) {
                     setTotalDistance(element?.distance?.value * 0.000621371)
+                    setLoading(false)
                 }
                 console.log("Element", element)
             }
         }).catch(err => {
+
             console.error(err)
         })
     }
@@ -310,7 +316,7 @@ console.log(subService,"jhdfhdff===>");
 
     const submit = () => {
         if (reorder) {
-           
+
             if (date.trim() == "") {
                 setTimeout(() => {
                     showToast("Please select date")
@@ -372,8 +378,8 @@ console.log(subService,"jhdfhdff===>");
                 showToast("Start Time must be grater than End Time. ")
             }, 200)
         } else {
-           
-            
+
+
             props.navigation.navigate("Mechanics", { data: data, subService: subService, extraData })
         }
     }
@@ -414,7 +420,7 @@ console.log(subService,"jhdfhdff===>");
     };
 
     const onLocation = (location, coords) => {
-     
+
         setFromAddress(location)
         setFromCoordinates({
             ...coords,
