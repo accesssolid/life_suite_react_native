@@ -1661,7 +1661,7 @@ const Mechanics = (props) => {
                 // backgroundColor={"transparent"} 
                 backgroundColor={LS_COLORS.global.green}
                 barStyle="light-content" />
-            <View style={{ width: '100%', height: '30%', backgroundColor: "red" }}>
+            <View style={{ width: '100%', height: '30%', }}>
                 <SureModal1
                     title="No provider available on selected date or time.Kindly change the time or select different date"
                     pressHandler={() => {
@@ -1702,7 +1702,8 @@ const Mechanics = (props) => {
                                 <Header
                                     imageUrl={require("../../../assets/backWhite.png")}
                                     action={() => {
-                                        props.navigation.navigate("HomeScreen")
+                                        props?.navigation?.goBack();
+                                        // props.navigation.navigate("HomeScreen")
                                     }}
                                     imageUrl1={require("../../../assets/homeWhite.png")}
                                     action1={() => {
@@ -1719,7 +1720,7 @@ const Mechanics = (props) => {
             </View>
             <SafeAreaView style={styles.safeArea} edges={["bottom"]} >
                 <View style={styles.container}>
-                    <View style={{ marginTop: 26 }}>
+                    <View style={{ marginTop: 26,flex:1 }}>
                         <View style={{ height: 40, width: '90%', alignSelf: "center", justifyContent: 'space-between', flexDirection: 'row' }}>
                             <TouchableOpacity onPress={() => { setFilterModal(true) }} style={{ justifyContent: "center", alignItems: "center", marginRight: 5 }}>
                                 <Image style={{ height: 30, width: 30, alignSelf: "center" }} source={require("../../../assets/filter.png")} />
@@ -1767,8 +1768,8 @@ const Mechanics = (props) => {
                         </View>
                         <ScrollView
                             style={{
-                                // backgroundColor: 'red',
-                                height: "80%"
+                                flex:1
+                                // height: heightPercentageToDP(80),
                             }}
                             contentContainerStyle={{
                                 paddingBottom: heightPercentageToDP(4),
@@ -1827,17 +1828,23 @@ const Mechanics = (props) => {
                                         is_insauranced = item?.questionnaire_data[0]?.is_insauranced == "1"
                                     }
                                     let checked_g = item.item_list.filter(i => i.checked).length > 0
-                                    return <View key={index} style={[styles.alexiContainer, {
+                                    return <View key={index} style={{
                                         shadowColor: "#000",
                                         shadowOffset: {
                                             width: 0,
                                             height: 2,
                                         },
-                                        shadowOpacity: 0.23,
-                                        shadowRadius: 2.62,
-
-                                        elevation: 4,
-                                    }]}>
+                                        shadowOpacity: 0.25,
+                                        shadowRadius: 3.84,
+                                        
+                                        elevation: 5,
+                                        width: "90%",
+                                        alignSelf: 'center',
+                                        borderRadius: 6,
+                                        padding: 10,
+                                        marginTop: 10,
+                                        backgroundColor:"white"
+                                    }}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Pressable onPress={() => {
                                                 props.navigation.navigate("ProviderDetail", { providerId: item.id, service: subService?.name, service_id: subService?.id, list: true })
@@ -2053,8 +2060,27 @@ const Mechanics = (props) => {
 
 
                     </View>
+                    <View style={{
+                        // backgroundColor:"yellow",
+                        // height:"20%",
+                        // paddingVertical:10
+                        // alignItems:'center',
+                        // justifyContent:'center'
+                    }}>
                     <Pressable
-                        style={[styles.save]}
+                        style={{
+                            justifyContent: "center",
+                            alignItems: 'center',
+                            height: 45,
+                            width: 122,
+                            backgroundColor: LS_COLORS.global.green,
+                            borderRadius: 6,
+                            alignSelf: 'center',
+                            marginTop:10,
+                            // position: 'absolute',
+                            // bottom: 0,
+                            marginBottom: 10
+                        }}
                         // activeOpacity={0.7}
                         onPress={() => {
                             // props.navigation.navigate("MainDrawer",{screen:"Orders"})
@@ -2084,6 +2110,7 @@ const Mechanics = (props) => {
                         }}>
                         <Text maxFontSizeMultiplier={1.5} style={styles.saveText}>Request</Text>
                     </Pressable>
+                    </View>
                 </View>
 
                 {loading && <Loader />}
