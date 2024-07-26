@@ -279,11 +279,11 @@ const MainDrawer = (props) => {
                     width: Dimensions.get('screen').width / 1.3
                 }}
                 initialRouteName="HomeScreen"
+                // screenOptions={{
+                //     unmountOnBlur: true,
+                //     headerShown: false
+                // }}
                 screenOptions={{
-                    unmountOnBlur: true,
-                    headerShown: false
-                }}
-                drawerContentOptions={{
                     labelStyle: {
                         fontFamily: LS_FONTS.PoppinsMedium,
                         fontSize: 14,
@@ -293,8 +293,23 @@ const MainDrawer = (props) => {
                         marginVertical: 0,
                     },
                     activeTintColor: LS_COLORS.global.white,
-                    inactiveTintColor: LS_COLORS.global.green
-                }}>
+                    inactiveTintColor: LS_COLORS.global.green,
+                    unmountOnBlur: true,
+                    headerShown: false
+                }}
+                // drawerContentOptions={{
+                //     labelStyle: {
+                //         fontFamily: LS_FONTS.PoppinsMedium,
+                //         fontSize: 14,
+                //         color: LS_COLORS.global.darkBlack,
+                //     },
+                //     itemStyle: {
+                //         marginVertical: 0,
+                //     },
+                //     activeTintColor: LS_COLORS.global.white,
+                //     inactiveTintColor: LS_COLORS.global.green
+                // }}
+                >
                 <Drawer.Screen
                     name="Profile"
                     component={Profile}

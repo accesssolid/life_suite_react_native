@@ -876,7 +876,7 @@ let temp = items?.filter(i=>i.name?.trim()?.toLowerCase() ==service_name?.trim()
                 endPoint: '/api/addProviderItemExist',
                 type: 'post'
             }
-            // console.log(JSON.stringify(config),"config===>");
+            console.log(JSON.stringify(config),"config77777");
             let res = await getApi(config)
             // console.log("res==>",JSON.stringify(res));
             if (res.status) {
@@ -933,7 +933,7 @@ let temp = items?.filter(i=>i.name?.trim()?.toLowerCase() ==service_name?.trim()
                         action={() => {
                             checkName()
                         }}
-                        customStyles={{ height: 40, width: "35%", borderRadius: 5, marginTop: 20 }}
+                        customStyles={{ height: 40, width: "35%", borderRadius: 5, marginTop: 20,marginBottom:20 }}
                         customTextStyles={{ fontSize: 12 }}
                     />
                 </Pressable>

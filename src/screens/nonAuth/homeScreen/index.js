@@ -497,14 +497,14 @@ const HomeScreen = props => {
   };
 
   const getCurrentPlace = () => {
-    console.log('results===>', results);
+    // console.log('results===>', results);
     setTimeout(() => {
       RNGooglePlaces.getCurrentPlace(['placeID', 'location', 'name', 'address'])
         .then(results => {
           let locationData = {
-            lat: results[0].location.latitude,
-            long: results[0].location.longitude,
-            address: results[0].address,
+            lat: results[0]?.location?.latitude,
+            long: results[0]?.location?.longitude,
+            address: results[0]?.address,
           };
           updateLocation(locationData);
         })

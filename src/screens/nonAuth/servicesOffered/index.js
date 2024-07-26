@@ -1069,6 +1069,7 @@ const ServicesProvided = (props) => {
                 type: "post",
                 endPoint: "/api/providerServicesSaveIndividually"
             }
+            console.log("config77777",JSON.stringify(config));
             let res = await getApi(config)
 
             if (res.status) {
