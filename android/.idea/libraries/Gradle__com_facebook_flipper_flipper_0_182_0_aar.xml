@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.facebook.flipper:flipper:0.182.0@aar">
+  <library name="Gradle: com.facebook.flipper:flipper:0.182.0@aar" external-system-id="GRADLE">
     <ANNOTATIONS>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/70f6b60203ce62339ae09fd189d41cd6/transformed/jetified-flipper-0.182.0/annotations.zip!/" />
     </ANNOTATIONS>

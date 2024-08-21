@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: io.grpc:grpc-protobuf-lite:1.45.1">
+  <library name="Gradle: io.grpc:grpc-protobuf-lite:1.45.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.grpc/grpc-protobuf-lite/1.45.1/a842605124e6542550b2da550a9acae1443a945/grpc-protobuf-lite-1.45.1.jar!/" />
     </CLASSES>

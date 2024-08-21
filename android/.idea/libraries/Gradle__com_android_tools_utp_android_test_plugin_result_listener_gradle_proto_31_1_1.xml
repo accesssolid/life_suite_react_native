@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:31.1.1">
+  <library name="Gradle: com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-result-listener-gradle-proto/31.1.1/12e0c415c599bd8768dc1e3db076bbe921db1e08/android-test-plugin-result-listener-gradle-proto-31.1.1.jar!/" />
     </CLASSES>

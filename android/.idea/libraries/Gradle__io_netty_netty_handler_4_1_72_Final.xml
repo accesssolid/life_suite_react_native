@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: io.netty:netty-handler:4.1.72.Final">
+  <library name="Gradle: io.netty:netty-handler:4.1.72.Final" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler/4.1.72.Final/9feee089fee606c64be90c0332db9aef1f7d8e46/netty-handler-4.1.72.Final.jar!/" />
     </CLASSES>

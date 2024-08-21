@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: io.netty:netty-codec-socks:4.1.72.Final">
+  <library name="Gradle: io.netty:netty-codec-socks:4.1.72.Final" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-socks/4.1.72.Final/d3bc427b6e2dc4bb6dc9d18d1cc47f8530970a8b/netty-codec-socks-4.1.72.Final.jar!/" />
     </CLASSES>

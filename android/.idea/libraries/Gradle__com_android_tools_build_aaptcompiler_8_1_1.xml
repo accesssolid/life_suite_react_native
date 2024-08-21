@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.build:aaptcompiler:8.1.1">
+  <library name="Gradle: com.android.tools.build:aaptcompiler:8.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.build/aaptcompiler/8.1.1/7f64699804514b64d14abd79a12c1d6902de7530/aaptcompiler-8.1.1.jar!/" />
     </CLASSES>

@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.utp:android-device-provider-ddmlib-proto:31.1.1">
+  <library name="Gradle: com.android.tools.utp:android-device-provider-ddmlib-proto:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-device-provider-ddmlib-proto/31.1.1/70f460be43fe32ed535b1d34a9966ac955191ce1/android-device-provider-ddmlib-proto-31.1.1.jar!/" />
     </CLASSES>

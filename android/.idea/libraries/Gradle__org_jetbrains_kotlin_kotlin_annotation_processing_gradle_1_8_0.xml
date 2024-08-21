@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: org.jetbrains.kotlin:kotlin-annotation-processing-gradle:1.8.0">
+  <library name="Gradle: org.jetbrains.kotlin:kotlin-annotation-processing-gradle:1.8.0" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-annotation-processing-gradle/1.8.0/fa6b4c851584366968803fe879d995bcfe7aa8aa/kotlin-annotation-processing-gradle-1.8.0.jar!/" />
     </CLASSES>

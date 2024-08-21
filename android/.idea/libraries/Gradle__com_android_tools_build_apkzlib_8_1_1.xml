@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.build:apkzlib:8.1.1">
+  <library name="Gradle: com.android.tools.build:apkzlib:8.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.build/apkzlib/8.1.1/cac4447eae289138e1cbbfe13a0d8bb6b4255e56/apkzlib-8.1.1.jar!/" />
     </CLASSES>

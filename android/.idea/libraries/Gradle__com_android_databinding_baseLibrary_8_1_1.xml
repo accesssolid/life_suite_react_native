@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.databinding:baseLibrary:8.1.1">
+  <library name="Gradle: com.android.databinding:baseLibrary:8.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.databinding/baseLibrary/8.1.1/7e7399239e52d4069896277615e005add7ae8e5a/baseLibrary-8.1.1.jar!/" />
     </CLASSES>

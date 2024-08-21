@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.19">
+  <library name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.19" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.mojo/animal-sniffer-annotations/1.19/1536e1a8fd552dc05f12b5f0827fbb2ee3d5a89b/animal-sniffer-annotations-1.19.jar!/" />
     </CLASSES>

@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.analytics-library:protos:31.1.1">
+  <library name="Gradle: com.android.tools.analytics-library:protos:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/protos/31.1.1/8e0699e5e6b59a622048b0b57237e9466740b84f/protos-31.1.1.jar!/" />
     </CLASSES>

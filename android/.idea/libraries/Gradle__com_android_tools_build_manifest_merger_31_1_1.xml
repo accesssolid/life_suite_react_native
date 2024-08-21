@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.build:manifest-merger:31.1.1">
+  <library name="Gradle: com.android.tools.build:manifest-merger:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.build/manifest-merger/31.1.1/d5f15475323231ed1506561184e7483f837f27f8/manifest-merger-31.1.1.jar!/" />
     </CLASSES>

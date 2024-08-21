@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.analytics-library:crash:31.1.1">
+  <library name="Gradle: com.android.tools.analytics-library:crash:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/crash/31.1.1/745eed5bd3b46fecd9a285aaf033e64b570b1d68/crash-31.1.1.jar!/" />
     </CLASSES>

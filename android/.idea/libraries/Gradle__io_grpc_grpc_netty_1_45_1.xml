@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: io.grpc:grpc-netty:1.45.1">
+  <library name="Gradle: io.grpc:grpc-netty:1.45.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.grpc/grpc-netty/1.45.1/e2a1bc48548213144f00aa709c4da92626b35cd8/grpc-netty-1.45.1.jar!/" />
     </CLASSES>

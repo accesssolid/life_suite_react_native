@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: org.jetbrains.kotlin:kotlin-tooling-core:1.8.0">
+  <library name="Gradle: org.jetbrains.kotlin:kotlin-tooling-core:1.8.0" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-tooling-core/1.8.0/da3a4252e4b48833eb566227b2baecbaede8993/kotlin-tooling-core-1.8.0.jar!/" />
     </CLASSES>

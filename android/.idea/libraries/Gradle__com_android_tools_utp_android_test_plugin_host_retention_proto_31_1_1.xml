@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.utp:android-test-plugin-host-retention-proto:31.1.1">
+  <library name="Gradle: com.android.tools.utp:android-test-plugin-host-retention-proto:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-host-retention-proto/31.1.1/4319b864edee0328f75afbc17ac4ae8997679420/android-test-plugin-host-retention-proto-31.1.1.jar!/" />
     </CLASSES>

@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools:dvlib:31.1.1">
+  <library name="Gradle: com.android.tools:dvlib:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools/dvlib/31.1.1/73f9e701a49ce55a5efc5ade01238f5fa9b2655d/dvlib-31.1.1.jar!/" />
     </CLASSES>

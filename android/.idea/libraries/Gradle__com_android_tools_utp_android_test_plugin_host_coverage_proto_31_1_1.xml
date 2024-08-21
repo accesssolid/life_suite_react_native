@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools.utp:android-test-plugin-host-coverage-proto:31.1.1">
+  <library name="Gradle: com.android.tools.utp:android-test-plugin-host-coverage-proto:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-host-coverage-proto/31.1.1/7b3dfe6654185ce95c2e815c3dcbc488a3ea567e/android-test-plugin-host-coverage-proto-31.1.1.jar!/" />
     </CLASSES>

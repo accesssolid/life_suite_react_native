@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.8.20-RC2">
+  <library name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.8.20-RC2" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.8.20-RC2/23853310e93f1c418a827be6fabe6f903addd231/kotlin-reflect-1.8.20-RC2.jar!/" />
     </CLASSES>

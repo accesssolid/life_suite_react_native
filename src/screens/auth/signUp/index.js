@@ -184,10 +184,17 @@ const SignUpScreen = (props) => {
         GetToken()
     }, [])
 
-    const getDeviceID = async () => {
-        let device_id = await DeviceInfo.getUniqueId()
+    async function getDeviceID() {
+        let device_id =await DeviceInfo?.getUniqueId();
+        // console.log("device_id",device_id)
         setDevicdId(device_id)
-    }
+      }
+
+    // const getDeviceID = async () => {
+    //     let device_id = await DeviceInfo?.getUniqueId()
+    //     console.log("device_id",device_id)
+    //     // setDevicdId(device_id)
+    // }
 
 
     useEffect(() => {
@@ -327,7 +334,6 @@ const SignUpScreen = (props) => {
         password: '',
         password_confirmation: '',
         address: [],
-        device_id: devicdId,
         fcm_token: '#fcm!234',
         is_accept_privatepolicy: 0,
         is_accept_cdd: 0,
@@ -338,7 +344,7 @@ const SignUpScreen = (props) => {
         middle_name: '',
         prefer_name: '',
     })
-
+// console.log("AAAAA",signUpData)
     const [provider_data, setProviderData] = React.useState({
         tagline: "",
         business_name: "",
@@ -502,18 +508,19 @@ const SignUpScreen = (props) => {
 
         let user_data = {
             ...signUpData,
-            about: signUpData.bio,
-            email: signUpData.email.toLowerCase(),
+            about: signUpData?.bio,
+            email: signUpData?.email?.toLowerCase(),
             address: JSON.stringify(address),
-            phone_number: signUpData.phone_number.replace(/[^\d]/g, ""),
+            phone_number: signUpData?.phone_number?.replace(/[^\d]/g, ""),
             is_same_address: isSameAddress ? 1 : 0,
-            dob: moment(signUpData.dob, "MM/DD/YYYY").format("YYYY-MM-DD"),
+            dob: moment(signUpData?.dob, "MM/DD/YYYY").format("YYYY-MM-DD"),
             notification_prefrence: getNotiPref(notificationType),
             timezone: getTimeZone(),
-            gender: String(gender).toLowerCase()
+            gender: String(gender).toLowerCase(),
+            device_id: devicdId,
 
         }
-        console.log(user_data)
+        console.log("user_data",user_data)
         if (profile_pic?.path) {
             user_data.profile = {
                 uri: Platform.OS == "ios" ? profile_pic.path.replace('file:///', '') : profile_pic.path,
@@ -551,16 +558,16 @@ const SignUpScreen = (props) => {
         }
         getApi(config)
             .then(async (response) => {
-                if (response.status == true) {
+                if (response?.status == true) {
                     // console.log(response.data)
                     showToast('User Registered Successfully', 'success')
                     setLoader(false)
-                    await storeItem('user', response.data)
-                    await storeItem('user_bio_data', response.data)
-                    await storeItem('access_token', response.access_token)
+                    await storeItem('user', response?.data)
+                    await storeItem('user_bio_data', response?.data)
+                    await storeItem('access_token', response?.access_token)
                     dispatch(setUserType("user"))
-                    dispatch(setAuthToken({ data: response.access_token }))
-                    dispatch(loginReducer(response.data))
+                    dispatch(setAuthToken({ data: response?.access_token }))
+                    dispatch(loginReducer(response?.data))
                     dispatch(changeSwitched(false))
                     props.navigation.dispatch(
                         CommonActions.reset({
@@ -737,11 +744,11 @@ const SignUpScreen = (props) => {
 
         getApi(config)
             .then((response) => {
-                if (response.status == true) {
+                if (response?.status == true) {
                     if (type == "home") {
-                        setDropCityMaster(response.data)
-                        let city = response.data.filter(item => item.id == homeAddressData.city)
-                        if (city.length > 0 && city[0].name !== undefined && homeAddressData.city) {
+                        setDropCityMaster(response?.data)
+                        let city = response?.data?.filter(item => item?.id == homeAddressData.city)
+                        if (city?.length > 0 && city[0].name !== undefined && homeAddressData.city) {
                             setDropCityValue(city[0].name)
                         } else {
                             setDropCityValue("")

@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.tools:repository:31.1.1">
+  <library name="Gradle: com.android.tools:repository:31.1.1" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.android.tools/repository/31.1.1/371ee5bee7cb5fbd24569a2c07944be4ee2b8ce7/repository-31.1.1.jar!/" />
     </CLASSES>

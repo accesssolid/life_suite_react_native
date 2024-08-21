@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.facebook.react:react-android:0.73.4@aar">
+  <library name="Gradle: com.facebook.react:react-android:0.73.4@aar" external-system-id="GRADLE">
     <ANNOTATIONS>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/1fe14087064f6c0aa77e9b94e388b8db/transformed/jetified-react-android-0.73.4-debug/annotations.zip!/" />
     </ANNOTATIONS>
