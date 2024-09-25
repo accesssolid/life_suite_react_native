@@ -95,10 +95,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1649917078/LifeSuite.react-native-localize.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1649917078/LifeSuite.react-native-localize.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1649917078/LifeSuite.react-native-localize.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1649917078/LifeSuite.react-native-localize.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1649917078/LifeSuite.react-native-localize.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1649917078/LifeSuite.react-native-localize.unitTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1164215928/LifeSuite.react-native-maps.iml" filepath="$PROJECT_DIR$/.idea/modules/1164215928/LifeSuite.react-native-maps.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1164215928/LifeSuite.react-native-maps.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/1164215928/LifeSuite.react-native-maps.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1164215928/LifeSuite.react-native-maps.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1164215928/LifeSuite.react-native-maps.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1164215928/LifeSuite.react-native-maps.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/1164215928/LifeSuite.react-native-maps.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-892892976/LifeSuite.react-native-month-year-picker.iml" filepath="$PROJECT_DIR$/.idea/modules/-892892976/LifeSuite.react-native-month-year-picker.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-892892976/LifeSuite.react-native-month-year-picker.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-892892976/LifeSuite.react-native-month-year-picker.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-892892976/LifeSuite.react-native-month-year-picker.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-892892976/LifeSuite.react-native-month-year-picker.main.iml" />
@@ -143,6 +139,10 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/480236730/LifeSuite.rn-fetch-blob.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/480236730/LifeSuite.rn-fetch-blob.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/480236730/LifeSuite.rn-fetch-blob.main.iml" filepath="$PROJECT_DIR$/.idea/modules/480236730/LifeSuite.rn-fetch-blob.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/480236730/LifeSuite.rn-fetch-blob.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/480236730/LifeSuite.rn-fetch-blob.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-966794130/android.LifeSuite.react-native-maps.iml" filepath="$PROJECT_DIR$/.idea/modules/-966794130/android.LifeSuite.react-native-maps.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-966794130/android.LifeSuite.react-native-maps.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-966794130/android.LifeSuite.react-native-maps.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-966794130/android.LifeSuite.react-native-maps.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-966794130/android.LifeSuite.react-native-maps.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-966794130/android.LifeSuite.react-native-maps.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-966794130/android.LifeSuite.react-native-maps.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1928749080/react-native-gradle-plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/-1928749080/react-native-gradle-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1928749080/react-native-gradle-plugin.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1928749080/react-native-gradle-plugin.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1928749080/react-native-gradle-plugin.test.iml" filepath="$PROJECT_DIR$/.idea/modules/-1928749080/react-native-gradle-plugin.test.iml" />

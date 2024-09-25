@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -23,38 +23,38 @@ import DeviceInfo, {
 
 /* Constants */
 import LS_COLORS from '../../../constants/colors';
-import {globalStyles} from '../../../utils';
+import { globalStyles } from '../../../utils';
 import LS_FONTS from '../../../constants/fonts';
 
 /* Packages */
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import SortableGrid from 'react-native-sortable-grid-with-fixed';
 
 /* Components */
 import Cards from '../../../components/cards';
 import UserCards from '../../../components/userCards';
-import {BASE_URL, getApi} from '../../../api/api';
-import {loginReducer, setServices} from '../../../redux/features/loginReducer';
+import { BASE_URL, getApi } from '../../../api/api';
+import { loginReducer, setServices } from '../../../redux/features/loginReducer';
 import Loader from '../../../components/loader';
-import {setMyJobs} from '../../../redux/features/provider';
-import {retrieveItem, showToast} from '../../../components/validators';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {setAddServiceMode} from '../../../redux/features/services';
+import { setMyJobs } from '../../../redux/features/provider';
+import { retrieveItem, showToast } from '../../../components/validators';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { setAddServiceMode } from '../../../redux/features/services';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
-import {role} from '../../../constants/globals';
-import {getStringData, storeStringData} from '../../../asyncStorage/async';
+import { role } from '../../../constants/globals';
+import { getStringData, storeStringData } from '../../../asyncStorage/async';
 import moment from 'moment';
-import {updateBankModelData} from '../../../redux/features/bankModel';
-import {updateSignupModal} from '../../../redux/features/signupModal';
-import {updateBlockModal} from '../../../redux/features/blockModel';
+import { updateBankModelData } from '../../../redux/features/bankModel';
+import { updateSignupModal } from '../../../redux/features/signupModal';
+import { updateBlockModal } from '../../../redux/features/blockModel';
 import ReviewBusiness from '../../../components/ReviewBusiness';
 import {
   setQOpen,
   setQService,
   setQuestionTypes,
 } from '../../../redux/features/questionaire.model';
-import {widthPercentageToDP} from 'react-native-responsive-screen';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 const HomeScreen = props => {
   const dispatch = useDispatch();
@@ -101,7 +101,7 @@ const HomeScreen = props => {
     let updateDay = '0';
     try {
       updateDay = await getStringData('@last_fcm_updated');
-    } catch (err) {}
+    } catch (err) { }
     const authorizationStatus = await messaging().requestPermission();
     if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
       const token = await messaging().getToken();
@@ -154,6 +154,7 @@ const HomeScreen = props => {
 
   const getDeviceID = async () => {
     let device_id = await DeviceInfo.getUniqueId();
+    console.log("APPPP", device_id)
     setDevicdId(device_id);
   };
   const getConnectAccountDetail = async () => {
@@ -203,7 +204,7 @@ const HomeScreen = props => {
   useFocusEffect(
     useCallback(() => {
       if (userType !== 'guest') {
-        dispatch(setAddServiceMode({data: false}));
+        dispatch(setAddServiceMode({ data: false }));
       }
     }, []),
   );
@@ -252,12 +253,12 @@ const HomeScreen = props => {
         } else {
         }
       })
-      .catch(err => {})
-      .finally(() => {});
+      .catch(err => { })
+      .finally(() => { });
   };
 
   const getGuestServices = (load = true) => {
-    Alert.alert('LL');
+    // Alert.alert('LL');
     setLoading(true);
 
     let headers = {
@@ -269,7 +270,7 @@ const HomeScreen = props => {
     };
     let config = {
       headers: headers,
-      data: JSON.stringify({...user_data}),
+      data: JSON.stringify({ ...user_data }),
       endPoint: '/api/guestCustomerServicesList',
       type: 'post',
     };
@@ -277,14 +278,14 @@ const HomeScreen = props => {
       .then(response => {
         console.log(response, 'res1==>>>>');
         if (response.status == true) {
-          dispatch(setServices({data: [...response.data]}));
+          dispatch(setServices({ data: [...response.data] }));
           setItems([...response.data]);
           //  getServices()
         } else {
           // showToast(response.message, 'danger')
         }
       })
-      .catch(err => {})
+      .catch(err => { })
       .finally(() => {
         setLoading(false);
       });
@@ -305,26 +306,26 @@ const HomeScreen = props => {
     };
     let config = {
       headers: headers,
-      data: JSON.stringify({...user_data}),
+      data: JSON.stringify({ ...user_data }),
       endPoint:
         user.user_role == 2 ? '/api/servicesList' : '/api/providerServicesList',
       type: 'post',
     };
     getApi(config)
       .then(response => {
-   
+        setLoading(false)
         if (response.status == true) {
-          dispatch(setServices({data: [...response.data]}));
+          dispatch(setServices({ data: [...response.data] }));
           setItems([...response.data]);
           setTimeout(() => {
-          setDataRefresh(!dataRefresh);
-            
+            setDataRefresh(!dataRefresh);
+
           }, 1000);
         } else {
           // showToast(response.message, 'danger')
         }
       })
-      .catch(err => {})
+      .catch(err => { })
       .finally(() => {
         setTimeout(() => {
           setLoading(false);
@@ -388,16 +389,16 @@ const HomeScreen = props => {
     };
     let config = {
       headers: headers,
-      data: JSON.stringify({...user_data}),
+      data: JSON.stringify({ ...user_data }),
       endPoint: '/api/providerAddedServicesList',
       type: 'post',
     };
-    console.log(config,"------->");
+    console.log(config, "------->");
     getApi(config)
       .then(response => {
         console.log('/api/providerAddedServicesList', JSON.stringify(response));
         if (response.status == true) {
-          dispatch(setMyJobs({data: [...response.data]}));
+          dispatch(setMyJobs({ data: [...response.data] }));
           setLoading(false);
         } else {
           setLoading(false);
@@ -439,7 +440,7 @@ const HomeScreen = props => {
   };
 
   const goToItems = item => {
-    dispatch(setAddServiceMode({data: true})),
+    dispatch(setAddServiceMode({ data: true })),
       props.navigation.navigate('ServicesProvided', {
         subService: item,
         items: [...item.itemsData],
@@ -509,7 +510,7 @@ const HomeScreen = props => {
           updateLocation(locationData);
         })
         .catch(error => console.log('results error => ', error.message))
-        .finally(() => {});
+        .finally(() => { });
     }, 0);
   };
 
@@ -531,7 +532,7 @@ const HomeScreen = props => {
     };
 
     getApi(config)
-      .then(response => {})
+      .then(response => { })
       .catch(err => {
         console.warn('updateLocation err =>> ', err);
       });
@@ -585,7 +586,7 @@ const HomeScreen = props => {
               props.navigation.openDrawer(); /* props.navigation.navigate("Profile") */
             }}>
             <Image
-              style={{width: '100%', height: '100%'}}
+              style={{ width: '100%', height: '100%' }}
               resizeMode="contain"
               source={
                 require('../../../assets/menu.png') /* user.profile_image ? { uri: BASE_URL + user.profile_image } : require("../../../assets/user.png") */
@@ -605,7 +606,7 @@ const HomeScreen = props => {
               />
             )}
           </TouchableOpacity>
-          <View style={{flex: 1, paddingHorizontal: '5%'}}></View>
+          <View style={{ flex: 1, paddingHorizontal: '5%' }}></View>
           {user.user_role == 2 ? (
             <TouchableOpacity
               style={styles.search}
@@ -650,7 +651,7 @@ const HomeScreen = props => {
                 <Image
                   source={require('../../../assets/addgreen.png')}
                   resizeMode="contain"
-                  style={{width: '100%', height: '100%'}}
+                  style={{ width: '100%', height: '100%' }}
                 />
               )}
               {isAddJobActive && (
@@ -664,7 +665,7 @@ const HomeScreen = props => {
                     alignItems: 'center',
                   }}>
                   <View
-                    style={{height: 2, width: 18, backgroundColor: 'white'}}
+                    style={{ height: 2, width: 18, backgroundColor: 'white' }}
                   />
                 </View>
               )}
@@ -684,7 +685,7 @@ const HomeScreen = props => {
         )}
         {user.user_role == 3 ? (
           isAddJobActive ? (
-            <View style={{flex: 1, paddingTop: '5%'}}>
+            <View style={{ flex: 1, paddingTop: '5%' }}>
               <FlatList
                 refreshControl={
                   <RefreshControl
@@ -700,13 +701,13 @@ const HomeScreen = props => {
                 }
                 data={items}
                 numColumns={2}
-                columnWrapperStyle={{justifyContent: 'space-between'}}
-                renderItem={({item, index}) => {
+                columnWrapperStyle={{ justifyContent: 'space-between' }}
+                renderItem={({ item, index }) => {
                   return (
                     <Cards
                       title1={item.name}
                       title2="SERVICES"
-                      imageUrl={{uri: BASE_URL + item.image}}
+                      imageUrl={{ uri: BASE_URL + item.image }}
                       action={() => {
                         if (user?.user_status == 3) {
                           dispatch(updateBlockModal(true));
@@ -716,8 +717,8 @@ const HomeScreen = props => {
                           item.itemsData.length > 0
                             ? goToItems(item)
                             : props.navigation.navigate('SubServices', {
-                                service: item,
-                              });
+                              service: item,
+                            });
                         } else {
                           dispatch(
                             updateBankModelData({
@@ -741,7 +742,7 @@ const HomeScreen = props => {
             </View>
           ) : myJobs.length > 0 ? (
             <FlatList
-            showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
               data={[...myJobs]}
               numColumns={2}
               refreshControl={
@@ -756,12 +757,12 @@ const HomeScreen = props => {
                   }}
                 />
               }
-              columnWrapperStyle={{justifyContent: 'space-between'}}
-              renderItem={({item, index}) => {
+              columnWrapperStyle={{ justifyContent: 'space-between' }}
+              renderItem={({ item, index }) => {
                 return (
                   <Cards
                     title1={item.name}
-                    imageUrl={{uri: BASE_URL + item.image}}
+                    imageUrl={{ uri: BASE_URL + item.image }}
                     action={() => {
                       // console.log()
                       console.log(item);
@@ -791,11 +792,11 @@ const HomeScreen = props => {
             />
           ) : (
             <View
-              style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               {!loading && (
                 <Text
                   maxFontSizeMultiplier={1.7}
-                  style={{fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16}}>
+                  style={{ fontFamily: LS_FONTS.PoppinsSemiBold, fontSize: 16 }}>
                   No Jobs Added Yet
                 </Text>
               )}
@@ -819,7 +820,7 @@ const HomeScreen = props => {
             }
             scrollEnabled={scrollEnabled}
             showsVerticalScrollIndicator={false}>
-            <View style={{flex: 1, paddingTop: '5%'}}>
+            <View style={{ flex: 1, paddingTop: '5%' }}>
               {(
                 <SortableGrid
                   // itemWidth={widthPercentageToDP(40)}
@@ -835,7 +836,7 @@ const HomeScreen = props => {
                       arr.push(items[itemData.key].id);
                       setOrder(arr);
                     });
-          
+
                     getList(arr);
                     console.log(
                       'Drag was released, the blocks are in the following order: ',
@@ -847,7 +848,7 @@ const HomeScreen = props => {
                   }}>
                   {items?.map(
                     (item, index) => (
-                   
+
                       (
                         <View
                           key={index}
@@ -861,65 +862,36 @@ const HomeScreen = props => {
                             } else {
                               item.itemsData.length > 0
                                 ? props.navigation.navigate(
-                                    'ServicesProvided',
-                                    {
-                                      subService: item,
-                                      items: [...item.itemsData],
-                                    },
-                                  )
+                                  'ServicesProvided',
+                                  {
+                                    subService: item,
+                                    items: [...item.itemsData],
+                                  },
+                                )
                                 : props.navigation.navigate('SubServices', {
-                                    service: item,
-                                  });
+                                  service: item,
+                                });
                             }
                           }}>
                           <UserCards
                             title1={item.name}
                             title2="SERVICES"
-                            imageUrl={{uri: BASE_URL + item.image}}
+                            imageUrl={{ uri: BASE_URL + item.image }}
                           />
                         </View>
                       )
                     ),
                   )}
 
-                  {/* <FlatList
-                data={items}
-                contentContainerStyle={{flex:1}}
-                  renderItem={({item, index}) => {
-                    return (
-                      <View
-                        key={index}
-                        style={{alignItems: 'center', justifyContent: 'center'}}
-                        onTap={() => {
-                          if (user?.user_status == 3) {
-                            dispatch(updateBlockModal(true));
-                          } else {
-                            item.itemsData.length > 0
-                              ? props.navigation.navigate('ServicesProvided', {
-                                  subService: item,
-                                  items: [...item.itemsData],
-                                })
-                              : props.navigation.navigate('SubServices', {
-                                  service: item,
-                                });
-                          }
-                        }}>
-                        <UserCards
-                          title1={item.name}
-                          title2="SERVICES"
-                          imageUrl={{uri: BASE_URL + item.image}}
-                        />
-                      </View>
-                    );
-                  }}></FlatList> */}
+                 
                 </SortableGrid>
-              ) 
-            }
+              )
+              }
             </View>
           </ScrollView>
         )}
         {!loading && (
-          <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => {
@@ -929,7 +901,7 @@ const HomeScreen = props => {
                   props.navigation.navigate('Orders');
                 }
               }}
-              style={[styles.orderContainer, {paddingHorizontal: 3}]}>
+              style={[styles.orderContainer, { paddingHorizontal: 3 }]}>
               <View>
                 <Text maxFontSizeMultiplier={1.4} style={[styles.order]}>
                   MY ORDERS
@@ -948,7 +920,7 @@ const HomeScreen = props => {
                 }}
                 style={[
                   styles.orderContainer,
-                  {paddingHorizontal: 3, marginHorizontal: 5},
+                  { paddingHorizontal: 3, marginHorizontal: 5 },
                 ]}>
                 <View>
                   <Text maxFontSizeMultiplier={1.4} style={styles.order}>
@@ -969,7 +941,7 @@ const HomeScreen = props => {
                     dispatch(updateBlockModal(true));
                   }
                 }}
-                style={[styles.orderContainer, {paddingHorizontal: 3}]}>
+                style={[styles.orderContainer, { paddingHorizontal: 3 }]}>
                 <View>
                   <Text maxFontSizeMultiplier={1.4} style={[styles.order]}>
                     SCHEDULE

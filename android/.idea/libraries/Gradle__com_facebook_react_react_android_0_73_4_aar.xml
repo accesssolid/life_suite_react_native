@@ -4,8 +4,8 @@
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/1fe14087064f6c0aa77e9b94e388b8db/transformed/jetified-react-android-0.73.4-debug/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/1fe14087064f6c0aa77e9b94e388b8db/transformed/jetified-react-android-0.73.4-debug/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-3/1fe14087064f6c0aa77e9b94e388b8db/transformed/jetified-react-android-0.73.4-debug/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/1fe14087064f6c0aa77e9b94e388b8db/transformed/jetified-react-android-0.73.4-debug/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-3/1fe14087064f6c0aa77e9b94e388b8db/transformed/jetified-react-android-0.73.4-debug/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
