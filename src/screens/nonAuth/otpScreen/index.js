@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   input: {
     color: LS_COLORS.global.darkBlack,
     borderColor: "#D3D3D3",
-    borderRadius: 5,
+    borderRadius: 5
   },
   otp: {
     width: "70%",
