@@ -57,6 +57,9 @@ import BlockModel, { updateBlockModal } from '../redux/features/blockModel';
 import BlockMessageModal from '../components/BlockMessageModal';
 import { updateDot } from '../redux/features/showDot';
 import CDCModal from '../components/cdcModal';
+import DeleteAccount from '../screens/nonAuth/deleteAccount';
+
+
 
 const Drawer = createDrawerNavigator();
 
@@ -297,19 +300,19 @@ const MainDrawer = (props) => {
                     unmountOnBlur: true,
                     headerShown: false
                 }}
-                // drawerContentOptions={{
-                //     labelStyle: {
-                //         fontFamily: LS_FONTS.PoppinsMedium,
-                //         fontSize: 14,
-                //         color: LS_COLORS.global.darkBlack,
-                //     },
-                //     itemStyle: {
-                //         marginVertical: 0,
-                //     },
-                //     activeTintColor: LS_COLORS.global.white,
-                //     inactiveTintColor: LS_COLORS.global.green
-                // }}
-                >
+            // drawerContentOptions={{
+            //     labelStyle: {
+            //         fontFamily: LS_FONTS.PoppinsMedium,
+            //         fontSize: 14,
+            //         color: LS_COLORS.global.darkBlack,
+            //     },
+            //     itemStyle: {
+            //         marginVertical: 0,
+            //     },
+            //     activeTintColor: LS_COLORS.global.white,
+            //     inactiveTintColor: LS_COLORS.global.green
+            // }}
+            >
                 <Drawer.Screen
                     name="Profile"
                     component={Profile}
@@ -389,6 +392,13 @@ const MainDrawer = (props) => {
                 <Drawer.Screen
                     name="Contact Us"
                     component={ContactUs}
+                    options={{
+                        drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/contactUs.png')} style={{ height: 20, width: 20 }} />,
+                    }}
+                />
+                <Drawer.Screen
+                    name="Delete Account"
+                    component={DeleteAccount}
                     options={{
                         drawerIcon: ({ focused, color }) => <Image resizeMode="contain" source={require('../assets/contactUs.png')} style={{ height: 20, width: 20 }} />,
                     }}
@@ -538,6 +548,7 @@ const CustomDrawerContent = (props) => {
         getApi(config)
             .then((response) => {
                 if (response.status == true) {
+                    setLoader(false)
                     storeItem('user', null)
                     storeItem('passcode', null)
                     navigation.navigate('WelcomeScreen1')
@@ -765,7 +776,23 @@ const CustomDrawerContent = (props) => {
                 </Text>}
                 icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/contactUs.png')} style={{ height: 20, width: 20 }} />}
                 onPress={() => {
-                    navigation.navigate("Contact Us",{from:"Drawer"})
+                    navigation.navigate("Contact Us", { from: "Drawer" })
+                }}
+            />
+            <DrawerItem
+                style={{ marginTop: 0 }}
+                label={(props) => <Text
+                    style={{
+                        fontFamily: LS_FONTS.PoppinsMedium,
+                        fontSize: 14,
+                        color: LS_COLORS.global.darkBlack,
+                    }}
+                    maxFontSizeMultiplier={1.7}
+                >Delete Account
+                </Text>}
+                icon={({ focused, color }) => <Image resizeMode="contain" source={require('../assets/delete1.png')} style={{ height: 20, width: 20 }} />}
+                onPress={() => {
+                    navigation.navigate("DeleteAccount", { from: "Drawer" })
                 }}
             />
             <DrawerItem

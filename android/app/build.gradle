@@ -111,9 +111,9 @@ android {
      namespace "com.lifesuite"
 
     defaultConfig {
-        applicationId 'com.lyfesuite'
+        applicationId 'com.lifesuite'
         minSdkVersion rootProject.ext.minSdkVersion
-        versionCode 4
+        versionCode 7
         versionName "1"
         targetSdk 34
 

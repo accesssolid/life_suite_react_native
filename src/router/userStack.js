@@ -36,6 +36,7 @@ import OrderSuspend from '../screens/nonAuth/orderSuspend'
 import FinishPay from '../screens/nonAuth/finishPay';
 import ProviderDetail from '../screens/nonAuth/providerDetail';
 import AddCard1 from '../screens/nonAuth/addCard1';
+import DeleteAccount from '../screens/nonAuth/deleteAccount';
 const Stack = createNativeStackNavigator();
 
 const UserStack = () => {
@@ -46,6 +47,8 @@ const UserStack = () => {
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="ServiceProfile" component={ServiceProfile} />
             <Stack.Screen name="ServicesProvided" component={ServicesProvided} />
+            <Stack.Screen name="DeleteAccount" component={DeleteAccount} />
+
             <Stack.Screen name="Calendar" component={Calendar} />
             <Stack.Screen name="MechanicLocation" component={MechanicLocation} />
             <Stack.Screen name="OrderHistory" component={OrderHistory} />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, Text, SafeAreaView, StatusBar } from 'react-native';
+import { View, StyleSheet, Image, Text, SafeAreaView, StatusBar, Platform } from 'react-native';
 import Colors from '../../../constants/colors';
 import CustomButton from "../../../components/customButton"
 import CustomTextInput from "../../../components/customTextInput"
@@ -111,9 +111,9 @@ const OtpScreen = props => {
       <StatusBar backgroundColor={Colors.global.green} barStyle="light-content" />
 
       <View>
-        <ScrollView>         
-        <MaterialIcons onPress={()=>props.navigation.goBack()} name='arrow-back' size={24} style={{padding:20}}/>
- 
+        <ScrollView>
+          <MaterialIcons onPress={() => props.navigation.goBack()} name='arrow-back' size={24} style={{ padding: 20 }} />
+
           <View style={styles.screen}>
             <Text maxFontSizeMultiplier={1.7} style={{ marginTop: "20%", ...styles.forgot }}>Verification</Text>
             <Text maxFontSizeMultiplier={1.7} style={{ ...styles.email, marginTop: "25%" }}>Please enter the</Text>
@@ -124,15 +124,16 @@ const OtpScreen = props => {
                 code={code}
                 pinCount={4}
                 style={styles.otp}
+                autoFocusOnLoad={Platform.OS === 'android' ? false : true}
                 codeInputFieldStyle={styles.input}
                 placeholderTextColor="black"
                 keyboardType="number-pad"
-                onCodeChanged={code => setCode(code)}             
+                onCodeChanged={code => setCode(code)}
               />
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 40, alignSelf: 'center' ,width:"90%"}}>
-              <Text maxFontSizeMultiplier={1.7} style={{textAlign:"center", fontFamily: Fonts.PoppinsMedium, color: Colors.white }}>Didn't receive the code? <Text maxFontSizeMultiplier={1.7} onPress={() => resendCode()} style={{ fontFamily: Fonts.PoppinsMedium, color: '#FDABC0' }}>Resend</Text></Text>
-           
+            <View style={{ flexDirection: 'row', marginTop: 40, alignSelf: 'center', width: "90%" }}>
+              <Text maxFontSizeMultiplier={1.7} style={{ textAlign: "center", fontFamily: Fonts.PoppinsMedium, color: Colors.white }}>Didn't receive the code? <Text maxFontSizeMultiplier={1.7} onPress={() => resendCode()} style={{ fontFamily: Fonts.PoppinsMedium, color: '#FDABC0' }}>Resend</Text></Text>
+
             </View>
             <View style={{ marginTop: '10%' }}>
               <CustomButton

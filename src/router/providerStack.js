@@ -31,12 +31,15 @@ import LocationServiceSelect from '../screens/nonAuth/locationSelect/selectServi
 import LocationUpdate from '../screens/nonAuth/locationSelect/location'
 import ScheduleTime from '../screens/nonAuth/schedule_time';
 import AddTimeFrameForService from '../screens/nonAuth/schedule_time/AddTimeForService';
+import DeleteAccount from '../screens/nonAuth/deleteAccount';
 const Stack = createNativeStackNavigator();
 
 const ProviderStack = () => {
     return (
         <Stack.Navigator screenOptions={{headerShown:false}} headerMode={'none'}>
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
+            <Stack.Screen name="DeleteAccount" component={DeleteAccount} />
+
             <Stack.Screen name="CnfSch" component={CnfSch} />
             <Stack.Screen name="DeclineConfirmation" component={DeclineConfirmation} />
             <Stack.Screen name="OrderHistory1" component={OrderHistory1} />

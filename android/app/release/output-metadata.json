@@ -4,14 +4,14 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.lyfesuite",
+  "applicationId": "com.lifesuite",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 4,
+      "versionCode": 6,
       "versionName": "1",
       "outputFile": "app-release.apk"
     }
